@@ -1,5 +1,18 @@
 Wie diese Dashboards zu importieren sind, siehe [hier](../README.md).
 
+# Localization Workflow
+
+- src/de: single source of truth (hand-edited dashboards).
+- de: generated German export for end users.
+- en: generated English export for end users.
+- localization/de_to_en.json: translation mapping and glossary.
+
+Generate localized dashboard files with:
+
+`ash
+node scripts/generate-localized-dashboards.mjs
+`
+
 # Today
 
 Real-time Statistiken des aktuellen Tages für Desktops oder Tablets.
