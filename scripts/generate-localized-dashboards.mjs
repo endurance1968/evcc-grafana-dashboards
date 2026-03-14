@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
@@ -118,7 +118,7 @@ function translateJsonNode(node, mapping) {
 
 function main() {
     const { sourceLanguage, targetLanguages } = readLanguagesConfig();
-    const sourceDir = path.join(repoRoot, "dashboards", "src", sourceLanguage);
+    const sourceDir = path.join(repoRoot, "dashboards", "original", sourceLanguage);
 
     if (!fs.existsSync(sourceDir)) {
         throw new Error(`Source directory does not exist: ${sourceDir}`);
@@ -128,7 +128,7 @@ function main() {
     const mappingCache = new Map();
 
     for (const targetLanguage of targetLanguages) {
-        const outDir = path.join(repoRoot, "dashboards", targetLanguage);
+        const outDir = path.join(repoRoot, "dashboards", "translation", targetLanguage);
         ensureDir(outDir);
 
         const mapping =

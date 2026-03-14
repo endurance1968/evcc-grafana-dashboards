@@ -3,8 +3,8 @@ Wie diese Dashboards zu importieren sind, siehe [hier](../README.md).
 # Localization Workflow
 
 - `dashboards/localization/languages.json`: defines source + target languages
-- `dashboards/src/<sourceLanguage>`: source of truth (hand-edited dashboards)
-- `dashboards/<language>`: generated output per configured target language
+- `dashboards/original/<sourceLanguage>`: source of truth (hand-edited dashboards)
+- `dashboards/translation/<language>`: generated output per configured target language
 - `dashboards/localization/<source>_to_<target>.json`: translation mapping per language pair
 
 Generate localized dashboard files for all configured target languages:

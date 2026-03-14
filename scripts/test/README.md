@@ -40,7 +40,7 @@ Defaults:
 - `--variant=generated` (if omitted)
 - language source path:
   - `generated` -> `dashboards/<language>`
-  - `orig` -> `dashboards/src/<language>`
+  - `orig` -> `dashboards/original/<language>`
 - default tag: `<language>-gen` or `<language>-orig`
 - smoke check enabled unless `--smoke=false`
 
@@ -61,14 +61,14 @@ Examples:
 # Generated German dashboards
 node scripts/test/deploy-dashboards.mjs --env=.env.local --language=de --variant=generated --purge=true
 
-# Original source dashboards from dashboards/src/de
+# Original source dashboards from dashboards/original/de
 node scripts/test/deploy-dashboards.mjs --env=.env.local --language=de --variant=orig --purge=true
 
 # French generated dashboards
 node scripts/test/deploy-dashboards.mjs --env=.env.local --language=fr --purge=true
 ```
 
-## import-dashboards.mjs
+## import-dashboards-raw.mjs
 
 Purpose: Import JSON dashboards into Grafana using `/api/dashboards/import` (closest to manual UI import behavior).
 
@@ -90,7 +90,7 @@ Parameters:
 Example:
 
 ```bash
-node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/src/de --tag=de-orig
+node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/original/de --tag=de-orig
 ```
 
 ## smoke-check.mjs
@@ -143,7 +143,7 @@ Purpose: Run import + smoke (and optional screenshots) for all configured sets.
 Behavior:
 
 - reads `dashboards/localization/languages.json`
-- includes source set `dashboards/src/<sourceLanguage>` (tag `src-<lang>`)
+- includes source set `dashboards/original/<sourceLanguage>` (tag `original-<lang>`)
 - includes each generated target folder `dashboards/<lang>`
 
 Parameters:

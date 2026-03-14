@@ -1,4 +1,4 @@
-import fs from "node:fs";
+﻿import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
@@ -15,30 +15,22 @@ loadEnvFile(parseArg("env", ".env"));
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
 const language = parseArg("language", "de").trim().toLowerCase();
-const variantRaw = parseArg("variant", "generated").trim().toLowerCase();
+const variant = parseArg("variant", "generated").trim().toLowerCase();
 const sourceOverride = parseArg("source", "").trim();
 const purgeLanguage = parseArg("purge", "false") === "true";
 const withSmoke = parseArg("smoke", "true") !== "false";
 const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-l10n-test");
 const envArg = parseArg("env", ".env");
 
-function readSourceLanguage() {
-  const configPath = path.join(process.cwd(), "dashboards", "localization", "languages.json");
-  if (!fs.existsSync(configPath)) {
-    return "de";
-  }
-
-  try {
-    const parsed = JSON.parse(fs.readFileSync(configPath, "utf8"));
-    return String(parsed.sourceLanguage || "de").trim().toLowerCase();
-  } catch {
-    return "de";
-  }
+if (!["orig", "generated"].includes(variant)) {
+  throw new Error("Invalid --variant. Use orig|generated");
 }
 
-const variant = variantRaw;
-
-const source = sourceOverride || (variant === "orig" ? `dashboards/src/${language}` : `dashboards/${language}`);
+const source =
+  sourceOverride ||
+  (variant === "orig"
+    ? `dashboards/original/${language}`
+    : `dashboards/translation/${language}`);
 const defaultTag = `${language}-${variant === "orig" ? "orig" : "gen"}`;
 const tag = sanitizeTag(parseArg("tag", defaultTag));
 const manifest = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
@@ -148,7 +140,7 @@ async function main() {
     ]);
   }
 
-  console.log(`\nLanguage deploy finished for '${language}' (variant='${variant}', tag='${tag}', source='${source}').`);
+  console.log(`\nDashboard deploy finished for '${language}' (variant='${variant}', tag='${tag}', source='${source}').`);
 }
 
 main().catch((err) => {

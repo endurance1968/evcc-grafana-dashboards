@@ -229,7 +229,7 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
 
 function main() {
     const { sourceLanguage, targetLanguages } = readLanguagesConfig();
-    const sourceDir = path.join(repoRoot, "dashboards", "src", sourceLanguage);
+    const sourceDir = path.join(repoRoot, "dashboards", "original", sourceLanguage);
 
     if (!fs.existsSync(sourceDir)) {
         throw new Error(`Source directory does not exist: ${sourceDir}`);

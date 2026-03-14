@@ -18,7 +18,7 @@ loadEnvFile(parseArg("env", ".env"));
 function defaultSourceFromConfig() {
   const configPath = path.join(process.cwd(), "dashboards", "localization", "languages.json");
   if (!fs.existsSync(configPath)) {
-    return "dashboards/de";
+    return "dashboards/translation/de";
   }
 
   const parsed = JSON.parse(fs.readFileSync(configPath, "utf8"));
@@ -28,7 +28,7 @@ function defaultSourceFromConfig() {
     : [];
 
   const firstTarget = targetLanguages.find(Boolean) || sourceLanguage;
-  return `dashboards/${firstTarget}`;
+  return `dashboards/translation/${firstTarget}`;
 }
 
 const baseUrl = requireEnv("GRAFANA_URL");

@@ -1,13 +1,13 @@
-﻿# Maintainer Workflow for Localization (No AI Required)
+# Maintainer Workflow for Localization (No AI Required)
 
 This workflow is designed so dashboard translations can be created and maintained with only Git + Node.js.
 
 ## Scope
 
 - Language config: `dashboards/localization/languages.json`
-- Source of truth: `dashboards/src/<sourceLanguage>`
+- Source of truth: `dashboards/original/<sourceLanguage>`
 - Per-language mapping: `dashboards/localization/<source>_to_<target>.json`
-- Generated outputs: `dashboards/<language>` for each configured target language
+- Generated outputs: `dashboards/translation/<language>` for each configured target language
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ For each target language that differs from source, create or maintain:
 
 ## Update workflow
 
-1. Edit source dashboards in `dashboards/src/<sourceLanguage>`.
+1. Edit source dashboards in `dashboards/original/<sourceLanguage>`.
 2. Run generation for all configured targets:
    ```bash
    node scripts/generate-localized-dashboards.mjs

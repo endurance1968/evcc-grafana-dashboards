@@ -38,7 +38,7 @@ Review `dashboards/localization/missing-<source>_to_<target>.exact.json` and upd
 Example for a target language set (example: fr):
 
 ```bash
-node scripts/test/import-dashboards-raw.mjs --source=dashboards/fr --tag=fr
+node scripts/test/import-dashboards-raw.mjs --source=dashboards/translation/fr --tag=fr
 node scripts/test/smoke-check.mjs --manifest=tests/artifacts/import-manifest-fr.json
 ```
 
@@ -89,7 +89,7 @@ node scripts/test/deploy-dashboards.mjs --env=.env.local --language=fr --purge=t
 node scripts/test/deploy-dashboards.mjs --env=.env.local --language=nl --purge=true
 ```
 
-- `--language=<code>` selects source (`de` uses `dashboards/src/de`, other languages use `dashboards/<code>`)
+- `--language=<code>` selects source (`--variant=orig` uses `dashboards/original/<code>`, `--variant=generated` uses `dashboards/translation/<code>`)
 - dashboards are tagged as `<language>-orig` (for example `de-orig`, `fr-orig`)
 - `--purge=true` removes dashboards of that language tag first and then orphaned library panels in the test folder
 

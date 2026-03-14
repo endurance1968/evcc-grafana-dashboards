@@ -1,4 +1,4 @@
-import fs from "node:fs";
+﻿import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
@@ -30,14 +30,14 @@ function readLanguagesConfig() {
 
 const { sourceLanguage, targetLanguages } = readLanguagesConfig();
 const sets = [
-  { tag: `src-${sanitizeTag(sourceLanguage)}`, source: `dashboards/src/${sourceLanguage}` },
-  ...targetLanguages.map((lang) => ({ tag: sanitizeTag(lang), source: `dashboards/${lang}` })),
+  { tag: `original-${sanitizeTag(sourceLanguage)}`, source: `dashboards/original/${sourceLanguage}` },
+  ...targetLanguages.map((lang) => ({ tag: `${sanitizeTag(lang)}-gen`, source: `dashboards/translation/${lang}` })),
 ];
 
 function run(script, args = []) {
   const cmd = ["node", script, ...args];
   console.log(`\n$ ${cmd.join(" ")}`);
-  const res = spawnSync(cmd[0], cmd.slice(1), { stdio: "inherit", shell: true });
+  const res = spawnSync(cmd[0], cmd.slice(1), { stdio: "inherit" });
   if (res.status !== 0) process.exit(res.status || 1);
 }
 

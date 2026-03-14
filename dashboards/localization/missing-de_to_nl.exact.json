@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-03-14T08:16:20.070Z",
+  "generatedAt": "2026-03-14T18:19:25.788Z",
   "sourceLanguage": "de",
   "targetLanguage": "nl",
-  "sourceDir": "dashboards\\src\\de",
+  "sourceDir": "dashboards\\original\\de",
   "mappingFile": "dashboards\\localization\\de_to_nl.json",
   "notes": [
     "Fill each value with the final target-language translation.",

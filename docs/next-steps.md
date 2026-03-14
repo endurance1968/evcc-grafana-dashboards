@@ -22,10 +22,10 @@ Current rule: work locally + push to Forgejo only until milestone "Dashboards tr
 - `github/main` was also aligned once, but from now on no more GitHub pushes until milestone complete
 
 2. Localization structure
-- Source dashboards moved from `dashboards/dashboards` to `dashboards/src/de`
+- Source dashboards moved from `dashboards/dashboards` to `dashboards/original/de`
 - Generated output folders introduced:
-  - `dashboards/de`
-  - `dashboards/en`
+  - `dashboards/translation/de`
+  - `dashboards/translation/en`
 - Localization mapping file created:
   - `dashboards/localization/de_to_en.json`
 - Generator created:
