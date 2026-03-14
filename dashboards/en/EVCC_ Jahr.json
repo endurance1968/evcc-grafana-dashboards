@@ -654,7 +654,7 @@
       }
     },
     "feio30f3nm0owe": {
-      "name": "EVCC: Strombilanz",
+      "name": "EVCC: Power balance",
       "uid": "feio30f3nm0owe",
       "kind": 1,
       "model": {
@@ -3877,7 +3877,7 @@
       "id": 65,
       "libraryPanel": {
         "uid": "feio30f3nm0owe",
-        "name": "EVCC: Strombilanz"
+        "name": "EVCC: Power balance"
       }
     },
     {

@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-03-14T07:58:54.231Z",
+  "sourceLanguage": "de",
+  "targetLanguage": "en",
+  "sourceDir": "dashboards\\src\\de",
+  "mappingFile": "dashboards\\localization\\de_to_en.json",
+  "notes": [
+    "Fill each value with the final target-language translation.",
+    "Then merge into dashboards/localization/de_to_en.json under exact.",
+    "This is a candidate list; some entries can be intentionally unchanged."
+  ],
+  "exact": {
+    "$inverterPortalTitle": "",
+    "Europe/Berlin": "",
+    "EVCC": "",
+    "EVCC Aggregrations": "",
+    "EVCC InfluxDB": "",
+    "EVCC: $loadpoint1Name": "",
+    "EVCC: $loadpoint2Name": "",
+    "EVCC: Batterieverlauf": "",
+    "EVCC: Energie": "",
+    "EVCC: Energieverteilung über Zeit": "",
+    "EVCC: Kennzahlen Verlauf": "",
+    "EVCC: Kosten": "",
+    "Fahrtkosten $vehicle": "",
+    "Finanzen": "",
+    "Ladeleistung": "",
+    "Ladepunkt": "",
+    "Ladepunkt $loadpoint": "",
+    "Netz": "",
+    "Phasen": "",
+    "PV Gesamtinvestitionskosten": "",
+    "PV Today": "",
+    "Spritpreis/Liter": "",
+    "Tarife": "",
+    "URL to the EVCC UI": "",
+    "URL to your inverter's management UI": ""
+  }
+}

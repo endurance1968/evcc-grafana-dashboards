@@ -2,10 +2,8 @@
 import path from "node:path";
 
 const repoRoot = process.cwd();
-const sourceDir = path.join(repoRoot, "dashboards", "src", "de");
-const outDeDir = path.join(repoRoot, "dashboards", "de");
-const outEnDir = path.join(repoRoot, "dashboards", "en");
-const mappingFile = path.join(repoRoot, "dashboards", "localization", "de_to_en.json");
+const localizationDir = path.join(repoRoot, "dashboards", "localization");
+const configFile = path.join(localizationDir, "languages.json");
 
 const translatableKeys = new Set([
     "title",
@@ -18,10 +16,6 @@ const translatableKeys = new Set([
     "legendFormat",
     "emptyMessage",
 ]);
-
-function ensureDir(dirPath) {
-    fs.mkdirSync(dirPath, { recursive: true });
-}
 
 function collectJsonFiles(dirPath) {
     const entries = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -37,13 +31,48 @@ function collectJsonFiles(dirPath) {
     return files;
 }
 
-function readMapping() {
-    if (!fs.existsSync(mappingFile)) {
-        return { exact: {}, contains: [] };
+function ensureDir(dirPath) {
+    fs.mkdirSync(dirPath, { recursive: true });
+}
+
+function readJson(filePath) {
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+}
+
+function writeJson(filePath, jsonData) {
+    const content = `${JSON.stringify(jsonData, null, 2)}\n`;
+    fs.writeFileSync(filePath, content, "utf8");
+}
+
+function readLanguagesConfig() {
+    if (!fs.existsSync(configFile)) {
+        return { sourceLanguage: "de", targetLanguages: ["de", "en"] };
     }
 
-    const raw = fs.readFileSync(mappingFile, "utf8");
-    const parsed = JSON.parse(raw);
+    const parsed = readJson(configFile);
+    const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
+    const configuredTargets = Array.isArray(parsed.targetLanguages)
+        ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
+        : [];
+
+    const targetLanguages = [...new Set(configuredTargets.length ? configuredTargets : [sourceLanguage])];
+    if (!targetLanguages.includes(sourceLanguage)) {
+        targetLanguages.unshift(sourceLanguage);
+    }
+
+    return { sourceLanguage, targetLanguages };
+}
+
+function mappingPath(sourceLanguage, targetLanguage) {
+    return path.join(localizationDir, `${sourceLanguage}_to_${targetLanguage}.json`);
+}
+
+function readMapping(sourceLanguage, targetLanguage) {
+    const filePath = mappingPath(sourceLanguage, targetLanguage);
+    if (!fs.existsSync(filePath)) {
+        return { exact: {}, contains: [] };
+    }
+    const parsed = readJson(filePath);
     return {
         exact: parsed.exact ?? {},
         contains: Array.isArray(parsed.contains) ? parsed.contains : [],
@@ -87,42 +116,52 @@ function translateJsonNode(node, mapping) {
     return node;
 }
 
-function writeJson(filePath, jsonData) {
-    const content = `${JSON.stringify(jsonData, null, 2)}\n`;
-    fs.writeFileSync(filePath, content, "utf8");
-}
-
 function main() {
+    const { sourceLanguage, targetLanguages } = readLanguagesConfig();
+    const sourceDir = path.join(repoRoot, "dashboards", "src", sourceLanguage);
+
     if (!fs.existsSync(sourceDir)) {
         throw new Error(`Source directory does not exist: ${sourceDir}`);
     }
 
-    ensureDir(outDeDir);
-    ensureDir(outEnDir);
-
-    const mapping = readMapping();
     const files = collectJsonFiles(sourceDir);
+    const mappingCache = new Map();
 
-    let count = 0;
-    for (const sourceFile of files) {
-        const relative = path.relative(sourceDir, sourceFile);
-        const targetDe = path.join(outDeDir, relative);
-        const targetEn = path.join(outEnDir, relative);
+    for (const targetLanguage of targetLanguages) {
+        const outDir = path.join(repoRoot, "dashboards", targetLanguage);
+        ensureDir(outDir);
 
-        ensureDir(path.dirname(targetDe));
-        ensureDir(path.dirname(targetEn));
+        const mapping =
+            targetLanguage === sourceLanguage
+                ? { exact: {}, contains: [] }
+                : (mappingCache.get(targetLanguage) || readMapping(sourceLanguage, targetLanguage));
 
-        const deJson = JSON.parse(fs.readFileSync(sourceFile, "utf8"));
-        const enJson = translateJsonNode(deJson, mapping);
+        mappingCache.set(targetLanguage, mapping);
 
-        writeJson(targetDe, deJson);
-        writeJson(targetEn, enJson);
-        count += 1;
+        let count = 0;
+        for (const sourceFile of files) {
+            const relative = path.relative(sourceDir, sourceFile);
+            const targetFile = path.join(outDir, relative);
+            ensureDir(path.dirname(targetFile));
+
+            const sourceJson = readJson(sourceFile);
+            const localizedJson =
+                targetLanguage === sourceLanguage
+                    ? sourceJson
+                    : translateJsonNode(sourceJson, mapping);
+
+            writeJson(targetFile, localizedJson);
+            count += 1;
+        }
+
+        console.log(`Generated ${count} dashboard files for '${targetLanguage}'.`);
+        console.log(`Output: ${path.relative(repoRoot, outDir)}`);
+        if (targetLanguage !== sourceLanguage) {
+            console.log(
+                `Mapping: ${path.relative(repoRoot, mappingPath(sourceLanguage, targetLanguage))}`,
+            );
+        }
     }
-
-    console.log(`Generated ${count} dashboard files.`);
-    console.log(`DE output: ${path.relative(repoRoot, outDeDir)}`);
-    console.log(`EN output: ${path.relative(repoRoot, outEnDir)}`);
 }
 
 main();

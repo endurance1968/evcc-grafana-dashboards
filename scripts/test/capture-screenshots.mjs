@@ -14,7 +14,7 @@ loadEnvFile(parseArg("env", ".env"));
 const baseUrl = requireEnv("GRAFANA_URL").replace(/\/$/, "");
 const username = requireEnv("GRAFANA_USERNAME");
 const password = requireEnv("GRAFANA_PASSWORD");
-const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-en.json");
+const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-set.json");
 const outDir = parseArg("out", "tests/artifacts/screenshots");
 const waitMs = Number(optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500"));
 const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "now-24h");
@@ -79,3 +79,4 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+

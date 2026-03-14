@@ -11,63 +11,63 @@
     {
       "name": "VAR_TIMEZONE",
       "type": "constant",
-      "label": "Timezone",
+      "label": "Tijdzone",
       "value": "Europe/Berlin",
       "description": ""
     },
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filter for maximum power / W",
+      "label": "Filter voor maximaal vermogen / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "EVCC URL",
+      "label": "URL, EVCC",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Name, inverter portal",
+      "label": "Naam, omvormerportaal",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL, inverter portal",
+      "label": "URL, omvormerportaal",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for loadpoints",
+      "label": "Blokkeerlijst voor laadpunten",
       "value": "/^none$/",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for vehicles",
+      "label": "Blokkeerlijst voor voertuigen",
       "value": "/^Mr White.*$|^.*\\(offline\\)$/",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
-      "value": "30s",
+      "label": "Energiemonsterinterval",
+      "value": "60s",
       "description": ""
     }
   ],
   "__elements": {
     "rswX1qRRz": {
-      "name": "EVCC: PV consumption history",
+      "name": "EVCC: PV-verbruiksgeschiedenis",
       "uid": "rswX1qRRz",
       "kind": 1,
       "model": {
@@ -524,8 +524,511 @@
         "type": "timeseries"
       }
     },
+    "d9a5a952-0d17-428f-9102-19683b4e515f": {
+      "name": "EVCC: Energieverdeling over tijd",
+      "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_EVCC_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "fixedColor": "orange",
+              "mode": "fixed"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisGridShow": false,
+              "axisLabel": "",
+              "axisPlacement": "left",
+              "axisWidth": 50,
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 80,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": 300000,
+              "lineInterpolation": "smooth",
+              "lineWidth": 1,
+              "pointSize": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "never",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "percent"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "text",
+                  "value": 0
+                }
+              ]
+            },
+            "unit": "watt"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "PV"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "semi-dark-green",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Haus"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "purple",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Einspeisung"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Einspeisung"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Netzbezug"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "yellow",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Netzbezug"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Garage"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "light-orange",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Speicher laden"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Speicher laden"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Speicher entladen"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "watt"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "blue",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Speicher entladen"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Stellplatz"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "semi-dark-orange",
+                    "mode": "fixed"
+                  }
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byType",
+                "options": "time"
+              },
+              "properties": [
+                {
+                  "id": "custom.axisPlacement",
+                  "value": "hidden"
+                }
+              ]
+            }
+          ]
+        },
+        "maxDataPoints": 1400,
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.2.1",
+        "targets": [
+          {
+            "alias": "Netzleistung",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": true,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"value\") FROM \"gridPower\" WHERE $timeFilter GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "netzleistung",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "Batterieleistung",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": true,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"value\") *(-1) FROM \"batteryPower\" WHERE $timeFilter AND (\"id\"::tag = '') GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "batterieleistung",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "(abs($netzleistung) + $netzleistung) / 2",
+            "hide": false,
+            "refId": "Netzbezug",
+            "type": "math"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "(abs($batterieleistung) - $batterieleistung) / 2",
+            "hide": false,
+            "refId": "Speicher entladen",
+            "type": "math"
+          },
+          {
+            "alias": "PV",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"value\") FROM \"pvPower\" WHERE (\"value\"::field < $peakPowerLimit) AND $timeFilter AND (\"id\"::tag = '') GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "PV Leistung",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "-(abs($netzleistung) - $netzleistung) / 2",
+            "hide": false,
+            "refId": "Einspeisung",
+            "type": "math"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "- (abs($batterieleistung) + $batterieleistung) / 2",
+            "hide": false,
+            "refId": "Speicher laden",
+            "type": "math"
+          },
+          {
+            "alias": "$tag_loadpoint",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"value\") * (-1) FROM \"chargePower\" WHERE $timeFilter AND \"loadpoint\"::tag !~ $loadpointBlocklist GROUP BY time($energySampleInterval), \"loadpoint\"::tag fill(none) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "loadpoints",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "Haus",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": false,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT max(\"value\") * (-1) FROM \"homePower\" WHERE (\"value\"::field < $peakPowerLimit) AND $timeFilter GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "Hausverbrauch",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          }
+        ],
+        "transparent": true,
+        "type": "timeseries"
+      }
+    },
     "Blh9JqRRk": {
-      "name": "EVCC: Batterieverlauf",
+      "name": "EVCC: Batterijverloop",
       "uid": "Blh9JqRRk",
       "kind": 1,
       "model": {
@@ -533,7 +1036,7 @@
           "type": "influxdb",
           "uid": "${DS_EVCC_INFLUXDB}"
         },
-        "description": "Black: prioritization threshold for vehicle charging",
+        "description": "Zwart: prioriteringsdrempel voor het opladen van voertuigen",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -788,7 +1291,7 @@
             "tags": []
           }
         ],
-        "title": "Battery levels",
+        "title": "Oplaadniveaus van de accu",
         "transformations": [
           {
             "id": "configFromData",
@@ -816,8 +1319,518 @@
         "type": "timeseries"
       }
     },
+    "ae8zrcafrfl6ob": {
+      "name": "EVCC: dynamische elektriciteitsprijs",
+      "uid": "ae8zrcafrfl6ob",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_EVCC_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisGridShow": true,
+              "axisLabel": "",
+              "axisPlacement": "left",
+              "axisSoftMax": 42,
+              "axisSoftMin": 20,
+              "axisWidth": 50,
+              "barAlignment": 1,
+              "barWidthFactor": 0.8,
+              "drawStyle": "bars",
+              "fillOpacity": 80,
+              "gradientMode": "scheme",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "stepBefore",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byType",
+                "options": "time"
+              },
+              "properties": [
+                {
+                  "id": "custom.axisPlacement",
+                  "value": "hidden"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Netzbezug"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "watth"
+                },
+                {
+                  "id": "custom.drawStyle",
+                  "value": "bars"
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 80
+                },
+                {
+                  "id": "custom.axisPlacement",
+                  "value": "hidden"
+                },
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "#818181",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.axisSoftMin",
+                  "value": 0
+                },
+                {
+                  "id": "custom.gradientMode",
+                  "value": "opacity"
+                },
+                {
+                  "id": "custom.lineStyle"
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "placement": "bottom",
+            "showLegend": false
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "multi",
+            "sort": "none"
+          }
+        },
+        "pluginVersion": "12.2.1",
+        "targets": [
+          {
+            "alias": "Preis",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "query": "SELECT last(\"value\") * 100 FROM \"tariffGrid\" WHERE $timeFilter GROUP BY time(1h) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "Tarif",
+            "resultFormat": "time_series"
+          },
+          {
+            "alias": "Netzbezug",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "hide": false,
+            "query": "SELECT integral(\"subquery\") /3600 FROM (SELECT mean(\"value\") AS \"subquery\" FROM \"gridPower\" WHERE $timeFilter and value >=0 GROUP BY time($energySampleInterval) fill(0) tz('$timezone')) WHERE $timeFilter GROUP BY time(1h) fill(0) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "Netzbezug",
+            "resultFormat": "time_series"
+          }
+        ],
+        "title": "Elektriciteitsprijs (ct/kWh)",
+        "transparent": true,
+        "type": "timeseries"
+      }
+    },
+    "cei4rwyht3uv4f": {
+      "name": "EVCC: Kosten",
+      "uid": "cei4rwyht3uv4f",
+      "kind": 1,
+      "model": {
+        "datasource": {
+          "type": "influxdb",
+          "uid": "${DS_EVCC_INFLUXDB}"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "continuous-GrYlRd"
+            },
+            "decimals": 2,
+            "links": [
+              {
+                "title": "Meer informatie",
+                "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
+              }
+            ],
+            "mappings": [],
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "currencyEUR"
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "boughtTotal"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "red",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Einkauf"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "soldTotal"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "green",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "displayName",
+                  "value": "Verkauf"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "dailyTotal"
+              },
+              "properties": [
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                {
+                  "id": "color"
+                },
+                {
+                  "id": "displayName",
+                  "value": "Tagessumme"
+                }
+              ]
+            }
+          ]
+        },
+        "options": {
+          "colorMode": "value",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "orientation": "vertical",
+          "percentChangeColorMode": "standard",
+          "reduceOptions": {
+            "calcs": [
+              "lastNotNull"
+            ],
+            "fields": "",
+            "values": false
+          },
+          "showPercentChange": false,
+          "text": {
+            "titleSize": 12,
+            "valueSize": 20
+          },
+          "textMode": "auto",
+          "wideLayout": true
+        },
+        "pluginVersion": "11.6.0",
+        "targets": [
+          {
+            "alias": "",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": true,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT last(\"value\") FROM \"tariffGrid\" WHERE $timeFilter GROUP BY time(1h) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "tariffGrid",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "alias": "",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": true,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT integral(\"subquery\") /3600000 FROM (SELECT mean(\"value\") AS \"subquery\" FROM \"gridPower\" WHERE $timeFilter and value >=0 GROUP BY time($energySampleInterval) fill(0) tz('$timezone')) WHERE $timeFilter GROUP BY time(1h) fill(0) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "grid",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "hide": true,
+            "query": "SELECT last(\"value\") FROM \"tariffFeedIn\" WHERE $timeFilter GROUP BY time(1h) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "tariffFeedin",
+            "resultFormat": "time_series"
+          },
+          {
+            "alias": "",
+            "datasource": {
+              "type": "influxdb",
+              "uid": "L-nZgczgk"
+            },
+            "groupBy": [
+              {
+                "params": [
+                  "$__interval"
+                ],
+                "type": "time"
+              },
+              {
+                "params": [
+                  "null"
+                ],
+                "type": "fill"
+              }
+            ],
+            "hide": true,
+            "orderByTime": "ASC",
+            "policy": "default",
+            "query": "SELECT integral(\"subquery\") /3600000 FROM (SELECT mean(\"value\") AS \"subquery\" FROM \"gridPower\" WHERE $timeFilter and value <=0 GROUP BY time($energySampleInterval) fill(0) tz('$timezone')) WHERE $timeFilter GROUP BY time(1h) fill(0) tz('$timezone')",
+            "rawQuery": true,
+            "refId": "feedIn",
+            "resultFormat": "time_series",
+            "select": [
+              [
+                {
+                  "params": [
+                    "value"
+                  ],
+                  "type": "field"
+                },
+                {
+                  "params": [],
+                  "type": "mean"
+                }
+              ]
+            ],
+            "tags": []
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "$tariffGrid * $grid",
+            "hide": true,
+            "refId": "bought",
+            "type": "math"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "$tariffFeedin * $feedIn",
+            "hide": true,
+            "refId": "sold",
+            "type": "math"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "bought",
+            "hide": false,
+            "reducer": "sum",
+            "refId": "boughtTotal",
+            "settings": {
+              "mode": "dropNN"
+            },
+            "type": "reduce"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "sold",
+            "hide": false,
+            "reducer": "sum",
+            "refId": "soldTotal",
+            "settings": {
+              "mode": "dropNN"
+            },
+            "type": "reduce"
+          },
+          {
+            "datasource": {
+              "name": "Expression",
+              "type": "__expr__",
+              "uid": "__expr__"
+            },
+            "expression": "$boughtTotal + $soldTotal",
+            "hide": false,
+            "refId": "dailyTotal",
+            "type": "math"
+          }
+        ],
+        "transparent": true,
+        "type": "stat"
+      }
+    },
     "edgpezcp0j474c": {
-      "name": "EVCC: Live metric gauges",
+      "name": "EVCC: Live metrische meters",
       "uid": "edgpezcp0j474c",
       "kind": 1,
       "model": {
@@ -1161,13 +2174,13 @@
             "type": "math"
           }
         ],
-        "title": "Metrics",
+        "title": "Meting",
         "transparent": true,
         "type": "gauge"
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Kennzahlen Verlauf",
+      "name": "EVCC: Kengetallenverloop",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -2174,7 +3187,7 @@
             "tags": []
           }
         ],
-        "title": "Energy (kWh)",
+        "title": "Vermogen (kWh)",
         "transformations": [
           {
             "id": "reduce",
@@ -2205,857 +3218,13 @@
         "transparent": true,
         "type": "barchart"
       }
-    },
-    "d9a5a952-0d17-428f-9102-19683b4e515f": {
-      "name": "EVCC: Energieverteilung über Zeit",
-      "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "${DS_EVCC_INFLUXDB}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "fixedColor": "orange",
-              "mode": "fixed"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisGridShow": false,
-              "axisLabel": "",
-              "axisPlacement": "left",
-              "axisWidth": 50,
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 80,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": 300000,
-              "lineInterpolation": "smooth",
-              "lineWidth": 1,
-              "pointSize": 1,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "never",
-              "showValues": false,
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "percent"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "red",
-                  "value": null
-                },
-                {
-                  "color": "text",
-                  "value": 0
-                }
-              ]
-            },
-            "unit": "watt"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Haus"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Einspeisung"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Einspeisung"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Netzbezug"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Netzbezug"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Garage"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Speicher laden"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Speicher laden"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Speicher entladen"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "watt"
-                },
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Speicher entladen"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Stellplatz"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byType",
-                "options": "time"
-              },
-              "properties": [
-                {
-                  "id": "custom.axisPlacement",
-                  "value": "hidden"
-                }
-              ]
-            }
-          ]
-        },
-        "maxDataPoints": 1400,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": false
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.2.1",
-        "targets": [
-          {
-            "alias": "Netzleistung",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": true,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"value\") FROM \"gridPower\" WHERE $timeFilter GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "netzleistung",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "alias": "Batterieleistung",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": true,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"value\") *(-1) FROM \"batteryPower\" WHERE $timeFilter AND (\"id\"::tag = '') GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "batterieleistung",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "(abs($netzleistung) + $netzleistung) / 2",
-            "hide": false,
-            "refId": "Netzbezug",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "(abs($batterieleistung) - $batterieleistung) / 2",
-            "hide": false,
-            "refId": "Speicher entladen",
-            "type": "math"
-          },
-          {
-            "alias": "PV",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": false,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"value\") FROM \"pvPower\" WHERE (\"value\"::field < $peakPowerLimit) AND $timeFilter AND (\"id\"::tag = '') GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "PV Leistung",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "-(abs($netzleistung) - $netzleistung) / 2",
-            "hide": false,
-            "refId": "Einspeisung",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "- (abs($batterieleistung) + $batterieleistung) / 2",
-            "hide": false,
-            "refId": "Speicher laden",
-            "type": "math"
-          },
-          {
-            "alias": "$tag_loadpoint",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": false,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"value\") * (-1) FROM \"chargePower\" WHERE $timeFilter AND \"loadpoint\"::tag !~ $loadpointBlocklist GROUP BY time($energySampleInterval), \"loadpoint\"::tag fill(none) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "loadpoints",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "alias": "Haus",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": false,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT max(\"value\") * (-1) FROM \"homePower\" WHERE (\"value\"::field < $peakPowerLimit) AND $timeFilter GROUP BY time($energySampleInterval) fill(none) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "Hausverbrauch",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          }
-        ],
-        "transparent": true,
-        "type": "timeseries"
-      }
-    },
-    "cei4rwyht3uv4f": {
-      "name": "EVCC: Kosten",
-      "uid": "cei4rwyht3uv4f",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "influxdb",
-          "uid": "${DS_EVCC_INFLUXDB}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "continuous-GrYlRd"
-            },
-            "decimals": 2,
-            "links": [
-              {
-                "title": "More details",
-                "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
-              }
-            ],
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "unit": "currencyEUR"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "boughtTotal"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "red",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Einkauf"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "soldTotal"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "green",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Verkauf"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "dailyTotal"
-              },
-              "properties": [
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "value": 0
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "color"
-                },
-                {
-                  "id": "displayName",
-                  "value": "Tagessumme"
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "colorMode": "value",
-          "graphMode": "none",
-          "justifyMode": "auto",
-          "orientation": "vertical",
-          "percentChangeColorMode": "standard",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "showPercentChange": false,
-          "text": {
-            "titleSize": 12,
-            "valueSize": 20
-          },
-          "textMode": "auto",
-          "wideLayout": true
-        },
-        "pluginVersion": "11.6.0",
-        "targets": [
-          {
-            "alias": "",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": true,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT last(\"value\") FROM \"tariffGrid\" WHERE $timeFilter GROUP BY time(1h) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "tariffGrid",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "alias": "",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": true,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT integral(\"subquery\") /3600000 FROM (SELECT mean(\"value\") AS \"subquery\" FROM \"gridPower\" WHERE $timeFilter and value >=0 GROUP BY time($energySampleInterval) fill(0) tz('$timezone')) WHERE $timeFilter GROUP BY time(1h) fill(0) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "grid",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "hide": true,
-            "query": "SELECT last(\"value\") FROM \"tariffFeedIn\" WHERE $timeFilter GROUP BY time(1h) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "tariffFeedin",
-            "resultFormat": "time_series"
-          },
-          {
-            "alias": "",
-            "datasource": {
-              "type": "influxdb",
-              "uid": "L-nZgczgk"
-            },
-            "groupBy": [
-              {
-                "params": [
-                  "$__interval"
-                ],
-                "type": "time"
-              },
-              {
-                "params": [
-                  "null"
-                ],
-                "type": "fill"
-              }
-            ],
-            "hide": true,
-            "orderByTime": "ASC",
-            "policy": "default",
-            "query": "SELECT integral(\"subquery\") /3600000 FROM (SELECT mean(\"value\") AS \"subquery\" FROM \"gridPower\" WHERE $timeFilter and value <=0 GROUP BY time($energySampleInterval) fill(0) tz('$timezone')) WHERE $timeFilter GROUP BY time(1h) fill(0) tz('$timezone')",
-            "rawQuery": true,
-            "refId": "feedIn",
-            "resultFormat": "time_series",
-            "select": [
-              [
-                {
-                  "params": [
-                    "value"
-                  ],
-                  "type": "field"
-                },
-                {
-                  "params": [],
-                  "type": "mean"
-                }
-              ]
-            ],
-            "tags": []
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "$tariffGrid * $grid",
-            "hide": true,
-            "refId": "bought",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "$tariffFeedin * $feedIn",
-            "hide": true,
-            "refId": "sold",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "bought",
-            "hide": false,
-            "reducer": "sum",
-            "refId": "boughtTotal",
-            "settings": {
-              "mode": "dropNN"
-            },
-            "type": "reduce"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "sold",
-            "hide": false,
-            "reducer": "sum",
-            "refId": "soldTotal",
-            "settings": {
-              "mode": "dropNN"
-            },
-            "type": "reduce"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "$boughtTotal + $soldTotal",
-            "hide": false,
-            "refId": "dailyTotal",
-            "type": "math"
-          }
-        ],
-        "transparent": true,
-        "type": "stat"
-      }
     }
   },
   "__requires": [
     {
       "type": "panel",
-      "id": "gauge",
-      "name": "Gauge",
+      "id": "bargauge",
+      "name": "Bar gauge",
       "version": ""
     },
     {
@@ -3069,6 +3238,12 @@
       "id": "influxdb",
       "name": "InfluxDB",
       "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
     }
   ],
   "annotations": {
@@ -3105,10 +3280,10 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Vandaag",
       "tooltip": "",
       "type": "link",
-      "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
+      "url": "/d/MRHnynkRz/pv-today-mobile?orgId=1&refresh=10s&from=now%2Fd&to=now%2Fd"
     },
     {
       "asDropdown": false,
@@ -3117,10 +3292,10 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Gisteren",
       "tooltip": "",
       "type": "link",
-      "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
+      "url": "/d/MRHnynkRz/pv-today-mobile?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
     },
     {
       "asDropdown": false,
@@ -3129,10 +3304,10 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Day before yesterday",
+      "title": "eergisteren",
       "tooltip": "",
       "type": "link",
-      "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
+      "url": "/d/MRHnynkRz/pv-today-mobile?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
     },
     {
       "asDropdown": true,
@@ -3143,7 +3318,7 @@
         "PV"
       ],
       "targetBlank": false,
-      "title": "Dashboards",
+      "title": "•••",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -3154,27 +3329,28 @@
       "includeVars": false,
       "keepTime": false,
       "tags": [],
-      "targetBlank": true,
+      "targetBlank": false,
       "title": "EVCC",
-      "tooltip": "",
+      "tooltip": "Go to EVCC",
       "type": "link",
       "url": "$evccUrl"
-    },
-    {
-      "asDropdown": false,
-      "icon": "cloud",
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "targetBlank": true,
-      "title": "$inverterPortalTitle",
-      "tooltip": "",
-      "type": "link",
-      "url": "$inverterPortalUrl"
     }
   ],
   "liveNow": true,
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 39,
+      "panels": [],
+      "title": "Stroom",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "influxdb",
@@ -3185,9 +3361,6 @@
         "defaults": {
           "color": {
             "mode": "thresholds"
-          },
-          "custom": {
-            "neutral": 0
           },
           "decimals": 2,
           "links": [],
@@ -3224,8 +3397,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "targetBlank": true,
-                    "title": "More details",
+                    "title": "Dagindeling en meer details...",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3243,10 +3415,6 @@
                 "value": {
                   "mode": "absolute",
                   "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
                     {
                       "color": "transparent",
                       "value": 0
@@ -3280,7 +3448,7 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "yellow",
+                      "color": "light-yellow",
                       "value": 0
                     },
                     {
@@ -3298,7 +3466,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Dagindeling en meer details...",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3333,7 +3501,7 @@
                       "value": 0
                     },
                     {
-                      "color": "dark-blue",
+                      "color": "blue",
                       "value": 0.001
                     }
                   ]
@@ -3375,7 +3543,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Meer informatie",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3459,52 +3627,25 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Heizlüfter"
+              "options": ""
             },
-            "properties": [
-              {
-                "id": "min",
-                "value": -3
-              },
-              {
-                "id": "max",
-                "value": 3
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "dark-purple",
-                      "value": 0
-                    },
-                    {
-                      "color": "transparent",
-                      "value": 0
-                    },
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0.001
-                    }
-                  ]
-                }
-              }
-            ]
+            "properties": []
           }
         ]
       },
       "gridPos": {
-        "h": 24,
-        "w": 3,
+        "h": 6,
+        "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
-      "id": 72,
+      "id": 73,
       "options": {
-        "minVizHeight": 200,
-        "minVizWidth": 138,
-        "orientation": "horizontal",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -3512,13 +3653,13 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto",
+        "showPercentChange": false,
         "text": {
-          "titleSize": 12,
-          "valueSize": 16
-        }
+          "titleSize": 10,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
       },
       "pluginVersion": "12.3.1",
       "targets": [
@@ -3610,18 +3751,6 @@
           "resultFormat": "time_series"
         },
         {
-          "alias": "Heizlüfter",
-          "datasource": {
-            "type": "influxdb",
-            "uid": "${DS_EVCC_INFLUXDB}"
-          },
-          "hide": true,
-          "query": "SELECT \"value\" *(-1)/1000 FROM \"extPower\" WHERE $timeFilter tz('$timezone')",
-          "rawQuery": true,
-          "refId": "Ext",
-          "resultFormat": "time_series"
-        },
-        {
           "alias": "Speicher",
           "datasource": {
             "type": "influxdb",
@@ -3684,99 +3813,364 @@
           "tags": []
         }
       ],
-      "title": "Power",
       "transparent": true,
-      "type": "gauge"
+      "type": "stat"
     },
     {
-      "gridPos": {
-        "h": 21,
-        "w": 16,
-        "x": 3,
-        "y": 0
+      "datasource": {
+        "type": "influxdb",
+        "uid": "${DS_EVCC_INFLUXDB}"
       },
-      "id": 2,
-      "libraryPanel": {
-        "uid": "rswX1qRRz",
-        "name": "EVCC: PV consumption history"
-      }
-    },
-    {
-      "gridPos": {
-        "h": 7,
-        "w": 5,
-        "x": 19,
-        "y": 0
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "links": [],
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 20
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 70
+              },
+              {
+                "color": "dark-orange",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Speicher"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ioniq 5"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tesla"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
-      "id": 66,
-      "libraryPanel": {
-        "uid": "Blh9JqRRk",
-        "name": "EVCC: Batterieverlauf"
-      }
-    },
-    {
       "gridPos": {
         "h": 4,
-        "w": 5,
-        "x": 19,
+        "w": 24,
+        "x": 0,
         "y": 7
       },
-      "id": 64,
-      "libraryPanel": {
-        "uid": "edgpezcp0j474c",
-        "name": "EVCC: Live metric gauges"
-      }
+      "id": 71,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {
+          "titleSize": 12
+        },
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.1",
+      "targets": [
+        {
+          "alias": "Speicher",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_EVCC_INFLUXDB}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "10s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "batterySoc",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT last(\"value\") FROM \"batterySoc\" WHERE $timeFilter GROUP BY time(10s) fill(previous) tz('$timezone')",
+          "rawQuery": true,
+          "refId": "socHome",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "$tag_vehicle",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_EVCC_INFLUXDB}"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "10s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "vehicleSoc",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT max(\"value\") FROM \"vehicleSoc\" WHERE $timeFilter AND (\"vehicle\"::tag <> '')  AND \"vehicle\"::tag !~ $vehicleBlocklist GROUP BY time(5m), \"vehicle\"::tag fill(none) tz('$timezone')",
+          "rawQuery": true,
+          "refId": "vehicles",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "vehicle::tag",
+              "operator": "=~",
+              "value": "/^$vehicle1Name$/"
+            }
+          ]
+        }
+      ],
+      "title": "Oplaadniveaus van de accu",
+      "transparent": true,
+      "type": "bargauge"
     },
     {
+      "collapsed": false,
       "gridPos": {
-        "h": 2,
-        "w": 5,
-        "x": 19,
+        "h": 1,
+        "w": 24,
+        "x": 0,
         "y": 11
       },
-      "id": 51,
-      "libraryPanel": {
-        "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Kennzahlen Verlauf"
-      }
+      "id": 37,
+      "panels": [],
+      "title": "Historie",
+      "type": "row"
     },
     {
       "gridPos": {
-        "h": 9,
-        "w": 5,
-        "x": 19,
-        "y": 13
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 12
       },
-      "id": 40,
+      "id": 43,
       "libraryPanel": {
-        "uid": "d-V6JqRgz",
-        "name": "EVCC: Energie"
+        "uid": "rswX1qRRz",
+        "name": "EVCC: PV-verbruiksgeschiedenis"
       }
     },
     {
       "gridPos": {
         "h": 3,
-        "w": 16,
-        "x": 3,
-        "y": 21
+        "w": 24,
+        "x": 0,
+        "y": 26
       },
-      "id": 45,
+      "id": 53,
       "libraryPanel": {
         "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
-        "name": "EVCC: Energieverteilung über Zeit"
+        "name": "EVCC: Energieverdeling over tijd"
+      }
+    },
+    {
+      "gridPos": {
+        "h": 6,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "id": 67,
+      "libraryPanel": {
+        "uid": "Blh9JqRRk",
+        "name": "EVCC: Batterijverloop"
+      }
+    },
+    {
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 72,
+      "libraryPanel": {
+        "uid": "ae8zrcafrfl6ob",
+        "name": "EVCC: dynamische elektriciteitsprijs"
+      }
+    },
+    {
+      "gridPos": {
+        "h": 3,
+        "w": 24,
+        "x": 0,
+        "y": 40
+      },
+      "id": 74,
+      "libraryPanel": {
+        "uid": "cei4rwyht3uv4f",
+        "name": "EVCC: Kosten"
+      }
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 35,
+      "panels": [],
+      "title": "Samenvatting",
+      "type": "row"
+    },
+    {
+      "gridPos": {
+        "h": 5,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "id": 65,
+      "libraryPanel": {
+        "uid": "edgpezcp0j474c",
+        "name": "EVCC: Live metrische meters"
       }
     },
     {
       "gridPos": {
         "h": 2,
-        "w": 5,
-        "x": 19,
-        "y": 22
+        "w": 24,
+        "x": 0,
+        "y": 49
       },
-      "id": 73,
+      "id": 57,
       "libraryPanel": {
-        "uid": "cei4rwyht3uv4f",
-        "name": "EVCC: Kosten"
+        "uid": "a46718d5-2383-4dba-b828-5941581b208e",
+        "name": "EVCC: Kengetallenverloop"
+      }
+    },
+    {
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 51
+      },
+      "id": 18,
+      "libraryPanel": {
+        "uid": "d-V6JqRgz",
+        "name": "EVCC: Energie"
       }
     }
   ],
@@ -3789,9 +4183,9 @@
   "templating": {
     "list": [
       {
-        "description": "Timezone: TZ identifier as listed here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
+        "description": "Tijdzone: TZ-identificatiecode zoals hier vermeld: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
         "hide": 2,
-        "label": "Timezone",
+        "label": "Tijdzone",
         "name": "timezone",
         "query": "${VAR_TIMEZONE}",
         "skipUrlSync": true,
@@ -3810,9 +4204,9 @@
         ]
       },
       {
-        "description": "Maximum power limit in W. Values above this threshold are treated as outliers.",
+        "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
         "hide": 2,
-        "label": "Filter for maximum power / W",
+        "label": "Filter voor maximaal vermogen / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -3831,9 +4225,9 @@
         ]
       },
       {
-        "description": "URL where EVCC opens.",
+        "description": "URL naar de EVCC-interface",
         "hide": 2,
-        "label": "EVCC URL",
+        "label": "URL, EVCC",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -3852,9 +4246,9 @@
         ]
       },
       {
-        "description": "Name of the inverter portal used for the portal link.",
+        "description": "Naam van het omvormerportaal dat wordt gebruikt voor de portaallink.",
         "hide": 2,
-        "label": "Name, inverter portal",
+        "label": "Naam, omvormerportaal",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -3873,9 +4267,9 @@
         ]
       },
       {
-        "description": "URL where the inverter portal opens.",
+        "description": "URL naar de beheerinterface van uw omvormer",
         "hide": 2,
-        "label": "URL, inverter portal",
+        "label": "URL, omvormerportaal",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -3894,9 +4288,9 @@
         ]
       },
       {
-        "description": "List of loadpoints that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter everything starting with 'foo': /^foo.*$/",
+        "description": "Lijst met laadpunten die NIET mogen worden weergegeven. Expressie moet een reguliere expressie zijn die begint en eindigt met /. Het mag niet leeg zijn. Als er niets moet worden gefilterd, gebruik dan een expressie die met geen van de vermeldingen overeenkomt.\n\nVoorbeelden:\nGeen vermeldingen: /^none$/\nFilter uit 'Garage': /^Garage$/\nFilter uit 'Garage' en 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter alles dat begint met 'foo': /^foo.*$/",
         "hide": 2,
-        "label": "Blocklist for loadpoints",
+        "label": "Blokkeerlijst voor laadpunten",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -3915,9 +4309,9 @@
         ]
       },
       {
-        "description": "List of vehicles that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter vehicles ending with (offline): /^.*\\(offline\\)$/",
+        "description": "Lijst van voertuigen die NIET getoond mogen worden. Expressie moet een reguliere expressie zijn die begint en eindigt met /. Het mag niet leeg zijn. Als er niets moet worden gefilterd, gebruik dan een expressie die met geen van de vermeldingen overeenkomt.\n\nVoorbeelden:\nGeen vermeldingen: /^none$/\nFilter uit 'Garage': /^Garage$/\nFilter uit 'Garage' en 'Stellplatz': /^Garage$|^Stellplatz$/\nVoertuigen filteren die eindigen op (offline): /^.*\\(offline\\)$/",
         "hide": 2,
-        "label": "Blocklist for vehicles",
+        "label": "Blokkeerlijst voor voertuigen",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -3936,9 +4330,9 @@
         ]
       },
       {
-        "description": "Sampling interval for energy calculation. Should be at least 2x the EVCC query interval. Default: 60s, because EVCC default interval is 60s.",
+        "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Energiemonsterinterval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -3962,10 +4356,16 @@
     "from": "now/d",
     "to": "now/d"
   },
-  "timepicker": {},
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "1m",
+      "1h"
+    ]
+  },
   "timezone": "",
-  "title": "EVCC: Today",
-  "uid": "7Ou-Y1Rgk",
-  "version": 219,
+  "title": "EVCC: vandaag (mobiel)",
+  "uid": "MRHnynkRz",
+  "version": 151,
   "weekStart": ""
 }

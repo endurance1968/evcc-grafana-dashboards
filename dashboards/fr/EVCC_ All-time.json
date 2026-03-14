@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_EVCC_AGGREGRATIONS",
-      "label": "EVCC Aggregrations",
+      "label": "EVCC Agr?gations",
       "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
@@ -26,28 +26,28 @@
     {
       "name": "VAR_SPEICHERKAPAZITAET",
       "type": "constant",
-      "label": "Home battery capacity / Wh",
+      "label": "Capacité de la batterie domestique/ Wh",
       "value": "9500",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for vehicles",
+      "label": "Liste de blocage pour les véhicules",
       "value": "/^Mr White.*$|^.*\\(offline\\)$/",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for loadpoints",
+      "label": "Liste de blocage pour les points de charge",
       "value": "/^none$/",
       "description": ""
     }
   ],
   "__elements": {
     "f5f62a1c-c847-493c-89f7-06bd383a2025": {
-      "name": "EVCC: Cumulative energy over time",
+      "name": "EVCC : Energie cumulée dans le temps",
       "uid": "f5f62a1c-c847-493c-89f7-06bd383a2025",
       "kind": 1,
       "model": {
@@ -366,13 +366,13 @@
             "resultFormat": "time_series"
           }
         ],
-        "title": "Energy",
+        "title": "Énergie",
         "transparent": true,
         "type": "barchart"
       }
     },
     "c872420b-86a9-4544-9e33-f367a07f9e40": {
-      "name": "EVCC: Metric gauges",
+      "name": "EVCC : Jauges métriques",
       "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
       "kind": 1,
       "model": {
@@ -656,13 +656,13 @@
             "type": "math"
           }
         ],
-        "title": "Metrics",
+        "title": "Métriques",
         "transparent": true,
         "type": "gauge"
       }
     },
     "b8787739-953e-4188-9507-0cc12b6ed91b": {
-      "name": "EVCC: Battery efficiency",
+      "name": "Efficacité de la batterie",
       "uid": "b8787739-953e-4188-9507-0cc12b6ed91b",
       "kind": 1,
       "model": {
@@ -880,7 +880,7 @@
       }
     },
     "feio30f3nm0owe": {
-      "name": "EVCC: Power balance",
+      "name": "Power Balance",
       "uid": "feio30f3nm0owe",
       "kind": 1,
       "model": {
@@ -1252,7 +1252,7 @@
             "type": "math"
           }
         ],
-        "title": "Power balance",
+        "title": "Power Balance",
         "transparent": true,
         "type": "stat"
       }
@@ -1336,7 +1336,7 @@
         "PV"
       ],
       "targetBlank": false,
-      "title": "Dashboards",
+      "title": "Tableaux de bord",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -1353,7 +1353,7 @@
       },
       "id": 10,
       "panels": [],
-      "title": "Energy",
+      "title": "Énergie",
       "type": "row"
     },
     {
@@ -1366,7 +1366,7 @@
       "id": 12,
       "libraryPanel": {
         "uid": "f5f62a1c-c847-493c-89f7-06bd383a2025",
-        "name": "EVCC: Cumulative energy over time"
+        "name": "EVCC : Energie cumulée dans le temps"
       }
     },
     {
@@ -1492,7 +1492,7 @@
           "tags": []
         }
       ],
-      "title": "Yearly yield",
+      "title": "Rendement annuel",
       "transformations": [
         {
           "id": "reduce",
@@ -1782,7 +1782,7 @@
           "tags": []
         }
       ],
-      "title": "Monthly yield/year",
+      "title": "Rendement Mensuel",
       "transformations": [
         {
           "id": "sortBy",
@@ -1840,7 +1840,7 @@
       "id": 13,
       "libraryPanel": {
         "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
-        "name": "EVCC: Metric gauges"
+        "name": "EVCC : Jauges métriques"
       }
     },
     {
@@ -1966,7 +1966,7 @@
           "tags": []
         }
       ],
-      "title": "Yearly home consumption",
+      "title": "Consommation annuelle à domicile",
       "transformations": [
         {
           "id": "reduce",
@@ -2257,7 +2257,7 @@
           "tags": []
         }
       ],
-      "title": "Monthly home consumption/year",
+      "title": "Consommation domestique mensuelle/an",
       "transformations": [
         {
           "id": "sortBy",
@@ -2428,7 +2428,7 @@
           "tags": []
         }
       ],
-      "title": "Yearly grid import",
+      "title": "Importation annuelle de la grille",
       "transformations": [
         {
           "id": "reduce",
@@ -2719,7 +2719,7 @@
           "tags": []
         }
       ],
-      "title": "Monthly grid import/year",
+      "title": "Importation de grille mensuelle/an",
       "transformations": [
         {
           "id": "sortBy",
@@ -2777,7 +2777,7 @@
       "id": 32,
       "libraryPanel": {
         "uid": "b8787739-953e-4188-9507-0cc12b6ed91b",
-        "name": "EVCC: Battery efficiency"
+        "name": "Efficacité de la batterie"
       }
     },
     {
@@ -2903,7 +2903,7 @@
           "tags": []
         }
       ],
-      "title": "Yearly feed-in",
+      "title": "Alimentation annuelle",
       "transformations": [
         {
           "id": "reduce",
@@ -3194,7 +3194,7 @@
           "tags": []
         }
       ],
-      "title": "Monthly feed-in/year",
+      "title": "Alimentation mensuelle/an",
       "transformations": [
         {
           "id": "sortBy",
@@ -3295,7 +3295,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "PV Today",
+                    "title": "PV Aujourd'hui",
                     "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&time=${__value.time}&time.window=86400000"
                   }
                 ]
@@ -3347,7 +3347,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV energy"
+            "displayName": "Énergie photovoltaïque"
           }
         ]
       },
@@ -3409,7 +3409,7 @@
           ]
         }
       ],
-      "title": "Days with highest yield",
+      "title": "Jours avec le rendement le plus élevé",
       "transparent": true,
       "type": "table"
     },
@@ -3466,7 +3466,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "PV Today",
+                    "title": "PV Aujourd'hui",
                     "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&time=${__value.time}&time.window=86400000"
                   }
                 ]
@@ -3518,7 +3518,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Feed-in"
+            "displayName": "Alimentation"
           }
         ]
       },
@@ -3580,7 +3580,7 @@
           ]
         }
       ],
-      "title": "Highest feed-in",
+      "title": "Entrée la plus élevée",
       "transparent": true,
       "type": "table"
     },
@@ -3635,7 +3635,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "PV Today",
+                    "title": "PV Aujourd'hui",
                     "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&time=${__value.time}&time.window=86400000"
                   }
                 ]
@@ -3687,7 +3687,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Home consumption"
+            "displayName": "Consommation indigène totale"
           }
         ]
       },
@@ -3749,7 +3749,7 @@
           ]
         }
       ],
-      "title": "Highest home consumption",
+      "title": "Consommation domestique la plus élevée",
       "transparent": true,
       "type": "table"
     },
@@ -3763,7 +3763,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Finanzen",
+      "title": "Finances",
       "type": "row"
     },
     {
@@ -3973,7 +3973,7 @@
           "type": "math"
         }
       ],
-      "title": "Monthly costs",
+      "title": "Coût mensuel",
       "type": "timeseries"
     },
     {
@@ -3986,7 +3986,7 @@
       "id": 33,
       "libraryPanel": {
         "uid": "feio30f3nm0owe",
-        "name": "EVCC: Power balance"
+        "name": "Power Balance"
       }
     },
     {
@@ -3994,7 +3994,7 @@
         "type": "influxdb",
         "uid": "${DS_EVCC_AGGREGRATIONS}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Pour moins de 365 jours de données, les valeurs sont extrapolées à une année complète avec une inexactitude correspondante en fonction de la période capturée.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4539,7 +4539,7 @@
           "type": "math"
         }
       ],
-      "title": "PV system amortization",
+      "title": "Amortissement du système PV",
       "transparent": true,
       "type": "stat"
     },
@@ -4548,7 +4548,7 @@
         "type": "influxdb",
         "uid": "${DS_EVCC_AGGREGRATIONS}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Pour moins de 365 jours de données, les valeurs sont extrapolées à une année complète avec une inexactitude correspondante en fonction de la période capturée.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -5041,7 +5041,7 @@
           "type": "math"
         }
       ],
-      "title": "Battery amortization",
+      "title": "Amortissement de la batterie",
       "transparent": true,
       "type": "stat"
     },
@@ -5050,7 +5050,7 @@
         "type": "datasource",
         "uid": "-- Mixed --"
       },
-      "description": "Values are rough estimates based on averages.\n\nAssumption: the vehicle is charged mainly at home. External charging is not included.",
+      "description": "Les valeurs sont des estimations approximatives basées sur des moyennes.\n\nHypothèse : le véhicule est chargé principalement à domicile. La charge externe n'est pas incluse.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -5587,7 +5587,7 @@
           "type": "math"
         }
       ],
-      "title": "Fahrtkosten $vehicle",
+      "title": "Co?ts de d?placement $vehicle",
       "type": "stat"
     },
     {
@@ -5600,7 +5600,7 @@
       },
       "id": 35,
       "panels": [],
-      "title": "System health",
+      "title": "Santé du système",
       "type": "row"
     },
     {
@@ -5608,7 +5608,7 @@
         "type": "influxdb",
         "uid": "${DS_EVCC_AGGREGRATIONS}"
       },
-      "description": "Uses the average yield of the best 30 days per year. Can help detect potential degradation, but must be interpreted holistically. Single years are not conclusive.",
+      "description": "Utilise le rendement moyen des 30 meilleurs jours par an. Peut aider à détecter une dégradation potentielle, mais doit être interprété de manière holistique. Les années individuelles ne sont pas concluantes.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -5731,7 +5731,7 @@
           "tags": []
         }
       ],
-      "title": "Average top 30 days/year",
+      "title": "Moyenne top 30 jours/an",
       "transformations": [
         {
           "id": "reduce",
@@ -5764,7 +5764,7 @@
         "type": "influxdb",
         "uid": "${DS_EVCC_AGGREGRATIONS}"
       },
-      "description": "Uses the average yield of the best 5 days per month. Can help detect potential degradation, but must be interpreted holistically. Single months are not conclusive.",
+      "description": "Utilise le rendement moyen des 5 meilleurs jours par mois. Peut aider à détecter une dégradation potentielle, mais doit être interprété de manière holistique. Les mois uniques ne sont pas concluants.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -6000,7 +6000,7 @@
           "tags": []
         }
       ],
-      "title": "Average top 5 days/month",
+      "title": "Moyenne des 5 premiers jours/mois",
       "transformations": [
         {
           "id": "sortBy",
@@ -6062,9 +6062,9 @@
           "text": "24884",
           "value": "24884"
         },
-        "description": "Purchase price of the PV system",
+        "description": "Prix d'achat du système PV",
         "includeAll": false,
-        "label": "PV Gesamtinvestitionskosten",
+        "label": "Co?t d'investissement total PV",
         "name": "purchasePricePv",
         "options": [
           {
@@ -6082,7 +6082,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "Battery investment cost",
+        "label": "Coût d'investissement de la batterie",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -6099,9 +6099,9 @@
           "text": "100",
           "value": "100"
         },
-        "description": "Yearly costs: insurance + other",
+        "description": "Coûts annuels : assurance + autres",
         "includeAll": false,
-        "label": "Ongoing costs",
+        "label": "Coûts d'entretien",
         "name": "runningCosts",
         "options": [
           {
@@ -6119,7 +6119,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "ICE consumption l/100km",
+        "label": "Consommation de GLACE l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -6137,7 +6137,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "Spritpreis/Liter",
+        "label": "Prix du carburant/litre",
         "name": "spritKosten",
         "options": [
           {
@@ -6154,7 +6154,7 @@
           "text": "Europe/Berlin",
           "value": "Europe/Berlin"
         },
-        "description": "Timezone: TZ identifier as listed here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
+        "description": "Fuseau horaire : identifiant TZ comme indiqué ici : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
         "hide": 2,
         "name": "timezone",
         "options": [
@@ -6168,9 +6168,9 @@
         "type": "custom"
       },
       {
-        "description": "Home battery capacity in Wh",
+        "description": "Capacité de la batterie domestique en Wh",
         "hide": 2,
-        "label": "Home battery capacity / Wh",
+        "label": "Capacité de la batterie domestique/ Wh",
         "name": "speicherkapazitaet",
         "query": "${VAR_SPEICHERKAPAZITAET}",
         "skipUrlSync": true,
@@ -6198,7 +6198,7 @@
         "definition": "show tag values from vehicleMonthlyEnergy with key = \"vehicle\" where \"vehicle\" !~ $vehicleBlocklist",
         "hide": 2,
         "includeAll": true,
-        "label": "Vehicle",
+        "label": "Véhicule",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -6211,9 +6211,9 @@
         "type": "query"
       },
       {
-        "description": "List of vehicles that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter vehicles ending with (offline): /^.*\\(offline\\)$/",
+        "description": "Liste des véhicules qui NE DOIVENT PAS être affichés. L'expression doit être une expression régulière commençant et se terminant par /. Il ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune des entrées.\n\nExemples :\nAucune saisie : /^none$ /\nFiltrer 'Garage' : /^Garage$ /\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$ /\nFiltrer les véhicules se terminant par (hors ligne) : /^.*\\(hors ligne\\)$ /",
         "hide": 2,
-        "label": "Blocklist for vehicles",
+        "label": "Liste de blocage pour les véhicules",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -6232,9 +6232,9 @@
         ]
       },
       {
-        "description": "List of loadpoints that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter everything starting with 'foo': /^foo.*$/",
+        "description": "Liste des points de charge qui NE DOIVENT PAS être affichés. L'expression doit être une expression régulière commençant et se terminant par /. Il ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune des entrées.\n\nExemples :\nAucune saisie : /^none$ /\nFiltrer 'Garage' : /^Garage$ /\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$ /\nFiltrer tout en commençant par 'foo' : /^foo.*$ /",
         "hide": 2,
-        "label": "Blocklist for loadpoints",
+        "label": "Liste de blocage pour les points de charge",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -6260,7 +6260,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "EVCC: All-time",
+  "title": "EVCC : Tous les temps",
   "uid": "LY-opIigz",
   "version": 261,
   "weekStart": "",

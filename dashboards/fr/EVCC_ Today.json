@@ -11,63 +11,63 @@
     {
       "name": "VAR_TIMEZONE",
       "type": "constant",
-      "label": "Timezone",
+      "label": "Fuseau horaire",
       "value": "Europe/Berlin",
       "description": ""
     },
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filter for maximum power / W",
+      "label": "Filtre pour une puissance maximale/ W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "EVCC URL",
+      "label": "URL EVCC",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Name, inverter portal",
+      "label": "Nom, portail de l'onduleur",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL, inverter portal",
+      "label": "URL, portail de l'onduleur",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for loadpoints",
+      "label": "Liste de blocage pour les points de charge",
       "value": "/^none$/",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for vehicles",
+      "label": "Liste de blocage pour les véhicules",
       "value": "/^Mr White.*$|^.*\\(offline\\)$/",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "Intervalle d'échantillon d'énergie",
       "value": "30s",
       "description": ""
     }
   ],
   "__elements": {
     "rswX1qRRz": {
-      "name": "EVCC: PV consumption history",
+      "name": "EVCC : historique de consommation PV",
       "uid": "rswX1qRRz",
       "kind": 1,
       "model": {
@@ -525,7 +525,7 @@
       }
     },
     "Blh9JqRRk": {
-      "name": "EVCC: Batterieverlauf",
+      "name": "EVCC: Historique de batterie",
       "uid": "Blh9JqRRk",
       "kind": 1,
       "model": {
@@ -533,7 +533,7 @@
           "type": "influxdb",
           "uid": "${DS_EVCC_INFLUXDB}"
         },
-        "description": "Black: prioritization threshold for vehicle charging",
+        "description": "Noir : seuil de priorisation pour la charge du véhicule",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -788,7 +788,7 @@
             "tags": []
           }
         ],
-        "title": "Battery levels",
+        "title": "Niveaux de la batterie",
         "transformations": [
           {
             "id": "configFromData",
@@ -817,7 +817,7 @@
       }
     },
     "edgpezcp0j474c": {
-      "name": "EVCC: Live metric gauges",
+      "name": "EVCC : Jauges métriques actives",
       "uid": "edgpezcp0j474c",
       "kind": 1,
       "model": {
@@ -1161,13 +1161,13 @@
             "type": "math"
           }
         ],
-        "title": "Metrics",
+        "title": "Métriques",
         "transparent": true,
         "type": "gauge"
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Kennzahlen Verlauf",
+      "name": "EVCC: Historique des indicateurs",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -1558,7 +1558,7 @@
       }
     },
     "d-V6JqRgz": {
-      "name": "EVCC: Energie",
+      "name": "EVCC: ?nergie",
       "uid": "d-V6JqRgz",
       "kind": 1,
       "model": {
@@ -2174,7 +2174,7 @@
             "tags": []
           }
         ],
-        "title": "Energy (kWh)",
+        "title": "Énergie (kWh)",
         "transformations": [
           {
             "id": "reduce",
@@ -2207,7 +2207,7 @@
       }
     },
     "d9a5a952-0d17-428f-9102-19683b4e515f": {
-      "name": "EVCC: Energieverteilung über Zeit",
+      "name": "EVCC: Répartition de l'énergie dans le temps",
       "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
       "kind": 1,
       "model": {
@@ -2710,7 +2710,7 @@
       }
     },
     "cei4rwyht3uv4f": {
-      "name": "EVCC: Kosten",
+      "name": "EVCC: Co?ts",
       "uid": "cei4rwyht3uv4f",
       "kind": 1,
       "model": {
@@ -2727,7 +2727,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "Plus de détails",
                 "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
               }
             ],
@@ -3105,7 +3105,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Aujourd’hui",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -3117,7 +3117,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Hier",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -3129,7 +3129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Day before yesterday",
+      "title": "Avant-hier",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
@@ -3143,7 +3143,7 @@
         "PV"
       ],
       "targetBlank": false,
-      "title": "Dashboards",
+      "title": "Tableaux de bord",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -3225,7 +3225,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3298,7 +3298,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3375,7 +3375,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3684,7 +3684,7 @@
           "tags": []
         }
       ],
-      "title": "Power",
+      "title": "Puissance",
       "transparent": true,
       "type": "gauge"
     },
@@ -3698,7 +3698,7 @@
       "id": 2,
       "libraryPanel": {
         "uid": "rswX1qRRz",
-        "name": "EVCC: PV consumption history"
+        "name": "EVCC : historique de consommation PV"
       }
     },
     {
@@ -3711,7 +3711,7 @@
       "id": 66,
       "libraryPanel": {
         "uid": "Blh9JqRRk",
-        "name": "EVCC: Batterieverlauf"
+        "name": "EVCC: Historique de batterie"
       }
     },
     {
@@ -3724,7 +3724,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "edgpezcp0j474c",
-        "name": "EVCC: Live metric gauges"
+        "name": "EVCC : Jauges métriques actives"
       }
     },
     {
@@ -3737,7 +3737,7 @@
       "id": 51,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Kennzahlen Verlauf"
+        "name": "EVCC: Historique des indicateurs"
       }
     },
     {
@@ -3750,7 +3750,7 @@
       "id": 40,
       "libraryPanel": {
         "uid": "d-V6JqRgz",
-        "name": "EVCC: Energie"
+        "name": "EVCC: ?nergie"
       }
     },
     {
@@ -3763,7 +3763,7 @@
       "id": 45,
       "libraryPanel": {
         "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
-        "name": "EVCC: Energieverteilung über Zeit"
+        "name": "EVCC: Répartition de l'énergie dans le temps"
       }
     },
     {
@@ -3776,7 +3776,7 @@
       "id": 73,
       "libraryPanel": {
         "uid": "cei4rwyht3uv4f",
-        "name": "EVCC: Kosten"
+        "name": "EVCC: Co?ts"
       }
     }
   ],
@@ -3789,9 +3789,9 @@
   "templating": {
     "list": [
       {
-        "description": "Timezone: TZ identifier as listed here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
+        "description": "Fuseau horaire : identifiant TZ comme indiqué ici : https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
         "hide": 2,
-        "label": "Timezone",
+        "label": "Fuseau horaire",
         "name": "timezone",
         "query": "${VAR_TIMEZONE}",
         "skipUrlSync": true,
@@ -3810,9 +3810,9 @@
         ]
       },
       {
-        "description": "Maximum power limit in W. Values above this threshold are treated as outliers.",
+        "description": "Limite de puissance maximale en W. Les valeurs supérieures à ce seuil sont traitées comme des valeurs aberrantes.",
         "hide": 2,
-        "label": "Filter for maximum power / W",
+        "label": "Filtre pour une puissance maximale/ W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -3831,9 +3831,9 @@
         ]
       },
       {
-        "description": "URL where EVCC opens.",
+        "description": "URL où EVCC s'ouvre.",
         "hide": 2,
-        "label": "EVCC URL",
+        "label": "URL EVCC",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -3852,9 +3852,9 @@
         ]
       },
       {
-        "description": "Name of the inverter portal used for the portal link.",
+        "description": "Nom du portail de l'onduleur utilisé pour le lien du portail.",
         "hide": 2,
-        "label": "Name, inverter portal",
+        "label": "Nom, portail de l'onduleur",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -3873,9 +3873,9 @@
         ]
       },
       {
-        "description": "URL where the inverter portal opens.",
+        "description": "URL où le portail de l'onduleur s'ouvre.",
         "hide": 2,
-        "label": "URL, inverter portal",
+        "label": "URL, portail de l'onduleur",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -3894,9 +3894,9 @@
         ]
       },
       {
-        "description": "List of loadpoints that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter everything starting with 'foo': /^foo.*$/",
+        "description": "Liste des points de charge qui NE DOIVENT PAS être affichés. L'expression doit être une expression régulière commençant et se terminant par /. Il ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune des entrées.\n\nExemples :\nAucune saisie : /^none$ /\nFiltrer 'Garage' : /^Garage$ /\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$ /\nFiltrer tout en commençant par 'foo' : /^foo.*$ /",
         "hide": 2,
-        "label": "Blocklist for loadpoints",
+        "label": "Liste de blocage pour les points de charge",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -3915,9 +3915,9 @@
         ]
       },
       {
-        "description": "List of vehicles that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter vehicles ending with (offline): /^.*\\(offline\\)$/",
+        "description": "Liste des véhicules qui NE DOIVENT PAS être affichés. L'expression doit être une expression régulière commençant et se terminant par /. Il ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune des entrées.\n\nExemples :\nAucune saisie : /^none$ /\nFiltrer 'Garage' : /^Garage$ /\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$ /\nFiltrer les véhicules se terminant par (hors ligne) : /^.*\\(hors ligne\\)$ /",
         "hide": 2,
-        "label": "Blocklist for vehicles",
+        "label": "Liste de blocage pour les véhicules",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -3936,9 +3936,9 @@
         ]
       },
       {
-        "description": "Sampling interval for energy calculation. Should be at least 2x the EVCC query interval. Default: 60s, because EVCC default interval is 60s.",
+        "description": "Intervalle d'échantillonnage pour le calcul de l'énergie. Doit être au moins 2 fois l'intervalle de requête EVCC. Par défaut : 60 s, car l'intervalle par défaut de l'EVCC est de 60 s.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Intervalle d'échantillon d'énergie",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -3964,7 +3964,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "EVCC: Today",
+  "title": "EVCC : Aujourd'hui",
   "uid": "7Ou-Y1Rgk",
   "version": 219,
   "weekStart": ""

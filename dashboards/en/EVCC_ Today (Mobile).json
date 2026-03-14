@@ -67,7 +67,7 @@
   ],
   "__elements": {
     "rswX1qRRz": {
-      "name": "EVCC: PV Verbrauchsverlauf",
+      "name": "EVCC: PV consumption history",
       "uid": "rswX1qRRz",
       "kind": 1,
       "model": {
@@ -4066,7 +4066,7 @@
       "id": 43,
       "libraryPanel": {
         "uid": "rswX1qRRz",
-        "name": "EVCC: PV Verbrauchsverlauf"
+        "name": "EVCC: PV consumption history"
       }
     },
     {

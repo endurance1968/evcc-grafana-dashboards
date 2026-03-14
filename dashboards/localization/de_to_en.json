@@ -126,7 +126,9 @@
     "Ströme/Phase": "Currents/phase",
     "EVCC: Kennzahlen Gauges": "EVCC: Metric gauges",
     "EVCC: Kennzahlen Gauges Live": "EVCC: Live metric gauges",
-    "EVCC: Speicher Effizenz": "EVCC: Battery efficiency"
+    "EVCC: Speicher Effizenz": "EVCC: Battery efficiency",
+    "EVCC: PV Verbrauchsverlauf": "EVCC: PV consumption history",
+    "EVCC: Strombilanz": "EVCC: Power balance"
   },
   "contains": []
 }

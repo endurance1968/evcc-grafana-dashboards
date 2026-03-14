@@ -11,63 +11,63 @@
     {
       "name": "VAR_TIMEZONE",
       "type": "constant",
-      "label": "Timezone",
+      "label": "Tijdzone",
       "value": "Europe/Berlin",
       "description": ""
     },
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filter for maximum power / W",
+      "label": "Filter voor maximaal vermogen / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "EVCC URL",
+      "label": "EVCC-URL",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Name, inverter portal",
+      "label": "Naam, omvormerportaal",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL, inverter portal",
+      "label": "URL, omvormerportaal",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for loadpoints",
+      "label": "Blokkeerlijst voor laadpunten",
       "value": "/^none$/",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist for vehicles",
+      "label": "Blokkeerlijst voor voertuigen",
       "value": "/^Mr White.*$|^.*\\(offline\\)$/",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "Energiemonsterinterval",
       "value": "30s",
       "description": ""
     }
   ],
   "__elements": {
     "rswX1qRRz": {
-      "name": "EVCC: PV consumption history",
+      "name": "EVCC: PV-verbruiksgeschiedenis",
       "uid": "rswX1qRRz",
       "kind": 1,
       "model": {
@@ -525,7 +525,7 @@
       }
     },
     "Blh9JqRRk": {
-      "name": "EVCC: Batterieverlauf",
+      "name": "EVCC: Batterijverloop",
       "uid": "Blh9JqRRk",
       "kind": 1,
       "model": {
@@ -533,7 +533,7 @@
           "type": "influxdb",
           "uid": "${DS_EVCC_INFLUXDB}"
         },
-        "description": "Black: prioritization threshold for vehicle charging",
+        "description": "Zwart: prioriteringsdrempel voor het opladen van voertuigen",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -788,7 +788,7 @@
             "tags": []
           }
         ],
-        "title": "Battery levels",
+        "title": "Oplaadniveaus van de accu",
         "transformations": [
           {
             "id": "configFromData",
@@ -817,7 +817,7 @@
       }
     },
     "edgpezcp0j474c": {
-      "name": "EVCC: Live metric gauges",
+      "name": "EVCC: Live metrische meters",
       "uid": "edgpezcp0j474c",
       "kind": 1,
       "model": {
@@ -1161,13 +1161,13 @@
             "type": "math"
           }
         ],
-        "title": "Metrics",
+        "title": "Meting",
         "transparent": true,
         "type": "gauge"
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Kennzahlen Verlauf",
+      "name": "EVCC: Kengetallenverloop",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -2174,7 +2174,7 @@
             "tags": []
           }
         ],
-        "title": "Energy (kWh)",
+        "title": "Vermogen (kWh)",
         "transformations": [
           {
             "id": "reduce",
@@ -2207,7 +2207,7 @@
       }
     },
     "d9a5a952-0d17-428f-9102-19683b4e515f": {
-      "name": "EVCC: Energieverteilung über Zeit",
+      "name": "EVCC: Energieverdeling over tijd",
       "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
       "kind": 1,
       "model": {
@@ -2727,7 +2727,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "Meer informatie",
                 "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
               }
             ],
@@ -3105,7 +3105,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Vandaag",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -3117,7 +3117,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Gisteren",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -3129,7 +3129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Day before yesterday",
+      "title": "eergisteren",
       "tooltip": "",
       "type": "link",
       "url": "/d/7Ou-Y1Rgk/pv-today-tablet?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
@@ -3225,7 +3225,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "Meer informatie",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3298,7 +3298,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Meer informatie",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3375,7 +3375,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Meer informatie",
                     "url": "/d/fed98n901h0xsb/evcc3a-today-details?$__url_time_range"
                   }
                 ]
@@ -3684,7 +3684,7 @@
           "tags": []
         }
       ],
-      "title": "Power",
+      "title": "Vermogen",
       "transparent": true,
       "type": "gauge"
     },
@@ -3698,7 +3698,7 @@
       "id": 2,
       "libraryPanel": {
         "uid": "rswX1qRRz",
-        "name": "EVCC: PV consumption history"
+        "name": "EVCC: PV-verbruiksgeschiedenis"
       }
     },
     {
@@ -3711,7 +3711,7 @@
       "id": 66,
       "libraryPanel": {
         "uid": "Blh9JqRRk",
-        "name": "EVCC: Batterieverlauf"
+        "name": "EVCC: Batterijverloop"
       }
     },
     {
@@ -3724,7 +3724,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "edgpezcp0j474c",
-        "name": "EVCC: Live metric gauges"
+        "name": "EVCC: Live metrische meters"
       }
     },
     {
@@ -3737,7 +3737,7 @@
       "id": 51,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Kennzahlen Verlauf"
+        "name": "EVCC: Kengetallenverloop"
       }
     },
     {
@@ -3763,7 +3763,7 @@
       "id": 45,
       "libraryPanel": {
         "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
-        "name": "EVCC: Energieverteilung über Zeit"
+        "name": "EVCC: Energieverdeling over tijd"
       }
     },
     {
@@ -3789,9 +3789,9 @@
   "templating": {
     "list": [
       {
-        "description": "Timezone: TZ identifier as listed here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
+        "description": "Tijdzone: TZ-identificatiecode zoals hier vermeld: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
         "hide": 2,
-        "label": "Timezone",
+        "label": "Tijdzone",
         "name": "timezone",
         "query": "${VAR_TIMEZONE}",
         "skipUrlSync": true,
@@ -3810,9 +3810,9 @@
         ]
       },
       {
-        "description": "Maximum power limit in W. Values above this threshold are treated as outliers.",
+        "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
         "hide": 2,
-        "label": "Filter for maximum power / W",
+        "label": "Filter voor maximaal vermogen / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -3831,9 +3831,9 @@
         ]
       },
       {
-        "description": "URL where EVCC opens.",
+        "description": "URL waar EVCC opent.",
         "hide": 2,
-        "label": "EVCC URL",
+        "label": "EVCC-URL",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -3852,9 +3852,9 @@
         ]
       },
       {
-        "description": "Name of the inverter portal used for the portal link.",
+        "description": "Naam van het omvormerportaal dat wordt gebruikt voor de portaallink.",
         "hide": 2,
-        "label": "Name, inverter portal",
+        "label": "Naam, omvormerportaal",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -3873,9 +3873,9 @@
         ]
       },
       {
-        "description": "URL where the inverter portal opens.",
+        "description": "URL waar het omvormerportaal wordt geopend.",
         "hide": 2,
-        "label": "URL, inverter portal",
+        "label": "URL, omvormerportaal",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -3894,9 +3894,9 @@
         ]
       },
       {
-        "description": "List of loadpoints that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter everything starting with 'foo': /^foo.*$/",
+        "description": "Lijst met laadpunten die NIET mogen worden weergegeven. Expressie moet een reguliere expressie zijn die begint en eindigt met /. Het mag niet leeg zijn. Als er niets moet worden gefilterd, gebruik dan een expressie die met geen van de vermeldingen overeenkomt.\n\nVoorbeelden:\nGeen vermeldingen: /^none$/\nFilter uit 'Garage': /^Garage$/\nFilter uit 'Garage' en 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter alles dat begint met 'foo': /^foo.*$/",
         "hide": 2,
-        "label": "Blocklist for loadpoints",
+        "label": "Blokkeerlijst voor laadpunten",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -3915,9 +3915,9 @@
         ]
       },
       {
-        "description": "List of vehicles that should NOT be shown. Expression must be a regular expression starting and ending with /. It must not be empty. If nothing should be filtered, use an expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Stellplatz': /^Garage$|^Stellplatz$/\nFilter vehicles ending with (offline): /^.*\\(offline\\)$/",
+        "description": "Lijst van voertuigen die NIET getoond mogen worden. Expressie moet een reguliere expressie zijn die begint en eindigt met /. Het mag niet leeg zijn. Als er niets moet worden gefilterd, gebruik dan een expressie die met geen van de vermeldingen overeenkomt.\n\nVoorbeelden:\nGeen vermeldingen: /^none$/\nFilter uit 'Garage': /^Garage$/\nFilter uit 'Garage' en 'Stellplatz': /^Garage$|^Stellplatz$/\nVoertuigen filteren die eindigen op (offline): /^.*\\(offline\\)$/",
         "hide": 2,
-        "label": "Blocklist for vehicles",
+        "label": "Blokkeerlijst voor voertuigen",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -3936,9 +3936,9 @@
         ]
       },
       {
-        "description": "Sampling interval for energy calculation. Should be at least 2x the EVCC query interval. Default: 60s, because EVCC default interval is 60s.",
+        "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Energiemonsterinterval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -3964,7 +3964,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "EVCC: Today",
+  "title": "EVCC: vandaag",
   "uid": "7Ou-Y1Rgk",
   "version": 219,
   "weekStart": ""

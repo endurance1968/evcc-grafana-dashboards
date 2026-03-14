@@ -1,0 +1,9 @@
+{
+    "sourceLanguage":  "de",
+    "targetLanguages":  [
+                            "de",
+                            "en",
+                            "fr",
+                            "nl"
+                        ]
+}

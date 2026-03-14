@@ -1,4 +1,4 @@
-﻿# Grafana Localization Test Workflow
+# Grafana Localization Test Workflow
 
 This setup validates localized dashboards against a real Grafana test instance.
 
@@ -26,19 +26,26 @@ Copy `.env.example` to `.env` and fill values:
 node scripts/generate-localized-dashboards.mjs
 ```
 
-## 3) Import one set and smoke-check
-
-Example for English set:
+## 2b) Audit translation coverage (recommended)
 
 ```bash
-node scripts/test/import-dashboards.mjs --source=dashboards/en --tag=en
-node scripts/test/smoke-check.mjs --manifest=tests/artifacts/import-manifest-en.json
+node scripts/audit-localization.mjs
+```
+
+Review `dashboards/localization/missing-<source>_to_<target>.exact.json` and update the matching `dashboards/localization/<source>_to_<target>.json` file before importing dashboards.
+## 3) Import one set and smoke-check
+
+Example for a target language set (example: fr):
+
+```bash
+node scripts/test/import-dashboards.mjs --source=dashboards/fr --tag=fr
+node scripts/test/smoke-check.mjs --manifest=tests/artifacts/import-manifest-fr.json
 ```
 
 ## 4) Capture screenshots (optional)
 
 ```bash
-node scripts/test/capture-screenshots.mjs --manifest=tests/artifacts/import-manifest-en.json
+node scripts/test/capture-screenshots.mjs --manifest=tests/artifacts/import-manifest-fr.json
 ```
 
 Outputs go to:
@@ -46,7 +53,7 @@ Outputs go to:
 - `tests/artifacts/screenshots/<tag>/desktop/*.png`
 - `tests/artifacts/screenshots/<tag>/mobile/*.png`
 
-## 5) Full suite for src/de, de, en
+## 5) Full suite for source + all configured target languages
 
 Without screenshots:
 
@@ -62,6 +69,34 @@ node scripts/test/run-suite.mjs --screenshots=true
 
 ## Notes
 
-- The importer rewrites dashboard UID per set tag (e.g. `en-...`) to prevent collisions.
+- The importer rewrites dashboard UID per set tag (e.g. `fr-...`) to prevent collisions.
 - `refId` and other technical references are intentionally not translated.
 - This is a smoke/layout test harness. Data-quality validation still depends on the underlying real dataset.
+
+## 6) Scripted language deployment
+
+Deploy a language set with automatic import + smoke-check:
+
+```bash
+node scripts/test/deploy-dashboards.mjs --env=.env.local --language=de --purge=true
+```
+
+Examples:
+
+```bash
+node scripts/test/deploy-dashboards.mjs --env=.env.local --language=en --purge=true
+node scripts/test/deploy-dashboards.mjs --env=.env.local --language=fr --purge=true
+node scripts/test/deploy-dashboards.mjs --env=.env.local --language=nl --purge=true
+```
+
+- `--language=<code>` selects source (`de` uses `dashboards/src/de`, other languages use `dashboards/<code>`)
+- dashboards are tagged as `<language>-orig` (for example `de-orig`, `fr-orig`)
+- `--purge=true` removes dashboards of that language tag first and then orphaned library panels in the test folder
+
+## 7) Full Grafana cleanup (test folder)
+
+Delete all dashboards and library panels in the configured test folder (datasources stay untouched):
+
+```bash
+node scripts/test/cleanup-grafana.mjs --env=.env.local
+```
