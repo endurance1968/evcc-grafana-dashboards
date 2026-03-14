@@ -1,4 +1,4 @@
-﻿# Next Steps (Localization Milestone)
+# Next Steps (Localization Milestone)
 
 ## Repo policy (important)
 
@@ -45,7 +45,7 @@ Current rule: work locally + push to Forgejo only until milestone "Dashboards tr
 4. Grafana test automation scaffold
 - Test scripts added:
   - `scripts/test/_lib.mjs`
-  - `scripts/test/import-dashboards.mjs`
+  - `scripts/test/import-dashboards-raw.mjs`
   - `scripts/test/smoke-check.mjs`
   - `scripts/test/capture-screenshots.mjs`
   - `scripts/test/run-suite.mjs`

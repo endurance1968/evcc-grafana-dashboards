@@ -38,7 +38,7 @@ Review `dashboards/localization/missing-<source>_to_<target>.exact.json` and upd
 Example for a target language set (example: fr):
 
 ```bash
-node scripts/test/import-dashboards.mjs --source=dashboards/fr --tag=fr
+node scripts/test/import-dashboards-raw.mjs --source=dashboards/fr --tag=fr
 node scripts/test/smoke-check.mjs --manifest=tests/artifacts/import-manifest-fr.json
 ```
 

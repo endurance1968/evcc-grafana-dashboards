@@ -1,4 +1,4 @@
-﻿# Test Scripts (Grafana)
+# Test Scripts (Grafana)
 
 This folder contains script-based deployment, validation, and cleanup workflows for Grafana dashboard testing.
 
@@ -10,7 +10,6 @@ This folder contains script-based deployment, validation, and cleanup workflows 
 - `capture-screenshots.mjs`: Screenshot capture for imported dashboards (desktop + mobile)
 - `run-suite.mjs`: Bulk import/smoke/screenshot workflow across configured language sets
 - `cleanup-grafana.mjs`: Full cleanup in test folder (dashboards + library panels), datasources remain untouched
-- `deploy-language.mjs`: Deprecated wrapper for backward compatibility (calls `deploy-dashboards.mjs`)
 - `_lib.mjs`: shared helpers (env loading, arg parsing, Grafana API, JSON I/O)
 
 ## Required environment
@@ -91,7 +90,7 @@ Parameters:
 Example:
 
 ```bash
-node scripts/test/import-dashboards.mjs --env=.env.local --source=dashboards/src/de --tag=de-orig
+node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/src/de --tag=de-orig
 ```
 
 ## smoke-check.mjs

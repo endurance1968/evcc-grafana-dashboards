@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
@@ -43,7 +43,7 @@ function run(script, args = []) {
 
 for (const set of sets) {
   const manifest = `tests/artifacts/import-manifest-${set.tag}.json`;
-  run("scripts/test/import-dashboards.mjs", [`--source=${set.source}`, `--tag=${set.tag}`, `--manifest=${manifest}`]);
+  run("scripts/test/import-dashboards-raw.mjs", [`--source=${set.source}`, `--tag=${set.tag}`, `--manifest=${manifest}`]);
   run("scripts/test/smoke-check.mjs", [`--manifest=${manifest}`]);
   if (withScreenshots) {
     run("scripts/test/capture-screenshots.mjs", [`--manifest=${manifest}`]);

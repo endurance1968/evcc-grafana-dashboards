@@ -134,7 +134,7 @@ async function main() {
     await purgeForLanguage();
   }
 
-  run("scripts/test/import-dashboards.mjs", [
+  run("scripts/test/import-dashboards-raw.mjs", [
     `--env=${envArg}`,
     `--source=${source}`,
     `--tag=${tag}`,
