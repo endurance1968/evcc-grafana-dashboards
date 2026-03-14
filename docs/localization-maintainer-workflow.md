@@ -35,11 +35,11 @@ For each target language that differs from source, create or maintain:
 1. Edit source dashboards in `dashboards/original/<sourceLanguage>`.
 2. Run generation for all configured targets:
    ```bash
-   node scripts/generate-localized-dashboards.mjs
+   node scripts/localization/generate-localized-dashboards.mjs
    ```
 3. Run localization audit for all targets:
    ```bash
-   node scripts/audit-localization.mjs
+   node scripts/localization/audit-localization.mjs
    ```
 4. Review generated suggestion files:
    - `dashboards/localization/missing-<source>_to_<target>.exact.json`

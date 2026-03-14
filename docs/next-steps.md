@@ -29,7 +29,7 @@ Current rule: work locally + push to Forgejo only until milestone "Dashboards tr
 - Localization mapping file created:
   - `dashboards/localization/de_to_en.json`
 - Generator created:
-  - `scripts/generate-localized-dashboards.mjs`
+  - `scripts/localization/generate-localized-dashboards.mjs`
 - `dashboards/README.md` updated with localization workflow section
 
 3. Translation quality improvements
@@ -58,7 +58,7 @@ Current rule: work locally + push to Forgejo only until milestone "Dashboards tr
 ## Next session start plan
 
 1. Generate dashboards fresh:
-- `node scripts/generate-localized-dashboards.mjs`
+- `node scripts/localization/generate-localized-dashboards.mjs`
 
 2. Run on Grafana test instance (after `.env` setup):
 - `node scripts/test/run-suite.mjs --screenshots=true`

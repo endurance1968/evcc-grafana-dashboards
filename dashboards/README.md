@@ -10,19 +10,19 @@ Wie diese Dashboards zu importieren sind, siehe [hier](../README.md).
 Generate localized dashboard files for all configured target languages:
 
 ```bash
-node scripts/generate-localized-dashboards.mjs
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 Audit missing source-to-target mappings for all configured targets:
 
 ```bash
-node scripts/audit-localization.mjs
+node scripts/localization/audit-localization.mjs
 ```
 
 Audit one specific target language:
 
 ```bash
-node scripts/audit-localization.mjs --target=en
+node scripts/localization/audit-localization.mjs --target=en
 ```
 
 The audit writes `dashboards/localization/missing-<source>_to_<target>.exact.json` with candidate keys that still need translations.

@@ -23,13 +23,13 @@ Copy `.env.example` to `.env` and fill values:
 ## 2) Generate localized output
 
 ```bash
-node scripts/generate-localized-dashboards.mjs
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 ## 2b) Audit translation coverage (recommended)
 
 ```bash
-node scripts/audit-localization.mjs
+node scripts/localization/audit-localization.mjs
 ```
 
 Review `dashboards/localization/missing-<source>_to_<target>.exact.json` and update the matching `dashboards/localization/<source>_to_<target>.json` file before importing dashboards.
