@@ -1,4 +1,4 @@
-﻿import path from "node:path";
+import path from "node:path";
 import fs from "node:fs";
 import { chromium } from "playwright";
 import {
@@ -38,7 +38,8 @@ async function login(page) {
 }
 
 async function captureDashboard(page, dashboard, tag) {
-  const url = `${baseUrl}${dashboard.url}?kiosk&from=${encodeURIComponent(timeFrom)}&to=${encodeURIComponent(timeTo)}`;
+  const dashboardPath = dashboard.url || `/d/${encodeURIComponent(dashboard.uid)}`;
+  const url = `${baseUrl}${dashboardPath}?kiosk&from=${encodeURIComponent(timeFrom)}&to=${encodeURIComponent(timeTo)}`;
   for (const vp of viewports) {
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto(url, { waitUntil: "domcontentloaded" });
