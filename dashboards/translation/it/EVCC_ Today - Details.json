@@ -3471,7 +3471,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Acquisto"
               }
             ]
           },
@@ -3490,7 +3490,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Vendita"
               }
             ]
           },
@@ -3521,7 +3521,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Tagessumme"
+                "value": "Totale giornaliero"
               }
             ]
           }
@@ -3840,7 +3840,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Acquisto"
               }
             ]
           },
@@ -3859,7 +3859,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Vendita"
               }
             ]
           }

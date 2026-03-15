@@ -425,7 +425,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "自给率"
                 }
               ]
             },
@@ -453,7 +453,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "自耗率"
                 }
               ]
             }
@@ -702,7 +702,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "电价：算术平均值"
                 },
                 {
                   "id": "color",
@@ -725,7 +725,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "实际电价（动态）"
                 },
                 {
                   "id": "color",
@@ -748,7 +748,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "通过动态电价节省的电费"
                 },
                 {
                   "id": "unit",
@@ -764,7 +764,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "通过动态电价节省"
                 }
               ]
             },
@@ -776,7 +776,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "按算术平均价的潜在购电"
                 }
               ]
             }
@@ -1159,7 +1159,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis"
+                  "value": "实际电价"
                 },
                 {
                   "id": "color",
@@ -1401,7 +1401,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "电池充电"
                 }
               ]
             },
@@ -1420,7 +1420,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "电池放电"
                 }
               ]
             },
@@ -2257,7 +2257,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbrauch"
+                "value": "自耗率"
               }
             ]
           },
@@ -2276,7 +2276,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "自给率"
               }
             ]
           }
@@ -2926,7 +2926,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "电池"
               }
             ]
           }
@@ -3145,7 +3145,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "电池"
               }
             ]
           }
@@ -3426,7 +3426,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bilanz"
+                "value": "结余"
               },
               {
                 "id": "color",

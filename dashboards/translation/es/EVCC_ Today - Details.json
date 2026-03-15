@@ -3471,7 +3471,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Compra"
               }
             ]
           },
@@ -3490,7 +3490,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Venta"
               }
             ]
           },
@@ -3521,7 +3521,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Tagessumme"
+                "value": "Suma diaria"
               }
             ]
           }
@@ -3840,7 +3840,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Compra"
               }
             ]
           },
@@ -3859,7 +3859,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Venta"
               }
             ]
           }

@@ -425,7 +425,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Self-sufficiency"
                 }
               ]
             },
@@ -453,7 +453,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Self-consumption"
                 }
               ]
             }
@@ -702,7 +702,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "Electricity price: arithmetic mean"
                 },
                 {
                   "id": "color",
@@ -725,7 +725,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "Effective electricity price, dynamic"
                 },
                 {
                   "id": "color",
@@ -748,7 +748,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "Electricity price savings through dynamic tariff"
                 },
                 {
                   "id": "unit",
@@ -764,7 +764,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "Savings through dynamic tariff"
                 }
               ]
             },
@@ -776,7 +776,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "Potential purchase at arithmetic price"
                 }
               ]
             }
@@ -1159,7 +1159,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis"
+                  "value": "Effective electricity price"
                 },
                 {
                   "id": "color",
@@ -1401,7 +1401,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Battery charge"
                 }
               ]
             },
@@ -1420,7 +1420,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Battery discharge"
                 }
               ]
             },
@@ -2257,7 +2257,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbrauch"
+                "value": "Self-consumption"
               }
             ]
           },
@@ -2276,7 +2276,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "Self-sufficiency"
               }
             ]
           }
@@ -2926,7 +2926,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Battery"
               }
             ]
           }
@@ -3145,7 +3145,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Battery"
               }
             ]
           }
@@ -3426,7 +3426,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bilanz"
+                "value": "Balance"
               },
               {
                 "id": "color",

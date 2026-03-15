@@ -426,7 +426,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autonomie"
                 }
               ]
             },
@@ -454,7 +454,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsommation"
                 }
               ]
             }
@@ -709,7 +709,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Charger la batterie"
                 }
               ]
             },
@@ -728,7 +728,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Decharger la batterie"
                 }
               ]
             },
@@ -921,7 +921,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "Prix de l electricite : moyenne arithmetique"
                 },
                 {
                   "id": "color",
@@ -944,7 +944,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "Prix effectif de l electricite, dynamique"
                 },
                 {
                   "id": "color",
@@ -967,7 +967,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "Prix d electricite economise grace au tarif dynamique"
                 },
                 {
                   "id": "unit",
@@ -983,7 +983,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "Economies grace au tarif dynamique"
                 }
               ]
             },
@@ -995,7 +995,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "Achat potentiel au prix arithmetique"
                 }
               ]
             }
@@ -1640,7 +1640,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "Mois"
               }
             ]
           },
@@ -2102,7 +2102,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "Mois"
               }
             ]
           },
@@ -2564,7 +2564,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "Mois"
               }
             ]
           },
@@ -3039,7 +3039,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "Mois"
               }
             ]
           },
@@ -3837,7 +3837,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Zugekaufte Energiekosten"
+                "value": "Couts d energie achetee"
               },
               {
                 "id": "color",
@@ -3875,7 +3875,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kosten"
+                "value": "Coûts"
               },
               {
                 "id": "color",
@@ -3894,7 +3894,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Einnahmen"
+                "value": "Revenus"
               },
               {
                 "id": "color",
@@ -4026,7 +4026,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Amortisationsdauer"
+                "value": "Duree d amortissement"
               },
               {
                 "id": "unit",
@@ -4070,7 +4070,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose basiert auf"
+                "value": "Prevision basee sur"
               },
               {
                 "id": "unit",
@@ -4116,7 +4116,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisher zugekaufte Energiekosten"
+                "value": "Couts d energie achetee jusqu ici"
               },
               {
                 "id": "color",
@@ -4135,7 +4135,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisherige Energiekosten"
+                "value": "Couts d energie jusqu ici"
               },
               {
                 "id": "thresholds",
@@ -4182,7 +4182,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisherige Energiekosten ohne PV"
+                "value": "Couts d energie jusqu ici sans PV"
               },
               {
                 "id": "color",
@@ -4576,7 +4576,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose basiert auf"
+                "value": "Prevision basee sur"
               },
               {
                 "id": "unit",
@@ -4603,7 +4603,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ladeenergie"
+                "value": "Energie de charge"
               },
               {
                 "id": "unit",
@@ -4626,7 +4626,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Entladeenergie"
+                "value": "Energie de decharge"
               },
               {
                 "id": "unit",
@@ -4649,7 +4649,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Speicherverluste"
+                "value": "Pertes de batterie"
               },
               {
                 "id": "unit",
@@ -4704,7 +4704,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Amortisationsdauer"
+                "value": "Duree d amortissement"
               },
               {
                 "id": "unit",
@@ -4728,7 +4728,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Vollzyklen"
+                "value": "Cycles complets"
               }
             ]
           }
@@ -5090,7 +5090,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Gefahrene Kilometer"
+                "value": "Kilometres parcourus"
               },
               {
                 "id": "color",
@@ -5109,7 +5109,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten $vehicle mit PV"
+                "value": "Couts de trajet $vehicle avec PV"
               },
               {
                 "id": "color",
@@ -5128,7 +5128,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten Verbrenner"
+                "value": "Couts de trajet thermique"
               }
             ]
           },
@@ -5168,7 +5168,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten $vehicle ohne PV"
+                "value": "Couts de trajet $vehicle sans PV"
               },
               {
                 "id": "color",
@@ -5187,7 +5187,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Eingesparte Fahrtkosten dank PV"
+                "value": "Couts de trajet economises grace au PV"
               },
               {
                 "id": "thresholds",
@@ -5219,7 +5219,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effektiver Ladepreis/kwh"
+                "value": "Prix de charge effectif/kWh"
               },
               {
                 "id": "color",
@@ -5845,7 +5845,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "Mois"
               }
             ]
           },

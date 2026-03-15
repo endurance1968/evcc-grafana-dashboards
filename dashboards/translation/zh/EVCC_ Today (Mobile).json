@@ -638,7 +638,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einspeisung"
+                  "value": "馈入"
                 }
               ]
             },
@@ -657,7 +657,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Netzbezug"
+                  "value": "电网购电"
                 }
               ]
             },
@@ -691,7 +691,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "电池充电"
                 }
               ]
             },
@@ -714,7 +714,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "电池放电"
                 }
               ]
             },
@@ -1542,7 +1542,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einkauf"
+                  "value": "购入"
                 }
               ]
             },
@@ -1561,7 +1561,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Verkauf"
+                  "value": "售出"
                 }
               ]
             },
@@ -1592,7 +1592,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Tagessumme"
+                  "value": "日总计"
                 }
               ]
             }
@@ -1883,7 +1883,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "自给率"
                 }
               ]
             },
@@ -1911,7 +1911,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "自耗率"
                 }
               ]
             }
@@ -2264,7 +2264,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "自耗率"
                 }
               ]
             },
@@ -2283,7 +2283,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "自给率"
                 }
               ]
             },

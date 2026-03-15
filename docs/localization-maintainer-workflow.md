@@ -1,69 +1,204 @@
-# Maintainer Workflow for Localization (No AI Required)
+﻿# Maintainer Workflow for Localization
 
-This workflow is designed so dashboard translations can be created and maintained with only Git + Node.js.
+This document is the maintainer-facing workflow for updating dashboard translations without any AI-specific tooling.
 
-## Scope
+It is intended for someone with general software engineering experience who needs a reproducible process.
 
-- Language config: `dashboards/localization/languages.json`
-- Source of truth: `dashboards/original/<sourceLanguage>`
-- Per-language mapping: `dashboards/localization/<source>_to_<target>.json`
-- Generated outputs: `dashboards/translation/<language>` for each configured target language
+## Mental model
+
+There are two translation layers in this repository.
+
+### Layer 1: Mapping-driven generation
+
+Source:
+
+- `dashboards/original/<sourceLanguage>`
+
+Mappings:
+
+- `dashboards/localization/<source>_to_<target>.json`
+
+Generated output:
+
+- `dashboards/translation/<language>`
+
+This layer is scriptable and should always run first.
+
+### Layer 2: Safe display-only cleanup
+
+After generation, some visible UI texts may still remain untranslated because they are stored in dashboard-specific display properties that are not fully covered by the generator.
+
+Examples:
+
+- display-name overrides in panel field config
+- some panel titles
+- some variable labels or descriptions
+
+This layer is now a scripted follow-up step on the generated dashboards only.
+
+Do not apply this step to `dashboards/original` unless you are intentionally refactoring the source dashboards.
+
+## Repository scope
+
+- language config: `dashboards/localization/languages.json`
+- source of truth: `dashboards/original/<sourceLanguage>`
+- per-language mapping: `dashboards/localization/<source>_to_<target>.json`
+- generated outputs: `dashboards/translation/<language>`
 
 ## Prerequisites
 
-- Node.js 20+ available locally
-- Ability to run scripts from repository root
+- Node.js 20+
+- ability to run commands from repository root
+- for Grafana validation, see `docs/grafana-localization-testing.md`
 
-## Configure languages
+## Standard update workflow
 
-Edit `dashboards/localization/languages.json`:
+### 1. Update source dashboards if needed
 
-```json
-{
-  "sourceLanguage": "de",
-  "targetLanguages": ["de", "en", "fr"]
-}
-```
+Edit:
 
-For each target language that differs from source, create or maintain:
+- `dashboards/original/<sourceLanguage>`
+
+Only do this for real source changes or structural panel refactors.
+
+### 2. Update mapping files
+
+Edit the relevant mapping JSON files, for example:
 
 - `dashboards/localization/de_to_en.json`
 - `dashboards/localization/de_to_fr.json`
+- `dashboards/localization/de_to_hi.json`
 
-## Update workflow
+Use `exact` for full labels and stable phrases.
 
-1. Edit source dashboards in `dashboards/original/<sourceLanguage>`.
-2. Run generation for all configured targets:
-   ```bash
-   node scripts/localization/generate-localized-dashboards.mjs
-   ```
-3. Run localization audit for all targets:
-   ```bash
-   node scripts/localization/audit-localization.mjs
-   ```
-4. Review generated suggestion files:
-   - `dashboards/localization/missing-<source>_to_<target>.exact.json`
-5. Copy relevant keys into `dashboards/localization/<source>_to_<target>.json` under `exact` and fill translations.
-6. Re-run generation + audit until candidate lists are acceptable.
-7. Validate in Grafana test instance (import, smoke check, screenshots), see `docs/grafana-localization-testing.md`.
+Use `contains` only for very stable token replacements that are safe across contexts.
 
-## Mapping rules
+### 3. Generate localized dashboards
 
-- Prefer `exact` for full UI labels and longer texts.
-- Use `contains` only for stable token replacements used in many places.
-- Keep technical IDs and references unchanged (`refId`, query identifiers, datasource internals).
-- `name` fields are translated only when prefixed with `EVCC:`.
+```bash
+node scripts/localization/generate-localized-dashboards.mjs
+```
 
-## Review checklist
+### 4. Apply safe display-only translations
 
-- No accidental translation of technical internals
-- No broken panel titles or legend labels
-- No untranslated source-language text in critical UI paths
-- All configured target folders regenerated in the same change
+```bash
+node scripts/localization/apply-safe-display-translations.mjs
+```
 
-## Recommended commit sequence
+This step only touches user-visible fields in generated dashboards, for example:
 
-1. `feat: update source dashboards`
-2. `chore: extend localization mappings`
-3. `chore: regenerate localized dashboards`
-4. `test: run Grafana localization smoke checks`
+- panel titles
+- link titles
+- variable labels and descriptions
+- override `displayName` values
+
+### 5. Audit missing mapping coverage
+
+```bash
+node scripts/localization/audit-localization.mjs
+```
+
+Review generated candidate files:
+
+- `dashboards/localization/missing-<source>_to_<target>.exact.json`
+
+Merge relevant entries into the real mapping file and regenerate.
+
+### 6. Review generated dashboards for remaining visible source-language text
+
+Review methods:
+
+- inspect JSON directly
+- or preferably run Grafana screenshots and inspect the rendered dashboards
+
+### 7. Apply additional safe display-only fixes only if still needed
+
+Allowed targets:
+
+- panel titles
+- link titles
+- variable labels and descriptions
+- override display labels stored in `fieldConfig.overrides[*].properties[*].value`
+
+Do not change blindly:
+
+- `alias`
+- `refId`
+- `matcher.options`
+- regexes
+- transformations that match by field name
+- formulas or expressions using those names
+
+### 8. Validate in Grafana
+
+Use the full testing workflow from:
+
+- `docs/grafana-localization-testing.md`
+
+For the standard end-to-end path, `run-suite.mjs` now runs both preparation steps automatically unless disabled with `--prepare=false`.
+
+## Safe vs unsafe translation rule
+
+### Safe
+
+A string is safe when it is only visible to the user and not used for internal wiring.
+
+Common safe examples:
+
+- `displayName` override values
+- panel titles
+- link titles
+- variable labels and descriptions
+
+### Unsafe until refactored
+
+A string is unsafe when it is used to connect panel logic.
+
+Common examples:
+
+- `refId`
+- `alias`
+- `matcher.options`
+- regex matchers like `^Kilometerstand: .*$`
+- formulas referencing localized names
+
+## Long-term maintainability rule
+
+If a visible label is also used as an internal key, the panel design is not localization-friendly.
+
+Preferred design:
+
+- stable internal ids such as `gridImport`, `selfConsumption`, `batteryCharge`
+- translated labels only in display properties
+
+This is the main structural improvement maintainers should aim for in source dashboards and library panels.
+
+## Non-Latin language rule
+
+For Hindi, Chinese, and similar languages:
+
+- edit JSON through a UTF-8-safe editor or Node.js script
+- avoid console-based replacements that can degrade Unicode text to `?`
+
+If a screenshot suddenly shows `????`, treat that as an encoding corruption issue in the edited JSON.
+
+## Review checklist before commit
+
+- source dashboards changed only if intentionally required
+- mapping files updated where possible instead of patching generated JSON first
+- generated dashboards regenerated after mapping changes
+- safe display-only translations applied through `apply-safe-display-translations.mjs`
+- any extra manual safe fixes limited to generated dashboards
+- no accidental change to `alias`, `refId`, `matcher.options`, regexes, or formulas unless explicitly planned
+- full Grafana smoke-check and screenshot run completed
+- remaining coupled or data-driven text documented separately
+
+## Recommended commit structure
+
+Suggested structure for a non-trivial localization update:
+
+1. `chore: extend localization mappings`
+2. `chore: regenerate localized dashboards`
+3. `fix: translate safe display-only dashboard labels`
+4. `test: refresh Grafana localization screenshots`
+5. `docs: update localization maintainer workflow`

@@ -3471,7 +3471,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "购入"
               }
             ]
           },
@@ -3490,7 +3490,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "售出"
               }
             ]
           },
@@ -3521,7 +3521,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Tagessumme"
+                "value": "日总计"
               }
             ]
           }
@@ -3840,7 +3840,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "购入"
               }
             ]
           },
@@ -3859,7 +3859,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "售出"
               }
             ]
           }

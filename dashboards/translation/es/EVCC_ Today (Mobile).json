@@ -638,7 +638,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einspeisung"
+                  "value": "Alimentación"
                 }
               ]
             },
@@ -657,7 +657,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Netzbezug"
+                  "value": "Consumo de red"
                 }
               ]
             },
@@ -691,7 +691,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Cargar bateria"
                 }
               ]
             },
@@ -714,7 +714,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Descargar bateria"
                 }
               ]
             },
@@ -1542,7 +1542,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einkauf"
+                  "value": "Compra"
                 }
               ]
             },
@@ -1561,7 +1561,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Verkauf"
+                  "value": "Venta"
                 }
               ]
             },
@@ -1592,7 +1592,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Tagessumme"
+                  "value": "Suma diaria"
                 }
               ]
             }
@@ -1883,7 +1883,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autosuficiencia"
                 }
               ]
             },
@@ -1911,7 +1911,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsumo"
                 }
               ]
             }
@@ -2264,7 +2264,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsumo"
                 }
               ]
             },
@@ -2283,7 +2283,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autosuficiencia"
                 }
               ]
             },

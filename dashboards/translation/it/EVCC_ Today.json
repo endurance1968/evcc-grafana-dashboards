@@ -870,7 +870,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autosufficienza"
                 }
               ]
             },
@@ -898,7 +898,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsumo"
                 }
               ]
             }
@@ -1251,7 +1251,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsumo"
                 }
               ]
             },
@@ -1270,7 +1270,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autosufficienza"
                 }
               ]
             },
@@ -2320,7 +2320,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einspeisung"
+                  "value": "Alimentazione"
                 }
               ]
             },
@@ -2339,7 +2339,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Netzbezug"
+                  "value": "Prelievo dalla rete"
                 }
               ]
             },
@@ -2373,7 +2373,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Caricare batteria"
                 }
               ]
             },
@@ -2396,7 +2396,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Scaricare batteria"
                 }
               ]
             },
@@ -2763,7 +2763,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einkauf"
+                  "value": "Acquisto"
                 }
               ]
             },
@@ -2782,7 +2782,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Verkauf"
+                  "value": "Vendita"
                 }
               ]
             },
@@ -2813,7 +2813,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Tagessumme"
+                  "value": "Totale giornaliero"
                 }
               ]
             }

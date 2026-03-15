@@ -418,7 +418,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Zelfvoorziening"
                 }
               ]
             },
@@ -446,7 +446,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Eigen verbruik"
                 }
               ]
             }
@@ -695,7 +695,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "Stroomprijs: rekenkundig gemiddelde"
                 },
                 {
                   "id": "color",
@@ -718,7 +718,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "Effectieve stroomprijs, dynamisch"
                 },
                 {
                   "id": "color",
@@ -741,7 +741,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "Bespaarde stroomprijs door dynamisch tarief"
                 },
                 {
                   "id": "unit",
@@ -757,7 +757,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "Besparing door dynamisch tarief"
                 }
               ]
             },
@@ -769,7 +769,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "Potentiele aankoop tegen rekenkundig gemiddelde prijs"
                 }
               ]
             }
@@ -1152,7 +1152,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis"
+                  "value": "Effectieve stroomprijs"
                 },
                 {
                   "id": "color",
@@ -1394,7 +1394,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Batterij laden"
                 }
               ]
             },
@@ -1413,7 +1413,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Batterij ontladen"
                 }
               ]
             },
@@ -2194,7 +2194,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbrauch"
+                "value": "Eigen verbruik"
               }
             ]
           },
@@ -2206,7 +2206,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "Zelfvoorziening"
               }
             ]
           }
@@ -2510,7 +2510,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verbrauch/Tag"
+                "value": "Verbruik/dag"
               }
             ]
           }
@@ -2831,7 +2831,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verbrauch"
+                "value": "Verbruik"
               }
             ]
           }
@@ -3485,7 +3485,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Accu"
               }
             ]
           }
@@ -3704,7 +3704,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Accu"
               }
             ]
           }

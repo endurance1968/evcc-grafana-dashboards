@@ -3471,7 +3471,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Purchase"
               }
             ]
           },
@@ -3490,7 +3490,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Sale"
               }
             ]
           },
@@ -3521,7 +3521,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Tagessumme"
+                "value": "Daily total"
               }
             ]
           }
@@ -3840,7 +3840,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Einkauf"
+                "value": "Purchase"
               }
             ]
           },
@@ -3859,7 +3859,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkauf"
+                "value": "Sale"
               }
             ]
           }

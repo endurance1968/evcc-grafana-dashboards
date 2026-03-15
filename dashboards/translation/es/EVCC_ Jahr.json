@@ -418,7 +418,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autosuficiencia"
                 }
               ]
             },
@@ -446,7 +446,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsumo"
                 }
               ]
             }
@@ -695,7 +695,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "Precio de la electricidad: media aritmetica"
                 },
                 {
                   "id": "color",
@@ -718,7 +718,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "Precio efectivo de la electricidad, dinamico"
                 },
                 {
                   "id": "color",
@@ -741,7 +741,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "Ahorro en el precio de la electricidad por tarifa dinamica"
                 },
                 {
                   "id": "unit",
@@ -757,7 +757,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "Ahorro por tarifa dinamica"
                 }
               ]
             },
@@ -769,7 +769,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "Compra potencial al precio aritmetico"
                 }
               ]
             }
@@ -1152,7 +1152,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis"
+                  "value": "Precio efectivo de la electricidad"
                 },
                 {
                   "id": "color",
@@ -1394,7 +1394,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Cargar bateria"
                 }
               ]
             },
@@ -1413,7 +1413,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Descargar bateria"
                 }
               ]
             },
@@ -1853,7 +1853,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "fotovoltaica"
               },
               {
                 "id": "color",
@@ -2194,7 +2194,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbrauch"
+                "value": "Autoconsumo"
               }
             ]
           },
@@ -2206,7 +2206,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "Autosuficiencia"
               }
             ]
           }
@@ -2510,7 +2510,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verbrauch/Tag"
+                "value": "Consumo/dia"
               }
             ]
           }
@@ -2831,7 +2831,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verbrauch"
+                "value": "Consumo"
               }
             ]
           }
@@ -3485,7 +3485,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Batería"
               }
             ]
           }
@@ -3704,7 +3704,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "Batería"
               }
             ]
           }

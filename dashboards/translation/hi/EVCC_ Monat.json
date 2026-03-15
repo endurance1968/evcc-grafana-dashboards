@@ -425,7 +425,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "आत्मनिर्भरता"
                 }
               ]
             },
@@ -453,7 +453,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "स्व-उपभोग"
                 }
               ]
             }
@@ -702,7 +702,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "बिजली मूल्य: अंकगणितीय औसत"
                 },
                 {
                   "id": "color",
@@ -725,7 +725,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "प्रभावी बिजली मूल्य, गतिशील"
                 },
                 {
                   "id": "color",
@@ -748,7 +748,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "गतिशील टैरिफ से बची बिजली लागत"
                 },
                 {
                   "id": "unit",
@@ -764,7 +764,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "गतिशील टैरिफ से बचत"
                 }
               ]
             },
@@ -776,7 +776,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "अंकगणितीय मूल्य पर संभावित खरीद"
                 }
               ]
             }
@@ -1159,7 +1159,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis"
+                  "value": "प्रभावी बिजली मूल्य"
                 },
                 {
                   "id": "color",
@@ -1401,7 +1401,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "बैटरी चार्ज"
                 }
               ]
             },
@@ -1420,7 +1420,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "बैटरी डिस्चार्ज"
                 }
               ]
             },
@@ -2257,7 +2257,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbrauch"
+                "value": "स्व-उपभोग"
               }
             ]
           },
@@ -2276,7 +2276,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "आत्मनिर्भरता"
               }
             ]
           }
@@ -2926,7 +2926,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "बैटरी"
               }
             ]
           }
@@ -3145,7 +3145,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Speicher"
+                "value": "बैटरी"
               }
             ]
           }
@@ -3426,7 +3426,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bilanz"
+                "value": "संतुलन"
               },
               {
                 "id": "color",

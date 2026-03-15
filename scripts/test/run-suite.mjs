@@ -6,6 +6,7 @@ import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
 loadEnvFile(parseArg("env", ".env"));
 
 const withScreenshots = parseArg("screenshots", "false") === "true";
+const withPrepare = parseArg("prepare", "true") !== "false";
 const repoRoot = process.cwd();
 const configPath = path.join(repoRoot, "dashboards", "localization", "languages.json");
 
@@ -41,8 +42,16 @@ function run(script, args = []) {
   if (res.status !== 0) process.exit(res.status || 1);
 }
 
+if (withPrepare) {
+  run("scripts/localization/generate-localized-dashboards.mjs");
+  run("scripts/localization/apply-safe-display-translations.mjs");
+}
+
 for (const set of sets) {
   const manifest = `tests/artifacts/import-manifest-${set.tag}.json`;
+  if (withScreenshots) {
+    run("scripts/test/cleanup-grafana.mjs");
+  }
   run("scripts/test/import-dashboards-raw.mjs", [`--source=${set.source}`, `--tag=${set.tag}`, `--manifest=${manifest}`]);
   run("scripts/test/smoke-check.mjs", [`--manifest=${manifest}`]);
   if (withScreenshots) {

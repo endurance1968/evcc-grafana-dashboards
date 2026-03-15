@@ -31,9 +31,20 @@ function safeName(input) {
 }
 
 function screenshotName(dashboard) {
-  return safeName(dashboard.title || dashboard.uid);
+  const titleSlug = safeName(dashboard.title || "");
+  const uidSlug = safeName(dashboard.uid || "dashboard");
+  if (!titleSlug || titleSlug === "evcc" || titleSlug.endsWith("-evcc")) {
+    return uidSlug;
+  }
+  if (titleSlug.length < 12) {
+    return `${titleSlug}-${uidSlug}`;
+  }
+  return titleSlug;
 }
 
+function sourceFileName(dashboard) {
+  return String(dashboard.sourceFile || "").replace(/^.*[\\/]/, "");
+}
 function trimTransparentBottom(png) {
   let lastVisibleRow = png.height - 1;
 
@@ -102,6 +113,23 @@ async function setToolbarVisibility(page, visible) {
   }, visible);
 }
 
+async function waitForPanelContent(page, locator) {
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const state = await locator.evaluate((el) => ({
+      canvases: el.querySelectorAll('canvas').length,
+      svgs: el.querySelectorAll('svg').length,
+      text: (el.textContent || '').replace(/\s+/g, ' ').trim(),
+      hasPanelChrome: !!el.querySelector('[data-testid="data-testid Panel header title"]'),
+    }));
+
+    if (state.canvases > 0 || state.svgs > 1 || state.text.length > 20 || state.hasPanelChrome) {
+      return;
+    }
+
+    await page.waitForTimeout(250);
+  }
+}
+
 async function readLayout(page) {
   return page.evaluate(() => {
     const body = document.querySelector('.css-1wpe07w-body');
@@ -157,6 +185,9 @@ async function captureComposed(page, viewport, target) {
 
   for (const panel of layout.panels) {
     const locator = page.locator('.react-grid-item').nth(panel.index);
+    await locator.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(250);
+    await waitForPanelContent(page, locator);
     const buffer = await locator.screenshot();
     const panelPng = PNG.sync.read(buffer);
     PNG.bitblt(panelPng, canvas, 0, 0, panelPng.width, panelPng.height, panel.left, panel.top);
@@ -170,7 +201,10 @@ async function captureComposed(page, viewport, target) {
 }
 
 function shouldCaptureInViewport(dashboard, viewportName) {
-  const isMobileVariant = /mobile/i.test(dashboard.title || "");
+  const title = String(dashboard.title || "");
+  const uid = safeName(dashboard.uid || "");
+  const sourceFile = sourceFileName(dashboard);
+  const isMobileVariant = /today\s*\(mobile\)/i.test(sourceFile) || /mobile/i.test(title) || /mobile/.test(uid);
   if (viewportName === "desktop") {
     return !isMobileVariant;
   }
@@ -180,22 +214,43 @@ function shouldCaptureInViewport(dashboard, viewportName) {
   return true;
 }
 
+function dashboardKind(dashboard) {
+  const title = String(dashboard.title || "");
+  const uid = safeName(dashboard.uid || "");
+  const sourceFile = sourceFileName(dashboard);
+
+  if (/all[-\s]?time/i.test(sourceFile) || /all[-\s]?time/i.test(title) || /all[-_]?time/.test(uid)) {
+    return "all-time";
+  }
+  if (/jahr/i.test(sourceFile) || /\bjahr\b/i.test(title) || /-jahr\b/.test(uid)) {
+    return "year";
+  }
+  if (/monat/i.test(sourceFile) || /\bmonat\b/i.test(title) || /-monat\b/.test(uid)) {
+    return "month";
+  }
+  if (/today\s*-\s*details/i.test(sourceFile) || /today\s*-\s*details/i.test(title) || /today[-_]?details/.test(uid)) {
+    return "today-details";
+  }
+
+  return "";
+}
+
 function resolveTimeRange(dashboard) {
   if (timeFrom && timeTo) {
     return { from: timeFrom, to: timeTo };
   }
 
-  const title = dashboard.title || "";
-  if (/\bEVCC: All-time\b/i.test(title)) {
+  const kind = dashboardKind(dashboard);
+  if (kind === "all-time") {
     return { from: "now-1y/y", to: "now" };
   }
-  if (/\bEVCC: Jahr\b/i.test(title)) {
+  if (kind === "year") {
     return { from: "now-1y/y", to: "now/y" };
   }
-  if (/\bEVCC: Monat\b/i.test(title)) {
+  if (kind === "month") {
     return { from: "now-1M/M", to: "now/M" };
   }
-  if (/\bEVCC: Today - Details\b/i.test(title)) {
+  if (kind === "today-details") {
     return { from: "now-1d/d", to: "now/d" };
   }
   return { from: timeFrom, to: timeTo };

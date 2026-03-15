@@ -426,7 +426,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "आत्मनिर्भरता"
                 }
               ]
             },
@@ -454,7 +454,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "स्व-उपभोग"
                 }
               ]
             }
@@ -709,7 +709,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "बैटरी चार्ज"
                 }
               ]
             },
@@ -728,7 +728,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "बैटरी डिस्चार्ज"
                 }
               ]
             },
@@ -921,7 +921,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Strompreis: Arithmetisches Mittel"
+                  "value": "बिजली मूल्य: अंकगणितीय औसत"
                 },
                 {
                   "id": "color",
@@ -944,7 +944,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Effektiver Strompreis, dynamisch"
+                  "value": "प्रभावी बिजली मूल्य, गतिशील"
                 },
                 {
                   "id": "color",
@@ -967,7 +967,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Eingesparter Strompreis durch dynamischen Tarif"
+                  "value": "गतिशील टैरिफ से बची बिजली लागत"
                 },
                 {
                   "id": "unit",
@@ -983,7 +983,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Einsparung durch dynamischen Tarif"
+                  "value": "गतिशील टैरिफ से बचत"
                 }
               ]
             },
@@ -995,7 +995,7 @@
               "properties": [
                 {
                   "id": "displayName",
-                  "value": "Potentieller Einkauf nach arithmetischen Preis"
+                  "value": "अंकगणितीय मूल्य पर संभावित खरीद"
                 }
               ]
             }
@@ -1640,7 +1640,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "माह"
               }
             ]
           },
@@ -2102,7 +2102,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "माह"
               }
             ]
           },
@@ -2564,7 +2564,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "माह"
               }
             ]
           },
@@ -3039,7 +3039,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "माह"
               }
             ]
           },
@@ -3837,7 +3837,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Zugekaufte Energiekosten"
+                "value": "खरीदी गई ऊर्जा लागत"
               },
               {
                 "id": "color",
@@ -3875,7 +3875,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kosten"
+                "value": "लागत"
               },
               {
                 "id": "color",
@@ -3894,7 +3894,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Einnahmen"
+                "value": "आय"
               },
               {
                 "id": "color",
@@ -4026,7 +4026,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Amortisationsdauer"
+                "value": "परिशोधन अवधि"
               },
               {
                 "id": "unit",
@@ -4070,7 +4070,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose basiert auf"
+                "value": "पूर्वानुमान आधारित है"
               },
               {
                 "id": "unit",
@@ -4116,7 +4116,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisher zugekaufte Energiekosten"
+                "value": "अब तक खरीदी गई ऊर्जा की लागत"
               },
               {
                 "id": "color",
@@ -4135,7 +4135,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisherige Energiekosten"
+                "value": "अब तक की ऊर्जा लागत"
               },
               {
                 "id": "thresholds",
@@ -4182,7 +4182,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bisherige Energiekosten ohne PV"
+                "value": "पीवी के बिना अब तक की ऊर्जा लागत"
               },
               {
                 "id": "color",
@@ -4576,7 +4576,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose basiert auf"
+                "value": "पूर्वानुमान आधारित है"
               },
               {
                 "id": "unit",
@@ -4603,7 +4603,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ladeenergie"
+                "value": "चार्जिंग ऊर्जा"
               },
               {
                 "id": "unit",
@@ -4626,7 +4626,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Entladeenergie"
+                "value": "डिस्चार्ज ऊर्जा"
               },
               {
                 "id": "unit",
@@ -4649,7 +4649,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Speicherverluste"
+                "value": "बैटरी हानि"
               },
               {
                 "id": "unit",
@@ -4704,7 +4704,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Amortisationsdauer"
+                "value": "परिशोधन अवधि"
               },
               {
                 "id": "unit",
@@ -4728,7 +4728,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Vollzyklen"
+                "value": "पूर्ण चक्र"
               }
             ]
           }
@@ -5090,7 +5090,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Gefahrene Kilometer"
+                "value": "चले हुए किलोमीटर"
               },
               {
                 "id": "color",
@@ -5109,7 +5109,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten $vehicle mit PV"
+                "value": "$vehicle की पीवी सहित यात्रा लागत"
               },
               {
                 "id": "color",
@@ -5128,7 +5128,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten Verbrenner"
+                "value": "ईंधन वाहन यात्रा लागत"
               }
             ]
           },
@@ -5168,7 +5168,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Fahrtkosten $vehicle ohne PV"
+                "value": "$vehicle की पीवी बिना यात्रा लागत"
               },
               {
                 "id": "color",
@@ -5187,7 +5187,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Eingesparte Fahrtkosten dank PV"
+                "value": "पीवी के कारण बची यात्रा लागत"
               },
               {
                 "id": "thresholds",
@@ -5219,7 +5219,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effektiver Ladepreis/kwh"
+                "value": "प्रभावी चार्जिंग मूल्य/kWh"
               },
               {
                 "id": "color",
@@ -5845,7 +5845,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Monat"
+                "value": "माह"
               }
             ]
           },

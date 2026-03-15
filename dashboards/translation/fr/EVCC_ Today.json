@@ -870,7 +870,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autonomie"
                 }
               ]
             },
@@ -898,7 +898,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsommation"
                 }
               ]
             }
@@ -1251,7 +1251,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Autoconsommation"
                 }
               ]
             },
@@ -1270,7 +1270,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autonomie"
                 }
               ]
             },
@@ -2320,7 +2320,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einspeisung"
+                  "value": "Alimentation"
                 }
               ]
             },
@@ -2339,7 +2339,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Netzbezug"
+                  "value": "Import reseau"
                 }
               ]
             },
@@ -2373,7 +2373,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher laden"
+                  "value": "Charger la batterie"
                 }
               ]
             },
@@ -2396,7 +2396,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Speicher entladen"
+                  "value": "Decharger la batterie"
                 }
               ]
             },
@@ -2763,7 +2763,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Einkauf"
+                  "value": "Achat"
                 }
               ]
             },
@@ -2782,7 +2782,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Verkauf"
+                  "value": "Vente"
                 }
               ]
             },
@@ -2813,7 +2813,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Tagessumme"
+                  "value": "Total journalier"
                 }
               ]
             }
