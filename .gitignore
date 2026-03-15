@@ -8,3 +8,6 @@ tests/artifacts/
 
 # Playwright cache/state
 .playwright/
+
+# Generated localization audit candidates
+dashboards/localization/missing-*.exact.json

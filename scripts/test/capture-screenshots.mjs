@@ -17,8 +17,8 @@ const password = requireEnv("GRAFANA_PASSWORD");
 const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-set.json");
 const outDir = parseArg("out", "tests/artifacts/screenshots");
 const waitMs = Number(optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500"));
-const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "now-24h");
-const timeTo = optionalEnv("GRAFANA_TIME_TO", "now");
+const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "").trim();
+const timeTo = optionalEnv("GRAFANA_TIME_TO", "").trim();
 
 const viewports = [
   { name: "desktop", width: 1440, height: 900 },
@@ -39,7 +39,10 @@ async function login(page) {
 
 async function captureDashboard(page, dashboard, tag) {
   const dashboardPath = dashboard.url || `/d/${encodeURIComponent(dashboard.uid)}`;
-  const url = `${baseUrl}${dashboardPath}?kiosk&from=${encodeURIComponent(timeFrom)}&to=${encodeURIComponent(timeTo)}`;
+  const rangeQuery = timeFrom && timeTo
+    ? `&from=${encodeURIComponent(timeFrom)}&to=${encodeURIComponent(timeTo)}`
+    : "";
+  const url = `${baseUrl}${dashboardPath}?kiosk${rangeQuery}`;
   for (const vp of viewports) {
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto(url, { waitUntil: "domcontentloaded" });

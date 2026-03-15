@@ -152,7 +152,7 @@ async function main() {
   const manifest = {
     createdAt: new Date().toISOString(),
     tag,
-    source: path.resolve(source),
+    source: path.relative(process.cwd(), path.resolve(source)),
     grafanaUrl: baseUrl,
     folderUid,
     dashboards: imported,
