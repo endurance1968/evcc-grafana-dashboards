@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-03-15T06:38:08.762Z",
+  "sourceLanguage": "de",
+  "targetLanguage": "it",
+  "sourceDir": "dashboards\\original\\de",
+  "mappingFile": "dashboards\\localization\\de_to_it.json",
+  "notes": [
+    "Fill each value with the final target-language translation.",
+    "Then merge into dashboards/localization/de_to_it.json under exact.",
+    "This is a candidate list; some entries can be intentionally unchanged."
+  ],
+  "exact": {}
+}
