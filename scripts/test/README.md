@@ -179,3 +179,24 @@ node scripts/test/cleanup-grafana.mjs --env=.env.local
 ## Maintenance note
 
 This README must be updated whenever script names, defaults, parameters, or behavior in `scripts/test/` change.
+
+## Screenshot Notes
+
+Current screenshot implementation uses a composed image instead of plain full-page screenshots:
+
+- capture the global Grafana toolbar once at the top
+- hide the toolbar before panel captures so it is not duplicated inside charts
+- capture each `.react-grid-item` panel separately and place it at its absolute dashboard position
+- trim transparent bottom rows from the final PNG
+- only capture non-mobile dashboards in `desktop` and only mobile dashboards in `mobile`
+
+Dashboard-specific time ranges currently enforced when no explicit `--from/--to` override is given:
+
+- `EVCC: All-time` -> `now-1y/y` to `now`
+- `EVCC: Jahr` -> `now-1y/y` to `now/y`
+- `EVCC: Monat` -> `now-1M/M` to `now/M`
+- `EVCC: Today - Details` -> `now-1d/d` to `now/d`
+
+Known maintenance detail:
+
+- Grafana CSS class names for the top toolbar can change between Grafana versions. If duplicate toolbars reappear in screenshots, inspect the current DOM and update the selector list in `capture-screenshots.mjs`.

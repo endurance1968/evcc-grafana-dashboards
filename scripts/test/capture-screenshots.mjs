@@ -1,6 +1,7 @@
-import path from "node:path";
+﻿import path from "node:path";
 import fs from "node:fs";
 import { chromium } from "playwright";
+import { PNG } from "pngjs";
 import {
   loadEnvFile,
   optionalEnv,
@@ -29,6 +30,57 @@ function safeName(input) {
   return String(input).replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase();
 }
 
+function screenshotName(dashboard) {
+  return safeName(dashboard.title || dashboard.uid);
+}
+
+function trimTransparentBottom(png) {
+  let lastVisibleRow = png.height - 1;
+
+  rowSearch: for (; lastVisibleRow >= 0; lastVisibleRow -= 1) {
+    for (let x = 0; x < png.width; x += 1) {
+      const alpha = png.data[(png.width * lastVisibleRow + x) * 4 + 3];
+      if (alpha > 0) {
+        break rowSearch;
+      }
+    }
+  }
+
+  const trimmedHeight = Math.max(1, lastVisibleRow + 1);
+  if (trimmedHeight === png.height) {
+    return png;
+  }
+
+  const trimmed = new PNG({ width: png.width, height: trimmedHeight });
+  PNG.bitblt(png, trimmed, 0, 0, png.width, trimmedHeight, 0, 0);
+  return trimmed;
+}
+
+function parseRgbColor(input) {
+  const match = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/i.exec(String(input || ""));
+  if (!match) {
+    return { r: 17, g: 24, b: 39, a: 255 };
+  }
+  return {
+    r: Number.parseInt(match[1], 10),
+    g: Number.parseInt(match[2], 10),
+    b: Number.parseInt(match[3], 10),
+    a: 255,
+  };
+}
+
+function fillCanvas(png, color) {
+  for (let y = 0; y < png.height; y += 1) {
+    for (let x = 0; x < png.width; x += 1) {
+      const index = (png.width * y + x) * 4;
+      png.data[index] = color.r;
+      png.data[index + 1] = color.g;
+      png.data[index + 2] = color.b;
+      png.data[index + 3] = color.a;
+    }
+  }
+}
+
 async function login(page) {
   await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded" });
   await page.fill('input[name="user"]', username);
@@ -37,13 +89,131 @@ async function login(page) {
   await page.waitForLoadState("networkidle");
 }
 
+async function setToolbarVisibility(page, visible) {
+  await page.evaluate((isVisible) => {
+    const selectors = ['.css-apndj3', '.css-12rf1df'];
+    for (const selector of selectors) {
+      for (const el of document.querySelectorAll(selector)) {
+        if (el instanceof HTMLElement) {
+          el.style.display = isVisible ? "" : "none";
+        }
+      }
+    }
+  }, visible);
+}
+
+async function readLayout(page) {
+  return page.evaluate(() => {
+    const body = document.querySelector('.css-1wpe07w-body');
+    const gridItems = [...document.querySelectorAll('.react-grid-item')]
+      .map((el, index) => {
+        const rect = el.getBoundingClientRect();
+        return {
+          index,
+          left: Math.max(0, Math.round(rect.left)),
+          top: Math.max(0, Math.round(rect.top + window.scrollY)),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        };
+      })
+      .filter((item) => item.width > 0 && item.height > 0)
+      .sort((a, b) => a.top - b.top || a.left - b.left);
+
+    const totalHeight = Math.max(
+      document.body?.scrollHeight ?? 0,
+      document.body?.offsetHeight ?? 0,
+      document.documentElement?.scrollHeight ?? 0,
+      document.documentElement?.offsetHeight ?? 0,
+      ...gridItems.map((item) => item.top + item.height),
+    );
+
+    return {
+      bodyTop: Math.max(0, Math.round(body ? body.getBoundingClientRect().top + window.scrollY : 64)),
+      totalHeight,
+      pageColor: getComputedStyle(document.body).backgroundColor,
+      panels: gridItems,
+    };
+  });
+}
+
+async function captureComposed(page, viewport, target) {
+  const layout = await readLayout(page);
+  const canvas = new PNG({ width: viewport.width, height: layout.totalHeight });
+  fillCanvas(canvas, parseRgbColor(layout.pageColor));
+
+  await setToolbarVisibility(page, true);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(800);
+
+  const topHeight = Math.min(viewport.height, Math.max(0, layout.bodyTop));
+  if (topHeight > 0) {
+    const topBuffer = await page.screenshot({ clip: { x: 0, y: 0, width: viewport.width, height: topHeight } });
+    const topPng = PNG.sync.read(topBuffer);
+    PNG.bitblt(topPng, canvas, 0, 0, topPng.width, topPng.height, 0, 0);
+  }
+
+  await setToolbarVisibility(page, false);
+  await page.waitForTimeout(200);
+
+  for (const panel of layout.panels) {
+    const locator = page.locator('.react-grid-item').nth(panel.index);
+    const buffer = await locator.screenshot();
+    const panelPng = PNG.sync.read(buffer);
+    PNG.bitblt(panelPng, canvas, 0, 0, panelPng.width, panelPng.height, panel.left, panel.top);
+  }
+
+  await setToolbarVisibility(page, true);
+
+  const output = PNG.sync.write(trimTransparentBottom(canvas));
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, output);
+}
+
+function shouldCaptureInViewport(dashboard, viewportName) {
+  const isMobileVariant = /mobile/i.test(dashboard.title || "");
+  if (viewportName === "desktop") {
+    return !isMobileVariant;
+  }
+  if (viewportName === "mobile") {
+    return isMobileVariant;
+  }
+  return true;
+}
+
+function resolveTimeRange(dashboard) {
+  if (timeFrom && timeTo) {
+    return { from: timeFrom, to: timeTo };
+  }
+
+  const title = dashboard.title || "";
+  if (/\bEVCC: All-time\b/i.test(title)) {
+    return { from: "now-1y/y", to: "now" };
+  }
+  if (/\bEVCC: Jahr\b/i.test(title)) {
+    return { from: "now-1y/y", to: "now/y" };
+  }
+  if (/\bEVCC: Monat\b/i.test(title)) {
+    return { from: "now-1M/M", to: "now/M" };
+  }
+  if (/\bEVCC: Today - Details\b/i.test(title)) {
+    return { from: "now-1d/d", to: "now/d" };
+  }
+  return { from: timeFrom, to: timeTo };
+}
+
 async function captureDashboard(page, dashboard, tag) {
   const dashboardPath = dashboard.url || `/d/${encodeURIComponent(dashboard.uid)}`;
-  const rangeQuery = timeFrom && timeTo
-    ? `&from=${encodeURIComponent(timeFrom)}&to=${encodeURIComponent(timeTo)}`
+  const range = resolveTimeRange(dashboard);
+  const rangeQuery = range.from && range.to
+    ? `&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`
     : "";
   const url = `${baseUrl}${dashboardPath}?kiosk${rangeQuery}`;
+
   for (const vp of viewports) {
+    if (!shouldCaptureInViewport(dashboard, vp.name)) {
+      continue;
+    }
+
     await page.setViewportSize({ width: vp.width, height: vp.height });
     await page.goto(url, { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(waitMs);
@@ -54,9 +224,8 @@ async function captureDashboard(page, dashboard, tag) {
       console.warn(`WARN ${dashboard.uid}: visible error hint in ${vp.name}`);
     }
 
-    const target = path.join(outDir, tag, vp.name, `${safeName(dashboard.uid)}.png`);
-    fs.mkdirSync(path.dirname(target), { recursive: true });
-    await page.screenshot({ path: target, fullPage: true });
+    const target = path.join(outDir, tag, vp.name, `${screenshotName(dashboard)}.png`);
+    await captureComposed(page, vp, target);
     console.log(`Screenshot: ${target}`);
   }
 }
@@ -83,4 +252,3 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
-

@@ -3108,7 +3108,7 @@
       },
       "id": 17,
       "panels": [],
-      "title": "Tarife",
+      "title": "Tariffs",
       "type": "row"
     },
     {
@@ -4412,7 +4412,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Netz",
+      "title": "Grid",
       "type": "row"
     },
     {
@@ -5197,7 +5197,7 @@
       "id": 10,
       "panels": [],
       "repeat": "loadpoint",
-      "title": "Ladepunkt $loadpoint",
+      "title": "Loadpoint $loadpoint",
       "type": "row"
     },
     {
@@ -5822,7 +5822,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Phasen",
+      "title": "Phases",
       "type": "timeseries"
     },
     {
@@ -5941,7 +5941,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Ladeleistung",
+      "title": "Charging power",
       "type": "timeseries"
     }
   ],
@@ -6020,7 +6020,7 @@
         "current": {},
         "definition": "show tag values from chargePower with key = \"loadpoint\" where \"loadpoint\" !~ $loadpointBlocklist",
         "includeAll": true,
-        "label": "Ladepunkt",
+        "label": "Loadpoint",
         "multi": true,
         "name": "loadpoint",
         "options": [],

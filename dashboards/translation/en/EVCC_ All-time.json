@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_EVCC_AGGREGRATIONS",
-      "label": "EVCC Aggregrations",
+      "label": "EVCC Aggregations",
       "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
@@ -3763,7 +3763,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Finanzen",
+      "title": "Finances",
       "type": "row"
     },
     {
@@ -5587,7 +5587,7 @@
           "type": "math"
         }
       ],
-      "title": "Fahrtkosten $vehicle",
+      "title": "Driving costs $vehicle",
       "type": "stat"
     },
     {
@@ -6064,7 +6064,7 @@
         },
         "description": "Purchase price of the PV system",
         "includeAll": false,
-        "label": "PV Gesamtinvestitionskosten",
+        "label": "PV total investment costs",
         "name": "purchasePricePv",
         "options": [
           {
@@ -6137,7 +6137,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "Spritpreis/Liter",
+        "label": "Fuel price/liter",
         "name": "spritKosten",
         "options": [
           {

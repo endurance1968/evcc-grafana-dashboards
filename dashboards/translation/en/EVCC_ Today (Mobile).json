@@ -1028,7 +1028,7 @@
       }
     },
     "Blh9JqRRk": {
-      "name": "EVCC: Batterieverlauf",
+      "name": "EVCC: Battery history",
       "uid": "Blh9JqRRk",
       "kind": 1,
       "model": {
@@ -1489,7 +1489,7 @@
       }
     },
     "cei4rwyht3uv4f": {
-      "name": "EVCC: Kosten",
+      "name": "EVCC: Costs",
       "uid": "cei4rwyht3uv4f",
       "kind": 1,
       "model": {
@@ -2180,7 +2180,7 @@
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Kennzahlen Verlauf",
+      "name": "EVCC: Metrics history",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -2571,7 +2571,7 @@
       }
     },
     "d-V6JqRgz": {
-      "name": "EVCC: Energie",
+      "name": "EVCC: Energy",
       "uid": "d-V6JqRgz",
       "kind": 1,
       "model": {
@@ -4092,7 +4092,7 @@
       "id": 67,
       "libraryPanel": {
         "uid": "Blh9JqRRk",
-        "name": "EVCC: Batterieverlauf"
+        "name": "EVCC: Battery history"
       }
     },
     {
@@ -4118,7 +4118,7 @@
       "id": 74,
       "libraryPanel": {
         "uid": "cei4rwyht3uv4f",
-        "name": "EVCC: Kosten"
+        "name": "EVCC: Costs"
       }
     },
     {
@@ -4157,7 +4157,7 @@
       "id": 57,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Kennzahlen Verlauf"
+        "name": "EVCC: Metrics history"
       }
     },
     {
@@ -4170,7 +4170,7 @@
       "id": 18,
       "libraryPanel": {
         "uid": "d-V6JqRgz",
-        "name": "EVCC: Energie"
+        "name": "EVCC: Energy"
       }
     }
   ],

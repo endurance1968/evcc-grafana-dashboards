@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_EVCC_AGGREGRATIONS",
-      "label": "EVCC Aggregrations",
+      "label": "EVCC Aggregations",
       "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
