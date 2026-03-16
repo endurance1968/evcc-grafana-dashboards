@@ -2580,7 +2580,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "Accueil",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -2763,7 +2763,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "Accueil",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"

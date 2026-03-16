@@ -7,6 +7,7 @@ loadEnvFile(parseArg("env", ".env"));
 
 const withScreenshots = parseArg("screenshots", "false") === "true";
 const withPrepare = parseArg("prepare", "true") !== "false";
+const withFinalCleanup = parseArg("cleanup-final", "false") === "true";
 const repoRoot = process.cwd();
 const configPath = path.join(repoRoot, "dashboards", "localization", "languages.json");
 
@@ -59,4 +60,9 @@ for (const set of sets) {
   }
 }
 
+if (withFinalCleanup) {
+  run("scripts/test/cleanup-grafana.mjs");
+}
+
 console.log("\nGrafana localization test suite finished.");
+

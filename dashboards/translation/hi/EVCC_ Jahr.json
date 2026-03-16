@@ -474,7 +474,7 @@
         "pluginVersion": "11.5.2",
         "targets": [
           {
-            "alias": "PV",
+            "alias": "पीवी",
             "datasource": {
               "type": "influxdb",
               "uid": "fe8sr664fohz4a"
@@ -2861,7 +2861,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "PV",
+          "alias": "पीवी",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -3140,7 +3140,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "घर",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -3322,7 +3322,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "घर",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -4633,7 +4633,7 @@
       "pluginVersion": "12.2.1",
       "targets": [
         {
-          "alias": "Speicher laden",
+          "alias": "बैटरी चार्ज",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -4645,7 +4645,7 @@
           "resultFormat": "time_series"
         },
         {
-          "alias": "Speicher entladen",
+          "alias": "बैटरी डिस्चार्ज",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"

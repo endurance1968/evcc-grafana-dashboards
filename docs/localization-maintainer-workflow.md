@@ -1,4 +1,4 @@
-﻿# Maintainer Workflow for Localization
+# Maintainer Workflow for Localization
 
 This document is the maintainer-facing workflow for updating dashboard translations without any AI-specific tooling.
 
@@ -81,6 +81,8 @@ node scripts/localization/generate-localized-dashboards.mjs
 
 ### 4. Apply safe display-only translations
 
+Important: run this step only after step 3 has fully finished. Do not run both scripts in parallel.
+
 ```bash
 node scripts/localization/apply-safe-display-translations.mjs
 ```
@@ -119,15 +121,17 @@ Allowed targets:
 - link titles
 - variable labels and descriptions
 - override display labels stored in `fieldConfig.overrides[*].properties[*].value`
+- query `alias` values, but only when no panel-internal wiring references those alias strings
 
 Do not change blindly:
 
-- `alias`
 - `refId`
 - `matcher.options`
 - regexes
 - transformations that match by field name
 - formulas or expressions using those names
+
+The scripted `alias` translation in `apply-safe-display-translations.mjs` performs a panel-level safety check and skips aliases that appear coupled to internal wiring.
 
 ### 8. Validate in Grafana
 
@@ -157,7 +161,7 @@ A string is unsafe when it is used to connect panel logic.
 Common examples:
 
 - `refId`
-- `alias`
+- `alias` values that are reused in matcher options, regexes, transformations, or formulas
 - `matcher.options`
 - regex matchers like `^Kilometerstand: .*$`
 - formulas referencing localized names
@@ -189,7 +193,7 @@ If a screenshot suddenly shows `????`, treat that as an encoding corruption issu
 - generated dashboards regenerated after mapping changes
 - safe display-only translations applied through `apply-safe-display-translations.mjs`
 - any extra manual safe fixes limited to generated dashboards
-- no accidental change to `alias`, `refId`, `matcher.options`, regexes, or formulas unless explicitly planned
+- no accidental unsafe change to `refId`, `matcher.options`, regexes, or formulas
 - full Grafana smoke-check and screenshot run completed
 - remaining coupled or data-driven text documented separately
 
@@ -202,3 +206,4 @@ Suggested structure for a non-trivial localization update:
 3. `fix: translate safe display-only dashboard labels`
 4. `test: refresh Grafana localization screenshots`
 5. `docs: update localization maintainer workflow`
+

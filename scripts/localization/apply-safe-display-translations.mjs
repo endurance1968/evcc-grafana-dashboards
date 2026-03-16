@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
@@ -18,6 +18,19 @@ const safeStringKeys = new Set([
 const safePropertyIds = new Set([
   "displayName",
   "displayNameFromDS",
+]);
+
+const aliasRiskyKeys = new Set([
+  "refId",
+  "expression",
+  "query",
+  "rawSql",
+  "sql",
+  "regex",
+  "pattern",
+  "matcher",
+  "options",
+  "transformations",
 ]);
 
 function collectJsonFiles(dirPath) {
@@ -93,6 +106,89 @@ function translateString(input, mapping) {
   return output;
 }
 
+function isSamePath(pathA, pathB) {
+  if (pathA.length !== pathB.length) {
+    return false;
+  }
+
+  for (let i = 0; i < pathA.length; i += 1) {
+    if (pathA[i] !== pathB[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function stringMentionsAlias(value, alias) {
+  if (value === alias) {
+    return true;
+  }
+
+  if (value.includes(`$${alias}`)) {
+    return true;
+  }
+
+  if (alias.length >= 4 && value.includes(alias)) {
+    return true;
+  }
+
+  return false;
+}
+
+function valueMentionsAlias(value, alias) {
+  if (typeof value === "string") {
+    return stringMentionsAlias(value, alias);
+  }
+
+  if (Array.isArray(value)) {
+    return value.some((item) => valueMentionsAlias(item, alias));
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).some((item) => valueMentionsAlias(item, alias));
+  }
+
+  return false;
+}
+
+function hasUnsafeAliasReference(node, alias, skipPath, currentPath = []) {
+  if (Array.isArray(node)) {
+    for (let i = 0; i < node.length; i += 1) {
+      if (hasUnsafeAliasReference(node[i], alias, skipPath, [...currentPath, i])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (!node || typeof node !== "object") {
+    return false;
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    const childPath = [...currentPath, key];
+    if (isSamePath(childPath, skipPath)) {
+      continue;
+    }
+
+    if (aliasRiskyKeys.has(key) && valueMentionsAlias(value, alias)) {
+      return true;
+    }
+
+    if (hasUnsafeAliasReference(value, alias, skipPath, childPath)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function canTranslateAlias(panelNode, targetIndex, alias) {
+  const aliasPath = ["targets", targetIndex, "alias"];
+  return !hasUnsafeAliasReference(panelNode, alias, aliasPath);
+}
+
 function translateSafeNode(node, mapping) {
   if (Array.isArray(node)) {
     return node.map((item) => translateSafeNode(item, mapping));
@@ -116,6 +212,30 @@ function translateSafeNode(node, mapping) {
       safePropertyIds.has(node.id)
     ) {
       result[childKey] = translateString(childValue, mapping);
+      continue;
+    }
+
+    if (childKey === "targets" && Array.isArray(childValue)) {
+      result[childKey] = childValue.map((target, targetIndex) => {
+        const translatedTarget = translateSafeNode(target, mapping);
+        if (!target || typeof target !== "object" || typeof target.alias !== "string") {
+          return translatedTarget;
+        }
+
+        const translatedAlias = translateString(target.alias, mapping);
+        if (translatedAlias === target.alias) {
+          return translatedTarget;
+        }
+
+        if (!canTranslateAlias(node, targetIndex, target.alias)) {
+          return translatedTarget;
+        }
+
+        return {
+          ...translatedTarget,
+          alias: translatedAlias,
+        };
+      });
       continue;
     }
 

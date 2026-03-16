@@ -482,7 +482,7 @@
         "pluginVersion": "11.5.2",
         "targets": [
           {
-            "alias": "PV",
+            "alias": "光伏发电",
             "datasource": {
               "type": "influxdb",
               "uid": "fe8sr664fohz4a"

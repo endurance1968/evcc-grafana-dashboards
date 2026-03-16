@@ -3140,7 +3140,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "Home",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -3322,7 +3322,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Haus",
+          "alias": "Home",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -4633,7 +4633,7 @@
       "pluginVersion": "12.2.1",
       "targets": [
         {
-          "alias": "Speicher laden",
+          "alias": "Battery charge",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -4645,7 +4645,7 @@
           "resultFormat": "time_series"
         },
         {
-          "alias": "Speicher entladen",
+          "alias": "Battery discharge",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"

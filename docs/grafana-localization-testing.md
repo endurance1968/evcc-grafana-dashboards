@@ -1,4 +1,4 @@
-﻿# Grafana Localization Testing
+# Grafana Localization Testing
 
 This document describes the current end-to-end workflow for validating localized dashboards against a real Grafana test instance.
 
@@ -111,6 +111,8 @@ node scripts/localization/apply-safe-display-translations.mjs
 
 This second preparation step translates additional safe display-only fields in generated dashboards, especially values that live under generic `value` properties.
 
+Important: run Step 1 and Step 2 strictly in sequence. Do not run them in parallel, otherwise Step 1 can overwrite Step 2 results.
+
 Typical safe cases:
 
 - panel titles
@@ -120,11 +122,13 @@ Typical safe cases:
 
 Typical unsafe cases that must not be translated blindly:
 
-- `alias`
 - `refId`
 - `matcher.options`
 - regex matchers
 - formulas or expressions that reference translated strings
+- `alias` when reused by matcher options, regexes, transformations, or formulas
+
+`apply-safe-display-translations.mjs` now translates `alias` only when a panel-level safety check finds no such coupling.
 
 ## Step 3: Audit translation coverage
 
@@ -226,6 +230,12 @@ To test the current generated files without rerunning preparation first:
 node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
 ```
 
+To finish with an empty Grafana test folder after the run:
+
+```bash
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
+```
+
 ### Full-suite behavior
 
 For each configured set, the suite does:
@@ -241,9 +251,11 @@ This cleanup is important because dashboards and library panels from one languag
 
 ### Important operational note
 
-The full suite cleans before each set, not after the last set.
+The full suite cleans before each set, not after the last set by default.
 
-That means the last processed language remains imported in the Grafana test folder after the suite finishes.
+Use `--cleanup-final=true` if you want one additional cleanup after the final set.
+
+Without `--cleanup-final=true`, the last processed language remains imported in the Grafana test folder after the suite finishes.
 
 ## Cleanup-only command
 
@@ -289,10 +301,11 @@ Patch generated dashboards only for clearly safe display-only fields.
 
 Refactor the original dashboards when untranslated text is tied to:
 
-- `alias`
+- `alias` values that are used as internal wiring inputs
 - `refId`
 - `matcher.options`
 - regex matchers
 - formulas that refer to localized strings
 
 Long-term maintainability depends on separating internal technical identifiers from visible user-facing labels.
+

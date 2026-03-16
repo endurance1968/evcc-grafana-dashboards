@@ -1,4 +1,4 @@
-﻿# Test Scripts (Grafana)
+# Test Scripts (Grafana)
 
 This folder contains the script-based Grafana test workflow used to import localized dashboards, validate them, and create review screenshots.
 
@@ -183,10 +183,17 @@ To test the current files without regenerating them first:
 node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
 ```
 
+To finish with an empty Grafana test folder:
+
+```bash
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
+```
+
 Important operational detail:
 
-- the suite cleans before each set, not after the last one
-- the last imported language remains in the Grafana test folder after the suite finishes
+- the suite cleans before each set, not after the last one by default
+- use `--cleanup-final=true` to clean once more after the final set
+- without `--cleanup-final=true`, the last imported language remains in the Grafana test folder after the suite finishes
 
 ## cleanup-grafana.mjs
 
@@ -220,3 +227,5 @@ If screenshots suddenly show `????`, first inspect the JSON files for encoding c
 ## Maintenance note
 
 Update this README whenever script names, defaults, tags, screenshot behavior, or workflow assumptions change.
+
+

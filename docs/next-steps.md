@@ -64,13 +64,9 @@ Goal:
 
 ### 5. Optional final cleanup improvement
 
-Current behavior:
+Status: completed (2026-03-16).
 
-- `run-suite.mjs` leaves the last processed language imported in Grafana
-
-Possible improvement:
-
-- add an optional final cleanup switch if maintainers prefer an empty test folder after the run
+- `run-suite.mjs` now supports `--cleanup-final=true` to run `cleanup-grafana.mjs` once after the final set.
 
 ## Maintainer reading order
 
