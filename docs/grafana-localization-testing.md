@@ -27,6 +27,14 @@ This workflow does not translate query internals automatically. It validates wha
   - Playwright Chromium installed via `npx playwright install chromium`
   - Grafana username/password available for browser login
 
+## Node dependency files
+
+This repository tracks Node dependencies through:
+
+- `package.json`: declares required packages and project metadata
+- `package-lock.json`: pins the exact resolved dependency tree for reproducible installs
+
+Use `npm install` to install dependencies exactly as locked in `package-lock.json`.
 ## Required environment
 
 Use `.env.local` or `.env`.
@@ -308,4 +316,5 @@ Refactor the original dashboards when untranslated text is tied to:
 - formulas that refer to localized strings
 
 Long-term maintainability depends on separating internal technical identifiers from visible user-facing labels.
+
 
