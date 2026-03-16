@@ -1,5 +1,31 @@
 Wie diese Dashboards zu importieren sind, siehe [hier](../README.md).
 
+# Localization Workflow
+
+- `dashboards/localization/languages.json`: defines source + target languages
+- `dashboards/original/<sourceLanguage>`: source of truth (hand-edited dashboards)
+- `dashboards/translation/<language>`: generated output per configured target language
+- `dashboards/localization/<source>_to_<target>.json`: translation mapping per language pair
+
+Generate localized dashboard files for all configured target languages:
+
+```bash
+node scripts/localization/generate-localized-dashboards.mjs
+```
+
+Audit missing source-to-target mappings for all configured targets:
+
+```bash
+node scripts/localization/audit-localization.mjs
+```
+
+Audit one specific target language:
+
+```bash
+node scripts/localization/audit-localization.mjs --target=en
+```
+
+The audit writes `dashboards/localization/missing-<source>_to_<target>.exact.json` with candidate keys that still need translations.
 # Today
 
 Real-time Statistiken des aktuellen Tages für Desktops oder Tablets.

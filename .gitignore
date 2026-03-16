@@ -1,1 +1,16 @@
 .DS_Store
+# Local environment files
+.env
+.env.local
+
+# Test artifacts
+tests/artifacts/
+
+# Playwright cache/state
+.playwright/
+
+# Generated localization audit candidates
+dashboards/localization/missing-*.exact.json
+
+# Local Node dependencies
+node_modules/
