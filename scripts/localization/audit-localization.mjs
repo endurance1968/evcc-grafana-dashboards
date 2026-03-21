@@ -1,9 +1,16 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
+import {
+  familyMappingPath,
+  familyReportPath,
+  familySourceDir,
+  parseFamilyArg,
+  readLanguagesConfig,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const localizationDir = path.join(repoRoot, "dashboards", "localization");
-const configFile = path.join(localizationDir, "languages.json");
+const family = resolveDashboardFamily(parseFamilyArg());
 const translatableKeys = new Set([
   "title",
   "description",
@@ -38,35 +45,8 @@ function writeJson(filePath, data) {
   fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
 
-function readLanguagesConfig() {
-  if (!fs.existsSync(configFile)) {
-    return { sourceLanguage: "de", targetLanguages: ["de", "en"] };
-  }
-
-  const parsed = readJson(configFile);
-  const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
-  const configuredTargets = Array.isArray(parsed.targetLanguages)
-    ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
-    : [];
-  const targetLanguages = [...new Set(configuredTargets.length ? configuredTargets : [sourceLanguage])];
-
-  if (!targetLanguages.includes(sourceLanguage)) {
-    targetLanguages.unshift(sourceLanguage);
-  }
-
-  return { sourceLanguage, targetLanguages };
-}
-
-function mappingPath(sourceLanguage, targetLanguage) {
-  return path.join(localizationDir, `${sourceLanguage}_to_${targetLanguage}.json`);
-}
-
-function reportPath(sourceLanguage, targetLanguage) {
-  return path.join(localizationDir, `missing-${sourceLanguage}_to_${targetLanguage}.exact.json`);
-}
-
 function readMapping(sourceLanguage, targetLanguage) {
-  const filePath = mappingPath(sourceLanguage, targetLanguage);
+  const filePath = familyMappingPath(family, sourceLanguage, targetLanguage);
   if (!fs.existsSync(filePath)) {
     return { exact: {}, contains: [] };
   }
@@ -213,16 +193,16 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
     exactSuggestions[sourceText] = "";
   }
 
-  const outputFile = reportPath(sourceLanguage, targetLanguage);
+  const outputFile = familyReportPath(family, sourceLanguage, targetLanguage);
   writeJson(outputFile, {
     generatedAt: new Date().toISOString(),
     sourceLanguage,
     targetLanguage,
     sourceDir: path.relative(repoRoot, sourceDir),
-    mappingFile: path.relative(repoRoot, mappingPath(sourceLanguage, targetLanguage)),
+    mappingFile: path.relative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage)),
     notes: [
       "Fill each value with the final target-language translation.",
-      `Then merge into dashboards/localization/${sourceLanguage}_to_${targetLanguage}.json under exact.`,
+      `Then merge into ${path.relative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage))} under exact.`,
       "This audit includes displayName/displayNameFromDS override values.",
       "This is a candidate list; some entries can be intentionally unchanged.",
     ],
@@ -245,8 +225,8 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
 }
 
 function main() {
-  const { sourceLanguage, targetLanguages } = readLanguagesConfig();
-  const sourceDir = path.join(repoRoot, "dashboards", "original", sourceLanguage);
+  const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
+  const sourceDir = familySourceDir(family, sourceLanguage);
 
   if (!fs.existsSync(sourceDir)) {
     throw new Error(`Source directory does not exist: ${sourceDir}`);
@@ -270,7 +250,7 @@ function main() {
   for (const targetLanguage of requestedTargets) {
     if (!configuredTargets.includes(targetLanguage)) {
       throw new Error(
-        `Unknown target language '${targetLanguage}'. Configure it in dashboards/localization/languages.json`,
+        `Unknown target language '${targetLanguage}'. Configure it in ${path.relative(repoRoot, family.languagesConfigPath)}`,
       );
     }
   }

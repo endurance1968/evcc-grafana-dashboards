@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import {
   buildUid,
@@ -12,23 +11,20 @@ import {
   sanitizeTag,
   writeJson,
 } from "./_lib.mjs";
+import {
+  familyTranslationDir,
+  parseFamilyArg,
+  readLanguagesConfig,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
+const family = resolveDashboardFamily(parseFamilyArg());
 
 function defaultSourceFromConfig() {
-  const configPath = path.join(process.cwd(), "dashboards", "localization", "languages.json");
-  if (!fs.existsSync(configPath)) {
-    return "dashboards/translation/de";
-  }
-
-  const parsed = JSON.parse(fs.readFileSync(configPath, "utf8"));
-  const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
-  const targetLanguages = Array.isArray(parsed.targetLanguages)
-    ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
-    : [];
-
+  const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
   const firstTarget = targetLanguages.find(Boolean) || sourceLanguage;
-  return `dashboards/translation/${firstTarget}`;
+  return path.relative(process.cwd(), familyTranslationDir(family, firstTarget));
 }
 
 const baseUrl = requireEnv("GRAFANA_URL");
@@ -46,10 +42,15 @@ if (legacyAggUid && !canonicalAggUid) {
   console.warn("WARN using legacy env var GRAFANA_DS_EVCC_AGGREGRATIONS_UID. Prefer GRAFANA_DS_EVCC_AGGREGATIONS_UID.");
 }
 
-const dsMap = {
-  DS_EVCC_INFLUXDB: optionalEnv("GRAFANA_DS_EVCC_INFLUXDB_UID", ""),
-  DS_EVCC_AGGREGRATIONS: legacyAggUid || canonicalAggUid,
-};
+const dsMap =
+  family.name === "influx-legacy"
+    ? {
+        DS_EVCC_INFLUXDB: optionalEnv("GRAFANA_DS_EVCC_INFLUXDB_UID", ""),
+        DS_EVCC_AGGREGRATIONS: legacyAggUid || canonicalAggUid,
+      }
+    : {
+        "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", ""),
+      };
 
 function buildInputs(raw) {
   const list = Array.isArray(raw.__inputs) ? raw.__inputs : [];
@@ -133,7 +134,7 @@ async function main() {
         dashboard,
         folderUid,
         overwrite: true,
-        message: `Localization test import (${tag})`,
+        message: `Dashboard test import (${tag})`,
         inputs,
       },
     });
@@ -151,6 +152,7 @@ async function main() {
 
   const manifest = {
     createdAt: new Date().toISOString(),
+    family: family.name,
     tag,
     source: path.relative(process.cwd(), path.resolve(source)),
     grafanaUrl: baseUrl,

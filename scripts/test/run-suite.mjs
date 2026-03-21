@@ -1,7 +1,13 @@
-﻿import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
+import {
+  familySourceDir,
+  familyTranslationDir,
+  parseFamilyArg,
+  readLanguagesConfig,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -9,31 +15,18 @@ const withScreenshots = parseArg("screenshots", "false") === "true";
 const withPrepare = parseArg("prepare", "true") !== "false";
 const withFinalCleanup = parseArg("cleanup-final", "false") === "true";
 const repoRoot = process.cwd();
-const configPath = path.join(repoRoot, "dashboards", "localization", "languages.json");
-
-function readLanguagesConfig() {
-  if (!fs.existsSync(configPath)) {
-    return { sourceLanguage: "de", targetLanguages: ["de", "en"] };
-  }
-
-  const parsed = JSON.parse(fs.readFileSync(configPath, "utf8"));
-  const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
-  const configuredTargets = Array.isArray(parsed.targetLanguages)
-    ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
-    : [];
-
-  const targetLanguages = [...new Set(configuredTargets.length ? configuredTargets : [sourceLanguage])];
-  if (!targetLanguages.includes(sourceLanguage)) {
-    targetLanguages.unshift(sourceLanguage);
-  }
-
-  return { sourceLanguage, targetLanguages };
-}
-
-const { sourceLanguage, targetLanguages } = readLanguagesConfig();
+const family = resolveDashboardFamily(parseFamilyArg());
+const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
+const familyTagPrefix = `${sanitizeTag(family.tagPrefix)}-`;
 const sets = [
-  { tag: `original-${sanitizeTag(sourceLanguage)}`, source: `dashboards/original/${sourceLanguage}` },
-  ...targetLanguages.map((lang) => ({ tag: `${sanitizeTag(lang)}-gen`, source: `dashboards/translation/${lang}` })),
+  {
+    tag: `${familyTagPrefix}original-${sanitizeTag(sourceLanguage)}`,
+    source: path.relative(repoRoot, familySourceDir(family, sourceLanguage)),
+  },
+  ...targetLanguages.map((lang) => ({
+    tag: `${familyTagPrefix}${sanitizeTag(lang)}-gen`,
+    source: path.relative(repoRoot, familyTranslationDir(family, lang)),
+  })),
 ];
 
 function run(script, args = []) {
@@ -44,8 +37,8 @@ function run(script, args = []) {
 }
 
 if (withPrepare) {
-  run("scripts/localization/generate-localized-dashboards.mjs");
-  run("scripts/localization/apply-safe-display-translations.mjs");
+  run("scripts/localization/generate-localized-dashboards.mjs", [`--family=${family.name}`]);
+  run("scripts/localization/apply-safe-display-translations.mjs", [`--family=${family.name}`]);
 }
 
 for (const set of sets) {
@@ -53,7 +46,12 @@ for (const set of sets) {
   if (withScreenshots) {
     run("scripts/test/cleanup-grafana.mjs");
   }
-  run("scripts/test/import-dashboards-raw.mjs", [`--source=${set.source}`, `--tag=${set.tag}`, `--manifest=${manifest}`]);
+  run("scripts/test/import-dashboards-raw.mjs", [
+    `--family=${family.name}`,
+    `--source=${set.source}`,
+    `--tag=${set.tag}`,
+    `--manifest=${manifest}`,
+  ]);
   run("scripts/test/smoke-check.mjs", [`--manifest=${manifest}`]);
   if (withScreenshots) {
     run("scripts/test/capture-screenshots.mjs", [`--manifest=${manifest}`]);
@@ -64,5 +62,4 @@ if (withFinalCleanup) {
   run("scripts/test/cleanup-grafana.mjs");
 }
 
-console.log("\nGrafana localization test suite finished.");
-
+console.log(`\nGrafana dashboard test suite finished for family '${family.name}'.`);

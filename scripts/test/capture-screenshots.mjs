@@ -1,4 +1,4 @@
-﻿import path from "node:path";
+import path from "node:path";
 import fs from "node:fs";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
@@ -50,6 +50,20 @@ function screenshotName(dashboard) {
 function sourceFileName(dashboard) {
   return String(dashboard.sourceFile || "").replace(/^.*[\\/]/, "");
 }
+function familyFolderName(manifest) {
+  return String(manifest?.family || "").trim();
+}
+
+function tagFolderName(manifest) {
+  const rawTag = String(manifest?.tag || "set").trim() || "set";
+  const family = familyFolderName(manifest);
+  const prefix = family === "influx-legacy" ? "influx-" : family === "vm" ? "vm-" : "";
+  if (prefix && rawTag.startsWith(prefix)) {
+    return rawTag.slice(prefix.length);
+  }
+  return rawTag;
+}
+
 function trimTransparentBottom(png) {
   let lastVisibleRow = png.height - 1;
 
@@ -261,7 +275,7 @@ function resolveTimeRange(dashboard) {
   return { from: timeFrom, to: timeTo };
 }
 
-async function captureDashboard(page, dashboard, tag) {
+async function captureDashboard(page, dashboard, manifest) {
   const dashboardPath = dashboard.url || `/d/${encodeURIComponent(dashboard.uid)}`;
   const range = resolveTimeRange(dashboard);
   const rangeQuery = range.from && range.to
@@ -284,7 +298,11 @@ async function captureDashboard(page, dashboard, tag) {
       console.warn(`WARN ${dashboard.uid}: visible error hint in ${vp.name}`);
     }
 
-    const target = path.join(outDir, tag, vp.name, `${screenshotName(dashboard)}.png`);
+    const familyDir = familyFolderName(manifest);
+    const tagDir = tagFolderName(manifest);
+    const target = familyDir
+      ? path.join(outDir, familyDir, tagDir, vp.name, `${screenshotName(dashboard)}.png`)
+      : path.join(outDir, tagDir, vp.name, `${screenshotName(dashboard)}.png`);
     await captureComposed(page, vp, target);
     console.log(`Screenshot: ${target}`);
   }
@@ -301,7 +319,7 @@ async function main() {
   await login(page);
 
   for (const dashboard of manifest.dashboards || []) {
-    await captureDashboard(page, dashboard, tag);
+    await captureDashboard(page, dashboard, manifest);
   }
 
   await browser.close();
@@ -312,3 +330,4 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+

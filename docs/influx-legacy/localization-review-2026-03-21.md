@@ -2,15 +2,15 @@
 
 This note records the current review state after a full Grafana import, smoke-check, and screenshot run across:
 
-- `original-de`
-- `de-gen`
-- `en-gen`
-- `fr-gen`
-- `nl-gen`
-- `es-gen`
-- `it-gen`
-- `zh-gen`
-- `hi-gen`
+- `influx-original-de`
+- `influx-de-gen`
+- `influx-en-gen`
+- `influx-fr-gen`
+- `influx-nl-gen`
+- `influx-es-gen`
+- `influx-it-gen`
+- `influx-zh-gen`
+- `influx-hi-gen`
 
 The goal is to separate:
 
@@ -45,11 +45,11 @@ These strings still appear in screenshots because they are coupled to dashboard 
 
 Representative examples are in the generated dashboards:
 
-- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/translation/en/EVCC_%20Today.json)
-- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/translation/fr/EVCC_%20Today.json)
-- [EVCC_ Today (Mobile).json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/translation/es/EVCC_%20Today%20(Mobile).json)
-- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/translation/zh/EVCC_%20Today.json)
-- [EVCC_ Today (Mobile).json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/translation/hi/EVCC_%20Today%20(Mobile).json)
+- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/influx-legacy/translation/en/EVCC_%20Today.json)
+- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/influx-legacy/translation/fr/EVCC_%20Today.json)
+- [EVCC_ Today (Mobile).json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/influx-legacy/translation/es/EVCC_%20Today%20(Mobile).json)
+- [EVCC_ Today.json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/influx-legacy/translation/zh/EVCC_%20Today.json)
+- [EVCC_ Today (Mobile).json](D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/influx-legacy/translation/hi/EVCC_%20Today%20(Mobile).json)
 
 Recurring coupled strings:
 
@@ -96,3 +96,6 @@ Current state after this round:
 ## Recommended next technical task
 
 Refactor the original `Today`, `Today (Mobile)`, `Monat`, `Jahr`, and `All-time` dashboards so the recurring internal names above are no longer used as visible labels.
+
+
+

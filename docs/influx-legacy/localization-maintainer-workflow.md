@@ -12,15 +12,15 @@ There are two translation layers in this repository.
 
 Source:
 
-- `dashboards/original/<sourceLanguage>`
+- `dashboards/influx-legacy/original/<sourceLanguage>`
 
 Mappings:
 
-- `dashboards/localization/<source>_to_<target>.json`
+- `dashboards/influx-legacy/localization/<source>_to_<target>.json`
 
 Generated output:
 
-- `dashboards/translation/<language>`
+- `dashboards/influx-legacy/translation/<language>`
 
 This layer is scriptable and should always run first.
 
@@ -36,20 +36,20 @@ Examples:
 
 This layer is now a scripted follow-up step on the generated dashboards only.
 
-Do not apply this step to `dashboards/original` unless you are intentionally refactoring the source dashboards.
+Do not apply this step to `dashboards/influx-legacy/original` unless you are intentionally refactoring the source dashboards.
 
 ## Repository scope
 
-- language config: `dashboards/localization/languages.json`
-- source of truth: `dashboards/original/<sourceLanguage>`
-- per-language mapping: `dashboards/localization/<source>_to_<target>.json`
-- generated outputs: `dashboards/translation/<language>`
+- language config: `dashboards/influx-legacy/localization/languages.json`
+- source of truth: `dashboards/influx-legacy/original/<sourceLanguage>`
+- per-language mapping: `dashboards/influx-legacy/localization/<source>_to_<target>.json`
+- generated outputs: `dashboards/influx-legacy/translation/<language>`
 
 ## Prerequisites
 
 - Node.js 20+
 - ability to run commands from repository root
-- for Grafana validation, see `docs/grafana-localization-testing.md`
+- for Grafana validation, see `docs/influx-legacy/grafana-localization-testing.md`
 
 ## Standard update workflow
 
@@ -57,7 +57,7 @@ Do not apply this step to `dashboards/original` unless you are intentionally ref
 
 Edit:
 
-- `dashboards/original/<sourceLanguage>`
+- `dashboards/influx-legacy/original/<sourceLanguage>`
 
 Only do this for real source changes or structural panel refactors.
 
@@ -65,9 +65,9 @@ Only do this for real source changes or structural panel refactors.
 
 Edit the relevant mapping JSON files, for example:
 
-- `dashboards/localization/de_to_en.json`
-- `dashboards/localization/de_to_fr.json`
-- `dashboards/localization/de_to_hi.json`
+- `dashboards/influx-legacy/localization/de_to_en.json`
+- `dashboards/influx-legacy/localization/de_to_fr.json`
+- `dashboards/influx-legacy/localization/de_to_hi.json`
 
 Use `exact` for full labels and stable phrases.
 
@@ -76,7 +76,7 @@ Use `contains` only for very stable token replacements that are safe across cont
 ### 3. Generate localized dashboards
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs
+node scripts/localization/generate-localized-dashboards.mjs --family=influx-legacy
 ```
 
 ### 4. Apply safe display-only translations
@@ -84,7 +84,7 @@ node scripts/localization/generate-localized-dashboards.mjs
 Important: run this step only after step 3 has fully finished. Do not run both scripts in parallel.
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs
+node scripts/localization/apply-safe-display-translations.mjs --family=influx-legacy
 ```
 
 This step only touches user-visible fields in generated dashboards, for example:
@@ -97,12 +97,12 @@ This step only touches user-visible fields in generated dashboards, for example:
 ### 5. Audit missing mapping coverage
 
 ```bash
-node scripts/localization/audit-localization.mjs
+node scripts/localization/audit-localization.mjs --family=influx-legacy
 ```
 
 Review generated candidate files:
 
-- `dashboards/localization/missing-<source>_to_<target>.exact.json`
+- `dashboards/influx-legacy/localization/missing-<source>_to_<target>.exact.json`
 
 Merge relevant entries into the real mapping file and regenerate.
 
@@ -137,7 +137,7 @@ The scripted `alias` translation in `apply-safe-display-translations.mjs` perfor
 
 Use the full testing workflow from:
 
-- `docs/grafana-localization-testing.md`
+- `docs/influx-legacy/grafana-localization-testing.md`
 
 For the standard end-to-end path, `run-suite.mjs` now runs both preparation steps automatically unless disabled with `--prepare=false`.
 
@@ -206,4 +206,6 @@ Suggested structure for a non-trivial localization update:
 3. `fix: translate safe display-only dashboard labels`
 4. `test: refresh Grafana localization screenshots`
 5. `docs: update localization maintainer workflow`
+
+
 

@@ -11,6 +11,8 @@ tests/artifacts/
 
 # Generated localization audit candidates
 dashboards/localization/missing-*.exact.json
+dashboards/influx-legacy/localization/missing-*.exact.json
 
 # Local Node dependencies
 node_modules/
+

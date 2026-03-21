@@ -8,8 +8,8 @@ It is intentionally short and should reflect the current repository state, not o
 
 Implemented:
 
-- source dashboards under `dashboards/original/de`
-- generated dashboards under `dashboards/translation/<language>`
+- source dashboards under `dashboards/influx-legacy/original/de`
+- generated dashboards under `dashboards/influx-legacy/translation/<language>`
 - mapping-based localization generator and audit scripts
 - Grafana import, smoke-check, cleanup, and screenshot automation
 - screenshot capture with panel-composition instead of naive full-page capture
@@ -17,7 +17,7 @@ Implemented:
 - per-language full-suite execution with cleanup before each screenshot run
 - safe display-only translation patches in generated dashboards for multiple languages
 - screenshot filename slugging now preserves Latin words with accents more cleanly
-- latest review documented in `docs/localization-review-2026-03-21.md`
+- latest review documented in `docs/influx-legacy/localization-review-2026-03-21.md`
 
 ## Remaining technical work
 
@@ -59,7 +59,7 @@ Goal:
 
 Status: partially completed.
 
-- latest review note: `docs/localization-review-2026-03-21.md`
+- latest review note: `docs/influx-legacy/localization-review-2026-03-21.md`
 - the dominant remaining category is now `source dashboard refactor needed`
 
 ### 4. Consolidate non-Latin language handling
@@ -79,7 +79,8 @@ Status: completed (2026-03-16).
 
 If you are new to this workflow, start with:
 
-1. `docs/localization-maintainer-workflow.md`
-2. `docs/grafana-localization-testing.md`
+1. `docs/influx-legacy/localization-maintainer-workflow.md`
+2. `docs/influx-legacy/grafana-localization-testing.md`
 3. `scripts/test/README.md`
 4. any remaining language-specific review notes that are still actively maintained
+

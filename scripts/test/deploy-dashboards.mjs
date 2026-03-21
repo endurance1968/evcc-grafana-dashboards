@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
@@ -9,11 +9,18 @@ import {
   requireEnv,
   sanitizeTag,
 } from "./_lib.mjs";
+import {
+  familySourceDir,
+  familyTranslationDir,
+  parseFamilyArg,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
 
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
+const family = resolveDashboardFamily(parseFamilyArg());
 const language = parseArg("language", "de").trim().toLowerCase();
 const variant = parseArg("variant", "generated").trim().toLowerCase();
 const sourceOverride = parseArg("source", "").trim();
@@ -28,10 +35,13 @@ if (!["orig", "generated"].includes(variant)) {
 
 const source =
   sourceOverride ||
-  (variant === "orig"
-    ? `dashboards/original/${language}`
-    : `dashboards/translation/${language}`);
-const defaultTag = `${language}-${variant === "orig" ? "orig" : "gen"}`;
+  path.relative(
+    process.cwd(),
+    variant === "orig"
+      ? familySourceDir(family, language)
+      : familyTranslationDir(family, language),
+  );
+const defaultTag = `${family.tagPrefix}-${language}-${variant === "orig" ? "orig" : "gen"}`;
 const tag = sanitizeTag(parseArg("tag", defaultTag));
 const manifest = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 
@@ -128,6 +138,7 @@ async function main() {
 
   run("scripts/test/import-dashboards-raw.mjs", [
     `--env=${envArg}`,
+    `--family=${family.name}`,
     `--source=${source}`,
     `--tag=${tag}`,
     `--manifest=${manifest}`,
@@ -140,7 +151,9 @@ async function main() {
     ]);
   }
 
-  console.log(`\nDashboard deploy finished for '${language}' (variant='${variant}', tag='${tag}', source='${source}').`);
+  console.log(
+    `\nDashboard deploy finished for family='${family.name}', language='${language}' (variant='${variant}', tag='${tag}', source='${source}').`,
+  );
 }
 
 main().catch((err) => {

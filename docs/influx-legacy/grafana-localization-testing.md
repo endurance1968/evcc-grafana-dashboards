@@ -62,29 +62,29 @@ Optional:
 
 ### Source and generated folders
 
-- source dashboards: `dashboards/original/<sourceLanguage>`
-- generated localized dashboards: `dashboards/translation/<language>`
-- mapping files: `dashboards/localization/<source>_to_<target>.json`
-- translation audit reports: `dashboards/localization/missing-<source>_to_<target>.exact.json`
+- source dashboards: `dashboards/influx-legacy/original/<sourceLanguage>`
+- generated localized dashboards: `dashboards/influx-legacy/translation/<language>`
+- mapping files: `dashboards/influx-legacy/localization/<source>_to_<target>.json`
+- translation audit reports: `dashboards/influx-legacy/localization/missing-<source>_to_<target>.exact.json`
 
 ### Import tags and manifests
 
 Current import tags are:
 
-- source reference set: `original-<sourceLanguage>`
-- generated sets: `<language>-gen`
+- source reference set: `influx-original-<sourceLanguage>`
+- generated sets: `influx-<language>-gen`
 
 Examples:
 
-- `original-de`
-- `en-gen`
-- `fr-gen`
+- `influx-original-de`
+- `influx-en-gen`
+- `influx-fr-gen`
 
 Current manifest naming:
 
-- `tests/artifacts/import-manifest-original-de.json`
-- `tests/artifacts/import-manifest-en-gen.json`
-- `tests/artifacts/import-manifest-fr-gen.json`
+- `tests/artifacts/import-manifest-influx-original-de.json`
+- `tests/artifacts/import-manifest-influx-en-gen.json`
+- `tests/artifacts/import-manifest-influx-fr-gen.json`
 
 Do not use old examples like `fr`, `de-orig`, or `import-manifest-fr.json`. Those belong to older intermediate states.
 
@@ -93,10 +93,10 @@ Do not use old examples like `fr`, `de-orig`, or `import-manifest-fr.json`. Thos
 Run:
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs
+node scripts/localization/generate-localized-dashboards.mjs --family=influx-legacy
 ```
 
-This copies `dashboards/original/<sourceLanguage>` into every configured target folder under `dashboards/translation/` and applies mapping-based translation for safe text keys.
+This copies `dashboards/influx-legacy/original/<sourceLanguage>` into every configured target folder under `dashboards/influx-legacy/translation/` and applies mapping-based translation for safe text keys.
 
 The generator translates only a limited safe key set such as:
 
@@ -114,7 +114,7 @@ It intentionally does not translate technical query internals.
 Run:
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs
+node scripts/localization/apply-safe-display-translations.mjs --family=influx-legacy
 ```
 
 This second preparation step translates additional safe display-only fields in generated dashboards, especially values that live under generic `value` properties.
@@ -143,10 +143,10 @@ Typical unsafe cases that must not be translated blindly:
 Run:
 
 ```bash
-node scripts/localization/audit-localization.mjs
+node scripts/localization/audit-localization.mjs --family=influx-legacy
 ```
 
-This creates per-language candidate files under `dashboards/localization/missing-*.exact.json`.
+This creates per-language candidate files under `dashboards/influx-legacy/localization/missing-*.exact.json`.
 
 Use these files to extend the matching `de_to_<lang>.json` mapping under `exact`.
 
@@ -160,27 +160,27 @@ Important:
 Example for French:
 
 ```bash
-node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/translation/fr --tag=fr-gen --manifest=tests/artifacts/import-manifest-fr-gen.json
-node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-fr-gen.json
+node scripts/test/import-dashboards-raw.mjs --family=influx-legacy --env=.env.local --source=dashboards/influx-legacy/translation/fr --tag=influx-fr-gen --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
+node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
 ```
 
 Source reference example:
 
 ```bash
-node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/original/de --tag=original-de --manifest=tests/artifacts/import-manifest-original-de.json
-node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-original-de.json
+node scripts/test/import-dashboards-raw.mjs --family=influx-legacy --env=.env.local --source=dashboards/influx-legacy/original/de --tag=influx-original-de --manifest=tests/artifacts/import-manifest-influx-original-de.json
+node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-influx-original-de.json
 ```
 
 ## Step 5: Capture screenshots for one set
 
 ```bash
-node scripts/test/capture-screenshots.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-fr-gen.json
+node scripts/test/capture-screenshots.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
 ```
 
 Outputs:
 
-- `tests/artifacts/screenshots/<tag>/desktop/*.png`
-- `tests/artifacts/screenshots/<tag>/mobile/*.png`
+- `tests/artifacts/screenshots/influx-legacy/<tag>/desktop/*.png`
+- `tests/artifacts/screenshots/influx-legacy/<tag>/mobile/*.png`
 
 ### Current screenshot behavior
 
@@ -223,25 +223,25 @@ This logic is language-independent.
 Without screenshots:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local
 ```
 
 With screenshots:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true
 ```
 
 To test the current generated files without rerunning preparation first:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true --prepare=false
 ```
 
 To finish with an empty Grafana test folder after the run:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true --cleanup-final=true
 ```
 
 ### Full-suite behavior
@@ -316,5 +316,9 @@ Refactor the original dashboards when untranslated text is tied to:
 - formulas that refer to localized strings
 
 Long-term maintainability depends on separating internal technical identifiers from visible user-facing labels.
+
+
+
+
 
 

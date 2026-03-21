@@ -1,4 +1,4 @@
-Wie diese Dashboards zu importieren sind, siehe [hier](../README.md).
+Wie diese Dashboards zu importieren sind, siehe [hier](../../README.md).
 
 # Today
 
@@ -29,7 +29,7 @@ Weitere Details, die bei der Fehlersuche helfen können wie
 Monatliche Statistiken.
 
 > [!NOTE]
-> Dieses Dashboard benötigt tägliche aggregierte Daten. Siehe [scripts](../scripts/) für das Aggregierungsskript.
+> Dieses Dashboard benötigt tägliche aggregierte Daten. Siehe [scripts](../../scripts/influx-legacy/) für das Aggregierungsskript.
 
 ![Monat Screenshot](img/monat.png)
 
@@ -39,7 +39,7 @@ Monatliche Statistiken.
 Jährliche Statistiken.
 
 > [!NOTE]
-> Dieses Dashboard benötigt monatliche und tägliche aggregierte Daten. Siehe [scripts](../scripts/) für das Aggregierungsskript.
+> Dieses Dashboard benötigt monatliche und tägliche aggregierte Daten. Siehe [scripts](../../scripts/influx-legacy/) für das Aggregierungsskript.
 
 ![Jahr Screenshot](img/jahr.png)
 
@@ -55,7 +55,7 @@ Statistiken über den gesamten erfassten  Datenzeitraum bestehend aus zwei Teile
 
 
 > [!NOTE]
-> Dieses Dashboard benötigt täglich und monatlich aggregierte Daten. Siehe [scripts](../scripts/) für das Aggregierungsskript.
+> Dieses Dashboard benötigt täglich und monatlich aggregierte Daten. Siehe [scripts](../../scripts/influx-legacy/) für das Aggregierungsskript.
 
 ![All-Time Screenshot](img/all-time.png)
 
@@ -153,3 +153,6 @@ In den Dashboards 'EVCC: Today - Details', 'EVCC: Monat', und 'EVCC:Jahr' müsse
    * 'EVCC: Jahr'
      * 'Haus: Energieverteilung'
      * 'Haus: Energieverbrauch'
+
+
+

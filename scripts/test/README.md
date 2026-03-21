@@ -5,7 +5,6 @@ This folder contains the script-based Grafana test workflow used to import local
 ## Script overview
 
 - `deploy-dashboards.mjs`: high-level deploy workflow for a single language or variant
-- `import-dashboards.mjs`: low-level dashboard import primitive
 - `import-dashboards-raw.mjs`: import via Grafana's raw dashboard import endpoint
 - `smoke-check.mjs`: post-import validation
 - `capture-screenshots.mjs`: browser-based screenshot capture
@@ -15,7 +14,7 @@ This folder contains the script-based Grafana test workflow used to import local
 
 Localization preparation scripts used before test runs:
 
-- `../localization/generate-localized-dashboards.mjs`: regenerate `dashboards/translation/<language>`
+- `../localization/generate-localized-dashboards.mjs`: regenerate `dashboards/influx-legacy/translation/<language>`
 - `../localization/apply-safe-display-translations.mjs`: apply safe display-only translations to generated dashboards
 
 ## Required environment
@@ -45,19 +44,19 @@ Optional:
 
 The suite currently uses these tags:
 
-- source reference set: `original-<sourceLanguage>`
-- generated localized set: `<language>-gen`
+- source reference set: `influx-original-<sourceLanguage>`
+- generated localized set: `influx-<language>-gen`
 
 Examples:
 
-- `original-de`
-- `en-gen`
-- `fr-gen`
+- `influx-original-de`
+- `influx-en-gen`
+- `influx-fr-gen`
 
 Manifests are written to:
 
-- `tests/artifacts/import-manifest-original-de.json`
-- `tests/artifacts/import-manifest-en-gen.json`
+- `tests/artifacts/import-manifest-influx-original-de.json`
+- `tests/artifacts/import-manifest-influx-en-gen.json`
 - and so on
 
 ## import-dashboards-raw.mjs
@@ -75,7 +74,7 @@ Behavior:
 Typical example:
 
 ```bash
-node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/translation/fr --tag=fr-gen --manifest=tests/artifacts/import-manifest-fr-gen.json
+node scripts/test/import-dashboards-raw.mjs --family=influx-legacy --env=.env.local --source=dashboards/influx-legacy/translation/fr --tag=influx-fr-gen --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
 ```
 
 ## smoke-check.mjs
@@ -92,7 +91,7 @@ Checks:
 Example:
 
 ```bash
-node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-fr-gen.json
+node scripts/test/smoke-check.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
 ```
 
 ## capture-screenshots.mjs
@@ -101,13 +100,13 @@ Purpose: capture deterministic dashboard screenshots for review.
 
 Outputs:
 
-- `tests/artifacts/screenshots/<tag>/desktop/*.png`
-- `tests/artifacts/screenshots/<tag>/mobile/*.png`
+- `tests/artifacts/screenshots/influx-legacy/<tag>/desktop/*.png`
+- `tests/artifacts/screenshots/influx-legacy/<tag>/mobile/*.png`
 
 Example:
 
 ```bash
-node scripts/test/capture-screenshots.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-fr-gen.json
+node scripts/test/capture-screenshots.mjs --env=.env.local --manifest=tests/artifacts/import-manifest-influx-fr-gen.json
 ```
 
 ## Screenshot implementation
@@ -163,9 +162,9 @@ Behavior:
 - by default runs localization preparation first:
   - `generate-localized-dashboards.mjs`
   - `apply-safe-display-translations.mjs`
-- reads `dashboards/localization/languages.json`
-- includes the source reference set as `original-<sourceLanguage>`
-- includes each generated target folder as `<language>-gen`
+- reads `dashboards/influx-legacy/localization/languages.json`
+- includes the source reference set as `influx-original-<sourceLanguage>`
+- includes each generated target folder as `influx-<language>-gen`
 - when `--screenshots=true`, runs `cleanup-grafana.mjs` before each set
 - imports the set
 - runs smoke-check
@@ -174,19 +173,19 @@ Behavior:
 Example:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true
 ```
 
 To test the current files without regenerating them first:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true --prepare=false
 ```
 
 To finish with an empty Grafana test folder:
 
 ```bash
-node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
+node scripts/test/run-suite.mjs --family=influx-legacy --env=.env.local --screenshots=true --cleanup-final=true
 ```
 
 Important operational detail:
@@ -227,5 +226,11 @@ If screenshots suddenly show `????`, first inspect the JSON files for encoding c
 ## Maintenance note
 
 Update this README whenever script names, defaults, tags, screenshot behavior, or workflow assumptions change.
+
+
+
+
+
+
 
 

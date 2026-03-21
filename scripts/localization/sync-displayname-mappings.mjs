@@ -1,27 +1,22 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
+import {
+  familyMappingPath,
+  familySourceDir,
+  familyTranslationDir,
+  parseFamilyArg,
+  readLanguagesConfig,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
-const repoRoot = process.cwd();
-const localizationDir = path.join(repoRoot, "dashboards", "localization");
-const originalDir = path.join(repoRoot, "dashboards", "original");
-const translationDir = path.join(repoRoot, "dashboards", "translation");
-const configPath = path.join(localizationDir, "languages.json");
+const family = resolveDashboardFamily(parseFamilyArg());
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
 function writeJson(filePath, data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2) + "\n", "utf8");
-}
-
-function readLanguagesConfig() {
-  const parsed = readJson(configPath);
-  const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
-  const targetLanguages = Array.isArray(parsed.targetLanguages)
-    ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
-    : [];
-  return { sourceLanguage, targetLanguages };
+  fs.writeFileSync(filePath, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
 
 function collectJsonFiles(dirPath) {
@@ -31,7 +26,7 @@ function collectJsonFiles(dirPath) {
     const fullPath = path.join(dirPath, entry.name);
     if (entry.isDirectory()) {
       files.push(...collectJsonFiles(fullPath));
-    } else if (entry.isFile() && entry.name.toLowerCase().endsWith('.json')) {
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".json")) {
       files.push(fullPath);
     }
   }
@@ -47,17 +42,17 @@ function collectDisplayNamePairs(sourceNode, targetNode, pairs) {
     return;
   }
 
-  if (!sourceNode || !targetNode || typeof sourceNode !== 'object' || typeof targetNode !== 'object') {
+  if (!sourceNode || !targetNode || typeof sourceNode !== "object" || typeof targetNode !== "object") {
     return;
   }
 
   if (
-    typeof sourceNode.id === 'string' &&
-    typeof targetNode.id === 'string' &&
+    typeof sourceNode.id === "string" &&
+    typeof targetNode.id === "string" &&
     sourceNode.id === targetNode.id &&
-    (sourceNode.id === 'displayName' || sourceNode.id === 'displayNameFromDS') &&
-    typeof sourceNode.value === 'string' &&
-    typeof targetNode.value === 'string' &&
+    (sourceNode.id === "displayName" || sourceNode.id === "displayNameFromDS") &&
+    typeof sourceNode.value === "string" &&
+    typeof targetNode.value === "string" &&
     sourceNode.value !== targetNode.value
   ) {
     pairs.set(sourceNode.value, targetNode.value);
@@ -73,15 +68,15 @@ function collectDisplayNamePairs(sourceNode, targetNode, pairs) {
 }
 
 function updateMapping(sourceLanguage, targetLanguage) {
-  const sourceLangDir = path.join(originalDir, sourceLanguage);
-  const targetLangDir = path.join(translationDir, targetLanguage);
-  const mappingPath = path.join(localizationDir, `${sourceLanguage}_to_${targetLanguage}.json`);
+  const sourceLangDir = familySourceDir(family, sourceLanguage);
+  const targetLangDir = familyTranslationDir(family, targetLanguage);
+  const mappingFile = familyMappingPath(family, sourceLanguage, targetLanguage);
 
-  if (!fs.existsSync(targetLangDir) || !fs.existsSync(mappingPath)) {
+  if (!fs.existsSync(targetLangDir) || !fs.existsSync(mappingFile)) {
     return { targetLanguage, added: 0, totalPairs: 0 };
   }
 
-  const mapping = readJson(mappingPath);
+  const mapping = readJson(mappingFile);
   mapping.exact = mapping.exact || {};
   mapping.contains = Array.isArray(mapping.contains) ? mapping.contains : [];
 
@@ -109,16 +104,18 @@ function updateMapping(sourceLanguage, targetLanguage) {
   }
 
   if (added > 0) {
-    const sortedExact = Object.fromEntries(Object.entries(mapping.exact).sort(([a], [b]) => a.localeCompare(b, 'de')));
+    const sortedExact = Object.fromEntries(
+      Object.entries(mapping.exact).sort(([a], [b]) => a.localeCompare(b, sourceLanguage)),
+    );
     mapping.exact = sortedExact;
-    writeJson(mappingPath, mapping);
+    writeJson(mappingFile, mapping);
   }
 
   return { targetLanguage, added, totalPairs: pairs.size };
 }
 
 function main() {
-  const { sourceLanguage, targetLanguages } = readLanguagesConfig();
+  const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
   for (const targetLanguage of targetLanguages) {
     if (targetLanguage === sourceLanguage) {
       continue;

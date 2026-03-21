@@ -2,6 +2,9 @@
 
 EVCC Dashboard mit Grafana für 2 Loadpoints und 2 Fahrzeuge. Loadpoints und Fahrzeuge können bei Bedarf einfach reduziert werden.
 
+> [!NOTE]
+> Diese README beschreibt den bestehenden Influx-basierten Legacy-Pfad. Die Legacy-Dashboards liegen jetzt unter dashboards/influx-legacy/. VictoriaMetrics wird separat aufgebaut.
+
 - Realtime Dashboard for Desktop, Tablet und Mobile.
 - Monatliche und jährliche Übersicht.
 - Berechnungen für Autarkie, Eigenverbrauch, sowie finanzielles Dashboard mit Kaptialrückflüssen und Amortisation.
@@ -9,9 +12,9 @@ EVCC Dashboard mit Grafana für 2 Loadpoints und 2 Fahrzeuge. Loadpoints und Fah
 
 Vorab: Ohne in Grafana einsteigen zu können, geht es nicht. Die Dashboards sind an meinen Bedürfnisse angepasst, so filtere ich in vielen Dashboards Ausreißer aus. Diese Werte müsst ihr ggf. anpassen. Zum Beispiel filtere ich bei meiner 9.84 kWp anlage alle Werte über 20 kW raus. Denkt bitte nicht, dass ihr meine Dashboards einfach in Grafana hochladen könnt und es wird bei Euch funktionieren. Seht das bitte eher als Startpunkt für eigene Dashboards.
 
-Ich habe versucht alle notwendigen Anpassungen unter ['dashboards'](dashboards/README.md) aufzulisten. Dabei ist mir aber sicher was durch die Lappen gegangen.
+Ich habe versucht alle notwendigen Anpassungen unter ['dashboards'](dashboards/influx-legacy/README.md) aufzulisten. Dabei ist mir aber sicher was durch die Lappen gegangen.
 
-![PV Today Screenshot](dashboards/img/today.png)
+![PV Today Screenshot](dashboards/influx-legacy/img/today.png)
 
 
 ## Installation
@@ -53,7 +56,7 @@ Dieser Thread ["InfluxDB und Grafana"](https://github.com/evcc-io/evcc/discussio
 ### Installation der Dashboards in Grafana
 
 
-1. Daten Aggregations Script wie [unter 'scripts beschrieben](./scripts/README.md) anpassen und installieren (ohne dieses werden die Dashboards für Monat, Jahr und Finanz nicht laufen).
+1. Daten Aggregations Script wie [unter 'scripts beschrieben](./scripts/influx-legacy/README.md) anpassen und installieren (ohne dieses werden die Dashboards für Monat, Jahr und Finanz nicht laufen).
 
 2. Data Sources unter 'Connections /  Data Sources' anlegen. 
    1. Oben rechts auf '+ Add new data source' clicken.
@@ -82,7 +85,7 @@ Dieser Thread ["InfluxDB und Grafana"](https://github.com/evcc-io/evcc/discussio
 
 4. Die Werte des Dashboards anpassen:
    1. Data Source auswählen. 'EVCC Influx DB' steht für die Datenbank, in die EVCC direkt schreibt. 'EVCC Aggregation' ist die Datenbank, in die das Aggregationsscript die aggregierten Daten schreibt. Weitere Variablen wie abgefragt ausfüllen. Diese können aber auch noch nach dem Import angepasst werden. Die Blockist Variablen würde ich nur bei Bedarf später ändern.
-   2. Letzte Anpassungen in den Dashboards vornehmen. Siehe auch [unter 'dashboards'](./dashboards/README.md#anpassungen). 
+   2. Letzte Anpassungen in den Dashboards vornehmen. Siehe auch [unter 'dashboards'](./dashboards/influx-legacy/README.md#anpassungen). 
    
    Der Screenshot zeigt den Import des Monatsdashboard. Die abgefragten Werte unterscheiden sich von Dashboard zu Dashboard.
 
@@ -122,7 +125,7 @@ Falls schon eine ältere Version installiert worden ist, hier die Schritte um di
 
 6. Die Werte des Dashboards anpassen:
    1. Data Source auswählen. 'EVCC Influx DB' steht für die Datenbank, in die EVCC direkt schreibt. 'EVCC Aggregation' ist die Datenbank, in die das Aggregationsscript die aggregierten Daten schreibt. Weitere Variablen wie abgefragt ausfüllen. Diese können aber auch noch nach dem Import angepasst werden. Die Blockist Variablen würde ich nur bei Bedarf später ändern.
-   2. Letzte Anpassungen in den Dashboards vornehmen. Siehe auch [unter 'dashboards'](./dashboards/README.md#anpassungen). 
+   2. Letzte Anpassungen in den Dashboards vornehmen. Siehe auch [unter 'dashboards'](./dashboards/influx-legacy/README.md#anpassungen). 
 
 
 ## FAQ
@@ -139,7 +142,7 @@ Gute Frage. Leider ist mir derzeit keine Möglichkeit bekannt unter HAOS (oder �
 
 Was ich evaluiert habe ist die Nutzung von Continuous Queries innerhalb von Influx. Leider stoße ich hier an andere Grenzen, da InfluxQL Funktionen wie $TODAY fehlen um die entsprechenden Queries formulieren zu können. 
 
-Die einzige Möglichkeit, die ich hier sehe ist das Shell Script auf einem externen Linux System zu konfigurieren, das sich remote mit der Influx DB auf dem HAOS System verbindet. Siehe die [Dokumentation des Aggregations Scriptes](./scripts/README.md) wie man es so konfiguriert, dass man es auf einem externen Linux System laufen lassen kann.
+Die einzige Möglichkeit, die ich hier sehe ist das Shell Script auf einem externen Linux System zu konfigurieren, das sich remote mit der Influx DB auf dem HAOS System verbindet. Siehe die [Dokumentation des Aggregations Scriptes](./scripts/influx-legacy/README.md) wie man es so konfiguriert, dass man es auf einem externen Linux System laufen lassen kann.
 
 ### Nach dem Upgrade sehen die Dashboards irgendwie komisch aus
 
@@ -147,7 +150,7 @@ Hast Du die Upgrade Schritte, insbesondere das Löschen der Library Panels befol
 
 ### Ein paar Panele zeigen nur "No Data" an.
 
-- Hast Du die Aggregation schon für alle betreffenden Zeiträume laufen gelassen? Siehe [scripts](./scripts/).
+- Hast Du die Aggregation schon für alle betreffenden Zeiträume laufen gelassen? Siehe [scripts](./scripts/influx-legacy/).
 - Wurden beim Import die richtigen Data Sources ausgewählt? Falls nein, kann sie auch nachträglich in den betroffenen Panels noch geändert werden.
 
 
@@ -155,3 +158,5 @@ Hast Du die Upgrade Schritte, insbesondere das Löschen der Library Panels befol
 # Danke
 
 Herzlichen Dank an alle, die im Thread ["InfluxDB und Grafana"](https://github.com/evcc-io/evcc/discussions/4213) im EVCC Repository aktiv mitgeholfen haben. Ohne Eure Hilfe wäre das hier entweder nichts geworden oder hätte deutlich länger gedauert.
+
+

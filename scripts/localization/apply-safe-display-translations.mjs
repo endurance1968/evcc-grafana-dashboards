@@ -1,9 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
+import {
+  familyMappingPath,
+  familyTranslationDir,
+  parseFamilyArg,
+  readLanguagesConfig,
+  resolveDashboardFamily,
+} from "../_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const localizationDir = path.join(repoRoot, "dashboards", "localization");
-const configFile = path.join(localizationDir, "languages.json");
+const family = resolveDashboardFamily(parseFamilyArg());
 
 const safeStringKeys = new Set([
   "title",
@@ -55,31 +61,8 @@ function writeJson(filePath, jsonData) {
   fs.writeFileSync(filePath, `${JSON.stringify(jsonData, null, 2)}\n`, "utf8");
 }
 
-function readLanguagesConfig() {
-  if (!fs.existsSync(configFile)) {
-    return { sourceLanguage: "de", targetLanguages: ["de", "en"] };
-  }
-
-  const parsed = readJson(configFile);
-  const sourceLanguage = String(parsed.sourceLanguage || "de").trim();
-  const configuredTargets = Array.isArray(parsed.targetLanguages)
-    ? parsed.targetLanguages.map((x) => String(x).trim()).filter(Boolean)
-    : [];
-
-  const targetLanguages = [...new Set(configuredTargets.length ? configuredTargets : [sourceLanguage])];
-  if (!targetLanguages.includes(sourceLanguage)) {
-    targetLanguages.unshift(sourceLanguage);
-  }
-
-  return { sourceLanguage, targetLanguages };
-}
-
-function mappingPath(sourceLanguage, targetLanguage) {
-  return path.join(localizationDir, `${sourceLanguage}_to_${targetLanguage}.json`);
-}
-
 function readMapping(sourceLanguage, targetLanguage) {
-  const filePath = mappingPath(sourceLanguage, targetLanguage);
+  const filePath = familyMappingPath(family, sourceLanguage, targetLanguage);
   if (!fs.existsSync(filePath)) {
     return { exact: {}, contains: [] };
   }
@@ -245,7 +228,7 @@ function translateSafeNode(node, mapping) {
 }
 
 function main() {
-  const { sourceLanguage, targetLanguages } = readLanguagesConfig();
+  const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
   let totalFiles = 0;
 
   for (const targetLanguage of targetLanguages) {
@@ -253,7 +236,7 @@ function main() {
       continue;
     }
 
-    const targetDir = path.join(repoRoot, "dashboards", "translation", targetLanguage);
+    const targetDir = familyTranslationDir(family, targetLanguage);
     if (!fs.existsSync(targetDir)) {
       console.warn(`Skipping missing translation directory: ${path.relative(repoRoot, targetDir)}`);
       continue;
@@ -269,7 +252,9 @@ function main() {
       totalFiles += 1;
     }
 
-    console.log(`Applied safe display-only translations to ${files.length} dashboard files for '${targetLanguage}'.`);
+    console.log(
+      `Applied safe display-only translations to ${files.length} dashboard files for '${targetLanguage}' in family '${family.name}'.`,
+    );
   }
 
   console.log(`Processed ${totalFiles} generated dashboard files in total.`);
