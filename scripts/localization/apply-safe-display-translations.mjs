@@ -172,6 +172,21 @@ function canTranslateAlias(panelNode, targetIndex, alias) {
   return !hasUnsafeAliasReference(panelNode, alias, aliasPath);
 }
 
+function translatedXField(node, translatedNode, mapping) {
+  const originalXField = node?.options?.xField;
+  if (typeof originalXField !== "string") {
+    return "";
+  }
+
+  const nextXField = translateString(originalXField, mapping);
+  if (nextXField === originalXField) {
+    return "";
+  }
+
+  const translatedTargets = Array.isArray(translatedNode?.targets) ? translatedNode.targets : [];
+  return translatedTargets.some((target) => target?.legendFormat === nextXField) ? nextXField : "";
+}
+
 function translateSafeNode(node, mapping) {
   if (Array.isArray(node)) {
     return node.map((item) => translateSafeNode(item, mapping));
@@ -224,6 +239,15 @@ function translateSafeNode(node, mapping) {
 
     result[childKey] = translateSafeNode(childValue, mapping);
   }
+
+  const nextXField = translatedXField(node, result, mapping);
+  if (nextXField) {
+    result.options = {
+      ...(result.options || {}),
+      xField: nextXField,
+    };
+  }
+
   return result;
 }
 

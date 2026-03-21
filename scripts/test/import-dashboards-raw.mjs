@@ -49,7 +49,7 @@ const dsMap =
         DS_EVCC_AGGREGRATIONS: legacyAggUid || canonicalAggUid,
       }
     : {
-        "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", ""),
+        "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
       };
 
 function buildInputs(raw) {

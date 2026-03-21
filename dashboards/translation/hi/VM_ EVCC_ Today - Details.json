@@ -1,0 +1,4138 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_VM-EVCC",
+      "label": "vm-evcc",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "victoriametrics-metrics-datasource",
+      "pluginName": "VictoriaMetrics"
+    },
+    {
+      "name": "DS_EXPRESSION",
+      "label": "अभिव्यक्ति",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "__expr__"
+    },
+    {
+      "name": "VAR_PEAKPOWERLIMIT",
+      "type": "constant",
+      "label": "अधिकतम शक्ति/डब्ल्यू के लिए फ़िल्टर",
+      "value": "25000",
+      "description": ""
+    },
+    {
+      "name": "VAR_LOADPOINTBLOCKLIST",
+      "type": "constant",
+      "label": "लोडप्वाइंट के लिए ब्लॉकलिस्ट",
+      "value": "^none$",
+      "description": ""
+    },
+    {
+      "name": "VAR_EXTBLOCKLIST",
+      "type": "constant",
+      "label": "extBlocklist",
+      "value": "^none$",
+      "description": ""
+    },
+    {
+      "name": "VAR_AUXBLOCKLIST",
+      "type": "constant",
+      "label": "auxBlocklist",
+      "value": "^none$",
+      "description": ""
+    },
+    {
+      "name": "VAR_ENERGYSAMPLEINTERVAL",
+      "type": "constant",
+      "label": "ऊर्जा नमूना अंतराल",
+      "value": "60s",
+      "description": ""
+    },
+    {
+      "name": "VAR_TARIFFPRICEINTERVAL",
+      "type": "constant",
+      "label": "टैरिफ अंतराल",
+      "value": "15m",
+      "description": ""
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "__expr__",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "barchart",
+      "name": "Bar chart",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.4.0"
+    },
+    {
+      "type": "panel",
+      "id": "piechart",
+      "name": "Pie chart",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "victoriametrics-metrics-datasource",
+      "name": "VictoriaMetrics",
+      "version": "0.20.1"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "आज",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "कल",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "परसों",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [
+        "EVCC"
+      ],
+      "targetBlank": false,
+      "title": "डैशबोर्ड",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    }
+  ],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 8,
+      "panels": [],
+      "title": "पीवी",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "hidden",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gesamt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "maxDataPoints": 1400,
+      "options": {
+        "barRadius": 0.2,
+        "barWidth": 0.7,
+        "fullHighlight": false,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 20
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "ऊर्जा",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(range_sum(integrate(avg by (title)(pvPower_value{id!=\"\"}) < $peakPowerLimit)) / 3600000, \"title\")",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "pvStringEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "min(chargePower_value)",
+          "format": "time_series",
+          "legendFormat": "ऊर्जा",
+          "range": true,
+          "refId": "workaround"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
+          "format": "time_series",
+          "interval": "$__interval",
+          "legendFormat": "कुल",
+          "range": true,
+          "refId": "pvEnergy"
+        }
+      ],
+      "title": "पीवी ऊर्जा",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "labelsToFields": false,
+            "reducers": [
+              "lastNotNull"
+            ]
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Field",
+                "handlerKey": "field.name"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gesamt"
+            },
+            "properties": [
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 17,
+        "x": 7,
+        "y": 1
+      },
+      "id": 27,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title)(pvPower_value{title!=\"\"}), \"title\")",
+          "format": "time_series",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "pvPowerPerString"
+        }
+      ],
+      "title": "पीवी शक्ति",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "hidden",
+            "fillOpacity": 100,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gesamt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 10
+      },
+      "id": 12,
+      "maxDataPoints": 1400,
+      "options": {
+        "barRadius": 0.2,
+        "barWidth": 0.7,
+        "fullHighlight": false,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 20
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title) (last_over_time(batterySoc_value{id!=\"\", title!=\"\"})), \"title\")",
+          "format": "time_series",
+          "interval": "1y",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "batterySoc"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(batterySoc_value{id=\"\"})",
+          "format": "time_series",
+          "interval": "1y",
+          "legendFormat": "कुल",
+          "range": true,
+          "refId": "totalSoc"
+        }
+      ],
+      "title": "बैटरी स्तर",
+      "transparent": true,
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 100,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gesamt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 10
+      },
+      "id": 13,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg by (title)(batteryPower_value{id!=\"\"})",
+          "format": "time_series",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "बैटरी पावर",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "hidden",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Vorhersage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tatsächlich"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 17
+      },
+      "id": 35,
+      "maxDataPoints": 1400,
+      "options": {
+        "barRadius": 0.2,
+        "barWidth": 0.7,
+        "fullHighlight": false,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {
+          "valueSize": 20
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "ऊर्जा",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "पूर्वानुमान",
+          "range": true,
+          "refId": "pvEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "वास्तविक",
+          "range": true,
+          "refId": "pvStringEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "min(chargePower_value)",
+          "format": "time_series",
+          "legendFormat": "ऊर्जा",
+          "range": true,
+          "refId": "workaround"
+        }
+      ],
+      "title": "पूर्वानुमान",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "labelsToFields": false,
+            "reducers": [
+              "lastNotNull"
+            ]
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Field",
+                "handlerKey": "field.name"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": true,
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 100,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 3,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "text",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tatsächlich"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Vorhersage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 17
+      },
+      "id": 16,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(tariffSolar_value)",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "पूर्वानुमान",
+          "range": true,
+          "refId": "forecast"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(pvPower_value{id=\"\"})",
+          "format": "time_series",
+          "legendFormat": "वास्तविक",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "पूर्वानुमान",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 25,
+      "panels": [],
+      "title": "उपभोग",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonstige"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 7,
+        "x": 0,
+        "y": 25
+      },
+      "id": 31,
+      "maxDataPoints": 1400,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Value",
+          "sortDesc": false,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExt"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))  - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExtAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "extPowers"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}), \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "auxPowers"
+        }
+      ],
+      "title": "घर: वर्तमान शक्ति",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonstige"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 17,
+        "x": 7,
+        "y": 25
+      },
+      "id": 36,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExt"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExtAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "extPowers"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}), \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "auxPowers"
+        }
+      ],
+      "title": "घर: शक्ति",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonstige"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 7,
+        "x": 0,
+        "y": 35
+      },
+      "id": 37,
+      "maxDataPoints": 1400,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Value",
+          "sortDesc": false,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 - range_sum(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"})))/3600",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExtAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 ",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersExt"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600 ",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherPowersAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(range_sum(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})))/3600, \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "extEnergies"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(range_sum(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"})))/3600, \"title\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "auxEnergies"
+        }
+      ],
+      "title": "होम: ऊर्जा वितरण",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gesamt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "transparent",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "A",
+                  "mode": "none"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sonstige"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 17,
+        "x": 7,
+        "y": 35
+      },
+      "id": 38,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherEnergyExtAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherEnergyExt"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "अन्य",
+          "range": true,
+          "refId": "otherEnergyAux"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h)/3600, \"title\")",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "{{title}}",
+          "range": true,
+          "refId": "extEnergies"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}offset -1h)/3600, \"title\")",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "auxEnergies"
+        }
+      ],
+      "title": "घर: ऊर्जा",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "AUX और EXT मीटर की उपलब्धता के आधार पर 'अन्य' का फॉर्मूला समायोजित किया जाना चाहिए। विवरण के लिए https://github.com/ha-puzzles/evcc-grafana-dashboards/tree/main/dashboards#formel-für-sonstge-anpassen देखें।",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic-by-name"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Haus"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Garage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stellplatz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 7,
+        "x": 0,
+        "y": 45
+      },
+      "id": 39,
+      "maxDataPoints": 1400,
+      "options": {
+        "displayLabels": [],
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "sortBy": "Value",
+          "sortDesc": false,
+          "values": [
+            "value"
+          ]
+        },
+        "pieType": "donut",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "sort": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "घर",
+          "range": true,
+          "refId": "totalHomeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(sum by (loadpoint)(range_sum (integrate(chargePower_value{loadpoint!=\"\", loadpoint !~ \"$loadpointBlocklist\"})) / 3600), \"loadpoint\")",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{loadpoint}}",
+          "range": true,
+          "refId": "loadpointEnergy"
+        }
+      ],
+      "title": "कुल: ऊर्जा वितरण",
+      "transparent": true,
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "palette-classic-by-name"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watth"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Haus"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Garage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stellplatz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 17,
+        "x": 7,
+        "y": 45
+      },
+      "id": 40,
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(homePower_value offset -1h))/3600",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "घर",
+          "range": true,
+          "refId": "totalHomeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by(loadpoint)(integrate(chargePower_value{loadpoint!=\"\"} offset -1h))/3600, \"loadpoint\")",
+          "format": "time_series",
+          "interval": "1h",
+          "legendFormat": "{{loadpoint}}",
+          "range": true,
+          "refId": "loadpointEnergies"
+        }
+      ],
+      "title": "कुल: ऊर्जा",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 55
+      },
+      "id": 17,
+      "panels": [],
+      "title": "शुल्क",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Durchschnitt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Min"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 0,
+        "y": 56
+      },
+      "id": 20,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "max_over_time(avg(tariffGrid_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "Max",
+          "range": true,
+          "refId": "maxPrice"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(avg(tariffGrid_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "औसत",
+          "range": true,
+          "refId": "avgPrice"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "min_over_time(avg(tariffGrid_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "Min",
+          "range": true,
+          "refId": "minPrice"
+        }
+      ],
+      "title": "बिजली की कीमत",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisSoftMax": 0.42,
+            "axisSoftMin": 0.2,
+            "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.7,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Netzbezug"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 20
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Preis"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 17,
+        "x": 7,
+        "y": 56
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(tariffGrid_value offset -$tariffPriceInterval)",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "मूल्य",
+          "range": true,
+          "refId": "price"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(avg(gridPower_value offset -$tariffPriceInterval), 0)",
+          "format": "time_series",
+          "legendFormat": "ग्रिड आयात",
+          "range": true,
+          "refId": "gridPowerIn"
+        }
+      ],
+      "title": "बिजली की कीमत",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "boughtTotal"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "खरीद"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "soldTotal"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "बिक्री"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dailyTotal"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": 0
+                    },
+                    {
+                      "color": "red",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color"
+              },
+              {
+                "id": "displayName",
+                "value": "दैनिक योग"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 0,
+        "y": 65
+      },
+      "id": 24,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "खरीद",
+          "range": true,
+          "refId": "bought"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "बिक्री",
+          "range": true,
+          "refId": "sold"
+        },
+        {
+          "datasource": {
+            "type": "__expr__",
+            "uid": "${DS_EXPRESSION}"
+          },
+          "expression": "$bought + $sold",
+          "refId": "dailyTotal",
+          "type": "math"
+        }
+      ],
+      "title": "लागत",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.8,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "stepBefore",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 3,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Einkauf"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Verkauf"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 17,
+        "x": 7,
+        "y": 65
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(tariffGrid_value offset -$tariffPriceInterval) * integrate(clamp_min(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "खरीद",
+          "range": true,
+          "refId": "bought"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "बिक्री",
+          "range": true,
+          "refId": "sold"
+        }
+      ],
+      "title": "लागत",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "g/kWh"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Durchschnitt"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Min"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 0,
+        "y": 74
+      },
+      "id": 22,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "max_over_time(avg(tariffCo2_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "Max",
+          "range": true,
+          "refId": "maxCo2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(avg(tariffCo2_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "औसत",
+          "range": true,
+          "refId": "avgCo2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "min_over_time(avg(tariffCo2_value)[1d])",
+          "format": "time_series",
+          "interval": "",
+          "legendFormat": "Min",
+          "range": true,
+          "refId": "minCo2"
+        }
+      ],
+      "title": "सीओ 2",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisSoftMax": 500,
+            "axisSoftMin": 0,
+            "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.8,
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "gradientMode": "scheme",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Netzbezug"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watt"
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 80
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 1
+              },
+              {
+                "id": "custom.axisSoftMin",
+                "value": 0
+              },
+              {
+                "id": "custom.gradientMode",
+                "value": "opacity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CO2"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "massg"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 17,
+        "x": 7,
+        "y": 74
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "tariffCo2_value offset -$tariffPriceInterval",
+          "format": "time_series",
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "सीओ 2",
+          "range": true,
+          "refId": "co2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(gridPower_value, 0)",
+          "format": "time_series",
+          "legendFormat": "ग्रिड आयात",
+          "range": true,
+          "refId": "gridPowerIn"
+        }
+      ],
+      "title": "सीओ 2",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 83
+      },
+      "id": 9,
+      "panels": [],
+      "title": "नेटवर्क",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "amp"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 84
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridCurrents_l1))",
+          "format": "time_series",
+          "legendFormat": "धारा L1",
+          "range": true,
+          "refId": "currentL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridCurrents_l2))",
+          "format": "time_series",
+          "legendFormat": "धारा L2",
+          "range": true,
+          "refId": "currentL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridCurrents_l3))",
+          "format": "time_series",
+          "legendFormat": "धारा L3",
+          "range": true,
+          "refId": "currentL3"
+        }
+      ],
+      "title": "धाराएँ/चरण",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "amp"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 17,
+        "x": 7,
+        "y": 84
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridCurrents_l1)",
+          "format": "time_series",
+          "legendFormat": "धारा L1",
+          "range": true,
+          "refId": "currentL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridCurrents_l2)",
+          "format": "time_series",
+          "legendFormat": "धारा L2",
+          "range": true,
+          "refId": "currentL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridCurrents_l3)",
+          "format": "time_series",
+          "legendFormat": "धारा L3",
+          "range": true,
+          "refId": "currentL3"
+        }
+      ],
+      "title": "धाराएँ/चरण",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 92
+      },
+      "id": 41,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridPowers_l1))",
+          "format": "time_series",
+          "legendFormat": "शक्ति L1",
+          "range": true,
+          "refId": "powerL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridPowers_l2))",
+          "format": "time_series",
+          "legendFormat": "शक्ति L2",
+          "range": true,
+          "refId": "powerL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(gridPowers_l3))",
+          "format": "time_series",
+          "legendFormat": "शक्ति L3",
+          "range": true,
+          "refId": "powerL3"
+        }
+      ],
+      "title": "शक्ति/चरण",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 17,
+        "x": 7,
+        "y": 92
+      },
+      "id": 42,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridPowers_l1)",
+          "format": "time_series",
+          "legendFormat": "शक्ति L1",
+          "range": true,
+          "refId": "powerL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridPowers_l2)",
+          "format": "time_series",
+          "legendFormat": "शक्ति L2",
+          "range": true,
+          "refId": "powerL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(gridPowers_l3)",
+          "format": "time_series",
+          "legendFormat": "शक्ति L3",
+          "range": true,
+          "refId": "powerL3"
+        }
+      ],
+      "title": "शक्ति/चरण",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 100
+      },
+      "id": 10,
+      "panels": [],
+      "repeat": "loadpoint",
+      "title": "लोडपॉइंट $लोडपॉइंट",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 24
+              }
+            ]
+          },
+          "unit": "amp"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 7,
+        "x": 0,
+        "y": 101
+      },
+      "id": 11,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"}))",
+          "format": "time_series",
+          "legendFormat": "धारा L1",
+          "range": true,
+          "refId": "currentL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "format": "time_series",
+          "legendFormat": "धारा L2",
+          "range": true,
+          "refId": "currentL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "format": "time_series",
+          "legendFormat": "धारा L3",
+          "range": true,
+          "refId": "currentL3"
+        }
+      ],
+      "title": "प्रति फेज चार्जिंग धारा: $loadpoint",
+      "transparent": true,
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 24
+              }
+            ]
+          },
+          "unit": "amp"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 17,
+        "x": 7,
+        "y": 101
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(chargeCurrents_l1 {loadpoint=\"$loadpoint\"})",
+          "format": "time_series",
+          "legendFormat": "धारा L1",
+          "range": true,
+          "refId": "currentL1"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(chargeCurrents_l2 {loadpoint=\"$loadpoint\"})",
+          "format": "time_series",
+          "legendFormat": "धारा L2",
+          "range": true,
+          "refId": "currentL2"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(chargeCurrents_l3 {loadpoint=\"$loadpoint\"})",
+          "format": "time_series",
+          "legendFormat": "धारा L3",
+          "range": true,
+          "refId": "currentL3"
+        }
+      ],
+      "title": "प्रति फेज चार्जिंग धारा: $loadpoint",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.2,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 60000,
+            "lineInterpolation": "linear",
+            "lineWidth": 4,
+            "pointSize": 8,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "always",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 3,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^1 phasig.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/^3 phasig.*/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 17,
+        "x": 7,
+        "y": 112
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) < 2",
+          "format": "time_series",
+          "interval": "1m",
+          "legendFormat": "1 फेज",
+          "range": true,
+          "refId": "1P"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) > 2",
+          "format": "time_series",
+          "interval": "1m",
+          "legendFormat": "3 फेज",
+          "range": true,
+          "refId": "3P"
+        }
+      ],
+      "title": "फेज: $loadpoint",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 17,
+        "x": 7,
+        "y": 117
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(chargePower_value {loadpoint=\"$loadpoint\"})",
+          "format": "time_series",
+          "legendFormat": "चार्जिंग पावर",
+          "range": true,
+          "refId": "Ladeleistung"
+        }
+      ],
+      "title": "चार्जिंग शक्ति: $loadpoint",
+      "type": "timeseries"
+    }
+  ],
+  "preload": false,
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": [
+    "EVCC"
+  ],
+  "templating": {
+    "list": [
+      {
+        "description": "डब्ल्यू में अधिकतम शक्ति सीमा। इस सीमा से ऊपर के मूल्यों को आउटलेयर के रूप में माना जाता है।",
+        "hide": 2,
+        "label": "अधिकतम शक्ति/डब्ल्यू के लिए फ़िल्टर",
+        "name": "peakPowerLimit",
+        "query": "${VAR_PEAKPOWERLIMIT}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_PEAKPOWERLIMIT}",
+          "text": "${VAR_PEAKPOWERLIMIT}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_PEAKPOWERLIMIT}",
+            "text": "${VAR_PEAKPOWERLIMIT}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "उन चार्जिंग पॉइंट्स की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Garage' फ़िल्टर करें: ^Garage$\n'Garage' और 'Stellplatz' फ़िल्टर करें: ^Garage$|^Stellplatz$\n'foo' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: ^foo.*$",
+        "hide": 2,
+        "label": "लोडप्वाइंट के लिए ब्लॉकलिस्ट",
+        "name": "loadpointBlocklist",
+        "query": "${VAR_LOADPOINTBLOCKLIST}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_LOADPOINTBLOCKLIST}",
+          "text": "${VAR_LOADPOINTBLOCKLIST}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_LOADPOINTBLOCKLIST}",
+            "text": "${VAR_LOADPOINTBLOCKLIST}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "उन EXT उपकरणों की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: /^none$/\n'Erdgeschoss' फ़िल्टर करें: /^Erdgeschoss$/\n'Erdgeschoss' और 'Erster Stock' फ़िल्टर करें: /^Erdgeschoss$|^Erster Stock$/\n'Verteiler' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: /^Verteiler.*$/",
+        "hide": 2,
+        "name": "extBlocklist",
+        "query": "${VAR_EXTBLOCKLIST}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EXTBLOCKLIST}",
+          "text": "${VAR_EXTBLOCKLIST}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EXTBLOCKLIST}",
+            "text": "${VAR_EXTBLOCKLIST}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "उन EXT उपकरणों की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Erdgeschoss' फ़िल्टर करें: ^Erdgeschoss$\n'Erdgeschoss' और 'Erster Stock' फ़िल्टर करें: ^Erdgeschoss$|^Erster Stock$\n'Verteiler' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: ^Verteiler.*$",
+        "hide": 2,
+        "name": "auxBlocklist",
+        "query": "${VAR_AUXBLOCKLIST}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_AUXBLOCKLIST}",
+          "text": "${VAR_AUXBLOCKLIST}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_AUXBLOCKLIST}",
+            "text": "${VAR_AUXBLOCKLIST}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "victoriametrics-metrics-datasource",
+          "uid": "${DS_VM-EVCC}"
+        },
+        "definition": "label_values(loadpoint)",
+        "includeAll": true,
+        "label": "चार्जिंग पॉइंट",
+        "multi": true,
+        "name": "loadpoint",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(loadpoint)",
+          "refId": "VariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "regexApplyTo": "value",
+        "type": "query"
+      },
+      {
+        "description": "ऊर्जा गणना के लिए नमूनाकरण अंतराल। EVCC क्वेरी अंतराल कम से कम 2x होना चाहिए। डिफ़ॉल्ट: 60s, क्योंकि EVCC डिफ़ॉल्ट अंतराल 60s है।",
+        "hide": 2,
+        "label": "ऊर्जा नमूना अंतराल",
+        "name": "energySampleInterval",
+        "query": "${VAR_ENERGYSAMPLEINTERVAL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_ENERGYSAMPLEINTERVAL}",
+          "text": "${VAR_ENERGYSAMPLEINTERVAL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_ENERGYSAMPLEINTERVAL}",
+            "text": "${VAR_ENERGYSAMPLEINTERVAL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "बिजली टैरिफ बदलने का अंतराल। यदि यह हर 15 मिनट में बदलता है तो इसे '15m' पर सेट करें। यदि टैरिफ स्थिर है तो एक दिन के लिए '1d' उपयोग करें।",
+        "hide": 2,
+        "label": "टैरिफ अंतराल",
+        "name": "tariffPriceInterval",
+        "query": "${VAR_TARIFFPRICEINTERVAL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_TARIFFPRICEINTERVAL}",
+          "text": "${VAR_TARIFFPRICEINTERVAL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_TARIFFPRICEINTERVAL}",
+            "text": "${VAR_TARIFFPRICEINTERVAL}",
+            "selected": false
+          }
+        ]
+      }
+    ]
+  },
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "VM: EVCC: आज - विवरण",
+  "uid": "adddvtj",
+  "version": 48,
+  "weekStart": ""
+}

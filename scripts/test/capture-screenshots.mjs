@@ -223,7 +223,11 @@ function shouldCaptureInViewport(dashboard, viewportName) {
   const title = String(dashboard.title || "");
   const uid = safeName(dashboard.uid || "");
   const sourceFile = sourceFileName(dashboard);
-  const isMobileVariant = /today\s*\(mobile\)/i.test(sourceFile) || /mobile/i.test(title) || /mobile/.test(uid);
+  const isMobileVariant =
+    /today\s*\(mobile\)/i.test(sourceFile) ||
+    /today\s*-\s*mobile/i.test(sourceFile) ||
+    /mobile/i.test(title) ||
+    /mobile/.test(uid);
   if (viewportName === "desktop") {
     return !isMobileVariant;
   }
