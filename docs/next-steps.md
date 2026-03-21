@@ -60,7 +60,8 @@ Goal:
 
 If you are new to the current default flow, start with:
 
-1. `docs/localization-maintainer-workflow.md`
-2. `docs/grafana-localization-testing.md`
-3. `scripts/test/README.md`
-4. `docs/localization-review-2026-03-21.md`
+1. `docs/vm-thread-restart-handoff-2026-03-21.md`
+2. `docs/localization-maintainer-workflow.md`
+3. `docs/grafana-localization-testing.md`
+4. `scripts/test/README.md`
+5. `docs/localization-review-2026-03-21.md`
