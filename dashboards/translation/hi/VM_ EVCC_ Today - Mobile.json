@@ -1165,12 +1165,12 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600",
+            "expr": "sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
             "legendFormat": "__auto",
-            "range": true,
+            "range": false,
             "refId": "pvEnergy"
           },
           {
@@ -1179,12 +1179,12 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600",
+            "expr": "sum(integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
             "legendFormat": "__auto",
-            "range": true,
+            "range": false,
             "refId": "gridEnergyIn"
           },
           {
@@ -1193,12 +1193,12 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / -3600",
+            "expr": "sum(integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / -3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
             "legendFormat": "__auto",
-            "range": true,
+            "range": false,
             "refId": "gridEnergyOut"
           },
           {
@@ -1207,12 +1207,12 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / 3600",
+            "expr": "sum(integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
             "legendFormat": "__auto",
-            "range": true,
+            "range": false,
             "refId": "homeEnergy"
           },
           {
@@ -1225,7 +1225,7 @@
             "format": "time_series",
             "hide": true,
             "legendFormat": "__auto",
-            "range": true,
+            "range": false,
             "refId": "loadpointEnergy"
           },
           {
@@ -1732,7 +1732,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d]) / 3600000",
+            "expr": "sum without(host) (integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d]) / 3600000)",
             "format": "time_series",
             "legendFormat": "पीवी",
             "range": true,
@@ -1744,7 +1744,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000",
+            "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "ग्रिड आयात",
@@ -1757,7 +1757,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000",
+            "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "जमा करो",
@@ -1770,7 +1770,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / -3600000",
+            "expr": "sum without(host) (integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / -3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "घर",
@@ -1783,7 +1783,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000",
+            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "बैटरी डिस्चार्ज",
@@ -1796,7 +1796,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000",
+            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "बैटरी चार्ज",
@@ -1809,7 +1809,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "sort_by_label(\n  integrate(\n    ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [1d:$energySampleInterval]\n  ) / -3600000\n, \"vehicle\")",
+            "expr": "sort_by_label(\n  sum without(host) (\n    integrate(\n      ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [1d:$energySampleInterval]\n    ) / -3600000\n  )\n, \"vehicle\")",
             "format": "time_series",
             "hide": false,
             "legendFormat": "{{vehicle}}",
@@ -1822,7 +1822,7 @@
               "uid": "bfbufhesv65fkc"
             },
             "editorMode": "code",
-            "expr": "(integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[1d:$energySampleInterval]) / -3600000)",
+            "expr": "sum without(host) ((integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[1d:$energySampleInterval]) / -3600000))",
             "format": "time_series",
             "hide": false,
             "legendFormat": "अतिथि: {{loadpoint}}",
@@ -2321,7 +2321,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(pvPower_value{id=\"\"}) / 1000",
+          "expr": "avg without(host) (pvPower_value{id=\"\"}) / 1000",
           "format": "time_series",
           "legendFormat": "पीवी",
           "range": true,
@@ -2333,7 +2333,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(gridPower_value) / 1000",
+          "expr": "avg without(host) (gridPower_value) / 1000",
           "format": "time_series",
           "legendFormat": "नेटवर्क",
           "range": true,
@@ -2345,7 +2345,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) / -1000",
+          "expr": "avg without(host) (homePower_value) / -1000",
           "format": "time_series",
           "legendFormat": "घर",
           "range": true,
@@ -2357,7 +2357,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(batteryPower_value{id=\"\"}) / 1000",
+          "expr": "avg without(host) (batteryPower_value{id=\"\"}) / 1000",
           "format": "time_series",
           "legendFormat": "बैटरी",
           "range": true,

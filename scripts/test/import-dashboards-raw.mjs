@@ -142,7 +142,7 @@ async function main() {
     imported.push({
       sourceFile: path.relative(process.cwd(), file),
       uid: result.uid || dashboard.uid,
-      url: result.url,
+      url: result.importedUrl || result.url || "",
       status: result.status,
       title: dashboard.title,
     });
