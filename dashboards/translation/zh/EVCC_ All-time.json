@@ -366,13 +366,13 @@
             "resultFormat": "time_series"
           }
         ],
-        "title": "活力",
+        "title": "能源",
         "transparent": true,
         "type": "barchart"
       }
     },
     "c872420b-86a9-4544-9e33-f367a07f9e40": {
-      "name": "EVCC: 公制仪表",
+      "name": "EVCC: 指标仪表",
       "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
       "kind": 1,
       "model": {
@@ -1353,7 +1353,7 @@
       },
       "id": 10,
       "panels": [],
-      "title": "活力",
+      "title": "能源",
       "type": "row"
     },
     {
@@ -1840,7 +1840,7 @@
       "id": 13,
       "libraryPanel": {
         "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
-        "name": "EVCC: 公制仪表"
+        "name": "EVCC: 指标仪表"
       }
     },
     {
@@ -3687,7 +3687,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "家居消费"
+            "displayName": "家庭用电"
           }
         ]
       },

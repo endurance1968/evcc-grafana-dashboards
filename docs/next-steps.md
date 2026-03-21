@@ -16,6 +16,8 @@ Implemented:
 - language-independent fixed time ranges for comparable screenshots
 - per-language full-suite execution with cleanup before each screenshot run
 - safe display-only translation patches in generated dashboards for multiple languages
+- screenshot filename slugging now preserves Latin words with accents more cleanly
+- latest review documented in `docs/localization-review-2026-03-21.md`
 
 ## Remaining technical work
 
@@ -54,6 +56,11 @@ Goal:
   - safe display-only fix
   - source dashboard refactor needed
   - data-driven text from InfluxDB or tags
+
+Status: partially completed.
+
+- latest review note: `docs/localization-review-2026-03-21.md`
+- the dominant remaining category is now `source dashboard refactor needed`
 
 ### 4. Consolidate non-Latin language handling
 

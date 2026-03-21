@@ -1636,7 +1636,7 @@
           "tags": []
         }
       ],
-      "title": "Puissance actuelle",
+      "title": "Maison : Puissance actuelle",
       "transparent": true,
       "type": "piechart"
     },
@@ -2001,7 +2001,7 @@
           "tags": []
         }
       ],
-      "title": "Accueil : Alimentation",
+      "title": "Maison : Puissance",
       "type": "timeseries"
     },
     {
@@ -2306,7 +2306,7 @@
           "tags": []
         }
       ],
-      "title": "Distribution de l'énergie",
+      "title": "Maison : Répartition de l'énergie",
       "transparent": true,
       "type": "piechart"
     },
@@ -2671,7 +2671,7 @@
           "tags": []
         }
       ],
-      "title": "Consommation d'énergie:",
+      "title": "Maison : Consommation d'énergie",
       "type": "timeseries"
     },
     {
@@ -4412,7 +4412,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "R?seau",
+      "title": "Réseau",
       "type": "row"
     },
     {

@@ -957,7 +957,7 @@
           "tags": []
         }
       ],
-      "title": "电池电量",
+      "title": "电池功率",
       "type": "timeseries"
     },
     {
@@ -1636,7 +1636,7 @@
           "tags": []
         }
       ],
-      "title": "首页：当前功率",
+      "title": "家庭：当前功率",
       "transparent": true,
       "type": "piechart"
     },
@@ -2001,7 +2001,7 @@
           "tags": []
         }
       ],
-      "title": "主页： 电源",
+      "title": "家庭：功率",
       "type": "timeseries"
     },
     {
@@ -2306,7 +2306,7 @@
           "tags": []
         }
       ],
-      "title": "主页：能源分配",
+      "title": "家庭：能源分配",
       "transparent": true,
       "type": "piechart"
     },
@@ -2671,7 +2671,7 @@
           "tags": []
         }
       ],
-      "title": "主页：能源消耗",
+      "title": "家庭：能源消耗",
       "type": "timeseries"
     },
     {
@@ -4412,7 +4412,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "网络",
+      "title": "电网",
       "type": "row"
     },
     {

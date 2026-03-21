@@ -525,7 +525,7 @@
       }
     },
     "d9a5a952-0d17-428f-9102-19683b4e515f": {
-      "name": "EVCC: Energieverteilung über Zeit",
+      "name": "EVCC: Energy distribution over time",
       "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
       "kind": 1,
       "model": {
@@ -4079,7 +4079,7 @@
       "id": 53,
       "libraryPanel": {
         "uid": "d9a5a952-0d17-428f-9102-19683b4e515f",
-        "name": "EVCC: Energieverteilung über Zeit"
+        "name": "EVCC: Energy distribution over time"
       }
     },
     {

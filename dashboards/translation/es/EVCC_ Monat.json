@@ -371,7 +371,7 @@
       }
     },
     "c872420b-86a9-4544-9e33-f367a07f9e40": {
-      "name": "EVCC: calibres métricos",
+      "name": "EVCC: Indicadores",
       "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
       "kind": 1,
       "model": {
@@ -661,7 +661,7 @@
       }
     },
     "feio30f3nm0owe": {
-      "name": "EVCC: equilibrio de poder",
+      "name": "EVCC: Balance de potencia",
       "uid": "feio30f3nm0owe",
       "kind": 1,
       "model": {
@@ -1033,7 +1033,7 @@
             "type": "math"
           }
         ],
-        "title": "equilibrio de poder",
+        "title": "Balance de potencia",
         "transparent": true,
         "type": "stat"
       }
@@ -2184,7 +2184,7 @@
       "id": 24,
       "libraryPanel": {
         "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
-        "name": "EVCC: calibres métricos"
+        "name": "EVCC: Indicadores"
       }
     },
     {
@@ -2650,7 +2650,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Inicio: Distribución de energía",
+      "title": "Hogar: Distribución de energía",
       "transparent": true,
       "type": "piechart"
     },
@@ -3316,7 +3316,7 @@
       "id": 30,
       "libraryPanel": {
         "uid": "feio30f3nm0owe",
-        "name": "EVCC: equilibrio de poder"
+        "name": "EVCC: Balance de potencia"
       }
     },
     {

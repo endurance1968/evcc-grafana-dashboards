@@ -196,7 +196,8 @@
     "Zeitzone": "Timezone",
     "Zeitzone: TZ Identifier wie hier gelistet: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List": "Timezone: TZ identifier as listed here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List",
     "Zugekaufte Energiekosten": "Purchased energy costs",
-    "Zusammenfassung": "Summary"
+    "Zusammenfassung": "Summary",
+    "EVCC: Energieverteilung über Zeit": "EVCC: Energy distribution over time"
   },
   "contains": []
 }

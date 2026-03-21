@@ -27,7 +27,12 @@ const viewports = [
 ];
 
 function safeName(input) {
-  return String(input).replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase();
+  return String(input)
+    .normalize("NFKD")
+    .replace(/\p{M}+/gu, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase();
 }
 
 function screenshotName(dashboard) {

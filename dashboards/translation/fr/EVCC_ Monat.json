@@ -2,7 +2,7 @@
   "__inputs": [
     {
       "name": "DS_EVCC_AGGREGRATIONS",
-      "label": "EVCC Agr?gations",
+      "label": "EVCC Aggregations",
       "description": "",
       "type": "datasource",
       "pluginId": "influxdb",
@@ -661,7 +661,7 @@
       }
     },
     "feio30f3nm0owe": {
-      "name": "Power Balance",
+      "name": "EVCC : Bilan de puissance",
       "uid": "feio30f3nm0owe",
       "kind": 1,
       "model": {
@@ -1033,7 +1033,7 @@
             "type": "math"
           }
         ],
-        "title": "Power Balance",
+        "title": "Bilan de puissance",
         "transparent": true,
         "type": "stat"
       }
@@ -1354,7 +1354,7 @@
       }
     },
     "b8787739-953e-4188-9507-0cc12b6ed91b": {
-      "name": "Efficacité de la batterie",
+      "name": "EVCC : Efficacité de la batterie",
       "uid": "b8787739-953e-4188-9507-0cc12b6ed91b",
       "kind": 1,
       "model": {
@@ -1401,7 +1401,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Charger la batterie"
+                  "value": "Charge batterie"
                 }
               ]
             },
@@ -1420,7 +1420,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Decharger la batterie"
+                  "value": "Décharge batterie"
                 }
               ]
             },
@@ -2496,7 +2496,7 @@
       },
       "id": 34,
       "panels": [],
-      "title": "Accueil",
+      "title": "Maison",
       "type": "row"
     },
     {
@@ -2580,7 +2580,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Accueil",
+          "alias": "Maison",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -2650,7 +2650,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Distribution de l'énergie",
+      "title": "Maison : Répartition de l'énergie",
       "transparent": true,
       "type": "piechart"
     },
@@ -2763,7 +2763,7 @@
       "pluginVersion": "12.3.1",
       "targets": [
         {
-          "alias": "Accueil",
+          "alias": "Maison",
           "datasource": {
             "type": "influxdb",
             "uid": "${DS_EVCC_AGGREGRATIONS}"
@@ -2833,7 +2833,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Consommation d'énergie:",
+      "title": "Maison : Consommation d'énergie",
       "type": "barchart"
     },
     {
@@ -3316,7 +3316,7 @@
       "id": 30,
       "libraryPanel": {
         "uid": "feio30f3nm0owe",
-        "name": "Power Balance"
+        "name": "EVCC : Bilan de puissance"
       }
     },
     {
@@ -3594,7 +3594,7 @@
       "id": 16,
       "libraryPanel": {
         "uid": "b8787739-953e-4188-9507-0cc12b6ed91b",
-        "name": "Efficacité de la batterie"
+        "name": "EVCC : Efficacité de la batterie"
       }
     },
     {

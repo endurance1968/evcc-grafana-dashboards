@@ -572,7 +572,7 @@
           "tags": []
         }
       ],
-      "title": "energía fotovoltaica",
+      "title": "Potencia FV",
       "type": "timeseries"
     },
     {
@@ -957,7 +957,7 @@
           "tags": []
         }
       ],
-      "title": "Energía de la batería",
+      "title": "Potencia de la batería",
       "type": "timeseries"
     },
     {
@@ -1636,7 +1636,7 @@
           "tags": []
         }
       ],
-      "title": "Inicio: Potencia actual",
+      "title": "Hogar: Potencia actual",
       "transparent": true,
       "type": "piechart"
     },
@@ -2001,7 +2001,7 @@
           "tags": []
         }
       ],
-      "title": "Inicio: Poder",
+      "title": "Hogar: Potencia",
       "type": "timeseries"
     },
     {
@@ -2306,7 +2306,7 @@
           "tags": []
         }
       ],
-      "title": "Inicio: Distribución de energía",
+      "title": "Hogar: Distribución de energía",
       "transparent": true,
       "type": "piechart"
     },
@@ -4412,7 +4412,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "red",
+      "title": "Red",
       "type": "row"
     },
     {
@@ -5941,7 +5941,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "Poder de carga",
+      "title": "Potencia de carga",
       "type": "timeseries"
     }
   ],

@@ -1167,7 +1167,7 @@
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Historique des indicateurs",
+      "name": "EVCC : Historique des indicateurs",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -1558,7 +1558,7 @@
       }
     },
     "d-V6JqRgz": {
-      "name": "EVCC: ?nergie",
+      "name": "EVCC : Énergie",
       "uid": "d-V6JqRgz",
       "kind": 1,
       "model": {
@@ -2339,7 +2339,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Import reseau"
+                  "value": "Import réseau"
                 }
               ]
             },
@@ -2373,7 +2373,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Charger la batterie"
+                  "value": "Charge batterie"
                 }
               ]
             },
@@ -2396,7 +2396,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Decharger la batterie"
+                  "value": "Décharge batterie"
                 }
               ]
             },
@@ -2710,7 +2710,7 @@
       }
     },
     "cei4rwyht3uv4f": {
-      "name": "EVCC: Co?ts",
+      "name": "EVCC : Coûts",
       "uid": "cei4rwyht3uv4f",
       "kind": 1,
       "model": {
@@ -3737,7 +3737,7 @@
       "id": 51,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Historique des indicateurs"
+        "name": "EVCC : Historique des indicateurs"
       }
     },
     {
@@ -3750,7 +3750,7 @@
       "id": 40,
       "libraryPanel": {
         "uid": "d-V6JqRgz",
-        "name": "EVCC: ?nergie"
+        "name": "EVCC : Énergie"
       }
     },
     {
@@ -3776,7 +3776,7 @@
       "id": 73,
       "libraryPanel": {
         "uid": "cei4rwyht3uv4f",
-        "name": "EVCC: Co?ts"
+        "name": "EVCC : Coûts"
       }
     }
   ],

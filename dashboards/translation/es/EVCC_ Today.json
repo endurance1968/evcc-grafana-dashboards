@@ -817,7 +817,7 @@
       }
     },
     "edgpezcp0j474c": {
-      "name": "EVCC: medidores métricos en vivo",
+      "name": "EVCC: Indicadores en tiempo real",
       "uid": "edgpezcp0j474c",
       "kind": 1,
       "model": {
@@ -1167,7 +1167,7 @@
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: Historia de cifras clave",
+      "name": "EVCC: Historial de indicadores",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -3684,7 +3684,7 @@
           "tags": []
         }
       ],
-      "title": "Fuerza",
+      "title": "Potencia",
       "transparent": true,
       "type": "gauge"
     },
@@ -3724,7 +3724,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "edgpezcp0j474c",
-        "name": "EVCC: medidores métricos en vivo"
+        "name": "EVCC: Indicadores en tiempo real"
       }
     },
     {
@@ -3737,7 +3737,7 @@
       "id": 51,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: Historia de cifras clave"
+        "name": "EVCC: Historial de indicadores"
       }
     },
     {
@@ -3964,7 +3964,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "EVCC: hoy",
+  "title": "EVCC: Hoy",
   "uid": "7Ou-Y1Rgk",
   "version": 219,
   "weekStart": ""

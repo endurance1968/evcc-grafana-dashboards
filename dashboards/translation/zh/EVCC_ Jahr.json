@@ -358,13 +358,13 @@
             "resultFormat": "time_series"
           }
         ],
-        "title": "活力",
+        "title": "能源",
         "transparent": true,
         "type": "barchart"
       }
     },
     "c872420b-86a9-4544-9e33-f367a07f9e40": {
-      "name": "EVCC: 公制仪表",
+      "name": "EVCC: 指标仪表",
       "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
       "kind": 1,
       "model": {
@@ -2113,7 +2113,7 @@
           "tags": []
         }
       ],
-      "title": "活力",
+      "title": "能源",
       "type": "barchart"
     },
     {
@@ -2126,7 +2126,7 @@
       "id": 44,
       "libraryPanel": {
         "uid": "c872420b-86a9-4544-9e33-f367a07f9e40",
-        "name": "EVCC: 公制仪表"
+        "name": "EVCC: 指标仪表"
       }
     },
     {
@@ -3210,7 +3210,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "主页：能源分配",
+      "title": "家庭：能源分配",
       "transparent": true,
       "type": "piechart"
     },
@@ -3392,7 +3392,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "主页：能源消耗",
+      "title": "家庭：能源消耗",
       "type": "barchart"
     },
     {
@@ -3864,7 +3864,7 @@
           "resultFormat": "time_series"
         }
       ],
-      "title": "主页：能源分配",
+      "title": "家庭：能源分配",
       "type": "barchart"
     },
     {

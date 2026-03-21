@@ -1830,7 +1830,7 @@
       }
     },
     "edgpezcp0j474c": {
-      "name": "EVCC: 实时公制仪表",
+      "name": "EVCC: 实时指标仪表",
       "uid": "edgpezcp0j474c",
       "kind": 1,
       "model": {
@@ -2180,7 +2180,7 @@
       }
     },
     "a46718d5-2383-4dba-b828-5941581b208e": {
-      "name": "EVCC: 关键人物历史",
+      "name": "EVCC: 指标历史",
       "uid": "a46718d5-2383-4dba-b828-5941581b208e",
       "kind": 1,
       "model": {
@@ -4144,7 +4144,7 @@
       "id": 65,
       "libraryPanel": {
         "uid": "edgpezcp0j474c",
-        "name": "EVCC: 实时公制仪表"
+        "name": "EVCC: 实时指标仪表"
       }
     },
     {
@@ -4157,7 +4157,7 @@
       "id": 57,
       "libraryPanel": {
         "uid": "a46718d5-2383-4dba-b828-5941581b208e",
-        "name": "EVCC: 关键人物历史"
+        "name": "EVCC: 指标历史"
       }
     },
     {
