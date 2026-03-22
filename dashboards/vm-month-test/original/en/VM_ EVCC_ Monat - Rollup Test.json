@@ -1635,7 +1635,11 @@
     {
       "id": 30,
       "title": "Power balance",
-      "type": "text",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
       "gridPos": {
         "h": 18,
         "w": 5,
@@ -1644,14 +1648,451 @@
       },
       "pluginVersion": "12.3.3",
       "transparent": true,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "averagePrice"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid price: arithmetic mean"
+              },
+              {
+                "id": "unit",
+                "value": "suffix: ct/kWh"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "weightedAveragePrice"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Effective price, dyn."
+              },
+              {
+                "id": "unit",
+                "value": "suffix: ct/kWh"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "savedPrice"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Saved vs arith."
+              },
+              {
+                "id": "unit",
+                "value": "suffix: ct/kWh"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "potentialPurchased"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Potential at arith."
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "purchasedDisplay"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Purchased, dynamic"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "totalSavings"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Savings dyn."
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "soldDisplay"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Sold (feed-in)"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "balance"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Balance"
+              },
+              {
+                "id": "unit",
+                "value": "currencyEUR"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
       "options": {
-        "mode": "markdown",
-        "content": "Monthly grid import, feed-in and battery balance are already represented in `Metrics`, `Total: Energy distribution` and `Electricity costs`. This small legacy side widget is left as a placeholder until a stable VM-native visualization is chosen."
-      }
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 12,
+          "valueSize": 24
+        },
+        "textMode": "auto",
+        "wideLayout": true,
+        "titleSize": 12,
+        "valueSize": 24
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "format": "time_series",
+          "legendFormat": "avg price daily",
+          "range": true,
+          "refId": "averagePriceDaily",
+          "hide": true,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "averagePriceDaily",
+          "hide": false,
+          "reducer": "mean",
+          "refId": "averagePrice",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum_over_time((avg_over_time(avg(gridPower_value{db=\"$dbLabel\"})[$energySampleInterval]) > 0)[1d:$energySampleInterval]) * 0",
+          "format": "time_series",
+          "legendFormat": "noop",
+          "range": true,
+          "refId": "noop",
+          "hide": true,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(clamp_min(avg(gridPower_value{db=\"$dbLabel\"}), 0)[1d:$energySampleInterval])) / 3600000",
+          "format": "time_series",
+          "legendFormat": "Purchased energy daily",
+          "range": true,
+          "refId": "energyPurchasedDaily",
+          "hide": true,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "energyPurchasedDaily",
+          "hide": true,
+          "reducer": "sum",
+          "refId": "energyPurchased",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"} offset 1h",
+          "format": "time_series",
+          "legendFormat": "Purchased daily",
+          "range": true,
+          "refId": "purchasedDaily",
+          "hide": true,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "purchasedDaily",
+          "hide": true,
+          "reducer": "sum",
+          "refId": "purchasedTotal",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$purchasedTotal / $energyPurchased * 100",
+          "hide": false,
+          "refId": "weightedAveragePrice",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$averagePrice - $weightedAveragePrice",
+          "hide": false,
+          "refId": "savedPrice",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$averagePrice * $energyPurchased / -100",
+          "hide": false,
+          "refId": "potentialPurchased",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$purchasedTotal * -1",
+          "hide": false,
+          "refId": "purchasedDisplay",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum_over_time((avg(tariffFeedIn_value{db=\"$dbLabel\"} offset $tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value{db=\"$dbLabel\"} offset $tariffPriceInterval), 0)) / 3600000)[1d:$tariffPriceInterval])",
+          "format": "time_series",
+          "legendFormat": "Sold daily raw",
+          "range": true,
+          "refId": "soldDailyRaw",
+          "hide": true,
+          "interval": "$tariffPriceInterval"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "soldDailyRaw",
+          "hide": true,
+          "reducer": "sum",
+          "refId": "soldTotalRaw",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$soldTotalRaw * -1",
+          "hide": false,
+          "refId": "soldDisplay",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$purchasedDisplay - $potentialPurchased",
+          "hide": false,
+          "refId": "totalSavings",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$purchasedDisplay + $soldDisplay",
+          "hide": false,
+          "refId": "balance",
+          "type": "math"
+        }
+      ]
     },
     {
       "id": 26,
-      "title": "Dynamic electricity price: Daily",
+      "title": "Dynamic electricity price (ct/kWh)",
       "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1669,22 +2110,24 @@
           "color": {
             "mode": "palette-classic"
           },
-          "unit": "currencyEUR",
+          "unit": "ct",
+          "decimals": 2,
           "custom": {
             "drawStyle": "line",
             "lineInterpolation": "linear",
             "barAlignment": 0,
-            "lineWidth": 2,
-            "fillOpacity": 25,
+            "lineWidth": 1,
+            "fillOpacity": 0,
             "gradientMode": "none",
-            "spanNulls": false,
-            "showPoints": "never",
+            "spanNulls": true,
+            "showPoints": "auto",
             "stacking": {
               "mode": "none",
               "group": "A"
             },
-            "axisPlacement": "auto",
-            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 80,
+            "axisLabel": "ct/kWh",
             "axisColorMode": "text",
             "scaleDistribution": {
               "type": "linear"
@@ -1713,7 +2156,68 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Max"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Average"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "text",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Effective electricity price"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Min"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "legend": {
@@ -1733,13 +2237,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(avg(tariffGrid_value{db=\"$dbLabel\"})[1d])",
+          "expr": "test_evcc_grid_import_price_max_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
           "format": "time_series",
-          "legendFormat": "Grid tariff avg",
+          "legendFormat": "Max",
           "range": true,
-          "refId": "tariffGrid",
-          "hide": false,
-          "interval": "$tariffPriceInterval"
+          "refId": "maxPrice",
+          "interval": "1d"
         },
         {
           "datasource": {
@@ -1747,20 +2250,45 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(avg(tariffFeedIn_value{db=\"$dbLabel\"})[1d])",
+          "expr": "test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
           "format": "time_series",
-          "legendFormat": "Feed-in tariff avg",
+          "legendFormat": "Average",
           "range": true,
-          "refId": "tariffFeedIn",
-          "hide": false,
-          "interval": "$tariffPriceInterval"
+          "refId": "avgPrice",
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "test_evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "format": "time_series",
+          "legendFormat": "Effective electricity price",
+          "range": true,
+          "refId": "weightedAveragePrice",
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "test_evcc_grid_import_price_min_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "format": "time_series",
+          "legendFormat": "Min",
+          "range": true,
+          "refId": "minPrice",
+          "interval": "1d"
         }
       ]
     },
     {
       "id": 28,
       "title": "Electricity costs",
-      "type": "timeseries",
+      "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -1775,33 +2303,28 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "fixed",
+            "fixedColor": "red"
           },
+          "decimals": 2,
           "unit": "currencyEUR",
           "custom": {
-            "drawStyle": "bars",
-            "lineInterpolation": "linear",
-            "barAlignment": 1,
-            "lineWidth": 1,
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisWidth": 80,
             "fillOpacity": 80,
             "gradientMode": "none",
-            "spanNulls": false,
-            "showPoints": "never",
-            "stacking": {
-              "mode": "normal",
-              "group": "A"
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
             },
-            "axisPlacement": "auto",
-            "axisLabel": "",
-            "axisColorMode": "text",
+            "lineWidth": 1,
             "scaleDistribution": {
               "type": "linear"
-            },
-            "axisCenteredZero": false,
-            "hideFrom": {
-              "tooltip": false,
-              "viz": false,
-              "legend": false
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -1812,27 +2335,64 @@
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 0
               }
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Purchased"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Purchased"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Time"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "time:MM/DD"
+              }
+            ]
+          }
+        ]
       },
       "options": {
+        "barRadius": 0.2,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
         "legend": {
+          "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
         "tooltip": {
+          "hideZeros": false,
           "mode": "multi",
           "sort": "none"
-        }
+        },
+        "xField": "Time",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
       "targets": [
         {
@@ -1841,38 +2401,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum_over_time((avg(tariffGrid_value{db=\"$dbLabel\"} offset $tariffPriceInterval) * integrate(clamp_min(avg(gridPower_value{db=\"$dbLabel\"} offset $tariffPriceInterval), 0)) / 3600000)[1d:$tariffPriceInterval])",
+          "expr": "test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"} offset 1h",
           "format": "time_series",
           "legendFormat": "Purchased",
           "range": true,
           "refId": "purchased",
-          "hide": false,
-          "interval": "$tariffPriceInterval"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum_over_time((avg(tariffFeedIn_value{db=\"$dbLabel\"} offset $tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value{db=\"$dbLabel\"} offset $tariffPriceInterval), 0)) / 3600000)[1d:$tariffPriceInterval])",
-          "format": "time_series",
-          "legendFormat": "Sold",
-          "range": true,
-          "refId": "sold",
-          "hide": false,
-          "interval": "$tariffPriceInterval"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$purchased + $sold",
-          "hide": false,
-          "refId": "totalCost",
-          "type": "math"
+          "interval": "1d"
         }
       ]
     },

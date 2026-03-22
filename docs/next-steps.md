@@ -14,6 +14,8 @@ Implemented:
 - family-separated screenshot output under `tests/artifacts/screenshots/vm`
 - initial VM rollup CLI under `scripts/evcc-vm-rollup.py`
 - operator guide under `docs/victoriametrics-aggregation-guide.md`
+- test-only grid import price and cost rollups in `test_evcc_*`
+- VM month review dashboard with working energy, battery, metric, price, and cost panels
 
 ## Remaining technical work
 
@@ -33,6 +35,12 @@ Primary references:
 - `docs/victoriametrics-dashboard-rollup-handoff-2026-03-22.md`
 - `docs/victoriametrics-rollup-design.md`
 
+Additional current concerns:
+
+- the repository currently uses `test_evcc_*` for the reviewed daily rollup families; production `evcc_*` rollups are still outstanding
+- VM-side `host` labels were cleaned up, but ingest hygiene still needs to be watched so those labels do not reappear later
+- if relevant historical host-only samples turn out to matter, a targeted reimport strategy may still be needed
+
 ### 0a. Finish VM month review pass
 
 Current issue:
@@ -48,6 +56,25 @@ Primary references:
 
 - `dashboards/vm-month-test/original/en/VM_ EVCC_ Monat - Rollup Test.json`
 - `docs/victoriametrics-dashboard-rollup-handoff-2026-03-22.md`
+
+### 0b. Validate and tune VM price and cost rollups
+
+Current issue:
+
+- import-side daily price and cost rollups now exist in `test_evcc_*`, but they still need tighter validation against Influx legacy and Tibber reality
+- the remaining drift is mainly in imported grid energy, not in the tariff series itself
+- export credit rollups are still not finalized
+
+Goal:
+
+- keep the current test-only import price/cost rollups as the baseline
+- tune and validate them before any promotion to `evcc_*`
+- then add export credit rollups on the same validated quarter-hour path
+
+Primary references:
+
+- `docs/victoriametrics-price-rollup-plan.md`
+- `docs/victoriametrics-rollup-design.md`
 
 ### 1. Reduce mixed-language source internals
 
