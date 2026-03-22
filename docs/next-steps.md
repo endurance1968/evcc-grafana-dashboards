@@ -12,8 +12,42 @@ Implemented:
 - localization audit with zero current missing candidates for the scripted key set
 - Grafana import, smoke-check, cleanup, and screenshot automation for the default VM family
 - family-separated screenshot output under `tests/artifacts/screenshots/vm`
+- initial VM rollup CLI under `scripts/evcc-vm-rollup.py`
+- operator guide under `docs/victoriametrics-aggregation-guide.md`
 
 ## Remaining technical work
+
+### 0. VM rollup baseline for long-range dashboards
+
+Current issue:
+
+- the repository now has a validated VM rollup direction, and a reviewable VM month test dashboard exists; year and all-time still need to be finalized on top of it
+
+Goal:
+
+- use the accepted VM daily-rollup baseline for long-range dashboards
+- avoid copying the Influx legacy monthly model unless measured VM performance later requires it
+
+Primary references:
+
+- `docs/victoriametrics-dashboard-rollup-handoff-2026-03-22.md`
+- `docs/victoriametrics-rollup-design.md`
+
+### 0a. Finish VM month review pass
+
+Current issue:
+
+- the VM month dashboard is now close to the legacy reference, but still needs one more review pass before it should be treated as the production template
+
+Goal:
+
+- close the remaining visual and semantic deltas in the month dashboard
+- then use the month dashboard as the template for VM year and all-time work
+
+Primary references:
+
+- `dashboards/vm-month-test/original/en/VM_ EVCC_ Monat - Rollup Test.json`
+- `docs/victoriametrics-dashboard-rollup-handoff-2026-03-22.md`
 
 ### 1. Reduce mixed-language source internals
 
@@ -60,8 +94,11 @@ Goal:
 
 If you are new to the current default flow, start with:
 
-1. `docs/vm-thread-restart-handoff-2026-03-21.md`
-2. `docs/localization-maintainer-workflow.md`
-3. `docs/grafana-localization-testing.md`
-4. `scripts/test/README.md`
-5. `docs/localization-review-2026-03-21.md`
+1. `docs/victoriametrics-dashboard-rollup-handoff-2026-03-22.md`
+2. `docs/victoriametrics-rollup-design.md`
+3. `docs/victoriametrics-aggregation-guide.md`
+4. `docs/vm-thread-restart-handoff-2026-03-21.md`
+5. `docs/localization-maintainer-workflow.md`
+6. `docs/grafana-localization-testing.md`
+7. `scripts/test/README.md`
+8. `docs/localization-review-2026-03-21.md`

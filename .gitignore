@@ -16,3 +16,7 @@ dashboards/influx-legacy/localization/missing-*.exact.json
 # Local Node dependencies
 node_modules/
 
+# Python cache
+__pycache__/
+*.pyc
+

@@ -1,0 +1,11 @@
+[victoriametrics]
+base_url = http://192.168.1.160:8428
+db_label = evcc
+host_label =
+timezone = Europe/Berlin
+metric_prefix = test_evcc
+
+[benchmark]
+start = 2026-02-20T00:00:00Z
+end = 2026-03-22T00:00:00Z
+step = 1d
