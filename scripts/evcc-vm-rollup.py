@@ -54,6 +54,10 @@ class ImportResponse:
     body: str
 
 
+PRICE_BUCKET_MINUTES = 15
+RAW_SAMPLE_STEP = "30s"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Plan, benchmark and backfill VictoriaMetrics rollups for EVCC safely."
@@ -341,6 +345,51 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             group_labels=(),
         ),
         RollupMetric(
+            key="grid_import_cost_daily",
+            record=record_name(settings, "grid_import_cost_daily_eur"),
+            expr="python: 15m raw grid import cost calculation",
+            description="Daily grid import cost from 15-minute raw import energy weighted by matching tariff.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="grid_import_price_avg_daily",
+            record=record_name(settings, "grid_import_price_avg_daily_ct_per_kwh"),
+            expr="python: 15m raw arithmetic daily import price mean",
+            description="Arithmetic daily mean of quarter-hour import tariffs.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="grid_import_price_effective_daily",
+            record=record_name(settings, "grid_import_price_effective_daily_ct_per_kwh"),
+            expr="python: 15m raw effective import price weighted by quarter-hour grid import",
+            description="Effective daily import price weighted by quarter-hour grid import energy.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="grid_import_price_min_daily",
+            record=record_name(settings, "grid_import_price_min_daily_ct_per_kwh"),
+            expr="python: 15m raw daily minimum import tariff",
+            description="Minimum quarter-hour import tariff of the day.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="grid_import_price_max_daily",
+            record=record_name(settings, "grid_import_price_max_daily_ct_per_kwh"),
+            expr="python: 15m raw daily maximum import tariff",
+            description="Maximum quarter-hour import tariff of the day.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
             key="pricing_rollups",
             record=record_name(settings, "energy_purchased_daily_eur"),
             expr="deferred",
@@ -455,7 +504,11 @@ def print_plan(settings: Settings) -> int:
 
 
 def render_vmalert_rules(settings: Settings) -> int:
-    catalog = [item for item in build_catalog(settings) if item.implemented]
+    catalog = [
+        item
+        for item in build_catalog(settings)
+        if item.implemented and not item.expr.startswith("python:")
+    ]
     lines = [
         "groups:",
         "  - name: evcc_vm_rollups_daily_test",
@@ -478,6 +531,14 @@ def render_vmalert_rules(settings: Settings) -> int:
 
 
 def benchmark_query(settings: Settings, item: RollupMetric) -> dict:
+    if item.expr.startswith("python:"):
+        return {
+            "key": item.key,
+            "record": item.record,
+            "elapsed_ms": None,
+            "series": None,
+            "status": "python-rollup",
+        }
     params = {
         "query": item.expr,
         "start": settings.benchmark_start,
@@ -580,6 +641,169 @@ def fetch_battery_soc_extrema(settings: Settings, window: DayWindow) -> tuple[fl
     return min(positive_values), max(positive_values)
 
 
+def fetch_single_series_range(
+    settings: Settings,
+    query: str,
+    start_iso: str,
+    end_iso: str,
+    step: str,
+) -> list[tuple[int, float]]:
+    response = http_get_json(
+        settings,
+        "/api/v1/query_range",
+        {
+            "query": query,
+            "start": start_iso,
+            "end": end_iso,
+            "step": step,
+            "nocache": "1",
+        },
+    )
+    series = response.get("data", {}).get("result", [])
+    if not series:
+        return []
+    samples: list[tuple[int, float]] = []
+    for row in series[0].get("values", []):
+        if not isinstance(row, list) or len(row) != 2:
+            continue
+        try:
+            timestamp = int(row[0])
+            value = float(row[1])
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(value):
+            samples.append((timestamp, value))
+    return samples
+
+
+def parse_step_seconds(step: str) -> int:
+    if step.endswith("s"):
+        return int(step[:-1])
+    if step.endswith("m"):
+        return int(step[:-1]) * 60
+    if step.endswith("h"):
+        return int(step[:-1]) * 3600
+    raise ValueError(f"Unsupported step format: {step}")
+
+
+def bucket_start_timestamps(window: DayWindow, bucket_minutes: int) -> list[int]:
+    start_ts = int(datetime.fromisoformat(window.start_iso.replace("Z", "+00:00")).timestamp())
+    end_ts = int(datetime.fromisoformat(window.end_iso.replace("Z", "+00:00")).timestamp())
+    bucket_seconds = bucket_minutes * 60
+    return list(range(start_ts, end_ts, bucket_seconds))
+
+
+
+def quarter_hour_price_rollups(
+    grid_samples: list[tuple[int, float]],
+    tariff_samples: list[tuple[int, float]],
+    bucket_starts: list[int],
+    raw_step_seconds: int,
+    bucket_minutes: int,
+) -> dict[str, float | None]:
+    bucket_seconds = bucket_minutes * 60
+    bucket_prices: list[float] = []
+    day_tariff_values: list[float] = []
+    total_import_kwh = 0.0
+    total_import_cost_eur = 0.0
+    last_price: float | None = None
+
+    grid_index = 0
+    tariff_index = 0
+    day_start = bucket_starts[0] if bucket_starts else 0
+    day_end = (bucket_starts[-1] + bucket_seconds) if bucket_starts else 0
+
+    for timestamp, value in tariff_samples:
+        if day_start <= timestamp < day_end:
+            day_tariff_values.append(value)
+
+    for bucket_start in bucket_starts:
+        bucket_end = bucket_start + bucket_seconds
+
+        while tariff_index < len(tariff_samples) and tariff_samples[tariff_index][0] < bucket_start:
+            last_price = tariff_samples[tariff_index][1]
+            tariff_index += 1
+
+        bucket_price = last_price
+        scan_index = tariff_index
+        while scan_index < len(tariff_samples):
+            timestamp, value = tariff_samples[scan_index]
+            if timestamp >= bucket_end:
+                break
+            if timestamp >= bucket_start:
+                bucket_price = value
+            scan_index += 1
+        tariff_index = scan_index
+
+        if bucket_price is not None:
+            last_price = bucket_price
+            bucket_prices.append(bucket_price)
+
+        while grid_index < len(grid_samples) and grid_samples[grid_index][0] < bucket_start:
+            grid_index += 1
+        scan_index = grid_index
+        bucket_import_kwh = 0.0
+        while scan_index < len(grid_samples):
+            timestamp, value = grid_samples[scan_index]
+            if timestamp >= bucket_end:
+                break
+            if timestamp >= bucket_start and value > 0:
+                bucket_import_kwh += value * raw_step_seconds / 3600000
+            scan_index += 1
+        grid_index = scan_index
+
+        if bucket_price is not None and bucket_import_kwh > 0:
+            total_import_kwh += bucket_import_kwh
+            total_import_cost_eur += bucket_import_kwh * bucket_price
+
+    if not day_tariff_values:
+        day_tariff_values = bucket_prices
+
+    arithmetic_avg = (sum(day_tariff_values) / len(day_tariff_values) * 100) if day_tariff_values else None
+    minimum_price = (min(day_tariff_values) * 100) if day_tariff_values else None
+    maximum_price = (max(day_tariff_values) * 100) if day_tariff_values else None
+    effective_price = (
+        total_import_cost_eur / total_import_kwh * 100
+        if total_import_kwh > 0
+        else None
+    )
+
+    return {
+        "grid_import_cost_daily": total_import_cost_eur,
+        "grid_import_price_avg_daily": arithmetic_avg,
+        "grid_import_price_effective_daily": effective_price,
+        "grid_import_price_min_daily": minimum_price,
+        "grid_import_price_max_daily": maximum_price,
+    }
+
+
+def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str, float | None]:
+    raw_step_seconds = parse_step_seconds(RAW_SAMPLE_STEP)
+    start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
+    extended_start_iso = to_iso_z(start_dt - timedelta(minutes=PRICE_BUCKET_MINUTES))
+    grid_samples = fetch_single_series_range(
+        settings,
+        f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[30s])',
+        window.start_iso,
+        window.end_iso,
+        RAW_SAMPLE_STEP,
+    )
+    tariff_samples = fetch_single_series_range(
+        settings,
+        f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+        extended_start_iso,
+        window.end_iso,
+        RAW_SAMPLE_STEP,
+    )
+    return quarter_hour_price_rollups(
+        grid_samples=grid_samples,
+        tariff_samples=tariff_samples,
+        bucket_starts=bucket_start_timestamps(window, PRICE_BUCKET_MINUTES),
+        raw_step_seconds=raw_step_seconds,
+        bucket_minutes=PRICE_BUCKET_MINUTES,
+    )
+
+
 def normalize_rollup_labels(settings: Settings, item: RollupMetric, metric: dict) -> dict[str, str]:
     labels: dict[str, str] = {
         "__name__": item.record,
@@ -653,6 +877,13 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     emitted_samples = 0
     total_batches = 0
     processed_days = 0
+    price_metric_keys = {
+        "grid_import_cost_daily",
+        "grid_import_price_avg_daily",
+        "grid_import_price_effective_daily",
+        "grid_import_price_min_daily",
+        "grid_import_price_max_daily",
+    }
 
     for chunk_index, (chunk_name, chunk_windows) in enumerate(chunks, start=1):
         series_map: dict[tuple[tuple[str, str], ...], dict] = {}
@@ -668,6 +899,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
 
         for window in chunk_windows:
             processed_days += 1
+            price_rollups: dict[str, float | None] | None = None
             for item in catalog:
                 if item.key == "vehicle_daily_distance":
                     for result_item in fetch_vehicle_odometer_vector(settings, window):
@@ -703,6 +935,24 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                     day_min, day_max = fetch_battery_soc_extrema(settings, window)
                     selected_value = day_min if item.key == "battery_soc_daily_min" else day_max
                     if selected_value is None:
+                        skipped += 1
+                        continue
+                    append_series_sample(
+                        series_map,
+                        {
+                            "__name__": item.record,
+                            "db": settings.db_label,
+                        },
+                        window.sample_timestamp_ms,
+                        selected_value,
+                    )
+                    emitted_samples += 1
+                    continue
+                if item.key in price_metric_keys:
+                    if price_rollups is None:
+                        price_rollups = fetch_grid_price_rollups(settings, window)
+                    selected_value = price_rollups.get(item.key)
+                    if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         continue
                     append_series_sample(

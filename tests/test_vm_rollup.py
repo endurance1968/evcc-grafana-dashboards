@@ -36,6 +36,8 @@ class VmRollupTests(unittest.TestCase):
         records = {item.record for item in catalog if item.implemented}
         self.assertIn("test_evcc_pv_energy_daily_wh", records)
         self.assertIn("test_evcc_vehicle_distance_daily_km", records)
+        self.assertIn("test_evcc_grid_import_cost_daily_eur", records)
+        self.assertIn("test_evcc_grid_import_price_effective_daily_ct_per_kwh", records)
 
     def test_catalog_marks_phase_two_items_as_deferred(self):
         catalog = MODULE.build_catalog(self.settings)
@@ -176,6 +178,62 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(len(chunks), 1)
         self.assertEqual(chunks[0][0], "all")
         self.assertEqual(len(chunks[0][1]), 4)
+
+
+    def test_quarter_hour_price_rollups_calculates_all_price_metrics(self):
+        bucket_starts = [0, 900]
+        grid_samples = []
+        grid_samples.extend((timestamp, 1000.0) for timestamp in range(0, 900, 30))
+        grid_samples.extend((timestamp, 2000.0) for timestamp in range(900, 1800, 30))
+        tariff_samples = [
+            (0, 0.20),
+            (300, 0.22),
+            (600, 0.24),
+            (900, 0.40),
+            (1200, 0.42),
+            (1500, 0.44),
+        ]
+
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=grid_samples,
+            tariff_samples=tariff_samples,
+            bucket_starts=bucket_starts,
+            raw_step_seconds=30,
+            bucket_minutes=15,
+        )
+
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.28, places=6)
+        self.assertAlmostEqual(result["grid_import_price_avg_daily"], 32.0, places=6)
+        self.assertAlmostEqual(
+            result["grid_import_price_effective_daily"],
+            37.333333333333336,
+            places=6,
+        )
+        self.assertAlmostEqual(result["grid_import_price_min_daily"], 20.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_max_daily"], 44.0, places=6)
+
+    def test_quarter_hour_price_rollups_carries_forward_last_tariff(self):
+        bucket_starts = [0, 900]
+        grid_samples = []
+        grid_samples.extend((timestamp, 1000.0) for timestamp in range(0, 900, 30))
+        grid_samples.extend((timestamp, 1000.0) for timestamp in range(900, 1800, 30))
+        tariff_samples = [
+            (0, 0.18),
+            (300, 0.21),
+            (600, 0.24),
+        ]
+
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=grid_samples,
+            tariff_samples=tariff_samples,
+            bucket_starts=bucket_starts,
+            raw_step_seconds=30,
+            bucket_minutes=15,
+        )
+
+        self.assertAlmostEqual(result["grid_import_price_avg_daily"], 21.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 24.0, places=6)
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.12, places=6)
 
 
 if __name__ == "__main__":

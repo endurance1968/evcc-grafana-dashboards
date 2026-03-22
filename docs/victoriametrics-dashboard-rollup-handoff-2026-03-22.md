@@ -46,6 +46,36 @@ Daily rollups are the default source for:
 
 Monthly rollups are explicitly not required for the first VM implementation.
 
+## Current VM data state
+
+Current VictoriaMetrics state for `db="evcc"`:
+
+- raw EVCC metrics are present
+- test rollups in the `test_evcc_*` namespace are present
+- production rollups in the `evcc_*` namespace do not exist yet
+
+This means:
+
+- review dashboards may currently depend on `test_evcc_*`
+- production dashboards must not yet assume productivized rollup names
+
+Current test rollup families include:
+
+- `test_evcc_pv_energy_daily_wh`
+- `test_evcc_home_energy_daily_wh`
+- `test_evcc_loadpoint_energy_daily_wh`
+- `test_evcc_vehicle_energy_daily_wh`
+- `test_evcc_vehicle_distance_daily_km`
+- `test_evcc_ext_energy_daily_wh`
+- `test_evcc_aux_energy_daily_wh`
+- `test_evcc_battery_soc_daily_min_pct`
+- `test_evcc_battery_soc_daily_max_pct`
+- `test_evcc_grid_import_cost_daily_eur`
+- `test_evcc_grid_import_price_avg_daily_ct_per_kwh`
+- `test_evcc_grid_import_price_effective_daily_ct_per_kwh`
+- `test_evcc_grid_import_price_min_daily_ct_per_kwh`
+- `test_evcc_grid_import_price_max_daily_ct_per_kwh`
+
 ## Why daily rollups are enough for the first implementation
 
 Measured on the real EVCC history window `2025-01-01` to `2026-03-21T08:00:00Z`:
@@ -117,6 +147,33 @@ Rules:
 
 The old Influx `All-time` dashboard uses both daily and monthly measurements. This was a performance workaround for Influx and constrained hardware. The VM design should not inherit this complexity unless real VM measurements later require it.
 
+## Maintainer compatibility status
+
+### Raw-data migration
+
+The raw-data migration path is close to the current maintainer expectations:
+
+- VictoriaMetrics datasource uses the native VM plugin type
+- Influx history was imported via `vmctl`
+- the problematic `batteryControllable` measurement was removed before import
+- imported raw metrics follow the expected VM naming style such as:
+  - `pvPower_value`
+  - `homePower_value`
+  - `gridPower_value`
+  - `chargePower_value`
+  - `batterySoc_value`
+
+This means the existing upstream-style VM `Today*` dashboards should remain compatible with the current raw VM data shape.
+
+### Rollup layer
+
+The rollup layer is currently our local design, not a confirmed upstream standard.
+
+This means:
+
+- the raw-data side is the compatible part
+- the long-range rollup side should still be treated as a local beta track until upstream settles on a VM-native aggregation model
+
 ## Current test assets
 
 Relevant existing assets in the repo:
@@ -146,12 +203,51 @@ Current status after interactive review:
 - `Metric gauges` now uses stable monthly inputs via hidden daily series plus `reduce(sum)` rather than long-range direct integrate queries
 - `Battery summary` now uses average daily max/min SOC values and corrected battery discharge math
 - `battery_soc_daily_min_pct` and `battery_soc_daily_max_pct` were rebuilt after a detected start-of-day rollup bug; March values now match raw data except for the still-open current day
+- the month dashboard currently works on test rollups, not on production `evcc_*` rollups
 
 Known remaining review items:
 
 - `Monthly energy totals` is still a `bar gauge`; it is acceptable for now, but a true legend row is not available in that panel type
 - vehicle distance rollups remain the most sensitive family and should stay under observation when more dashboard panels start depending on them
-- pricing and tariff rollups remain intentionally deferred; month dashboard still uses raw fallback there
+- import-side pricing and tariff rollups are now implemented in `test_evcc_*` and partially wired into the month dashboard
+- the remaining validation gap is a small but consistent undercount in VM import energy compared with Influx legacy, which makes VM daily costs slightly lower on many days
+- export-side credit rollups are still deferred
+
+## Next session focus: price and cost tuning
+
+The next major work item after the current month review is not first implementation anymore, but validation and tuning of the new tariff and cost rollups.
+
+Planning note:
+
+- [victoriametrics-price-rollup-plan.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/victoriametrics-price-rollup-plan.md)
+
+Current direction:
+
+- keep the implemented import-side daily test rollups in `test_evcc_*` as the working baseline
+- compare them against Influx legacy and Tibber billing reality
+- focus on the remaining import-energy drift before promoting anything to `evcc_*`
+- add export-side credit rollups only after the import path is accepted
+
+## Current host-label state
+
+Current VM state after the latest cleanup:
+
+- EVCC series with `host` were removed from VictoriaMetrics
+- current EVCC queries should now resolve without `host`
+- `label/host/values` for `db="evcc"` is empty at the time of writing
+
+Important operational note:
+
+- this cleanup happened only inside VictoriaMetrics
+- if the ingest path writes `host` again later, the label can reappear
+- this should be treated as an ingest hygiene topic, not as a dashboard-only concern
+
+## Open follow-up items
+
+- confirm whether the ingest path will stay hostless over time
+- verify whether any historically relevant host-only samples need a targeted reimport from Influx
+- productivize the tested daily rollup families from `test_evcc_*` to `evcc_*`
+- complete the still-open tariff and cost rollup phase
 
 ## Runtime hint
 
@@ -168,7 +264,7 @@ Important deployment note:
 
 1. Finalize the production rollup metric catalog based on the tested daily families.
 2. Build VM `Monat`, `Jahr`, and `All-time` dashboards against daily rollups.
-3. Keep finance and tariff rollups in a later phase.
+3. Execute the phase-2 tariff and cost plan in `docs/victoriametrics-price-rollup-plan.md`.
 4. Revisit monthly rollups only after a measured dashboard bottleneck.
 
 ## Reading order for the dashboard thread
