@@ -52,6 +52,7 @@ Current VictoriaMetrics state for `db="evcc"`:
 
 - raw EVCC metrics are present
 - test rollups in the `test_evcc_*` namespace are present
+- parallel clamp-rollups in the `test_evcc_clamp_*` namespace are present
 - production rollups in the `evcc_*` namespace do not exist yet
 
 This means:
@@ -75,6 +76,7 @@ Current test rollup families include:
 - `test_evcc_grid_import_price_effective_daily_ct_per_kwh`
 - `test_evcc_grid_import_price_min_daily_ct_per_kwh`
 - `test_evcc_grid_import_price_max_daily_ct_per_kwh`
+- parallel clamp namespace mirrors the same metric family under `test_evcc_clamp_*`
 
 ## Why daily rollups are enough for the first implementation
 
@@ -196,6 +198,11 @@ Current VM month review dashboard:
 - source: [VM_ EVCC_ Monat - Rollup Test.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/vm-month-test/original/en/VM_%20EVCC_%20Monat%20-%20Rollup%20Test.json)
 - live URL: [VM: EVCC: Monat - Rollup Test](http://192.168.1.189:3000/d/vm-month-test-en-orig-vm-rollup-month-te/21f8417)
 
+Parallel clamp comparison dashboard:
+
+- source: [VM_ EVCC_ Monat - Rollup Clamp Test.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/vm-month-clamp-test/original/en/VM_%20EVCC_%20Monat%20-%20Rollup%20Clamp%20Test.json)
+- live URL: [VM: EVCC: Monat - Rollup Clamp Test](http://192.168.1.189:3000/d/vm-month-clamp-test-en-o-vm-rollup-month/3aed633)
+
 Current status after interactive review:
 
 - month dashboard is now close to the Influx legacy layout for the most important panels
@@ -227,6 +234,12 @@ Current direction:
 - compare them against Influx legacy and Tibber billing reality
 - focus on the remaining import-energy drift before promoting anything to `evcc_*`
 - add export-side credit rollups only after the import path is accepted
+
+Cleanup rule for the parallel track:
+
+- sampled path can be removed via `__name__=~"test_evcc_.*"` only after the clamp experiment is rejected or merged
+- clamp path can be removed independently via `__name__=~"test_evcc_clamp_.*"`
+- the corresponding dashboard source for the clamp path is isolated under `dashboards/vm-month-clamp-test`
 
 ## Current host-label state
 

@@ -15,6 +15,7 @@ Implemented:
 - initial VM rollup CLI under `scripts/evcc-vm-rollup.py`
 - operator guide under `docs/victoriametrics-aggregation-guide.md`
 - test-only grid import price and cost rollups in `test_evcc_*`
+- parallel clamp-based test rollups in `test_evcc_clamp_*` with a separate month review dashboard
 - VM month review dashboard with working energy, battery, metric, price, and cost panels
 
 ## Remaining technical work
@@ -37,7 +38,7 @@ Primary references:
 
 Additional current concerns:
 
-- the repository currently uses `test_evcc_*` for the reviewed daily rollup families; production `evcc_*` rollups are still outstanding
+- the repository currently uses `test_evcc_*` and `test_evcc_clamp_*` for reviewed daily rollup families; production `evcc_*` rollups are still outstanding
 - VM-side `host` labels were cleaned up, but ingest hygiene still needs to be watched so those labels do not reappear later
 - if relevant historical host-only samples turn out to matter, a targeted reimport strategy may still be needed
 
@@ -45,7 +46,7 @@ Additional current concerns:
 
 Current issue:
 
-- the VM month dashboard is now close to the legacy reference, but still needs one more review pass before it should be treated as the production template
+- the VM month dashboard is now close to the legacy reference, and a parallel clamp-based comparison dashboard now exists for direct review before production decisions
 
 Goal:
 
