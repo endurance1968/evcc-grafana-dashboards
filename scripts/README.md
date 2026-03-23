@@ -8,6 +8,7 @@ Current default files:
 - `evcc-vm-rollup.conf.example`
 - `evcc-vm-rollup-clamp.py`
 - `evcc-vm-rollup-clamp.conf.example`
+- `vm-rewrite-drop-label.py`
 
 Legacy Influx aggregation remains separate under `scripts/influx-legacy/`.
 
@@ -113,6 +114,40 @@ python3 evcc-vm-rollup-clamp.py backfill-test --start-day 2025-01-01 --end-day 2
 
 This writes to the independent `test_evcc_clamp_*` namespace and is intended only for side-by-side validation against the sampled path.
 
+### Rewrite VM-only host-tagged series
+
+Dry-run with backup plus overlap check:
+
+```bash
+python3 vm-rewrite-drop-label.py \
+  --base-url http://192.168.1.160:8428 \
+  --matcher '{db="evcc",host!=""}' \
+  --drop-label host \
+  --backup-jsonl backups/evcc-host-series.jsonl
+```
+
+Actual rewrite (default append-only path):
+
+```bash
+python3 vm-rewrite-drop-label.py   --base-url http://192.168.1.160:8428   --matcher '{db="evcc",host!=""}'   --drop-label host   --backup-jsonl backups/evcc-host-series.jsonl   --rewritten-jsonl backups/evcc-hostless-series.jsonl   --write   --reset-cache
+```
+
+Advanced full-series merge path only when really needed:
+
+```bash
+python3 vm-rewrite-drop-label.py   --base-url http://192.168.1.160:8428   --matcher '{db="evcc",host!=""}'   --drop-label host   --backup-jsonl backups/evcc-host-series.jsonl   --rewritten-jsonl backups/evcc-hostless-series.jsonl   --merge-target   --import-batch-size 1   --write   --reset-cache
+```
+
+This flow is VM-only:
+
+- exports the matching source series to a JSONL backup
+- removes the selected label from the exported metrics
+- checks for timestamp overlap against existing hostless target series
+- default write path appends only the transformed host series without rewriting the full target history
+- `--merge-target` is the advanced path for explicit full-series merge when append-only is not sufficient
+- deletes the original matcher only during `--write` and only after successful imports
+- imports the transformed series back into VM in configurable batches
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.
@@ -159,3 +194,4 @@ Deferred to phase 2:
 - grid import and export split
 - battery charge and discharge split
 - tariff and finance rollups
+

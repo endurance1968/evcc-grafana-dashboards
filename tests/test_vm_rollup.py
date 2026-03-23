@@ -21,6 +21,7 @@ class VmRollupTests(unittest.TestCase):
             timezone="Europe/Berlin",
             metric_prefix="test_evcc",
             raw_sample_step="10s",
+            energy_rollup_step="60s",
             price_bucket_minutes=15,
             price_rollup_mode="sampled",
             benchmark_start="2026-02-20T00:00:00Z",
@@ -259,14 +260,17 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_price_max_daily"], 44.0, places=6)
         self.assertAlmostEqual(result["grid_export_credit_daily"], 0.028, places=6)
 
-    def test_summarize_grid_energy_samples_splits_import_and_export(self):
+    def test_summarize_grid_energy_samples_uses_legacy_60s_mean_buckets(self):
         result = MODULE.summarize_grid_energy_samples(
-            [(0, -100.0), (10, 200.0), (20, -300.0), (30, 400.0)],
-            raw_step_seconds=10,
+            [
+                (0, -100.0), (10, 200.0), (20, -300.0), (30, 400.0), (40, 0.0), (50, 0.0),
+                (60, -60.0), (70, -120.0), (80, 180.0), (90, 0.0), (100, 0.0), (110, 0.0),
+            ],
+            bucket_seconds=60,
         )
 
-        self.assertAlmostEqual(result["grid_import_daily_energy"], (200.0 + 400.0) * 10 / 3600, places=6)
-        self.assertAlmostEqual(result["grid_export_daily_energy"], (100.0 + 300.0) * 10 / 3600, places=6)
+        self.assertAlmostEqual(result["grid_import_daily_energy"], 3.25, places=6)
+        self.assertAlmostEqual(result["grid_export_daily_energy"], 2.2666666666666666, places=6)
 
     def test_summarize_bucket_grid_energy_converts_kwh_to_wh(self):
         result = MODULE.summarize_bucket_grid_energy(
@@ -277,14 +281,17 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_daily_energy"], 750.0, places=6)
         self.assertAlmostEqual(result["grid_export_daily_energy"], 300.0, places=6)
 
-    def test_summarize_battery_energy_samples_splits_charge_and_discharge(self):
+    def test_summarize_battery_energy_samples_uses_legacy_60s_mean_buckets(self):
         result = MODULE.summarize_battery_energy_samples(
-            [(0, -500.0), (10, 250.0), (20, -250.0), (30, 750.0)],
-            raw_step_seconds=10,
+            [
+                (0, -500.0), (10, 250.0), (20, -250.0), (30, 750.0), (40, 0.0), (50, 0.0),
+                (60, -200.0), (70, -400.0), (80, 600.0), (90, 0.0), (100, 0.0), (110, 0.0),
+            ],
+            bucket_seconds=60,
         )
 
-        self.assertAlmostEqual(result["battery_charge_daily_energy"], (500.0 + 250.0) * 10 / 3600, places=6)
-        self.assertAlmostEqual(result["battery_discharge_daily_energy"], (250.0 + 750.0) * 10 / 3600, places=6)
+        self.assertAlmostEqual(result["battery_charge_daily_energy"], 5.125, places=6)
+        self.assertAlmostEqual(result["battery_discharge_daily_energy"], 6.666666666666667, places=6)
 
     def test_summarize_bucket_battery_energy_converts_kwh_to_wh(self):
         result = MODULE.summarize_bucket_battery_energy(

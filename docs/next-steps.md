@@ -65,6 +65,7 @@ Current issue:
 - import-side daily price and cost rollups now exist in `test_evcc_*`, but they still need tighter validation against Influx legacy and Tibber reality
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
 - export credit rollups are still not finalized
+- next session check: evaluate whether the successful 10s -> 60s energy integration path should also replace direct daily integrate(...[1d]) rollups for pv, home, and loadpoint metrics
 
 Goal:
 
@@ -130,3 +131,4 @@ If you are new to the current default flow, start with:
 6. `docs/grafana-localization-testing.md`
 7. `scripts/test/README.md`
 8. `docs/localization-review-2026-03-21.md`
+
