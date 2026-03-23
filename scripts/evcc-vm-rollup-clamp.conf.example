@@ -5,6 +5,7 @@ host_label =
 timezone = Europe/Berlin
 metric_prefix = test_evcc_clamp
 raw_sample_step = 10s
+energy_rollup_step = 60s
 price_bucket_minutes = 15
 price_rollup_mode = clamp
 

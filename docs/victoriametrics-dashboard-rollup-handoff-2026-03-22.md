@@ -219,6 +219,7 @@ Known remaining review items:
 - import-side pricing and tariff rollups are now implemented in `test_evcc_*` and partially wired into the month dashboard
 - the remaining validation gap is a small but consistent undercount in VM import energy compared with Influx legacy, which makes VM daily costs slightly lower on many days
 - export-side credit rollups are still deferred
+- next session should explicitly check whether the corrected 10s -> 60s energy aggregation path should also be adopted for pv, home, and loadpoint rollups, or kept limited to grid and attery only
 
 ## Next session focus: price and cost tuning
 
@@ -286,3 +287,4 @@ Important deployment note:
 2. [victoriametrics-rollup-design.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/victoriametrics-rollup-design.md)
 3. [victoriametrics-handoff-2026-03-21.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/victoriametrics-handoff-2026-03-21.md)
 4. [vm-thread-restart-handoff-2026-03-21.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/vm-thread-restart-handoff-2026-03-21.md)
+

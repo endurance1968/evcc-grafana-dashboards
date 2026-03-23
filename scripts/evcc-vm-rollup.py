@@ -25,6 +25,7 @@ class Settings:
     timezone: str
     metric_prefix: str
     raw_sample_step: str
+    energy_rollup_step: str
     price_bucket_minutes: int
     price_rollup_mode: str
     benchmark_start: str
@@ -116,6 +117,7 @@ def load_settings(path: str) -> Settings:
         timezone=parser.get("victoriametrics", "timezone"),
         metric_prefix=parser.get("victoriametrics", "metric_prefix"),
         raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
+        energy_rollup_step=parser.get("victoriametrics", "energy_rollup_step", fallback="60s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
         price_rollup_mode=parser.get("victoriametrics", "price_rollup_mode", fallback="sampled"),
         benchmark_start=parser.get("benchmark", "start"),
@@ -132,6 +134,19 @@ def http_get_json(settings: Settings, path: str, params: dict[str, str | list[st
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"HTTP {exc.code} for {url}: {body}") from exc
+
+
+def http_get_text(settings: Settings, path: str, params: dict[str, str | list[str]] | None = None) -> str:
+    url = settings.base_url + path
+    if params:
+        url = url + "?" + urllib.parse.urlencode(params, doseq=True)
+    request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"HTTP {exc.code} for {url}: {body}") from exc
@@ -687,6 +702,44 @@ def fetch_single_series_range(
     return samples
 
 
+def fetch_metric_export_samples(
+    settings: Settings,
+    matcher: str,
+    start_iso: str,
+    end_iso: str,
+) -> list[tuple[int, float]]:
+    start_ts = int(datetime.fromisoformat(start_iso.replace("Z", "+00:00")).timestamp())
+    end_ts = int(datetime.fromisoformat(end_iso.replace("Z", "+00:00")).timestamp())
+    text = http_get_text(
+        settings,
+        "/api/v1/export",
+        {
+            "match[]": [matcher],
+            "start": start_iso,
+            "end": end_iso,
+        },
+    )
+    samples: list[tuple[int, float]] = []
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        item = json.loads(line)
+        timestamps = item.get("timestamps", [])
+        values = item.get("values", [])
+        for timestamp_ms, value in zip(timestamps, values):
+            try:
+                timestamp = int(timestamp_ms) // 1000
+                numeric = float(value)
+            except (TypeError, ValueError):
+                continue
+            if not math.isfinite(numeric):
+                continue
+            if start_ts <= timestamp < end_ts:
+                samples.append((timestamp, numeric))
+    samples.sort()
+    return samples
+
+
 def parse_step_seconds(step: str) -> int:
     if step.endswith("s"):
         return int(step[:-1])
@@ -709,38 +762,67 @@ def bucket_end_timestamps(window: DayWindow, bucket_minutes: int) -> list[int]:
     return [timestamp + bucket_seconds for timestamp in bucket_start_timestamps(window, bucket_minutes)]
 
 
+def summarize_polarity_bucket_energy_samples(
+    samples: list[tuple[int, float]],
+    bucket_seconds: int,
+    positive_label: str,
+    negative_label: str,
+    peak_power_limit: float,
+) -> dict[str, float]:
+    positive_sums: dict[int, float] = {}
+    positive_counts: dict[int, int] = {}
+    negative_sums: dict[int, float] = {}
+    negative_counts: dict[int, int] = {}
+
+    for timestamp, value in samples:
+        bucket_start = (timestamp // bucket_seconds) * bucket_seconds
+        if 0 <= value < peak_power_limit:
+            positive_sums[bucket_start] = positive_sums.get(bucket_start, 0.0) + value
+            positive_counts[bucket_start] = positive_counts.get(bucket_start, 0) + 1
+        if value <= 0 and value < peak_power_limit:
+            negative_sums[bucket_start] = negative_sums.get(bucket_start, 0.0) + value
+            negative_counts[bucket_start] = negative_counts.get(bucket_start, 0) + 1
+
+    positive_wh = sum(
+        (positive_sums[bucket] / positive_counts[bucket]) * bucket_seconds / 3600
+        for bucket in positive_sums
+    )
+    negative_wh = sum(
+        (-negative_sums[bucket] / negative_counts[bucket]) * bucket_seconds / 3600
+        for bucket in negative_sums
+    )
+    return {
+        positive_label: positive_wh,
+        negative_label: negative_wh,
+    }
+
+
 def summarize_grid_energy_samples(
     grid_samples: list[tuple[int, float]],
-    raw_step_seconds: int,
+    bucket_seconds: int,
+    peak_power_limit: float = 40000.0,
 ) -> dict[str, float]:
-    import_wh = 0.0
-    export_wh = 0.0
-    for _, value in grid_samples:
-        if value > 0:
-            import_wh += value * raw_step_seconds / 3600
-        elif value < 0:
-            export_wh += (-value) * raw_step_seconds / 3600
-    return {
-        "grid_import_daily_energy": import_wh,
-        "grid_export_daily_energy": export_wh,
-    }
+    return summarize_polarity_bucket_energy_samples(
+        samples=grid_samples,
+        bucket_seconds=bucket_seconds,
+        positive_label="grid_import_daily_energy",
+        negative_label="grid_export_daily_energy",
+        peak_power_limit=peak_power_limit,
+    )
 
 
 def summarize_battery_energy_samples(
     battery_samples: list[tuple[int, float]],
-    raw_step_seconds: int,
+    bucket_seconds: int,
+    peak_power_limit: float = 40000.0,
 ) -> dict[str, float]:
-    charge_wh = 0.0
-    discharge_wh = 0.0
-    for _, value in battery_samples:
-        if value < 0:
-            charge_wh += (-value) * raw_step_seconds / 3600
-        elif value > 0:
-            discharge_wh += value * raw_step_seconds / 3600
-    return {
-        "battery_charge_daily_energy": charge_wh,
-        "battery_discharge_daily_energy": discharge_wh,
-    }
+    return summarize_polarity_bucket_energy_samples(
+        samples=[(timestamp, -value) for timestamp, value in battery_samples],
+        bucket_seconds=bucket_seconds,
+        positive_label="battery_charge_daily_energy",
+        negative_label="battery_discharge_daily_energy",
+        peak_power_limit=peak_power_limit,
+    )
 
 
 def summarize_bucket_grid_energy(
@@ -878,39 +960,6 @@ def quarter_hour_price_rollups(
 
 
 def fetch_grid_energy_rollups(settings: Settings, window: DayWindow) -> dict[str, float]:
-    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
-    if settings.price_rollup_mode == "clamp":
-        bucket_step = f'{settings.price_bucket_minutes}m'
-        start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
-        first_bucket_end_iso = to_iso_z(start_dt + timedelta(minutes=settings.price_bucket_minutes))
-        bucket_end_set = set(bucket_end_timestamps(window, settings.price_bucket_minutes))
-        bucket_import_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_min(gridPower_value{{{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / 3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        bucket_export_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_max(gridPower_value{{{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / -3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        return summarize_bucket_grid_energy(
-            [(timestamp, value) for timestamp, value in bucket_import_samples if timestamp in bucket_end_set],
-            [(timestamp, value) for timestamp, value in bucket_export_samples if timestamp in bucket_end_set],
-        )
-
     grid_samples = fetch_single_series_range(
         settings,
         f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
@@ -918,43 +967,10 @@ def fetch_grid_energy_rollups(settings: Settings, window: DayWindow) -> dict[str
         window.end_iso,
         settings.raw_sample_step,
     )
-    return summarize_grid_energy_samples(grid_samples, raw_step_seconds)
+    return summarize_grid_energy_samples(grid_samples, parse_step_seconds(settings.energy_rollup_step))
 
 
 def fetch_battery_energy_rollups(settings: Settings, window: DayWindow) -> dict[str, float]:
-    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
-    if settings.price_rollup_mode == "clamp":
-        bucket_step = f'{settings.price_bucket_minutes}m'
-        start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
-        first_bucket_end_iso = to_iso_z(start_dt + timedelta(minutes=settings.price_bucket_minutes))
-        bucket_end_set = set(bucket_end_timestamps(window, settings.price_bucket_minutes))
-        bucket_charge_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_min(batteryPower_value{{id="",{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / -3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        bucket_discharge_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_max(batteryPower_value{{id="",{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / 3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        return summarize_bucket_battery_energy(
-            [(timestamp, value) for timestamp, value in bucket_charge_samples if timestamp in bucket_end_set],
-            [(timestamp, value) for timestamp, value in bucket_discharge_samples if timestamp in bucket_end_set],
-        )
-
     battery_samples = fetch_single_series_range(
         settings,
         f'avg_over_time(avg without(host) (batteryPower_value{{id="",{base_matchers(settings)}}})[{settings.raw_sample_step}])',
@@ -962,7 +978,7 @@ def fetch_battery_energy_rollups(settings: Settings, window: DayWindow) -> dict[
         window.end_iso,
         settings.raw_sample_step,
     )
-    return summarize_battery_energy_samples(battery_samples, raw_step_seconds)
+    return summarize_battery_energy_samples(battery_samples, parse_step_seconds(settings.energy_rollup_step))
 
 
 def bucket_price_rollups(
@@ -1399,6 +1415,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "mode": "write" if args.write else "dry-run",
         "timezone": settings.timezone,
         "raw_sample_step": settings.raw_sample_step,
+        "energy_rollup_step": settings.energy_rollup_step,
         "price_bucket_minutes": settings.price_bucket_minutes,
         "price_rollup_mode": settings.price_rollup_mode,
         "range": {
@@ -1440,5 +1457,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
