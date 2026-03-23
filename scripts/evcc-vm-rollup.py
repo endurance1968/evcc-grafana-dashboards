@@ -26,6 +26,7 @@ class Settings:
     metric_prefix: str
     raw_sample_step: str
     price_bucket_minutes: int
+    price_rollup_mode: str
     benchmark_start: str
     benchmark_end: str
     benchmark_step: str
@@ -116,6 +117,7 @@ def load_settings(path: str) -> Settings:
         metric_prefix=parser.get("victoriametrics", "metric_prefix"),
         raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
+        price_rollup_mode=parser.get("victoriametrics", "price_rollup_mode", fallback="sampled"),
         benchmark_start=parser.get("benchmark", "start"),
         benchmark_end=parser.get("benchmark", "end"),
         benchmark_step=parser.get("benchmark", "step"),
@@ -693,6 +695,10 @@ def bucket_start_timestamps(window: DayWindow, bucket_minutes: int) -> list[int]
     return list(range(start_ts, end_ts, bucket_seconds))
 
 
+def bucket_end_timestamps(window: DayWindow, bucket_minutes: int) -> list[int]:
+    bucket_seconds = bucket_minutes * 60
+    return [timestamp + bucket_seconds for timestamp in bucket_start_timestamps(window, bucket_minutes)]
+
 
 def quarter_hour_price_rollups(
     grid_samples: list[tuple[int, float]],
@@ -777,17 +783,80 @@ def quarter_hour_price_rollups(
     }
 
 
+def bucket_price_rollups(
+    bucket_import_samples: list[tuple[int, float]],
+    tariff_samples: list[tuple[int, float]],
+    bucket_starts: list[int],
+    bucket_minutes: int,
+) -> dict[str, float | None]:
+    bucket_seconds = bucket_minutes * 60
+    bucket_prices: list[float] = []
+    day_tariff_values: list[float] = []
+    total_import_kwh = 0.0
+    total_import_cost_eur = 0.0
+    last_price: float | None = None
+
+    bucket_import_map = {timestamp: value for timestamp, value in bucket_import_samples}
+    day_start = bucket_starts[0] if bucket_starts else 0
+    day_end = (bucket_starts[-1] + bucket_seconds) if bucket_starts else 0
+
+    for timestamp, value in tariff_samples:
+        if day_start <= timestamp < day_end:
+            day_tariff_values.append(value)
+
+    tariff_index = 0
+    for bucket_start in bucket_starts:
+        bucket_end = bucket_start + bucket_seconds
+
+        while tariff_index < len(tariff_samples) and tariff_samples[tariff_index][0] < bucket_start:
+            last_price = tariff_samples[tariff_index][1]
+            tariff_index += 1
+
+        bucket_price = last_price
+        scan_index = tariff_index
+        while scan_index < len(tariff_samples):
+            timestamp, value = tariff_samples[scan_index]
+            if timestamp >= bucket_end:
+                break
+            if timestamp >= bucket_start:
+                bucket_price = value
+            scan_index += 1
+        tariff_index = scan_index
+
+        if bucket_price is not None:
+            last_price = bucket_price
+            bucket_prices.append(bucket_price)
+
+        bucket_import_kwh = max(bucket_import_map.get(bucket_end, 0.0), 0.0)
+        if bucket_price is not None and bucket_import_kwh > 0:
+            total_import_kwh += bucket_import_kwh
+            total_import_cost_eur += bucket_import_kwh * bucket_price
+
+    if not day_tariff_values:
+        day_tariff_values = bucket_prices
+
+    arithmetic_avg = (sum(day_tariff_values) / len(day_tariff_values) * 100) if day_tariff_values else None
+    minimum_price = (min(day_tariff_values) * 100) if day_tariff_values else None
+    maximum_price = (max(day_tariff_values) * 100) if day_tariff_values else None
+    effective_price = (
+        total_import_cost_eur / total_import_kwh * 100
+        if total_import_kwh > 0
+        else None
+    )
+
+    return {
+        "grid_import_cost_daily": total_import_cost_eur,
+        "grid_import_price_avg_daily": arithmetic_avg,
+        "grid_import_price_effective_daily": effective_price,
+        "grid_import_price_min_daily": minimum_price,
+        "grid_import_price_max_daily": maximum_price,
+    }
+
+
 def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str, float | None]:
     raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
     start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
     extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
-    grid_samples = fetch_single_series_range(
-        settings,
-        f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
-        window.start_iso,
-        window.end_iso,
-        settings.raw_sample_step,
-    )
     tariff_samples = fetch_single_series_range(
         settings,
         f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
@@ -795,10 +864,45 @@ def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str,
         window.end_iso,
         settings.raw_sample_step,
     )
+    bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
+
+    if settings.price_rollup_mode == "clamp":
+        bucket_step = f'{settings.price_bucket_minutes}m'
+        bucket_end_set = set(bucket_end_timestamps(window, settings.price_bucket_minutes))
+        first_bucket_end_iso = to_iso_z(start_dt + timedelta(minutes=settings.price_bucket_minutes))
+        bucket_import_samples = fetch_single_series_range(
+            settings,
+            (
+                f'sum without(host) '
+                f'(integrate(clamp_min(gridPower_value{{{base_matchers(settings)}}}, 0)'
+                f'[{settings.price_bucket_minutes}m])) / 3600000'
+            ),
+            first_bucket_end_iso,
+            window.end_iso,
+            bucket_step,
+        )
+        return bucket_price_rollups(
+            bucket_import_samples=[
+                (timestamp, value)
+                for timestamp, value in bucket_import_samples
+                if timestamp in bucket_end_set
+            ],
+            tariff_samples=tariff_samples,
+            bucket_starts=bucket_starts,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+
+    grid_samples = fetch_single_series_range(
+        settings,
+        f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+        window.start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
     return quarter_hour_price_rollups(
         grid_samples=grid_samples,
         tariff_samples=tariff_samples,
-        bucket_starts=bucket_start_timestamps(window, settings.price_bucket_minutes),
+        bucket_starts=bucket_starts,
         raw_step_seconds=raw_step_seconds,
         bucket_minutes=settings.price_bucket_minutes,
     )
@@ -1015,6 +1119,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "timezone": settings.timezone,
         "raw_sample_step": settings.raw_sample_step,
         "price_bucket_minutes": settings.price_bucket_minutes,
+        "price_rollup_mode": settings.price_rollup_mode,
         "range": {
             "start_day": start_day.isoformat(),
             "end_day": end_day.isoformat(),

@@ -6,6 +6,8 @@ Current default files:
 
 - `evcc-vm-rollup.py`
 - `evcc-vm-rollup.conf.example`
+- `evcc-vm-rollup-clamp.py`
+- `evcc-vm-rollup-clamp.conf.example`
 
 Legacy Influx aggregation remains separate under `scripts/influx-legacy/`.
 
@@ -102,6 +104,14 @@ python3 evcc-vm-rollup.py   --config evcc-vm-rollup.conf.example   backfill-test
 ```
 
 The tool computes each local day separately, evaluates the raw MetricsQL expression at local day-end and writes the resulting daily samples via `/api/v1/import`.
+
+### Run the parallel clamp comparison path
+
+```bash
+python3 evcc-vm-rollup-clamp.py backfill-test --start-day 2025-01-01 --end-day 2026-03-22 --progress --write
+```
+
+This writes to the independent `test_evcc_clamp_*` namespace and is intended only for side-by-side validation against the sampled path.
 
 ## Configuration
 

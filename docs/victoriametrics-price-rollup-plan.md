@@ -23,6 +23,13 @@ Current validation result:
 - the remaining difference is mainly caused by imported grid energy being a bit lower on the VM path, not by obviously wrong tariff values
 - this means the next tuning step belongs to the import-energy path, not to the basic tariff formulas
 
+Parallel comparison track now available:
+
+- `test_evcc_*` keeps the current sampled `10s` / `15m` baseline
+- `test_evcc_clamp_*` now provides a parallel clamp-based import path for direct comparison
+- the separate comparison dashboard lives under `dashboards/vm-month-clamp-test`
+- both test namespaces can be deleted independently when one path is rejected
+
 ## Why this is phase 2
 
 Energy rollups were safe to implement first because they can be derived directly from power and state metrics with simple daily aggregation.

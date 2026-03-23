@@ -22,6 +22,7 @@ class VmRollupTests(unittest.TestCase):
             metric_prefix="test_evcc",
             raw_sample_step="10s",
             price_bucket_minutes=15,
+            price_rollup_mode="sampled",
             benchmark_start="2026-02-20T00:00:00Z",
             benchmark_end="2026-03-22T00:00:00Z",
             benchmark_step="1d",
@@ -236,6 +237,20 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_price_avg_daily"], 21.0, places=6)
         self.assertAlmostEqual(result["grid_import_price_effective_daily"], 24.0, places=6)
         self.assertAlmostEqual(result["grid_import_cost_daily"], 0.12, places=6)
+
+    def test_bucket_price_rollups_uses_bucket_import_kwh(self):
+        result = MODULE.bucket_price_rollups(
+            bucket_import_samples=[(900, 0.25), (1800, 0.50)],
+            tariff_samples=[(0, 0.20), (600, 0.24), (900, 0.40), (1500, 0.44)],
+            bucket_starts=[0, 900],
+            bucket_minutes=15,
+        )
+
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.28, places=6)
+        self.assertAlmostEqual(result["grid_import_price_avg_daily"], 32.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 37.333333333333336, places=6)
+        self.assertAlmostEqual(result["grid_import_price_min_daily"], 20.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_max_daily"], 44.0, places=6)
 
 
 if __name__ == "__main__":
