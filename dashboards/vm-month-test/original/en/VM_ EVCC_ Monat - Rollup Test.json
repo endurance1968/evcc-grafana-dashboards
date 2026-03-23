@@ -260,7 +260,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "PV",
           "range": true,
@@ -274,7 +274,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} > 0) default 0)[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Grid import",
           "range": true,
@@ -288,7 +288,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Home",
           "range": true,
@@ -302,7 +302,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h / 1000, \"loadpoint\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -316,7 +316,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} < 0) default 0)[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Feed-in",
           "range": true,
@@ -610,7 +610,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "PV",
           "range": true,
@@ -624,7 +624,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} > 0) default 0)[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Grid import",
           "range": true,
@@ -638,7 +638,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / -1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / -1000",
           "format": "time_series",
           "legendFormat": "Home",
           "range": true,
@@ -652,7 +652,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h / -1000, \"loadpoint\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]) / -1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -666,7 +666,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} < 0) default 0)[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]) / -1000",
           "format": "time_series",
           "legendFormat": "Feed-in",
           "range": true,
@@ -738,7 +738,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) / 1000",
+          "expr": "sum(sum_over_time(test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[$__range])) / 1000",
           "format": "table",
           "legendFormat": "PV",
           "range": false,
@@ -880,7 +880,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -894,7 +894,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} > 0) default 0)[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -908,7 +908,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} < 0) default 0)[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -922,7 +922,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -936,7 +936,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h) / 1000",
+          "expr": "sum(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d])) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1164,7 +1164,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "1 - (sum without(host) (integrate(((gridPower_value{db=\"$dbLabel\"} > 0) default 0)[1d:$energySampleInterval]) / 3600000)) / ((sum(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h) / 1000) + (test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000))",
+          "expr": "1 - ((sum(last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d])) / 1000)) / ((sum(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d])) / 1000) + (last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000))",
           "format": "time_series",
           "legendFormat": "Autarkie",
           "range": true,
@@ -1240,7 +1240,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) / 1000",
+          "expr": "sum(sum_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[$__range])) / 1000",
           "format": "table",
           "legendFormat": "Ext total",
           "range": false,
@@ -1253,7 +1253,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) / 1000",
+          "expr": "sum(sum_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[$__range])) / 1000",
           "format": "table",
           "legendFormat": "Aux total",
           "range": false,
@@ -1266,7 +1266,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) / 1000",
+          "expr": "sum(sum_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[$__range])) / 1000",
           "format": "table",
           "legendFormat": "Home total",
           "range": false,
@@ -1290,7 +1290,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[$__range])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1303,7 +1303,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[$__range] offset 1h)) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[$__range])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1414,7 +1414,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Home total",
           "range": true,
@@ -1428,7 +1428,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"} offset 1h) / 1000",
+          "expr": "sum(last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "Ext total",
           "range": true,
@@ -1442,7 +1442,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"} offset 1h) / 1000",
+          "expr": "sum(last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "Aux total",
           "range": true,
@@ -1467,7 +1467,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000, \"title\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -1481,7 +1481,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000, \"title\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -1579,7 +1579,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Home",
           "range": true,
@@ -1593,7 +1593,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h / 1000, \"loadpoint\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -1607,7 +1607,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_min(clamp_max(batteryPower_value{id=\"\",db=\"$dbLabel\"}, 0), -$peakPowerLimit))[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_battery_charge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery charge",
           "range": true,
@@ -1621,7 +1621,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_max(clamp_min(batteryPower_value{id=\"\",db=\"$dbLabel\"}, $peakPowerLimit), 0))[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_battery_discharge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery discharge",
           "range": true,
@@ -1778,7 +1778,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_min(clamp_max(batteryPower_value{id=\"\",db=\"$dbLabel\"}, 0), -$peakPowerLimit))[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_battery_charge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery charge",
           "range": true,
@@ -1792,7 +1792,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_max(clamp_min(batteryPower_value{id=\"\",db=\"$dbLabel\"}, $peakPowerLimit), 0))[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_battery_discharge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery discharge",
           "range": true,
@@ -1817,7 +1817,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_home_energy_daily_wh{db=\"$dbLabel\"} offset 1h / 1000",
+          "expr": "last_over_time(test_evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Home",
           "range": true,
@@ -1831,7 +1831,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"} offset 1h / 1000, \"loadpoint\")",
+          "expr": "sort_by_label(last_over_time(test_evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -2097,7 +2097,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "avg price daily",
           "range": true,
@@ -2126,7 +2126,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum_over_time((avg_over_time(avg(gridPower_value{db=\"$dbLabel\"})[$energySampleInterval]) > 0)[1d:$energySampleInterval]) * 0",
+          "expr": "sum(last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d])) * 0",
           "format": "time_series",
           "legendFormat": "noop",
           "range": true,
@@ -2140,7 +2140,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(integrate(clamp_min(avg(gridPower_value{db=\"$dbLabel\"}), 0)[1d:$energySampleInterval])) / 3600000",
+          "expr": "last_over_time(test_evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Purchased energy daily",
           "range": true,
@@ -2169,7 +2169,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Purchased daily",
           "range": true,
@@ -2242,13 +2242,13 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum_over_time((avg(tariffFeedIn_value{db=\"$dbLabel\"} offset $tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value{db=\"$dbLabel\"} offset $tariffPriceInterval), 0)) / 3600000)[1d:$tariffPriceInterval])",
+          "expr": "last_over_time(test_evcc_grid_export_credit_daily_eur{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Sold daily raw",
           "range": true,
           "refId": "soldDailyRaw",
           "hide": true,
-          "interval": "$tariffPriceInterval"
+          "interval": "1d"
         },
         {
           "datasource": {
@@ -2447,7 +2447,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_price_max_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_price_max_daily_ct_per_kwh{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Max",
           "range": true,
@@ -2460,7 +2460,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Average",
           "range": true,
@@ -2473,7 +2473,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Effective electricity price",
           "range": true,
@@ -2486,7 +2486,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_price_min_daily_ct_per_kwh{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_price_min_daily_ct_per_kwh{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Min",
           "range": true,
@@ -2611,7 +2611,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"} offset 1h",
+          "expr": "last_over_time(test_evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"}[1d])",
           "format": "time_series",
           "legendFormat": "Purchased",
           "range": true,
@@ -2795,7 +2795,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_min(clamp_max(batteryPower_value{id=\"\",db=\"$dbLabel\"}, 0), -$peakPowerLimit))[1d:$energySampleInterval]) / -3600000)",
+          "expr": "last_over_time(test_evcc_battery_charge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery charge daily",
           "range": true,
@@ -2809,7 +2809,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum without(host) (integrate((clamp_max(clamp_min(batteryPower_value{id=\"\",db=\"$dbLabel\"}, 0), $peakPowerLimit))[1d:$energySampleInterval]) / 3600000)",
+          "expr": "last_over_time(test_evcc_battery_discharge_daily_wh{db=\"$dbLabel\"}[1d]) / 1000",
           "format": "time_series",
           "legendFormat": "Battery discharge daily",
           "range": true,
@@ -2864,7 +2864,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "((test_evcc_battery_soc_daily_max_pct{db=\"$dbLabel\"} offset 1h / 100) > 0)",
+          "expr": "((last_over_time(test_evcc_battery_soc_daily_max_pct{db=\"$dbLabel\"}[1d]) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "Max SOC series",
           "range": true,
@@ -2878,7 +2878,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "((test_evcc_battery_soc_daily_min_pct{db=\"$dbLabel\"} offset 1h / 100) > 0)",
+          "expr": "((last_over_time(test_evcc_battery_soc_daily_min_pct{db=\"$dbLabel\"}[1d]) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "Min SOC series",
           "range": true,
@@ -3060,7 +3060,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "((test_evcc_battery_soc_daily_max_pct{db=\"$dbLabel\"} offset 1h / 100) > 0)",
+          "expr": "((last_over_time(test_evcc_battery_soc_daily_max_pct{db=\"$dbLabel\"}[1d]) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "SOC max",
           "range": true,
@@ -3074,7 +3074,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "((test_evcc_battery_soc_daily_min_pct{db=\"$dbLabel\"} offset 1h / 100) > 0)",
+          "expr": "((last_over_time(test_evcc_battery_soc_daily_min_pct{db=\"$dbLabel\"}[1d]) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "SOC min",
           "range": true,
