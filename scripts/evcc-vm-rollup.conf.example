@@ -4,6 +4,8 @@ db_label = evcc
 host_label =
 timezone = Europe/Berlin
 metric_prefix = test_evcc
+raw_sample_step = 10s
+price_bucket_minutes = 15
 
 [benchmark]
 start = 2026-02-20T00:00:00Z
