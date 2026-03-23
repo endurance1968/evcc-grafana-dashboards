@@ -42,10 +42,12 @@ class VmRollupTests(unittest.TestCase):
         self.assertIn("test_evcc_grid_import_cost_daily_eur", records)
         self.assertIn("test_evcc_grid_import_price_effective_daily_ct_per_kwh", records)
 
-    def test_catalog_marks_phase_two_items_as_deferred(self):
+    def test_catalog_marks_only_remaining_phase_two_items_as_deferred(self):
         catalog = MODULE.build_catalog(self.settings)
         deferred = {item.key for item in catalog if not item.implemented}
-        self.assertIn("grid_import_daily_energy", deferred)
+        self.assertNotIn("grid_import_daily_energy", deferred)
+        self.assertNotIn("battery_charge_daily_energy", deferred)
+        self.assertNotIn("grid_export_credit_daily", deferred)
         self.assertIn("pricing_rollups", deferred)
 
     def test_vehicle_distance_rollup_collapses_to_vehicle_dimension(self):
@@ -200,6 +202,7 @@ class VmRollupTests(unittest.TestCase):
         result = MODULE.quarter_hour_price_rollups(
             grid_samples=grid_samples,
             tariff_samples=tariff_samples,
+            feed_in_tariff_samples=[(0, 0.08), (900, 0.10)],
             bucket_starts=bucket_starts,
             raw_step_seconds=30,
             bucket_minutes=15,
@@ -229,6 +232,7 @@ class VmRollupTests(unittest.TestCase):
         result = MODULE.quarter_hour_price_rollups(
             grid_samples=grid_samples,
             tariff_samples=tariff_samples,
+            feed_in_tariff_samples=[(0, 0.08), (900, 0.10)],
             bucket_starts=bucket_starts,
             raw_step_seconds=30,
             bucket_minutes=15,
@@ -241,7 +245,9 @@ class VmRollupTests(unittest.TestCase):
     def test_bucket_price_rollups_uses_bucket_import_kwh(self):
         result = MODULE.bucket_price_rollups(
             bucket_import_samples=[(900, 0.25), (1800, 0.50)],
+            bucket_export_samples=[(900, 0.10), (1800, 0.20)],
             tariff_samples=[(0, 0.20), (600, 0.24), (900, 0.40), (1500, 0.44)],
+            feed_in_tariff_samples=[(0, 0.08), (900, 0.10)],
             bucket_starts=[0, 900],
             bucket_minutes=15,
         )
@@ -251,6 +257,43 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_price_effective_daily"], 37.333333333333336, places=6)
         self.assertAlmostEqual(result["grid_import_price_min_daily"], 20.0, places=6)
         self.assertAlmostEqual(result["grid_import_price_max_daily"], 44.0, places=6)
+        self.assertAlmostEqual(result["grid_export_credit_daily"], 0.028, places=6)
+
+    def test_summarize_grid_energy_samples_splits_import_and_export(self):
+        result = MODULE.summarize_grid_energy_samples(
+            [(0, -100.0), (10, 200.0), (20, -300.0), (30, 400.0)],
+            raw_step_seconds=10,
+        )
+
+        self.assertAlmostEqual(result["grid_import_daily_energy"], (200.0 + 400.0) * 10 / 3600, places=6)
+        self.assertAlmostEqual(result["grid_export_daily_energy"], (100.0 + 300.0) * 10 / 3600, places=6)
+
+    def test_summarize_bucket_grid_energy_converts_kwh_to_wh(self):
+        result = MODULE.summarize_bucket_grid_energy(
+            bucket_import_samples=[(900, 0.25), (1800, 0.5)],
+            bucket_export_samples=[(900, 0.1), (1800, 0.2)],
+        )
+
+        self.assertAlmostEqual(result["grid_import_daily_energy"], 750.0, places=6)
+        self.assertAlmostEqual(result["grid_export_daily_energy"], 300.0, places=6)
+
+    def test_summarize_battery_energy_samples_splits_charge_and_discharge(self):
+        result = MODULE.summarize_battery_energy_samples(
+            [(0, -500.0), (10, 250.0), (20, -250.0), (30, 750.0)],
+            raw_step_seconds=10,
+        )
+
+        self.assertAlmostEqual(result["battery_charge_daily_energy"], (500.0 + 250.0) * 10 / 3600, places=6)
+        self.assertAlmostEqual(result["battery_discharge_daily_energy"], (250.0 + 750.0) * 10 / 3600, places=6)
+
+    def test_summarize_bucket_battery_energy_converts_kwh_to_wh(self):
+        result = MODULE.summarize_bucket_battery_energy(
+            bucket_charge_samples=[(900, 0.25), (1800, 0.5)],
+            bucket_discharge_samples=[(900, 0.1), (1800, 0.2)],
+        )
+
+        self.assertAlmostEqual(result["battery_charge_daily_energy"], 750.0, places=6)
+        self.assertAlmostEqual(result["battery_discharge_daily_energy"], 300.0, places=6)
 
 
 if __name__ == "__main__":
