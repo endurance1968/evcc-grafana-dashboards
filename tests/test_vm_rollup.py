@@ -20,6 +20,8 @@ class VmRollupTests(unittest.TestCase):
             host_label="",
             timezone="Europe/Berlin",
             metric_prefix="test_evcc",
+            raw_sample_step="10s",
+            price_bucket_minutes=15,
             benchmark_start="2026-02-20T00:00:00Z",
             benchmark_end="2026-03-22T00:00:00Z",
             benchmark_step="1d",

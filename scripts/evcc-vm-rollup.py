@@ -24,6 +24,8 @@ class Settings:
     host_label: str
     timezone: str
     metric_prefix: str
+    raw_sample_step: str
+    price_bucket_minutes: int
     benchmark_start: str
     benchmark_end: str
     benchmark_step: str
@@ -52,10 +54,6 @@ class DayWindow:
 class ImportResponse:
     status_code: int
     body: str
-
-
-PRICE_BUCKET_MINUTES = 15
-RAW_SAMPLE_STEP = "30s"
 
 
 def parse_args() -> argparse.Namespace:
@@ -116,6 +114,8 @@ def load_settings(path: str) -> Settings:
         host_label=parser.get("victoriametrics", "host_label", fallback=""),
         timezone=parser.get("victoriametrics", "timezone"),
         metric_prefix=parser.get("victoriametrics", "metric_prefix"),
+        raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
+        price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
         benchmark_start=parser.get("benchmark", "start"),
         benchmark_end=parser.get("benchmark", "end"),
         benchmark_step=parser.get("benchmark", "step"),
@@ -778,29 +778,29 @@ def quarter_hour_price_rollups(
 
 
 def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str, float | None]:
-    raw_step_seconds = parse_step_seconds(RAW_SAMPLE_STEP)
+    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
     start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
-    extended_start_iso = to_iso_z(start_dt - timedelta(minutes=PRICE_BUCKET_MINUTES))
+    extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
     grid_samples = fetch_single_series_range(
         settings,
-        f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[30s])',
+        f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
         window.start_iso,
         window.end_iso,
-        RAW_SAMPLE_STEP,
+        settings.raw_sample_step,
     )
     tariff_samples = fetch_single_series_range(
         settings,
         f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
         extended_start_iso,
         window.end_iso,
-        RAW_SAMPLE_STEP,
+        settings.raw_sample_step,
     )
     return quarter_hour_price_rollups(
         grid_samples=grid_samples,
         tariff_samples=tariff_samples,
-        bucket_starts=bucket_start_timestamps(window, PRICE_BUCKET_MINUTES),
+        bucket_starts=bucket_start_timestamps(window, settings.price_bucket_minutes),
         raw_step_seconds=raw_step_seconds,
-        bucket_minutes=PRICE_BUCKET_MINUTES,
+        bucket_minutes=settings.price_bucket_minutes,
     )
 
 
@@ -1013,6 +1013,8 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     summary = {
         "mode": "write" if args.write else "dry-run",
         "timezone": settings.timezone,
+        "raw_sample_step": settings.raw_sample_step,
+        "price_bucket_minutes": settings.price_bucket_minutes,
         "range": {
             "start_day": start_day.isoformat(),
             "end_day": end_day.isoformat(),
