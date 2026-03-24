@@ -87,6 +87,30 @@ Decision snapshot:
 - accepted baseline: `test_evcc_*` with the original `sampled-old` import-cost path
 - comparison-only path: `test_evcc_clamp_*`
 - rejected experiment for now: `sampled-new`
+- decision basis: month-cost comparison against Tibber now favors `sampled` on total deviation, so further tuning should continue only on the sampled path
+
+Algorithm note for the compared month-cost paths:
+
+- `Influx`: legacy path from `evcc_agg`; import energy is derived with the original Influx aggregation semantics, i.e. negative/positive filtering plus `mean(value)` on fixed 60s buckets, followed by daily integration on local Europe/Berlin day windows
+- `sampled`: current VM baseline in `test_evcc_*`; import energy for the daily energy rollups follows the corrected raw-sample-based path used in the Python rollup CLI, while import cost is calculated from sampled quarter-hour import energy plus the quarter-hour tariff selection used in the script
+- `clamp`: alternative VM path in `test_evcc_clamp_*`; uses the same daily energy baseline as the accepted sampled path for grid and battery energy, but keeps the clamp-oriented quarter-hour import-cost path for price/cost rollups
+- this means the remaining visible difference between `sampled` and `clamp` is no longer the daily grid energy itself, but mainly how quarter-hour import energy is converted into cost and effective import price
+
+Month-cost comparison against Tibber, without the incomplete October 2025 month:
+
+| Month | Influx EUR | Clamp EUR | Sampled EUR | Tibber EUR | Influx delta % | Clamp delta % | Sampled delta % |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2025-05 | 116.15 | 111.60 | 117.75 | 120.38 | -3.5% | -7.3% | -2.2% |
+| 2025-06 | 112.51 | 105.31 | 108.50 | 119.49 | -5.8% | -11.9% | -9.2% |
+| 2025-07 | 117.23 | 107.39 | 113.77 | 123.51 | -5.1% | -13.1% | -7.9% |
+| 2025-08 | 136.04 | 131.04 | 137.91 | 130.35 | +4.4% | +0.5% | +5.8% |
+| 2025-09 | 137.52 | 132.28 | 138.55 | 136.57 | +0.7% | -3.1% | +1.5% |
+| 2025-11 | 339.71 | 354.14 | 350.40 | 349.43 | -2.8% | +1.3% | +0.3% |
+| 2025-12 | 412.34 | 437.81 | 434.15 | 422.03 | -2.3% | +3.7% | +2.9% |
+| 2026-01 | 469.70 | 474.63 | 469.88 | 480.35 | -2.2% | -1.2% | -2.2% |
+| 2026-02 | 315.47 | 305.33 | 309.13 | 317.82 | -0.7% | -3.9% | -2.7% |
+| 2026-03 | 76.62 | 75.09 | 72.00 | 74.86 | +2.3% | +0.3% | -3.8% |
+| **Total** | **2233.29** | **2234.62** | **2252.04** | **2274.79** | **-1.8%** | **-1.8%** | **-1.0%** |
 
 ### 1. Reduce mixed-language source internals
 
