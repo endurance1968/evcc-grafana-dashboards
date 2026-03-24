@@ -220,6 +220,9 @@ Known remaining review items:
 - the remaining validation gap is a small but consistent undercount in VM import energy compared with Influx legacy, which makes VM daily costs slightly lower on many days
 - export-side credit rollups are still deferred
 - next session should explicitly check whether the corrected 10s -> 60s energy aggregation path should also be adopted for pv, home, and loadpoint rollups, or kept limited to grid and attery only
+- sampled vs clamp monthly cost comparisons were extended against Tibber for May 2025 through February 2026
+- excluding the incomplete October 2025 data gap month, the original `sampled-old` import-cost path currently has the lowest error and remains the baseline
+- the later `sampled-new` experiment that reused the 10s -> 60s energy prebucket path for 15m cost weighting did not win overall and has been discarded
 
 ## Next session focus: price and cost tuning
 
@@ -235,6 +238,8 @@ Current direction:
 - compare them against Influx legacy and Tibber billing reality
 - focus on the remaining import-energy drift before promoting anything to `evcc_*`
 - add export-side credit rollups only after the import path is accepted
+- keep `sampled-old` as the working import-cost baseline until a future comparison clearly beats it
+- retain `clamp` only as an explicit comparison path, not as the preferred month-dashboard source
 
 Cleanup rule for the parallel track:
 

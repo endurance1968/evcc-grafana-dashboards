@@ -17,6 +17,8 @@ Implemented:
 - test-only grid import price and cost rollups in `test_evcc_*`
 - parallel clamp-based test rollups in `test_evcc_clamp_*` with a separate month review dashboard
 - VM month review dashboard with working energy, battery, metric, price, and cost panels
+- monthly Tibber comparison for May 2025 through February 2026 now exists for `Influx`, `sampled`, and `clamp`
+- current decision baseline for import-side price and cost rollups is `sampled-old`; the later 60s-prebucketed `sampled-new` experiment was rejected after comparison
 
 ## Remaining technical work
 
@@ -66,6 +68,8 @@ Current issue:
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
 - export credit rollups are still not finalized
 - next session check: evaluate whether the successful 10s -> 60s energy integration path should also replace direct daily integrate(...[1d]) rollups for pv, home, and loadpoint metrics
+- sampled vs clamp for monthly import costs has now been compared against Tibber for May 2025 through February 2026; excluding the incomplete October 2025 month, `sampled-old` currently has the lowest mean absolute error and remains the accepted baseline
+- the later `sampled-new` cost-path experiment, which applied the 10s -> 60s prebucket logic before 15m tariff weighting, did not win overall and should stay rejected unless new evidence appears
 
 Goal:
 
@@ -77,6 +81,12 @@ Primary references:
 
 - `docs/victoriametrics-price-rollup-plan.md`
 - `docs/victoriametrics-rollup-design.md`
+
+Decision snapshot:
+
+- accepted baseline: `test_evcc_*` with the original `sampled-old` import-cost path
+- comparison-only path: `test_evcc_clamp_*`
+- rejected experiment for now: `sampled-new`
 
 ### 1. Reduce mixed-language source internals
 
