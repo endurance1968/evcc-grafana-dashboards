@@ -52,7 +52,7 @@ Current VictoriaMetrics state for `db="evcc"`:
 
 - raw EVCC metrics are present
 - test rollups in the `test_evcc_*` namespace are present
-- parallel clamp-rollups in the `test_evcc_clamp_*` namespace are present
+- the former clamp-rollup namespace `test_evcc_clamp_*` has been removed after the sampled decision
 - production rollups in the `evcc_*` namespace do not exist yet
 
 This means:
@@ -76,7 +76,7 @@ Current test rollup families include:
 - `test_evcc_grid_import_price_effective_daily_ct_per_kwh`
 - `test_evcc_grid_import_price_min_daily_ct_per_kwh`
 - `test_evcc_grid_import_price_max_daily_ct_per_kwh`
-- parallel clamp namespace mirrors the same metric family under `test_evcc_clamp_*`
+- historically, a parallel clamp namespace mirrored the same metric family under `test_evcc_clamp_*`; this comparison path has since been removed
 
 ## Why daily rollups are enough for the first implementation
 
@@ -198,10 +198,7 @@ Current VM month review dashboard:
 - source: [VM_ EVCC_ Monat - Rollup Test.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/vm-month-test/original/en/VM_%20EVCC_%20Monat%20-%20Rollup%20Test.json)
 - live URL: [VM: EVCC: Monat - Rollup Test](http://192.168.1.189:3000/d/vm-month-test-en-orig-vm-rollup-month-te/21f8417)
 
-Parallel clamp comparison dashboard:
-
-- source: [VM_ EVCC_ Monat - Rollup Clamp Test.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/vm-month-clamp-test/original/en/VM_%20EVCC_%20Monat%20-%20Rollup%20Clamp%20Test.json)
-- live URL: [VM: EVCC: Monat - Rollup Clamp Test](http://192.168.1.189:3000/d/vm-month-clamp-test-en-o-vm-rollup-month/3aed633)
+Historical note: a dedicated clamp month comparison dashboard existed during evaluation, but it was removed after the sampled path won the month-cost decision.
 
 Current status after interactive review:
 
@@ -246,7 +243,7 @@ Short algorithm distinction behind the comparison:
 
 - `Influx`: legacy `evcc_agg` result built with InfluxQL semantics, especially fixed 60s `mean(value)` buckets and daily integration on local day windows
 - `sampled`: VM test rollup baseline in `test_evcc_*`; quarter-hour import costs are built from the sampled raw-data path implemented in the Python rollup CLI
-- `clamp`: VM comparison path in `test_evcc_clamp_*`; shares the corrected daily grid/battery energy baseline, but keeps the clamp-based quarter-hour cost path
+- `clamp`: historical VM comparison path; it shared the corrected daily grid/battery energy baseline, but kept the clamp-based quarter-hour cost path
 - practical consequence: current month-panel differences between `sampled` and `clamp` are mainly cost/effective-price differences, not large daily grid-energy differences
 
 Decision table used for this call:
@@ -265,11 +262,10 @@ Decision table used for this call:
 | 2026-03 | 76.62 | 75.09 | 72.00 | 74.86 | +2.3% | +0.3% | -3.8% |
 | **Total** | **2233.29** | **2234.62** | **2252.04** | **2274.79** | **-1.8%** | **-1.8%** | **-1.0%** |
 
-Cleanup rule for the parallel track:
+Cleanup note:
 
-- sampled path can be removed via `__name__=~"test_evcc_.*"` only after the clamp experiment is rejected or merged
-- clamp path can be removed independently via `__name__=~"test_evcc_clamp_.*"`
-- the corresponding dashboard source for the clamp path is isolated under `dashboards/vm-month-clamp-test`
+- the clamp experiment has already been rejected and removed
+- sampled remains the only active VM price/cost rollup path
 
 ## Current host-label state
 

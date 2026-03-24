@@ -27,7 +27,6 @@ class Settings:
     raw_sample_step: str
     energy_rollup_step: str
     price_bucket_minutes: int
-    price_rollup_mode: str
     benchmark_start: str
     benchmark_end: str
     benchmark_step: str
@@ -119,7 +118,6 @@ def load_settings(path: str) -> Settings:
         raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
         energy_rollup_step=parser.get("victoriametrics", "energy_rollup_step", fallback="60s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
-        price_rollup_mode=parser.get("victoriametrics", "price_rollup_mode", fallback="sampled"),
         benchmark_start=parser.get("benchmark", "start"),
         benchmark_end=parser.get("benchmark", "end"),
         benchmark_step=parser.get("benchmark", "step"),
@@ -1097,51 +1095,8 @@ def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str,
         settings.raw_sample_step,
     )
     bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
-
-    if settings.price_rollup_mode == "clamp":
-        bucket_step = f'{settings.price_bucket_minutes}m'
-        bucket_end_set = set(bucket_end_timestamps(window, settings.price_bucket_minutes))
-        first_bucket_end_iso = to_iso_z(start_dt + timedelta(minutes=settings.price_bucket_minutes))
-        bucket_import_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_min(gridPower_value{{{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / 3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        bucket_export_samples = fetch_single_series_range(
-            settings,
-            (
-                f'sum without(host) '
-                f'(integrate(clamp_max(gridPower_value{{{base_matchers(settings)}}}, 0)'
-                f'[{settings.price_bucket_minutes}m])) / -3600000'
-            ),
-            first_bucket_end_iso,
-            window.end_iso,
-            bucket_step,
-        )
-        return bucket_price_rollups(
-            bucket_import_samples=[
-                (timestamp, value)
-                for timestamp, value in bucket_import_samples
-                if timestamp in bucket_end_set
-            ],
-            bucket_export_samples=[
-                (timestamp, value)
-                for timestamp, value in bucket_export_samples
-                if timestamp in bucket_end_set
-            ],
-            tariff_samples=tariff_samples,
-            feed_in_tariff_samples=feed_in_tariff_samples,
-            bucket_starts=bucket_starts,
-            bucket_minutes=settings.price_bucket_minutes,
-        )
-
     grid_samples = fetch_single_series_range(
+
         settings,
         f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
         window.start_iso,
@@ -1417,7 +1372,6 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "raw_sample_step": settings.raw_sample_step,
         "energy_rollup_step": settings.energy_rollup_step,
         "price_bucket_minutes": settings.price_bucket_minutes,
-        "price_rollup_mode": settings.price_rollup_mode,
         "range": {
             "start_day": start_day.isoformat(),
             "end_day": end_day.isoformat(),

@@ -20,9 +20,7 @@ Do not use it for the `Today*` dashboards. Those continue to read raw VM metrics
 ## Files
 
 - script: `scripts/evcc-vm-rollup.py`
-- clamp wrapper: `scripts/evcc-vm-rollup-clamp.py`
 - example config: `scripts/evcc-vm-rollup.conf.example`
-- clamp example config: `scripts/evcc-vm-rollup-clamp.conf.example`
 - design baseline: `docs/victoriametrics-rollup-design.md`
 
 ## Current rollout scope
@@ -68,7 +66,7 @@ Important settings:
 - `db_label`: stable EVCC history label, currently `evcc`
 - `timezone`: local day boundary, currently `Europe/Berlin`
 - `metric_prefix`: use `test_evcc` first, switch to `evcc` only after validation
-- `price_rollup_mode`: `sampled` for the current default path, `clamp` for the parallel comparison path
+- import-side price and cost rollups now continue only on the sampled baseline path
 
 Important rule:
 
@@ -167,18 +165,7 @@ Use monthly chunking unless you have a measured reason not to.
 - do not switch dashboards to production rollups before Grafana validation
 - clear only the `test_evcc_*` namespace when rebuilding test rollups
 
-### Parallel clamp comparison path
-
-A second safe comparison track now exists for import-side price and cost rollups:
-
-```bash
-python3 scripts/evcc-vm-rollup-clamp.py detect
-python3 scripts/evcc-vm-rollup-clamp.py backfill-test --start-day 2025-01-01 --end-day 2026-03-22 --progress --write
-```
-
-This wrapper uses `scripts/evcc-vm-rollup-clamp.conf.example` by default and writes to `test_evcc_clamp_*`.
-
-Use it only for comparison and validation, not as the accepted production baseline unless the clamp path wins review.
+Historical note: a temporary clamp comparison path existed during validation, but it has been removed after the sampled path won the cost comparison against Tibber.
 
 ## Production rollout
 

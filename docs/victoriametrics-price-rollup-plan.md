@@ -23,12 +23,11 @@ Current validation result:
 - the remaining difference is mainly caused by imported grid energy being a bit lower on the VM path, not by obviously wrong tariff values
 - this means the next tuning step belongs to the import-energy path, not to the basic tariff formulas
 
-Parallel comparison track now available:
+Comparison outcome:
 
-- `test_evcc_*` keeps the current sampled `10s` / `15m` baseline
-- `test_evcc_clamp_*` now provides a parallel clamp-based import path for direct comparison
-- the separate comparison dashboard lives under `dashboards/vm-month-clamp-test`
-- both test namespaces can be deleted independently when one path is rejected
+- `test_evcc_*` remains the accepted sampled baseline
+- the temporary `test_evcc_clamp_*` comparison path was removed after the Tibber-backed month-cost comparison
+- the historical comparison remains documented, but no active clamp namespace or dashboard should be kept
 
 ## Why this is phase 2
 
