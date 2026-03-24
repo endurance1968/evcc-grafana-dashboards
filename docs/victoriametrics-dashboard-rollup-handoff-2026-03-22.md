@@ -223,6 +223,7 @@ Known remaining review items:
 - sampled vs clamp monthly cost comparisons were extended against Tibber for May 2025 through February 2026
 - excluding the incomplete October 2025 data gap month, the original `sampled-old` import-cost path currently has the lowest error and remains the baseline
 - the later `sampled-new` experiment that reused the 10s -> 60s energy prebucket path for 15m cost weighting did not win overall and has been discarded
+- the comparison set was then extended with the current March 2026 month and a total row; this still favors `sampled` over `clamp` on aggregate deviation to Tibber
 
 ## Next session focus: price and cost tuning
 
@@ -239,7 +240,30 @@ Current direction:
 - focus on the remaining import-energy drift before promoting anything to `evcc_*`
 - add export-side credit rollups only after the import path is accepted
 - keep `sampled-old` as the working import-cost baseline until a future comparison clearly beats it
-- retain `clamp` only as an explicit comparison path, not as the preferred month-dashboard source
+- from this point on, continue tuning only on the sampled path; clamp is no longer the preferred comparison branch for further cost work
+
+Short algorithm distinction behind the comparison:
+
+- `Influx`: legacy `evcc_agg` result built with InfluxQL semantics, especially fixed 60s `mean(value)` buckets and daily integration on local day windows
+- `sampled`: VM test rollup baseline in `test_evcc_*`; quarter-hour import costs are built from the sampled raw-data path implemented in the Python rollup CLI
+- `clamp`: VM comparison path in `test_evcc_clamp_*`; shares the corrected daily grid/battery energy baseline, but keeps the clamp-based quarter-hour cost path
+- practical consequence: current month-panel differences between `sampled` and `clamp` are mainly cost/effective-price differences, not large daily grid-energy differences
+
+Decision table used for this call:
+
+| Month | Influx EUR | Clamp EUR | Sampled EUR | Tibber EUR | Influx delta % | Clamp delta % | Sampled delta % |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2025-05 | 116.15 | 111.60 | 117.75 | 120.38 | -3.5% | -7.3% | -2.2% |
+| 2025-06 | 112.51 | 105.31 | 108.50 | 119.49 | -5.8% | -11.9% | -9.2% |
+| 2025-07 | 117.23 | 107.39 | 113.77 | 123.51 | -5.1% | -13.1% | -7.9% |
+| 2025-08 | 136.04 | 131.04 | 137.91 | 130.35 | +4.4% | +0.5% | +5.8% |
+| 2025-09 | 137.52 | 132.28 | 138.55 | 136.57 | +0.7% | -3.1% | +1.5% |
+| 2025-11 | 339.71 | 354.14 | 350.40 | 349.43 | -2.8% | +1.3% | +0.3% |
+| 2025-12 | 412.34 | 437.81 | 434.15 | 422.03 | -2.3% | +3.7% | +2.9% |
+| 2026-01 | 469.70 | 474.63 | 469.88 | 480.35 | -2.2% | -1.2% | -2.2% |
+| 2026-02 | 315.47 | 305.33 | 309.13 | 317.82 | -0.7% | -3.9% | -2.7% |
+| 2026-03 | 76.62 | 75.09 | 72.00 | 74.86 | +2.3% | +0.3% | -3.8% |
+| **Total** | **2233.29** | **2234.62** | **2252.04** | **2274.79** | **-1.8%** | **-1.8%** | **-1.0%** |
 
 Cleanup rule for the parallel track:
 
