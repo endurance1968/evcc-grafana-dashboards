@@ -23,7 +23,6 @@ class VmRollupTests(unittest.TestCase):
             raw_sample_step="10s",
             energy_rollup_step="60s",
             price_bucket_minutes=15,
-            price_rollup_mode="sampled",
             benchmark_start="2026-02-20T00:00:00Z",
             benchmark_end="2026-03-22T00:00:00Z",
             benchmark_step="1d",

@@ -15,7 +15,7 @@ Implemented:
 - initial VM rollup CLI under `scripts/evcc-vm-rollup.py`
 - operator guide under `docs/victoriametrics-aggregation-guide.md`
 - test-only grid import price and cost rollups in `test_evcc_*`
-- parallel clamp-based test rollups in `test_evcc_clamp_*` with a separate month review dashboard
+- historical clamp-based comparison results are documented, but the runtime clamp path and dashboard have been removed
 - VM month review dashboard with working energy, battery, metric, price, and cost panels
 - monthly Tibber comparison for May 2025 through February 2026 now exists for `Influx`, `sampled`, and `clamp`
 - current decision baseline for import-side price and cost rollups is `sampled-old`; the later 60s-prebucketed `sampled-new` experiment was rejected after comparison
@@ -40,7 +40,7 @@ Primary references:
 
 Additional current concerns:
 
-- the repository currently uses `test_evcc_*` and `test_evcc_clamp_*` for reviewed daily rollup families; production `evcc_*` rollups are still outstanding
+- the repository currently uses `test_evcc_*` for the reviewed daily rollup family; production `evcc_*` rollups are still outstanding
 - VM-side `host` labels were cleaned up, but ingest hygiene still needs to be watched so those labels do not reappear later
 - if relevant historical host-only samples turn out to matter, a targeted reimport strategy may still be needed
 
@@ -48,7 +48,7 @@ Additional current concerns:
 
 Current issue:
 
-- the VM month dashboard is now close to the legacy reference, and a parallel clamp-based comparison dashboard now exists for direct review before production decisions
+- the VM month dashboard is now close to the legacy reference, and the earlier clamp comparison decision is documented for traceability
 
 Goal:
 
@@ -85,7 +85,7 @@ Primary references:
 Decision snapshot:
 
 - accepted baseline: `test_evcc_*` with the original `sampled-old` import-cost path
-- comparison-only path: `test_evcc_clamp_*`
+- historical comparison path: `test_evcc_clamp_*` was evaluated and then removed
 - rejected experiment for now: `sampled-new`
 - decision basis: month-cost comparison against Tibber now favors `sampled` on total deviation, so further tuning should continue only on the sampled path
 
@@ -93,7 +93,7 @@ Algorithm note for the compared month-cost paths:
 
 - `Influx`: legacy path from `evcc_agg`; import energy is derived with the original Influx aggregation semantics, i.e. negative/positive filtering plus `mean(value)` on fixed 60s buckets, followed by daily integration on local Europe/Berlin day windows
 - `sampled`: current VM baseline in `test_evcc_*`; import energy for the daily energy rollups follows the corrected raw-sample-based path used in the Python rollup CLI, while import cost is calculated from sampled quarter-hour import energy plus the quarter-hour tariff selection used in the script
-- `clamp`: alternative VM path in `test_evcc_clamp_*`; uses the same daily energy baseline as the accepted sampled path for grid and battery energy, but keeps the clamp-oriented quarter-hour import-cost path for price/cost rollups
+- `clamp`: historical VM comparison path; it used the same daily energy baseline as the accepted sampled path for grid and battery energy, but kept a clamp-oriented quarter-hour import-cost path for price/cost rollups
 - this means the remaining visible difference between `sampled` and `clamp` is no longer the daily grid energy itself, but mainly how quarter-hour import energy is converted into cost and effective import price
 
 Month-cost comparison against Tibber, without the incomplete October 2025 month:
