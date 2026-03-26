@@ -555,29 +555,20 @@
       "id": 12,
       "maxDataPoints": 1400,
       "options": {
-        "barRadius": 0.2,
-        "barWidth": 0.7,
-        "fullHighlight": false,
-        "groupWidth": 1,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
+        "displayMode": "gradient",
         "orientation": "horizontal",
-        "showValue": "always",
-        "stacking": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
         "text": {
           "valueSize": 20
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        }
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -587,11 +578,10 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(avg by (title) (last_over_time(batterySoc_value{id!=\"\", title!=\"\"})), \"title\")",
+          "expr": "sort_by_label(avg by (title) (batterySoc_value{id!=\"\", title!=\"\"}), \"title\")",
           "format": "time_series",
-          "interval": "1y",
           "legendFormat": "{{title}}",
-          "range": true,
+          "range": false,
           "refId": "batterySoc"
         },
         {
@@ -600,17 +590,16 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(batterySoc_value{id=\"\"})",
+          "expr": "batterySoc_value{id=\"\"}",
           "format": "time_series",
-          "interval": "1y",
           "legendFormat": "Gesamt",
-          "range": true,
+          "range": false,
           "refId": "totalSoc"
         }
       ],
       "title": "Speicherstand",
       "transparent": true,
-      "type": "barchart"
+      "type": "bargauge"
     },
     {
       "datasource": {

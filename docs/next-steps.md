@@ -68,6 +68,9 @@ Current issue:
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
 - export credit rollups are still not finalized
 - next session check: evaluate whether the successful 10s -> 60s energy integration path should also replace direct daily integrate(...[1d]) rollups for pv, home, and loadpoint metrics
+- next session check: investigate the large delta on `2026-02-01` against the Influx Grafana dashboard
+- next weekend task: review and add a blocklist for loadpoints, aligned with the Influx dashboard behavior
+- next weekend task: review and add a blocklist for meters/counters, aligned with the Influx dashboard behavior
 - sampled vs clamp for monthly import costs has now been compared against Tibber for May 2025 through February 2026; excluding the incomplete October 2025 month, `sampled-old` currently has the lowest mean absolute error and remains the accepted baseline
 - the later `sampled-new` cost-path experiment, which applied the 10s -> 60s prebucket logic before 15m tariff weighting, did not win overall and should stay rejected unless new evidence appears
 

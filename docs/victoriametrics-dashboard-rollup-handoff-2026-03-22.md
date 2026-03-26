@@ -217,6 +217,9 @@ Known remaining review items:
 - the remaining validation gap is a small but consistent undercount in VM import energy compared with Influx legacy, which makes VM daily costs slightly lower on many days
 - export-side credit rollups are still deferred
 - next session should explicitly check whether the corrected 10s -> 60s energy aggregation path should also be adopted for pv, home, and loadpoint rollups, or kept limited to grid and attery only
+- next session should investigate the large `2026-02-01` delta against the Influx Grafana dashboard
+- next weekend should review an explicit loadpoint blocklist, matching the legacy Influx dashboard behavior where appropriate
+- next weekend should review an explicit meter/counter blocklist, matching the legacy Influx dashboard behavior where appropriate
 - sampled vs clamp monthly cost comparisons were extended against Tibber for May 2025 through February 2026
 - excluding the incomplete October 2025 data gap month, the original `sampled-old` import-cost path currently has the lowest error and remains the baseline
 - the later `sampled-new` experiment that reused the 10s -> 60s energy prebucket path for 15m cost weighting did not win overall and has been discarded
