@@ -100,6 +100,10 @@ class VmRollupTests(unittest.TestCase):
                 start_iso="2026-03-01T23:00:00Z",
                 end_iso="2026-03-02T23:00:00Z",
                 sample_timestamp_ms=1772406000000,
+                local_year="2026",
+                local_month="03",
+                local_day="02",
+                local_date="2026-03-02",
             )
             day_min, day_max = MODULE.fetch_battery_soc_extrema(self.settings, window)
         finally:
@@ -119,19 +123,36 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(len(windows), 1)
         self.assertEqual(windows[0].start_iso, "2026-03-28T23:00:00Z")
         self.assertEqual(windows[0].end_iso, "2026-03-29T22:00:00Z")
+        self.assertEqual(windows[0].local_year, "2026")
+        self.assertEqual(windows[0].local_month, "03")
+        self.assertEqual(windows[0].local_day, "29")
+        self.assertEqual(windows[0].local_date, "2026-03-29")
 
-    def test_normalize_rollup_labels_adds_namespace_and_dimension(self):
+    def test_normalize_rollup_labels_adds_namespace_dimension_and_local_month_labels(self):
         item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "vehicle_daily_energy")
+        window = MODULE.DayWindow(
+            day="2026-03-02",
+            start_iso="2026-03-01T23:00:00Z",
+            end_iso="2026-03-02T23:00:00Z",
+            sample_timestamp_ms=1772406000000,
+            local_year="2026",
+            local_month="03",
+            local_day="02",
+            local_date="2026-03-02",
+        )
         labels = MODULE.normalize_rollup_labels(
             self.settings,
             item,
             {"vehicle": "BMW i3", "__name__": "chargePower_value"},
+            window,
         )
         self.assertEqual(
             labels,
             {
                 "__name__": "test_evcc_vehicle_energy_daily_wh",
                 "db": "evcc",
+                "local_year": "2026",
+                "local_month": "03",
                 "vehicle": "BMW i3",
             },
         )
