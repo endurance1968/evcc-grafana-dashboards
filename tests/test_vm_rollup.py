@@ -157,6 +157,32 @@ class VmRollupTests(unittest.TestCase):
             },
         )
 
+    def test_summarize_positive_bucket_energy_samples_uses_bucket_means(self):
+        value = MODULE.summarize_positive_bucket_energy_samples(
+            [
+                (0, 600.0),
+                (10, 1200.0),
+                (60, 300.0),
+                (70, -5.0),
+                (80, 50000.0),
+            ],
+            bucket_seconds=60,
+        )
+        self.assertAlmostEqual(value, 20.0, places=6)
+
+    def test_positive_energy_query_uses_expected_grouping(self):
+        catalog = MODULE.build_catalog(self.settings)
+        loadpoint_item = next(metric for metric in catalog if metric.key == "loadpoint_daily_energy")
+        vehicle_item = next(metric for metric in catalog if metric.key == "vehicle_daily_energy")
+        self.assertEqual(
+            MODULE.positive_energy_query(self.settings, loadpoint_item),
+            'sum by (loadpoint) (chargePower_value{db="evcc"})',
+        )
+        self.assertEqual(
+            MODULE.positive_energy_query(self.settings, vehicle_item),
+            'sum by (vehicle) (chargePower_value{db="evcc"})',
+        )
+
     def test_serialize_import_jsonl_creates_one_json_line_per_series(self):
         payload = MODULE.serialize_import_jsonl(
             [
@@ -325,3 +351,4 @@ class VmRollupTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

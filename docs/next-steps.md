@@ -66,10 +66,10 @@ Current issue:
 
 - import-side daily price and cost rollups now exist in `test_evcc_*`, but they still need tighter validation against Influx legacy and Tibber reality
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
-- export credit rollups are still not finalized
-- next session check: evaluate whether the successful 10s -> 60s energy integration path should also replace direct daily integrate(...[1d]) rollups for pv, home, and loadpoint metrics
-- next weekend task: review and add a blocklist for loadpoints, aligned with the Influx dashboard behavior
-- next weekend task: review and add a blocklist for meters/counters, aligned with the Influx dashboard behavior
+- export-side credit rollups are implemented on the same validated 15-minute path; in the current history they evaluate to zero because `tariffFeedIn` is historically zero
+- the positive-only 10s -> 60s bucket path has now also been adopted for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`; representative month checks improved drift versus Influx for those families
+- the VM month dashboard now has an explicit `loadpointBlocklist` and separate `extBlocklist` / `auxBlocklist` controls for counters/meters
+- local test default for the meter-side blocklist is currently `.*Car.*|.*Haupt.*`; any publicized dashboard should reset these blocklist defaults to `^none$`
 - sampled vs clamp for monthly import costs has now been compared against Tibber for May 2025 through February 2026; excluding the incomplete October 2025 month, `sampled-old` currently has the lowest mean absolute error and remains the accepted baseline
 - the later `sampled-new` cost-path experiment, which applied the 10s -> 60s prebucket logic before 15m tariff weighting, did not win overall and should stay rejected unless new evidence appears
 
@@ -83,13 +83,13 @@ Latest raw-data findings to continue from:
 - `2025-01-01` was also repaired by targeted raw reimport
 - likely root cause for that first imported local day: the global reimport window had started at `2025-01-01T00:00:00Z`; for `Europe/Berlin`, the local day `2025-01-01` starts already at `2024-12-31T23:00:00Z`
 - future full-history reimports therefore need a deliberate UTC lead-in before the first local midnight, so the first local day is not truncated again
-- later cleanup item: many VM month queries currently inline `timezone_offset("Europe/Berlin")` and repeated month/year guards; this should be refactored to a more central and maintainable pattern before year/all-time hardening
+- month queries now use explicit `local_year` and `local_month` rollup labels instead of repeated inline timezone/month guards; this pattern should be reused for year/all-time dashboards
 
 Goal:
 
 - keep the current test-only import price/cost rollups as the baseline
 - tune and validate them before any promotion to `evcc_*`
-- then add export credit rollups on the same validated quarter-hour path
+- keep the export-credit rollups on the same validated quarter-hour path; with the current historical data they remain zero because `tariffFeedIn` is zero
 
 Primary references:
 
