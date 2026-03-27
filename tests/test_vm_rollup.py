@@ -39,6 +39,8 @@ class VmRollupTests(unittest.TestCase):
         records = {item.record for item in catalog if item.implemented}
         self.assertIn("test_evcc_pv_energy_daily_wh", records)
         self.assertIn("test_evcc_vehicle_distance_daily_km", records)
+        self.assertIn("test_evcc_vehicle_charge_cost_daily_eur", records)
+        self.assertIn("test_evcc_potential_vehicle_charge_cost_daily_eur", records)
         self.assertIn("test_evcc_grid_import_cost_daily_eur", records)
         self.assertIn("test_evcc_grid_import_price_effective_daily_ct_per_kwh", records)
 
@@ -318,6 +320,94 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_daily_energy"], 3.25, places=6)
         self.assertAlmostEqual(result["grid_export_daily_energy"], 2.2666666666666666, places=6)
 
+    def test_summarize_counter_spread_samples_converts_kwh_to_wh(self):
+        value = MODULE.summarize_counter_spread_samples(
+            [
+                (0, -1.0),
+                (10, 100.0),
+                (20, float("nan")),
+                (30, 101.25),
+                (40, 100.75),
+            ]
+        )
+
+        self.assertAlmostEqual(value, 1250.0, places=6)
+
+    def test_fetch_grid_energy_rollups_prefers_counter_spread_for_import(self):
+        def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):
+            if "gridPower_value" in query:
+                return [
+                    (0, -100.0), (10, 200.0), (20, -300.0), (30, 400.0), (40, 0.0), (50, 0.0),
+                ]
+            if "gridEnergy_value" in query:
+                return [(0, 1000.0), (10, 1000.5), (20, 1001.2)]
+            raise AssertionError(query)
+
+        original = MODULE.fetch_single_series_range
+        MODULE.fetch_single_series_range = fake_fetch_single_series_range
+        try:
+            window = MODULE.DayWindow(
+                day="2026-03-02",
+                start_iso="2026-03-01T23:00:00Z",
+                end_iso="2026-03-02T23:00:00Z",
+                sample_timestamp_ms=1772406000000,
+                local_year="2026",
+                local_month="03",
+                local_day="02",
+                local_date="2026-03-02",
+            )
+            result = MODULE.fetch_grid_energy_rollups(self.settings, window)
+        finally:
+            MODULE.fetch_single_series_range = original
+
+        self.assertAlmostEqual(result["grid_import_daily_energy"], 1200.0, places=6)
+        self.assertAlmostEqual(result["grid_export_daily_energy"], 1.6666666666666667, places=6)
+
+    def test_fetch_vehicle_price_rollups_uses_matching_tariffs(self):
+        def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):
+            if "tariffPriceLoadpoints_value" in query:
+                return [(0, 0.10), (900, 0.20)]
+            if "tariffGrid_value" in query:
+                return [(0, 0.30), (900, 0.40)]
+            raise AssertionError(query)
+
+        def fake_fetch_series_range(settings, query, start_iso, end_iso, step):
+            if 'chargePower_value' not in query:
+                raise AssertionError(query)
+            return [
+                {
+                    'metric': {'vehicle': 'BMW i3'},
+                    'samples': [(0, 1000.0), (30, 1000.0), (900, 2000.0), (930, 2000.0)],
+                }
+            ]
+
+        original_single = MODULE.fetch_single_series_range
+        original_series = MODULE.fetch_series_range
+        MODULE.fetch_single_series_range = fake_fetch_single_series_range
+        MODULE.fetch_series_range = fake_fetch_series_range
+        try:
+            window = MODULE.DayWindow(
+                day="2026-03-02",
+                start_iso="1970-01-01T00:00:00Z",
+                end_iso="1970-01-01T00:30:00Z",
+                sample_timestamp_ms=0,
+                local_year="1970",
+                local_month="01",
+                local_day="01",
+                local_date="1970-01-01",
+            )
+            actual_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == 'vehicle_charge_cost_daily')
+            potential_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == 'potential_vehicle_charge_cost_daily')
+            actual = MODULE.fetch_vehicle_price_rollups(self.settings, actual_item, window)
+            potential = MODULE.fetch_vehicle_price_rollups(self.settings, potential_item, window)
+        finally:
+            MODULE.fetch_single_series_range = original_single
+            MODULE.fetch_series_range = original_series
+
+        self.assertEqual(actual[0][0]['vehicle'], 'BMW i3')
+        self.assertAlmostEqual(actual[0][1], 0.002777777777777778, places=6)
+        self.assertAlmostEqual(potential[0][1], 0.006111111111111111, places=6)
+
     def test_summarize_bucket_grid_energy_converts_kwh_to_wh(self):
         result = MODULE.summarize_bucket_grid_energy(
             bucket_import_samples=[(900, 0.25), (1800, 0.5)],
@@ -348,7 +438,32 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["battery_charge_daily_energy"], 750.0, places=6)
         self.assertAlmostEqual(result["battery_discharge_daily_energy"], 300.0, places=6)
 
+    def test_mean_of_top_uses_available_values_when_fewer_than_limit(self):
+        self.assertAlmostEqual(MODULE.mean_of_top([5.0, 10.0, 7.0], 5), 22.0 / 3.0, places=6)
+        self.assertIsNone(MODULE.mean_of_top([], 5))
+
+    def test_build_pv_health_rollups_creates_yearly_and_monthly_series(self):
+        result = MODULE.build_pv_health_rollups(
+            self.settings,
+            {
+                "2025": {"values": [10.0, 30.0, 20.0], "timestamp_ms": 1738281600000},
+            },
+            {
+                ("2025", "01"): {"values": [5.0, 15.0, 10.0], "timestamp_ms": 1735689600000},
+            },
+        )
+
+        self.assertEqual(len(result), 2)
+        yearly = next(row for row in result if row["metric"]["__name__"] == "test_evcc_pv_top30_mean_yearly_wh")
+        monthly = next(row for row in result if row["metric"]["__name__"] == "test_evcc_pv_top5_mean_monthly_wh")
+        self.assertEqual(yearly["metric"], {"__name__": "test_evcc_pv_top30_mean_yearly_wh", "db": "evcc", "local_year": "2025"})
+        self.assertEqual(monthly["metric"], {"__name__": "test_evcc_pv_top5_mean_monthly_wh", "db": "evcc", "local_year": "2025", "local_month": "01"})
+        self.assertAlmostEqual(yearly["values"][0], 20.0, places=6)
+        self.assertAlmostEqual(monthly["values"][0], 10.0, places=6)
+
 
 if __name__ == "__main__":
     unittest.main()
+
+
 
