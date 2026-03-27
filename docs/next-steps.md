@@ -68,11 +68,21 @@ Current issue:
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
 - export credit rollups are still not finalized
 - next session check: evaluate whether the successful 10s -> 60s energy integration path should also replace direct daily integrate(...[1d]) rollups for pv, home, and loadpoint metrics
-- next session check: investigate the large delta on `2026-02-01` against the Influx Grafana dashboard
 - next weekend task: review and add a blocklist for loadpoints, aligned with the Influx dashboard behavior
 - next weekend task: review and add a blocklist for meters/counters, aligned with the Influx dashboard behavior
 - sampled vs clamp for monthly import costs has now been compared against Tibber for May 2025 through February 2026; excluding the incomplete October 2025 month, `sampled-old` currently has the lowest mean absolute error and remains the accepted baseline
 - the later `sampled-new` cost-path experiment, which applied the 10s -> 60s prebucket logic before 15m tariff weighting, did not win overall and should stay rejected unless new evidence appears
+
+Latest raw-data findings to continue from:
+
+- `2026-02-01` was not a dashboard-only issue; `gridPower_value` in VM was damaged for that day and had to be repaired by deleting and fully reimporting `gridPower`
+- after the `gridPower` repair, `test_evcc_*` had to be deleted and rebuilt because stale duplicate daily rollup samples still made the month dashboard show the old wrong value
+- `2026-01-01` and `2026-01-02` were a second raw-data issue: VM was missing a continuous `gridPower_value` block from `2025-12-31T23:59:57Z` to `2026-01-02T01:45:27Z`
+- that year-change block has now been repaired by targeted `gridPower` reimport plus a full `test_evcc_*` rebuild; the month dashboard now shows the corrected January values again
+- separately, the first imported local day of `2025` showed the same first-hour boundary symptom: `2025-01-01` was missing exactly the first local hour in VM (`8280` vs `8640` points)
+- `2025-01-01` was also repaired by targeted raw reimport
+- likely root cause for that first imported local day: the global reimport window had started at `2025-01-01T00:00:00Z`; for `Europe/Berlin`, the local day `2025-01-01` starts already at `2024-12-31T23:00:00Z`
+- future full-history reimports therefore need a deliberate UTC lead-in before the first local midnight, so the first local day is not truncated again
 
 Goal:
 
