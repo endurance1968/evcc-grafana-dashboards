@@ -83,6 +83,7 @@ Latest raw-data findings to continue from:
 - `2025-01-01` was also repaired by targeted raw reimport
 - likely root cause for that first imported local day: the global reimport window had started at `2025-01-01T00:00:00Z`; for `Europe/Berlin`, the local day `2025-01-01` starts already at `2024-12-31T23:00:00Z`
 - future full-history reimports therefore need a deliberate UTC lead-in before the first local midnight, so the first local day is not truncated again
+- later cleanup item: many VM month queries currently inline `timezone_offset("Europe/Berlin")` and repeated month/year guards; this should be refactored to a more central and maintainable pattern before year/all-time hardening
 
 Goal:
 

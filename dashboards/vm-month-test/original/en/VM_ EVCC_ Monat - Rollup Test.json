@@ -1240,7 +1240,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "Ext total",
           "range": false,
@@ -1253,7 +1253,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "Aux total",
           "range": false,
@@ -1290,7 +1290,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1303,7 +1303,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))))[$__range:1d])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1428,12 +1428,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\")))))) / 1000",
+          "expr": "sum((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\")))))) / 1000",
           "format": "time_series",
           "legendFormat": "Ext total",
           "range": true,
           "refId": "extTotalDaily",
-          "hide": false,
+          "hide": true,
           "interval": "1d"
         },
         {
@@ -1442,12 +1442,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\")))))) / 1000",
+          "expr": "sum((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\")))))) / 1000",
           "format": "time_series",
           "legendFormat": "Aux total",
           "range": true,
           "refId": "auxTotalDaily",
-          "hide": false,
+          "hide": true,
           "interval": "1d"
         },
         {
@@ -1467,7 +1467,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))) / 1000, \"title\")",
+          "expr": "sort_by_label((last_over_time(test_evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -1481,7 +1481,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))) / 1000, \"title\")",
+          "expr": "sort_by_label((last_over_time(test_evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\"}[1d]) and on() ((month(vector(time()) + timezone_offset(\"Europe/Berlin\")) == month(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))) and (year(vector(time()) + timezone_offset(\"Europe/Berlin\")) == year(vector($__from / 1000) + timezone_offset(\"Europe/Berlin\"))))) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -3168,6 +3168,40 @@
         "type": "constant",
         "query": "^none$",
         "label": "Loadpoint Blocklist",
+        "current": {
+          "text": "^none$",
+          "value": "^none$"
+        },
+        "options": [
+          {
+            "text": "^none$",
+            "value": "^none$",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "name": "extBlocklist",
+        "type": "constant",
+        "query": ".*Car.*|.*Haupt.*",
+        "label": "EXT Blocklist",
+        "current": {
+          "text": ".*Car.*|.*Haupt.*",
+          "value": ".*Car.*|.*Haupt.*"
+        },
+        "options": [
+          {
+            "text": ".*Car.*|.*Haupt.*",
+            "value": ".*Car.*|.*Haupt.*",
+            "selected": true
+          }
+        ]
+      },
+      {
+        "name": "auxBlocklist",
+        "type": "constant",
+        "query": "^none$",
+        "label": "AUX Blocklist",
         "current": {
           "text": "^none$",
           "value": "^none$"

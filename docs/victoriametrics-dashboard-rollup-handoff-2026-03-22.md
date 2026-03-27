@@ -228,6 +228,7 @@ Known remaining review items:
 - the first imported local day of `2025` showed the same first-hour boundary symptom (`2025-01-01` was short by exactly one local hour); this was also repaired by targeted raw reimport
 - confirmed root-cause rule for future history rebuilds: when a full reimport starts at `2025-01-01T00:00:00Z`, the first Europe/Berlin local day loses the UTC hour from `2024-12-31T23:00:00Z` to `2025-01-01T00:00:00Z`
 - future full-history reimports should therefore start before the first local midnight in UTC, or explicitly patch the first local day afterward
+- later cleanup item: the current month dashboard relies on many inline `timezone_offset("Europe/Berlin")` month/year guards in panel queries; this works, but should be consolidated into a more elegant and maintainable approach before the year and all-time dashboards are finalized
 
 ## Next session focus: price and cost tuning
 
