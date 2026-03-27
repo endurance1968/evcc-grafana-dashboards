@@ -128,8 +128,8 @@ Examples:
 
 Rules:
 
-- keep only real business dimensions as labels
-- do not add `year`, `month`, or `day` labels
+- keep only real business dimensions plus the accepted local-period helpers `local_year` and `local_month` on daily rollups
+- do not add `local_day` or `local_date`, because they would fragment each daily series into one series per day
 - do not encode infrastructure labels such as `host` into the rollup design
 
 ## Dashboard implementation guidance
@@ -215,10 +215,10 @@ Known remaining review items:
 - vehicle distance rollups remain the most sensitive family and should stay under observation when more dashboard panels start depending on them
 - import-side pricing and tariff rollups are now implemented in `test_evcc_*` and partially wired into the month dashboard
 - the remaining validation gap is a small but consistent undercount in VM import energy compared with Influx legacy, which makes VM daily costs slightly lower on many days
-- export-side credit rollups are still deferred
-- next session should explicitly check whether the corrected 10s -> 60s energy aggregation path should also be adopted for pv, home, and loadpoint rollups, or kept limited to grid and attery only
-- next weekend should review an explicit loadpoint blocklist, matching the legacy Influx dashboard behavior where appropriate
-- next weekend should review an explicit meter/counter blocklist, matching the legacy Influx dashboard behavior where appropriate
+- export-side credit rollups are implemented on the same 15-minute path; in the current history they remain zero because `tariffFeedIn` is historically zero
+- the corrected 10s -> 60s positive-energy aggregation path has now also been adopted for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`; representative month checks improved drift versus Influx
+- the month dashboard now has an explicit `loadpointBlocklist` and separate `extBlocklist` / `auxBlocklist` controls for counters/meters
+- local test default for the meter-side blocklist is `.*Car.*|.*Haupt.*`; publicized dashboards should reset those defaults to `^none$`
 - sampled vs clamp monthly cost comparisons were extended against Tibber for May 2025 through February 2026
 - excluding the incomplete October 2025 data gap month, the original `sampled-old` import-cost path currently has the lowest error and remains the baseline
 - the later `sampled-new` experiment that reused the 10s -> 60s energy prebucket path for 15m cost weighting did not win overall and has been discarded
@@ -228,7 +228,7 @@ Known remaining review items:
 - the first imported local day of `2025` showed the same first-hour boundary symptom (`2025-01-01` was short by exactly one local hour); this was also repaired by targeted raw reimport
 - confirmed root-cause rule for future history rebuilds: when a full reimport starts at `2025-01-01T00:00:00Z`, the first Europe/Berlin local day loses the UTC hour from `2024-12-31T23:00:00Z` to `2025-01-01T00:00:00Z`
 - future full-history reimports should therefore start before the first local midnight in UTC, or explicitly patch the first local day afterward
-- later cleanup item: the current month dashboard relies on many inline `timezone_offset("Europe/Berlin")` month/year guards in panel queries; this works, but should be consolidated into a more elegant and maintainable approach before the year and all-time dashboards are finalized
+- the month dashboard now uses `local_year` and `local_month` rollup labels instead of repeated inline timezone/month guards; year and all-time should follow the same pattern
 
 ## Next session focus: price and cost tuning
 
@@ -243,7 +243,7 @@ Current direction:
 - keep the implemented import-side daily test rollups in `test_evcc_*` as the working baseline
 - compare them against Influx legacy and Tibber billing reality
 - focus on the remaining import-energy drift before promoting anything to `evcc_*`
-- add export-side credit rollups only after the import path is accepted
+- export-side credit rollups are part of the accepted sampled baseline; with the current historical `tariffFeedIn` data they evaluate to zero
 - keep `sampled-old` as the working import-cost baseline until a future comparison clearly beats it
 - from this point on, continue tuning only on the sampled path; clamp is no longer the preferred comparison branch for further cost work
 

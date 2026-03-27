@@ -155,17 +155,19 @@ Monthly rollups are currently not part of the required baseline.
 - Do not rely on a `host` label for EVCC history.
 - Encode units in metric names.
 - Keep only real dimensions as labels.
-- Never add `year`, `month` or `day` as labels.
+- Use `local_year` and `local_month` on daily rollups when local calendar filtering materially simplifies Grafana queries.
+- Do not add `local_day` or `local_date`; those labels would explode each daily family into one series per day.
 
 Good examples:
 
 - `evcc_pv_energy_daily_wh`
-- `evcc_vehicle_energy_daily_wh{vehicle="BMW i3"}`
+- `evcc_vehicle_energy_daily_wh{vehicle="BMW i3",local_year="2026",local_month="03"}`
 
 Bad examples:
 
 - `pvDailyEnergy,year=2026,month=03,day=22`
 - `evcc_daily_energy{day="22"}`
+- `evcc_pv_energy_daily_wh{local_date="2026-03-22"}`
 
 ## Grafana model
 

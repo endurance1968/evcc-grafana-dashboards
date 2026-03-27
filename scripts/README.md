@@ -180,10 +180,15 @@ Implemented in the catalog:
 - ext daily energy
 - aux daily energy
 - battery min and max SOC per day
-
-Deferred to phase 2:
-
 - grid import and export split
 - battery charge and discharge split
-- tariff and finance rollups
+- import price and cost rollups
+- export credit rollups
+
+Daily rollups now carry `local_year` and `local_month` labels so month/year dashboards can filter on local calendar periods without repeating large timezone guard expressions in every query.
+
+Still deferred beyond the current baseline:
+
+- productivizing `test_evcc_*` into `evcc_*`
+- any optional monthly rollup layer
 

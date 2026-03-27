@@ -246,8 +246,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="pv_daily_energy",
             record=record_name(settings, "pv_energy_daily_wh"),
-            expr=f"sum(integrate(pvPower_value{{{root_no_id}}}[1d])) / 3600",
-            description="PV daily energy from raw power values.",
+            expr="python: positive-only daily PV energy on 60s buckets",
+            description="PV daily energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -255,8 +255,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="home_daily_energy",
             record=record_name(settings, "home_energy_daily_wh"),
-            expr=f"sum(integrate(homePower_value{{{root}}}[1d])) / 3600",
-            description="Home daily energy from raw power values.",
+            expr="python: positive-only daily home energy on 60s buckets",
+            description="Home daily energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -264,8 +264,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="loadpoint_daily_energy",
             record=record_name(settings, "loadpoint_energy_daily_wh"),
-            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (loadpoint) / 3600",
-            description="Per-loadpoint daily charging energy.",
+            expr="python: positive-only per-loadpoint daily energy on 60s buckets",
+            description="Per-loadpoint daily charging energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=("loadpoint",),
@@ -273,8 +273,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="vehicle_daily_energy",
             record=record_name(settings, "vehicle_energy_daily_wh"),
-            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (vehicle) / 3600",
-            description="Per-vehicle daily charging energy.",
+            expr="python: positive-only per-vehicle daily energy on 60s buckets",
+            description="Per-vehicle daily charging energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=("vehicle",),
@@ -294,8 +294,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
-            expr=f"sum(integrate(extPower_value{{{root}}}[1d])) by (title) / 3600",
-            description="Per-ext-title daily energy.",
+            expr="python: positive-only per-ext-title daily energy on 60s buckets",
+            description="Per-ext-title daily energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -303,8 +303,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="aux_daily_energy",
             record=record_name(settings, "aux_energy_daily_wh"),
-            expr=f"sum(integrate(auxPower_value{{{root}}}[1d])) by (title) / 3600",
-            description="Per-aux-title daily energy.",
+            expr="python: positive-only per-aux-title daily energy on 60s buckets",
+            description="Per-aux-title daily energy from positive 60-second power buckets.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -674,13 +674,13 @@ def fetch_battery_soc_extrema(settings: Settings, window: DayWindow) -> tuple[fl
     return min(positive_values), max(positive_values)
 
 
-def fetch_single_series_range(
+def fetch_series_range(
     settings: Settings,
     query: str,
     start_iso: str,
     end_iso: str,
     step: str,
-) -> list[tuple[int, float]]:
+) -> list[dict]:
     response = http_get_json(
         settings,
         "/api/v1/query_range",
@@ -692,21 +692,35 @@ def fetch_single_series_range(
             "nocache": "1",
         },
     )
-    series = response.get("data", {}).get("result", [])
+    out: list[dict] = []
+    for result_item in response.get("data", {}).get("result", []):
+        samples: list[tuple[int, float]] = []
+        for row in result_item.get("values", []):
+            if not isinstance(row, list) or len(row) != 2:
+                continue
+            try:
+                timestamp = int(row[0])
+                value = float(row[1])
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(value):
+                samples.append((timestamp, value))
+        if samples:
+            out.append({"metric": result_item.get("metric", {}), "samples": samples})
+    return out
+
+
+def fetch_single_series_range(
+    settings: Settings,
+    query: str,
+    start_iso: str,
+    end_iso: str,
+    step: str,
+) -> list[tuple[int, float]]:
+    series = fetch_series_range(settings, query, start_iso, end_iso, step)
     if not series:
         return []
-    samples: list[tuple[int, float]] = []
-    for row in series[0].get("values", []):
-        if not isinstance(row, list) or len(row) != 2:
-            continue
-        try:
-            timestamp = int(row[0])
-            value = float(row[1])
-        except (TypeError, ValueError):
-            continue
-        if math.isfinite(value):
-            samples.append((timestamp, value))
-    return samples
+    return series[0]["samples"]
 
 
 def fetch_metric_export_samples(
@@ -842,6 +856,58 @@ def summarize_bucket_grid_energy(
         "grid_import_daily_energy": import_wh,
         "grid_export_daily_energy": export_wh,
     }
+
+
+def summarize_positive_bucket_energy_samples(
+    samples: list[tuple[int, float]],
+    bucket_seconds: int,
+    peak_power_limit: float = 40000.0,
+) -> float:
+    buckets: dict[int, list[float]] = {}
+    for timestamp, value in samples:
+        if not math.isfinite(value) or value <= 0 or value >= peak_power_limit:
+            continue
+        bucket_start = (timestamp // bucket_seconds) * bucket_seconds
+        buckets.setdefault(bucket_start, []).append(value)
+    total_wh = 0.0
+    for values in buckets.values():
+        total_wh += (sum(values) / len(values)) * bucket_seconds / 3600.0
+    return total_wh
+
+
+def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
+    root = base_matchers(settings)
+    root_no_id = root + ',id=""'
+    if item.key == "pv_daily_energy":
+        return f'sum without(host) (pvPower_value{{{root_no_id}}})'
+    if item.key == "home_daily_energy":
+        return f'sum without(host) (homePower_value{{{root}}})'
+    if item.key == "loadpoint_daily_energy":
+        return f'sum by (loadpoint) (chargePower_value{{{root}}})'
+    if item.key == "vehicle_daily_energy":
+        return f'sum by (vehicle) (chargePower_value{{{root}}})'
+    if item.key == "ext_daily_energy":
+        return f'sum by (title) (extPower_value{{{root}}})'
+    if item.key == "aux_daily_energy":
+        return f'sum by (title) (auxPower_value{{{root}}})'
+    raise ValueError(f"Unsupported positive energy key: {item.key}")
+
+
+def fetch_positive_energy_rollups(settings: Settings, item: RollupMetric, window: DayWindow) -> list[tuple[dict[str, str], float]]:
+    matrix = fetch_series_range(
+        settings,
+        positive_energy_query(settings, item),
+        window.start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    bucket_seconds = parse_step_seconds(settings.energy_rollup_step)
+    out: list[tuple[dict[str, str], float]] = []
+    for result_item in matrix:
+        value = summarize_positive_bucket_energy_samples(result_item["samples"], bucket_seconds)
+        labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
+        out.append((labels, value))
+    return out
 
 
 def summarize_bucket_battery_energy(
@@ -1208,6 +1274,14 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     emitted_samples = 0
     total_batches = 0
     processed_days = 0
+    positive_energy_metric_keys = {
+        "pv_daily_energy",
+        "home_daily_energy",
+        "loadpoint_daily_energy",
+        "vehicle_daily_energy",
+        "ext_daily_energy",
+        "aux_daily_energy",
+    }
     price_metric_keys = {
         "grid_import_cost_daily",
         "grid_import_price_avg_daily",
@@ -1284,6 +1358,19 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    continue
+                if item.key in positive_energy_metric_keys:
+                    for labels, value in fetch_positive_energy_rollups(settings, item, window):
+                        if not math.isfinite(value):
+                            skipped += 1
+                            continue
+                        append_series_sample(
+                            series_map,
+                            labels,
+                            window.sample_timestamp_ms,
+                            value,
+                        )
+                        emitted_samples += 1
                     continue
                 if item.key in price_metric_keys:
                     if price_rollups is None:
