@@ -14,7 +14,7 @@ Implemented:
 - family-separated screenshot output under `tests/artifacts/screenshots/vm`
 - initial VM rollup CLI under `scripts/evcc-vm-rollup.py`
 - operator guide under `docs/victoriametrics-aggregation-guide.md`
-- test-only grid import price and cost rollups in `test_evcc_*`
+- reviewed grid import/export, battery, price, and cost rollups now exist in both `test_evcc_*` and promoted `evcc_*` namespaces
 - historical clamp-based comparison results are documented, but the runtime clamp path and dashboard have been removed
 - VM month review dashboard with working energy, battery, metric, price, and cost panels
 - monthly Tibber comparison for May 2025 through February 2026 now exists for `Influx`, `sampled`, and `clamp`
@@ -40,7 +40,7 @@ Primary references:
 
 Additional current concerns:
 
-- the repository currently uses `test_evcc_*` for the reviewed daily rollup family; production `evcc_*` rollups are still outstanding
+- the reviewed daily rollup family now exists both as `test_evcc_*` for comparison/debugging and as promoted `evcc_*` for production dashboard use
 - VM-side `host` labels were cleaned up, but ingest hygiene still needs to be watched so those labels do not reappear later
 - if relevant historical host-only samples turn out to matter, a targeted reimport strategy may still be needed
 
@@ -87,8 +87,8 @@ Latest raw-data findings to continue from:
 
 Goal:
 
-- keep the current test-only import price/cost rollups as the baseline
-- tune and validate them before any promotion to `evcc_*`
+- keep `evcc_*` as the promoted production namespace and `test_evcc_*` as the parallel debug/review namespace
+- continue validating the promoted sampled path against Influx legacy and Tibber as needed
 - keep the export-credit rollups on the same validated quarter-hour path; with the current historical data they remain zero because `tariffFeedIn` is zero
 
 Primary references:
