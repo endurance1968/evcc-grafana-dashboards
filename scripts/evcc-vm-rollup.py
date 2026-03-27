@@ -49,6 +49,10 @@ class DayWindow:
     start_iso: str
     end_iso: str
     sample_timestamp_ms: int
+    local_year: str
+    local_month: str
+    local_day: str
+    local_date: str
 
 
 @dataclass(frozen=True)
@@ -448,12 +452,17 @@ def build_day_windows(settings: Settings, start_day: date, end_day: date) -> lis
         end_local = start_local + timedelta(days=1)
         start_utc = start_local.astimezone(timezone.utc)
         end_utc = end_local.astimezone(timezone.utc)
+        day_text = current.isoformat()
         windows.append(
             DayWindow(
-                day=current.isoformat(),
+                day=day_text,
                 start_iso=to_iso_z(start_utc),
                 end_iso=to_iso_z(end_utc),
                 sample_timestamp_ms=int(start_utc.timestamp() * 1000),
+                local_year=day_text[0:4],
+                local_month=day_text[5:7],
+                local_day=day_text[8:10],
+                local_date=day_text,
             )
         )
         current += timedelta(days=1)
@@ -1113,11 +1122,24 @@ def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str,
     )
 
 
-def normalize_rollup_labels(settings: Settings, item: RollupMetric, metric: dict) -> dict[str, str]:
+def window_local_labels(window: DayWindow) -> dict[str, str]:
+    return {
+        "local_year": window.local_year,
+        "local_month": window.local_month,
+    }
+
+
+def base_daily_labels(settings: Settings, record: str, window: DayWindow) -> dict[str, str]:
     labels: dict[str, str] = {
-        "__name__": item.record,
+        "__name__": record,
         "db": settings.db_label,
     }
+    labels.update(window_local_labels(window))
+    return labels
+
+
+def normalize_rollup_labels(settings: Settings, item: RollupMetric, metric: dict, window: DayWindow) -> dict[str, str]:
+    labels = base_daily_labels(settings, item.record, window)
     for label in item.group_labels:
         value = str(metric.get(label, "")).strip()
         if value:
@@ -1239,13 +1261,11 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         if not math.isfinite(delta) or delta < 0:
                             skipped += 1
                             continue
+                        labels = base_daily_labels(settings, item.record, window)
+                        labels["vehicle"] = vehicle
                         append_series_sample(
                             series_map,
-                            {
-                                "__name__": item.record,
-                                "db": settings.db_label,
-                                "vehicle": vehicle,
-                            },
+                            labels,
                             window.sample_timestamp_ms,
                             delta,
                         )
@@ -1259,10 +1279,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         continue
                     append_series_sample(
                         series_map,
-                        {
-                            "__name__": item.record,
-                            "db": settings.db_label,
-                        },
+                        base_daily_labels(settings, item.record, window),
                         window.sample_timestamp_ms,
                         selected_value,
                     )
@@ -1277,10 +1294,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         continue
                     append_series_sample(
                         series_map,
-                        {
-                            "__name__": item.record,
-                            "db": settings.db_label,
-                        },
+                        base_daily_labels(settings, item.record, window),
                         window.sample_timestamp_ms,
                         selected_value,
                     )
@@ -1295,10 +1309,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         continue
                     append_series_sample(
                         series_map,
-                        {
-                            "__name__": item.record,
-                            "db": settings.db_label,
-                        },
+                        base_daily_labels(settings, item.record, window),
                         window.sample_timestamp_ms,
                         selected_value,
                     )
@@ -1313,10 +1324,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         continue
                     append_series_sample(
                         series_map,
-                        {
-                            "__name__": item.record,
-                            "db": settings.db_label,
-                        },
+                        base_daily_labels(settings, item.record, window),
                         window.sample_timestamp_ms,
                         selected_value,
                     )
@@ -1327,7 +1335,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                     if value is None:
                         skipped += 1
                         continue
-                    labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}))
+                    labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
                     append_series_sample(series_map, labels, window.sample_timestamp_ms, value)
                     emitted_samples += 1
 
