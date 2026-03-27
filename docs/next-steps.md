@@ -90,6 +90,13 @@ Goal:
 - keep `evcc_*` as the promoted production namespace and `test_evcc_*` as the parallel debug/review namespace
 - continue validating the promoted sampled path against Influx legacy and Tibber as needed
 - keep the export-credit rollups on the same validated quarter-hour path; with the current historical data they remain zero because `tariffFeedIn` is zero
+- before adding many more rollup metrics, create a concrete runtime profile of the Python rollup CLI on the existing multi-year history
+- measure separately:
+  - VM query time
+  - Python aggregation and bucketing time
+  - VM import/write time
+  - monthly chunk overhead
+- only optimize after those measurements identify the real bottleneck
 
 Primary references:
 

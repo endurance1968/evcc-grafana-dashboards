@@ -292,6 +292,60 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             group_labels=("vehicle",),
         ),
         RollupMetric(
+            key="vehicle_charge_cost_daily",
+            record=record_name(settings, "vehicle_charge_cost_daily_eur"),
+            expr="python: 15m raw per-vehicle charging cost from loadpoint tariffs",
+            description="Per-vehicle daily charging cost from 15-minute charge energy weighted by matching loadpoint tariffs.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=("vehicle",),
+        ),
+        RollupMetric(
+            key="potential_vehicle_charge_cost_daily",
+            record=record_name(settings, "potential_vehicle_charge_cost_daily_eur"),
+            expr="python: 15m raw per-vehicle charging cost from grid tariffs",
+            description="Per-vehicle daily charging cost at grid tariffs as the no-PV comparison baseline.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=("vehicle",),
+        ),
+        RollupMetric(
+            key="potential_home_cost_daily",
+            record=record_name(settings, "potential_home_cost_daily_eur"),
+            expr="python: 15m raw daily home cost at grid tariffs",
+            description="Daily home energy valued at grid tariffs as the no-PV baseline.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="potential_loadpoint_cost_daily",
+            record=record_name(settings, "potential_loadpoint_cost_daily_eur"),
+            expr="python: 15m raw daily loadpoint charging cost at grid tariffs",
+            description="Daily charging energy valued at grid tariffs as the no-PV baseline.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="battery_discharge_value_daily",
+            record=record_name(settings, "battery_discharge_value_daily_eur"),
+            expr="python: 15m raw daily battery discharge value at grid tariffs",
+            description="Daily value of discharged battery energy at grid tariffs.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
+            key="battery_charge_feedin_cost_daily",
+            record=record_name(settings, "battery_charge_feedin_cost_daily_eur"),
+            expr="python: 15m raw daily battery charge opportunity cost at feed-in tariffs",
+            description="Daily opportunity cost of charging the battery instead of exporting at feed-in tariffs.",
+            phase="phase-2",
+            implemented=True,
+            group_labels=(),
+        ),
+        RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
             expr="python: positive-only per-ext-title daily energy on 60s buckets",
@@ -330,8 +384,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="grid_import_daily_energy",
             record=record_name(settings, "grid_import_daily_wh"),
-            expr="python: sign-aware daily grid import energy",
-            description="Daily grid import energy on the active sampled/clamp comparison path.",
+            expr="python: daily grid import energy from gridEnergy counter spread",
+            description="Daily grid import energy from the local-day spread of the gridEnergy meter counter.",
             phase="phase-2",
             implemented=True,
             group_labels=(),
@@ -832,6 +886,23 @@ def summarize_grid_energy_samples(
     )
 
 
+def summarize_counter_spread_samples(
+    counter_samples: list[tuple[int, float]],
+    unit_multiplier: float = 1000.0,
+) -> float | None:
+    values = [
+        value
+        for _, value in counter_samples
+        if math.isfinite(value) and value >= 0
+    ]
+    if len(values) < 2:
+        return None
+    spread = max(values) - min(values)
+    if spread < 0:
+        return None
+    return spread * unit_multiplier
+
+
 def summarize_battery_energy_samples(
     battery_samples: list[tuple[int, float]],
     bucket_seconds: int,
@@ -1040,7 +1111,18 @@ def fetch_grid_energy_rollups(settings: Settings, window: DayWindow) -> dict[str
         window.end_iso,
         settings.raw_sample_step,
     )
-    return summarize_grid_energy_samples(grid_samples, parse_step_seconds(settings.energy_rollup_step))
+    rollups = summarize_grid_energy_samples(grid_samples, parse_step_seconds(settings.energy_rollup_step))
+    grid_energy_samples = fetch_single_series_range(
+        settings,
+        f'sum without(host) (gridEnergy_value{{{base_matchers(settings)}}})',
+        window.start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    counter_import_wh = summarize_counter_spread_samples(grid_energy_samples)
+    if counter_import_wh is not None:
+        rollups["grid_import_daily_energy"] = counter_import_wh
+    return rollups
 
 
 def fetch_battery_energy_rollups(settings: Settings, window: DayWindow) -> dict[str, float]:
@@ -1188,6 +1270,181 @@ def fetch_grid_price_rollups(settings: Settings, window: DayWindow) -> dict[str,
     )
 
 
+def fetch_vehicle_price_rollups(
+    settings: Settings,
+    item: RollupMetric,
+    window: DayWindow,
+) -> list[tuple[dict[str, str], float]]:
+    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
+    start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
+    extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
+    grid_tariff_samples = fetch_single_series_range(
+        settings,
+        f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+        extended_start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    charge_tariff_samples = fetch_single_series_range(
+        settings,
+        f'avg without(host) (tariffPriceLoadpoints_value{{{base_matchers(settings)}}})',
+        extended_start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
+    charge_matrix = fetch_series_range(
+        settings,
+        f'sum by (vehicle) (chargePower_value{{{base_matchers(settings)},vehicle!=""}})',
+        window.start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    if item.key == "vehicle_charge_cost_daily":
+        tariff_samples = charge_tariff_samples
+    elif item.key == "potential_vehicle_charge_cost_daily":
+        tariff_samples = grid_tariff_samples
+    else:
+        raise ValueError(f"Unsupported vehicle price rollup key: {item.key}")
+
+    out: list[tuple[dict[str, str], float]] = []
+    for result_item in charge_matrix:
+        vehicle = str(result_item.get("metric", {}).get("vehicle", "")).strip()
+        if not vehicle:
+            continue
+        rollups = quarter_hour_price_rollups(
+            grid_samples=result_item["samples"],
+            tariff_samples=tariff_samples,
+            feed_in_tariff_samples=[],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=raw_step_seconds,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+        value = rollups.get("grid_import_cost_daily")
+        if value is None or not math.isfinite(value):
+            continue
+        labels = base_daily_labels(settings, item.record, window)
+        labels["vehicle"] = vehicle
+        out.append((labels, value))
+    return out
+
+
+def fetch_aggregate_price_rollups(
+    settings: Settings,
+    item: RollupMetric,
+    window: DayWindow,
+) -> dict[str, float | None]:
+    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
+    start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
+    extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
+    grid_tariff_samples = fetch_single_series_range(
+        settings,
+        f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+        extended_start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    feed_in_tariff_samples = fetch_single_series_range(
+        settings,
+        f'avg without(host) (tariffFeedIn_value{{{base_matchers(settings)}}})',
+        extended_start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
+    if item.key == "potential_home_cost_daily":
+        samples = fetch_single_series_range(
+            settings,
+            f'avg_over_time(sum without(host) (homePower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        rollups = quarter_hour_price_rollups(
+            grid_samples=samples,
+            tariff_samples=grid_tariff_samples,
+            feed_in_tariff_samples=[],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=raw_step_seconds,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+        return {item.key: rollups.get("grid_import_cost_daily")}
+    if item.key == "potential_loadpoint_cost_daily":
+        samples = fetch_single_series_range(
+            settings,
+            f'avg_over_time(sum without(host) (chargePower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        rollups = quarter_hour_price_rollups(
+            grid_samples=samples,
+            tariff_samples=grid_tariff_samples,
+            feed_in_tariff_samples=[],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=raw_step_seconds,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+        return {item.key: rollups.get("grid_import_cost_daily")}
+    samples = fetch_single_series_range(
+        settings,
+        f'avg_over_time(avg without(host) (batteryPower_value{{id="",{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+        window.start_iso,
+        window.end_iso,
+        settings.raw_sample_step,
+    )
+    if item.key == "battery_discharge_value_daily":
+        discharge_samples = [(ts, max(value, 0.0)) for ts, value in samples]
+        rollups = quarter_hour_price_rollups(
+            grid_samples=discharge_samples,
+            tariff_samples=grid_tariff_samples,
+            feed_in_tariff_samples=[],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=raw_step_seconds,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+        return {item.key: rollups.get("grid_import_cost_daily")}
+    if item.key == "battery_charge_feedin_cost_daily":
+        charge_samples = [(ts, max(-value, 0.0)) for ts, value in samples]
+        rollups = quarter_hour_price_rollups(
+            grid_samples=[],
+            tariff_samples=[],
+            feed_in_tariff_samples=feed_in_tariff_samples,
+            bucket_starts=bucket_starts,
+            raw_step_seconds=raw_step_seconds,
+            bucket_minutes=settings.price_bucket_minutes,
+        )
+        # quarter_hour_price_rollups expects export energy via negative grid samples, so compute directly here
+        total_cost = 0.0
+        bucket_seconds = settings.price_bucket_minutes * 60
+        last_price = None
+        idx = 0
+        for bucket_start in bucket_starts:
+            bucket_end = bucket_start + bucket_seconds
+            while idx < len(feed_in_tariff_samples) and feed_in_tariff_samples[idx][0] < bucket_start:
+                last_price = feed_in_tariff_samples[idx][1]
+                idx += 1
+            bucket_price = last_price
+            scan = idx
+            while scan < len(feed_in_tariff_samples):
+                ts, val = feed_in_tariff_samples[scan]
+                if ts >= bucket_end:
+                    break
+                if ts >= bucket_start:
+                    bucket_price = val
+                scan += 1
+            idx = scan
+            if bucket_price is None:
+                continue
+            bucket_kwh = 0.0
+            for ts, value in charge_samples:
+                if bucket_start <= ts < bucket_end:
+                    bucket_kwh += value * raw_step_seconds / 3600000.0
+            total_cost += bucket_kwh * bucket_price
+        return {item.key: total_cost}
+    raise ValueError(f"Unsupported aggregate price rollup key: {item.key}")
+
+
 def window_local_labels(window: DayWindow) -> dict[str, str]:
     return {
         "local_year": window.local_year,
@@ -1254,6 +1511,63 @@ def serialize_import_jsonl(series_rows: list[dict]) -> bytes:
     return ("\n".join(lines) + ("\n" if lines else "")).encode("utf-8")
 
 
+def mean_of_top(values: list[float], limit: int) -> float | None:
+    finite = [value for value in values if math.isfinite(value)]
+    if not finite:
+        return None
+    top_values = sorted(finite, reverse=True)[:limit]
+    if not top_values:
+        return None
+    return sum(top_values) / len(top_values)
+
+
+def build_pv_health_rollups(
+    settings: Settings,
+    pv_daily_values_by_year: dict[str, dict[str, object]],
+    pv_daily_values_by_year_month: dict[tuple[str, str], dict[str, object]],
+) -> list[dict]:
+    series_rows: list[dict] = []
+    yearly_record = record_name(settings, "pv_top30_mean_yearly_wh")
+    monthly_record = record_name(settings, "pv_top5_mean_monthly_wh")
+
+    for local_year, payload in sorted(pv_daily_values_by_year.items()):
+        value = mean_of_top(payload.get("values", []), 30)
+        timestamp_ms = int(payload.get("timestamp_ms", 0) or 0)
+        if value is None or timestamp_ms <= 0:
+            continue
+        series_rows.append(
+            {
+                "metric": {
+                    "__name__": yearly_record,
+                    "db": settings.db_label,
+                    "local_year": local_year,
+                },
+                "values": [value],
+                "timestamps": [timestamp_ms],
+            }
+        )
+
+    for (local_year, local_month), payload in sorted(pv_daily_values_by_year_month.items()):
+        value = mean_of_top(payload.get("values", []), 5)
+        timestamp_ms = int(payload.get("timestamp_ms", 0) or 0)
+        if value is None or timestamp_ms <= 0:
+            continue
+        series_rows.append(
+            {
+                "metric": {
+                    "__name__": monthly_record,
+                    "db": settings.db_label,
+                    "local_year": local_year,
+                    "local_month": local_month,
+                },
+                "values": [value],
+                "timestamps": [timestamp_ms],
+            }
+        )
+
+    return series_rows
+
+
 def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     if not args.start_day or not args.end_day:
         raise SystemExit("backfill-test requires --start-day and --end-day.")
@@ -1274,6 +1588,8 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     emitted_samples = 0
     total_batches = 0
     processed_days = 0
+    pv_daily_values_by_year: dict[str, dict[str, object]] = {}
+    pv_daily_values_by_year_month: dict[tuple[str, str], dict[str, object]] = {}
     positive_energy_metric_keys = {
         "pv_daily_energy",
         "home_daily_energy",
@@ -1289,6 +1605,16 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "grid_import_price_min_daily",
         "grid_import_price_max_daily",
         "grid_export_credit_daily",
+    }
+    vehicle_price_metric_keys = {
+        "vehicle_charge_cost_daily",
+        "potential_vehicle_charge_cost_daily",
+    }
+    aggregate_price_metric_keys = {
+        "potential_home_cost_daily",
+        "potential_loadpoint_cost_daily",
+        "battery_discharge_value_daily",
+        "battery_charge_feedin_cost_daily",
     }
     grid_energy_metric_keys = {
         "grid_import_daily_energy",
@@ -1370,12 +1696,53 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                             window.sample_timestamp_ms,
                             value,
                         )
+                        if item.key == "pv_daily_energy":
+                            year_bucket = pv_daily_values_by_year.setdefault(
+                                window.local_year,
+                                {"values": [], "timestamp_ms": 0},
+                            )
+                            year_bucket["values"].append(value)
+                            year_bucket["timestamp_ms"] = max(int(year_bucket["timestamp_ms"]), window.sample_timestamp_ms)
+                            month_key = (window.local_year, window.local_month)
+                            month_bucket = pv_daily_values_by_year_month.setdefault(
+                                month_key,
+                                {"values": [], "timestamp_ms": 0},
+                            )
+                            month_bucket["values"].append(value)
+                            month_bucket["timestamp_ms"] = max(int(month_bucket["timestamp_ms"]), window.sample_timestamp_ms)
                         emitted_samples += 1
                     continue
                 if item.key in price_metric_keys:
                     if price_rollups is None:
                         price_rollups = fetch_grid_price_rollups(settings, window)
                     selected_value = price_rollups.get(item.key)
+                    if selected_value is None or not math.isfinite(selected_value):
+                        skipped += 1
+                        continue
+                    append_series_sample(
+                        series_map,
+                        base_daily_labels(settings, item.record, window),
+                        window.sample_timestamp_ms,
+                        selected_value,
+                    )
+                    emitted_samples += 1
+                    continue
+                if item.key in vehicle_price_metric_keys:
+                    for labels, value in fetch_vehicle_price_rollups(settings, item, window):
+                        if not math.isfinite(value):
+                            skipped += 1
+                            continue
+                        append_series_sample(
+                            series_map,
+                            labels,
+                            window.sample_timestamp_ms,
+                            value,
+                        )
+                        emitted_samples += 1
+                    continue
+                if item.key in aggregate_price_metric_keys:
+                    aggregate_price_rollups = fetch_aggregate_price_rollups(settings, item, window)
+                    selected_value = aggregate_price_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         continue
@@ -1461,6 +1828,26 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                 flush=True,
             )
 
+    health_series_rows = build_pv_health_rollups(
+        settings,
+        pv_daily_values_by_year,
+        pv_daily_values_by_year_month,
+    )
+    if args.write and health_series_rows:
+        for batch_index, batch in enumerate(chunked(health_series_rows, args.batch_size), start=1):
+            response = http_post_bytes(settings, "/api/v1/import", serialize_import_jsonl(batch))
+            import_results.append(
+                {
+                    "chunk": "health",
+                    "batch": batch_index,
+                    "status_code": response.status_code,
+                    "body": response.body.strip(),
+                    "series": len(batch),
+                }
+            )
+        total_batches += len(chunked(health_series_rows, args.batch_size))
+    seen_series_keys.update(tuple(sorted(row["metric"].items())) for row in health_series_rows)
+
     summary = {
         "mode": "write" if args.write else "dry-run",
         "timezone": settings.timezone,
@@ -1472,7 +1859,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             "end_day": end_day.isoformat(),
             "days": len(windows),
         },
-        "metrics": [item.record for item in catalog],
+        "metrics": [item.record for item in catalog] + [
+            record_name(settings, "pv_top30_mean_yearly_wh"),
+            record_name(settings, "pv_top5_mean_monthly_wh"),
+        ],
         "samples": emitted_samples,
         "series": len(seen_series_keys),
         "skipped": skipped,
@@ -1506,6 +1896,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
 
 
 

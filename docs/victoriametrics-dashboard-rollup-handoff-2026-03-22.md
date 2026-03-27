@@ -295,6 +295,13 @@ Important operational note:
 - verify whether any historically relevant host-only samples need a targeted reimport from Influx
 - productivize the tested daily rollup families from `test_evcc_*` to `evcc_*`
 - complete the still-open tariff and cost rollup phase
+- create a concrete runtime profile for the Python rollup CLI before adding many more metrics
+- measure separately:
+  - VM query time
+  - Python aggregation and bucketing time
+  - VM import time
+  - monthly chunk overhead on multi-year history
+- only optimize after those measurements identify the real bottleneck
 
 ## Runtime hint
 
