@@ -53,12 +53,12 @@ Current VictoriaMetrics state for `db="evcc"`:
 - raw EVCC metrics are present
 - test rollups in the `test_evcc_*` namespace are present
 - the former clamp-rollup namespace `test_evcc_clamp_*` has been removed after the sampled decision
-- production rollups in the `evcc_*` namespace do not exist yet
+- promoted production rollups in the `evcc_*` namespace now exist alongside the test namespace
 
 This means:
 
-- review dashboards may currently depend on `test_evcc_*`
-- production dashboards must not yet assume productivized rollup names
+- review dashboards may still depend on `test_evcc_*`
+- production dashboards can now target the promoted `evcc_*` names
 
 Current test rollup families include:
 
@@ -207,7 +207,7 @@ Current status after interactive review:
 - `Metric gauges` now uses stable monthly inputs via hidden daily series plus `reduce(sum)` rather than long-range direct integrate queries
 - `Battery summary` now uses average daily max/min SOC values and corrected battery discharge math
 - `battery_soc_daily_min_pct` and `battery_soc_daily_max_pct` were rebuilt after a detected start-of-day rollup bug; March values now match raw data except for the still-open current day
-- the month dashboard currently works on test rollups, not on production `evcc_*` rollups
+- the original month dashboard source now exists as [VM_ EVCC_ Monat.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/original/en/VM_%20EVCC_%20Monat.json) on top of promoted `evcc_*` rollups; the review dashboard still exists separately on `test_evcc_*`
 
 Known remaining review items:
 
@@ -240,9 +240,9 @@ Planning note:
 
 Current direction:
 
-- keep the implemented import-side daily test rollups in `test_evcc_*` as the working baseline
-- compare them against Influx legacy and Tibber billing reality
-- focus on the remaining import-energy drift before promoting anything to `evcc_*`
+- keep the promoted sampled rollups in `evcc_*` as the production baseline and retain `test_evcc_*` for verification and experiments
+- compare them against Influx legacy and Tibber billing reality where needed
+- focus on any remaining import-energy drift without reopening the namespace decision
 - export-side credit rollups are part of the accepted sampled baseline; with the current historical `tariffFeedIn` data they evaluate to zero
 - keep `sampled-old` as the working import-cost baseline until a future comparison clearly beats it
 - from this point on, continue tuning only on the sampled path; clamp is no longer the preferred comparison branch for further cost work

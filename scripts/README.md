@@ -6,6 +6,7 @@ Current default files:
 
 - `evcc-vm-rollup.py`
 - `evcc-vm-rollup.conf.example`
+- `evcc-vm-rollup-prod.conf.example`
 - `vm-rewrite-drop-label.py`
 
 Legacy Influx aggregation remains separate under `scripts/influx-legacy/`.
@@ -95,6 +96,12 @@ This means:
 - long historical runs emit visible shell progress
 - writes happen in bounded monthly chunks instead of one giant final flush
 - vehicle odometer state is still preserved across chunk boundaries
+
+Promote the same rollup family into `evcc_*`:
+
+```bash
+python3 evcc-vm-rollup.py   --config evcc-vm-rollup-prod.conf.example   backfill-test   --start-day 2025-01-01   --end-day 2026-03-27   --progress   --write
+```
 
 Force the previous one-shot behavior only if you really need it:
 
