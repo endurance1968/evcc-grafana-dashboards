@@ -1,6 +1,7 @@
 import path from "node:path";
 import {
   buildUid,
+  deepReplaceDataSourcePlaceholders,
   grafanaApi,
   listJsonFiles,
   loadEnvFile,
@@ -114,15 +115,66 @@ function prepareDashboard(raw, filePath) {
   return dashboard;
 }
 
+function collectLibraryElements(rawDashboards) {
+  const byUid = new Map();
+
+  for (const raw of rawDashboards) {
+    const elements = raw?.__elements;
+    if (!elements || typeof elements !== "object") {
+      continue;
+    }
+
+    for (const element of Object.values(elements)) {
+      if (!element || typeof element.uid !== "string" || !element.uid) {
+        continue;
+      }
+      byUid.set(element.uid, JSON.parse(JSON.stringify(element)));
+    }
+  }
+
+  return [...byUid.values()].sort((a, b) => a.uid.localeCompare(b.uid));
+}
+
+async function ensureLibraryElements(rawDashboards) {
+  const elements = collectLibraryElements(rawDashboards);
+  if (!elements.length) {
+    return;
+  }
+
+  for (const element of elements) {
+    const body = {
+      uid: element.uid,
+      name: element.name,
+      kind: element.kind ?? 1,
+      folderUid,
+      model: deepReplaceDataSourcePlaceholders(element.model, dsMap),
+    };
+
+    await grafanaApi("/api/library-elements", {
+      method: "POST",
+      token,
+      baseUrl,
+      body,
+    });
+
+    console.log(`Imported library panel: ${element.name} -> ${element.uid}`);
+  }
+}
+
 async function main() {
   const files = listJsonFiles(source);
   if (!files.length) throw new Error(`No JSON files found in ${source}`);
 
   await ensureFolder();
 
+  const rawDashboards = files.map((file) => ({
+    file,
+    raw: readJson(file),
+  }));
+  await ensureLibraryElements(rawDashboards.map((entry) => entry.raw));
+
   const imported = [];
-  for (const file of files) {
-    const raw = readJson(file);
+  for (const { file, raw } of rawDashboards) {
     const dashboard = prepareDashboard(raw, file);
     const inputs = buildInputs(raw);
 
