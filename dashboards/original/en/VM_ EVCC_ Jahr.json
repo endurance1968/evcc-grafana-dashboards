@@ -4103,7 +4103,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "label_copy(sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{db=\"$dbLabel\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle), \"vehicle\", \"series\")",
+          "expr": "label_copy(sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle), \"vehicle\", \"series\")",
           "format": "table",
           "instant": true,
           "range": false,
@@ -4261,7 +4261,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "label_copy(sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{db=\"$dbLabel\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle) / 1000, \"vehicle\", \"series\")",
+          "expr": "label_copy(sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle) / 1000, \"vehicle\", \"series\")",
           "format": "table",
           "instant": true,
           "range": false,
@@ -4420,7 +4420,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "label_copy((sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{db=\"$dbLabel\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle) / 1000) / (sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{db=\"$dbLabel\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle)) * 100, \"vehicle\", \"series\")",
+          "expr": "label_copy((sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle) / 1000) / (sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month, vehicle)) * 100, \"vehicle\", \"series\")",
           "format": "table",
           "instant": true,
           "range": false,
@@ -4544,11 +4544,12 @@
       {
         "name": "extBlocklist",
         "type": "constant",
-        "query": "^none$",
+        "query": ".*Car.*|.*Haupt.*",
         "label": "EXT Blocklist",
         "current": {
-          "text": "^none$",
-          "value": "^none$"
+          "selected": true,
+          "text": ".*Car.*|.*Haupt.*",
+          "value": ".*Car.*|.*Haupt.*"
         },
         "options": [
           {
