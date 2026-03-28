@@ -27,7 +27,6 @@ class Settings:
     raw_sample_step: str
     energy_rollup_step: str
     price_bucket_minutes: int
-    fetch_strategy: str
     max_fetch_points_per_series: int
     benchmark_start: str
     benchmark_end: str
@@ -198,9 +197,6 @@ def load_settings(path: str) -> Settings:
     with open(path, "r", encoding="utf-8") as handle:
         parser.read_file(handle)
 
-    fetch_strategy = parser.get("victoriametrics", "fetch_strategy", fallback="compat").strip().lower()
-    if fetch_strategy not in {"compat", "chunk-cache"}:
-        raise SystemExit(f"Unsupported fetch_strategy: {fetch_strategy}")
     max_fetch_points_per_series = parser.getint("victoriametrics", "max_fetch_points_per_series", fallback=28000)
     if max_fetch_points_per_series < 1000:
         raise SystemExit("max_fetch_points_per_series must be at least 1000")
@@ -214,7 +210,6 @@ def load_settings(path: str) -> Settings:
         raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
         energy_rollup_step=parser.get("victoriametrics", "energy_rollup_step", fallback="60s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
-        fetch_strategy=fetch_strategy,
         max_fetch_points_per_series=max_fetch_points_per_series,
         benchmark_start=parser.get("benchmark", "start"),
         benchmark_end=parser.get("benchmark", "end"),
@@ -933,16 +928,6 @@ def build_fetch_blocks(
         for item in current_windows:
             block_by_day[item.day] = block
 
-    return blocks, block_by_day
-
-
-def build_compat_fetch_blocks(chunk_name: str, windows: list[DayWindow]) -> tuple[list[ChunkWindow], dict[str, ChunkWindow]]:
-    blocks: list[ChunkWindow] = []
-    block_by_day: dict[str, ChunkWindow] = {}
-    for index, window in enumerate(windows, start=1):
-        block = build_chunk_window(f"{chunk_name}-d{index}", [window])
-        blocks.append(block)
-        block_by_day[window.day] = block
     return blocks, block_by_day
 
 
@@ -2001,15 +1986,12 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         series_map: dict[tuple[tuple[str, str], ...], dict] = {}
         chunk_start_samples = emitted_samples
         chunk_start_skipped = skipped
-        if settings.fetch_strategy == "chunk-cache":
-            fetch_blocks, fetch_block_by_day = build_fetch_blocks(
-                chunk_name,
-                chunk_windows,
-                parse_step_seconds(settings.raw_sample_step),
-                settings.max_fetch_points_per_series,
-            )
-        else:
-            fetch_blocks, fetch_block_by_day = build_compat_fetch_blocks(chunk_name, chunk_windows)
+        fetch_blocks, fetch_block_by_day = build_fetch_blocks(
+            chunk_name,
+            chunk_windows,
+            parse_step_seconds(settings.raw_sample_step),
+            settings.max_fetch_points_per_series,
+        )
         positive_energy_cache: dict[tuple[str, str], list[dict]] = {}
         shared_price_contexts: dict[str, dict[str, object]] = {}
 
@@ -2289,7 +2271,6 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "raw_sample_step": settings.raw_sample_step,
         "energy_rollup_step": settings.energy_rollup_step,
         "price_bucket_minutes": settings.price_bucket_minutes,
-        "fetch_strategy": settings.fetch_strategy,
         "max_fetch_points_per_series": settings.max_fetch_points_per_series,
         "range": {
             "start_day": start_day.isoformat(),
