@@ -54,6 +54,41 @@ function run(script, args = []) {
   }
 }
 
+function listJsonFilesRecursive(dirPath) {
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listJsonFilesRecursive(fullPath));
+    } else if (entry.isFile() && entry.name.toLowerCase().endsWith(".json")) {
+      files.push(fullPath);
+    }
+  }
+  return files;
+}
+
+function collectSourceLibraryUids(sourceDir) {
+  const files = listJsonFilesRecursive(path.resolve(sourceDir));
+  const uids = new Set();
+
+  for (const file of files) {
+    const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+    const elements = raw?.__elements;
+    if (!elements || typeof elements !== "object") {
+      continue;
+    }
+
+    for (const element of Object.values(elements)) {
+      if (element && typeof element.uid === "string" && element.uid) {
+        uids.add(element.uid);
+      }
+    }
+  }
+
+  return uids;
+}
+
 async function listDashboardsInFolder() {
   const query = `/api/search?type=dash-db&limit=5000&folderUIDs=${encodeURIComponent(folderUid)}`;
   return await grafanaApi(query, { token, baseUrl });
@@ -104,23 +139,38 @@ async function purgeForLanguage() {
   }
 
   const libraryElements = await listAllLibraryElements();
+  const sourceLibraryUids = collectSourceLibraryUids(source);
+  const ownedLibraryPanels = libraryElements.filter(
+    (el) =>
+      el.folderUid === folderUid &&
+      typeof el.uid === "string" &&
+      sourceLibraryUids.has(el.uid),
+  );
   const orphanedInFolder = libraryElements.filter(
     (el) =>
       el.folderUid === folderUid &&
       Number(el?.meta?.connectedDashboards || 0) === 0,
   );
 
+  const toDeleteLibraries = new Map();
+  for (const el of ownedLibraryPanels) {
+    toDeleteLibraries.set(el.uid, el);
+  }
   for (const el of orphanedInFolder) {
+    toDeleteLibraries.set(el.uid, el);
+  }
+
+  for (const el of toDeleteLibraries.values()) {
     await grafanaApi(`/api/library-elements/${encodeURIComponent(el.uid)}`, {
       method: "DELETE",
       token,
       baseUrl,
     });
-    console.log(`Deleted orphan library panel: ${el.uid} | ${el.name}`);
+    console.log(`Deleted library panel: ${el.uid} | ${el.name}`);
   }
 
   console.log(
-    `Purge done. Dashboards removed=${toDelete.length}, orphan library panels removed=${orphanedInFolder.length}`,
+    `Purge done. Dashboards removed=${toDelete.length}, library panels removed=${toDeleteLibraries.size}`,
   );
 }
 
