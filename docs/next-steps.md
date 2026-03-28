@@ -106,8 +106,8 @@ Goal:
 - the first optimization priority is therefore query consolidation, not import tuning
 - priority 1: merge the tariff/cost paths so `grid`, `tariffGrid`, `tariffFeedIn`, `chargePower`, and related vehicle/grid price inputs are fetched once per chunk and then reused locally for daily and quarter-hour rollups
 - priority 2: merge positive-energy paths (`pv`, `home`, `loadpoint`, `vehicle`, `ext`, `aux`) so their raw power samples are fetched once per chunk and split into day/local-label rollups in Python instead of by many day-local queries
-- first implementation of that optimization now runs under a separate comparison prefix `evcc_cmp_*` via `scripts/evcc-vm-rollup-compare.conf.example`, so existing production rollups in `evcc_*` stay untouched during profiling and semantic comparison
-- first full comparison rebuild on `evcc_cmp_*` reduced total runtime from about `562.65s` to about `248.34s`; `http_get_json_calls` dropped from `14883` to `3708`, and `http_get_json_s` dropped from about `472.56s` to about `152.07s`
+- the optimized read-side consolidation is now the active production path for `evcc_*`
+- compared with the older baseline, the full rebuild runtime dropped from about `562.65s` to about `252.60s`; `http_get_json_calls` dropped from `14883` to `3708`, and `http_get_json_s` dropped from about `472.56s` to about `157.27s`
 - the optimized comparison path is not yet accepted as production-identical: the first year-level check still showed a small residual delta against the current `evcc_*` baseline (about `0.89 kWh` on 2025 grid import and about `5.72 EUR` on 2025 grid-import cost), so semantic verification must continue before promotion
 - full dry-run memory profiling is now included as memory_peak_mb / memory_last_mb; on the current Windows host over `2025-01-01 .. 2026-03-27`, the active chunked fetch path peaked at about `1266.2 MB`
 - on the same full dry-run, the active chunked fetch path took about `218.47s`; `http_get_json_calls` dropped to `3708`
