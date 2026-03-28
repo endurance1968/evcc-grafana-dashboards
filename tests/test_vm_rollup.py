@@ -263,6 +263,17 @@ class VmRollupTests(unittest.TestCase):
         sliced = MODULE.slice_samples(samples, 100, 111, include_last_before=True)
         self.assertEqual(sliced, [(90, 1.0), (100, 2.0), (110, 3.0)])
 
+    def test_slice_samples_limits_previous_sample_by_lookback(self):
+        samples = [(0, 1.0), (200, 2.0), (310, 3.0)]
+        sliced = MODULE.slice_samples(
+            samples,
+            300,
+            320,
+            include_last_before=True,
+            max_lookback_seconds=30,
+        )
+        self.assertEqual(sliced, [(310, 3.0)])
+
 
     def test_quarter_hour_price_rollups_calculates_all_price_metrics(self):
         bucket_starts = [0, 900]

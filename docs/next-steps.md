@@ -111,8 +111,8 @@ Goal:
 - the optimized comparison path is not yet accepted as production-identical: the first year-level check still showed a small residual delta against the current `evcc_*` baseline (about `0.89 kWh` on 2025 grid import and about `5.72 EUR` on 2025 grid-import cost), so semantic verification must continue before promotion
 - full dry-run memory profiling is now included as memory_peak_mb / memory_last_mb; on the current Windows host over 2025-01-01 .. 2026-03-27, compat peaked at about 1270.9 MB and chunk-cache at about 1266.2 MB, so the faster mode is currently not meaningfully more memory-hungry
 - on the same full dry-run, `compat` took about `298.53s` vs `218.47s` for `chunk-cache`; `http_get_json_calls` dropped from `8118` to `3708`
-- semantic delta versus `evcc_*` is already tiny for most metrics (`pv` effectively identical, `vehicle_charge_cost_daily_eur` off by about `0.0015 EUR`, `grid_import_daily_wh` off by about `888.93 Wh` in 2025 = about `0.12‰`), but `grid_import_cost_daily_eur` is still off by about `5.72 EUR` in 2025 = about `3.33‰`
-- because RAM is currently almost identical between both modes, keeping two fetch strategies is probably only justified temporarily until the remaining import-cost delta is closed
+- after aligning the chunk-cache tariff carry-over with the old 15-minute lookback semantics, the remaining delta versus `evcc_*` is now in the promille range: `grid_import_daily_wh` is still off by about `888.93 Wh` in 2025 = about `0.12‰`, `vehicle_charge_cost_daily_eur` by about `0.0015 EUR`, and `grid_import_cost_daily_eur` by only about `0.0383 EUR` in 2025 = about `0.022‰`
+- because RAM is currently almost identical between both modes and the remaining delta is now already in the promille range, keeping two fetch strategies is probably only justified temporarily until we decide whether the slower `compat` mode is still needed at all
 - only after those two larger read-side reductions should smaller candidates such as `batterySoc` step size or catalog fetches be revisited
 - in the same review, analyze which derived views are better computed directly in dashboard queries instead of being materialized as extra rollups
 - especially check whether simple ranking/aggregation views such as top-5 and top-30 PV health metrics are straightforward enough in MetricsQL to avoid dedicated rollup series
@@ -239,5 +239,6 @@ If you are new to the current default flow, start with:
 6. `docs/grafana-localization-testing.md`
 7. `scripts/test/README.md`
 8. `docs/localization-review-2026-03-21.md`
+
 
 

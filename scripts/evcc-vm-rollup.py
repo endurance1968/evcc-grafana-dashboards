@@ -951,6 +951,7 @@ def slice_samples(
     start_ts: int,
     end_ts: int,
     include_last_before: bool = False,
+    max_lookback_seconds: int | None = None,
 ) -> list[tuple[int, float]]:
     sliced = [(timestamp, value) for timestamp, value in samples if start_ts <= timestamp < end_ts]
     if include_last_before:
@@ -959,9 +960,12 @@ def slice_samples(
             if timestamp >= start_ts:
                 break
             previous = (timestamp, value)
-        if previous is not None:
+        if previous is not None and (
+            max_lookback_seconds is None or previous[0] >= (start_ts - max_lookback_seconds)
+        ):
             sliced.insert(0, previous)
     return sliced
+
 
 
 def slice_matrix_samples(
@@ -1582,8 +1586,8 @@ def fetch_grid_price_rollups(
             settings.raw_sample_step,
         )
     else:
-        tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True)
-        feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True)
+        tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
         grid_samples = slice_samples(context["grid_samples"], start_ts, end_ts)
     return quarter_hour_price_rollups(
         grid_samples=grid_samples,
@@ -1630,8 +1634,8 @@ def fetch_vehicle_price_rollups(
             settings.raw_sample_step,
         )
     else:
-        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True)
-        charge_tariff_samples = slice_samples(context["loadpoint_tariff_samples"], start_ts, end_ts, include_last_before=True)
+        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        charge_tariff_samples = slice_samples(context["loadpoint_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
         charge_matrix = slice_matrix_samples(context["charge_vehicle_matrix"], start_ts, end_ts)
     if item.key == "vehicle_charge_cost_daily":
         tariff_samples = charge_tariff_samples
@@ -1711,8 +1715,8 @@ def fetch_aggregate_price_rollups(
             settings.raw_sample_step,
         )
     else:
-        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True)
-        feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True)
+        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
         home_samples = slice_samples(context["home_samples"], start_ts, end_ts)
         charge_total_samples = slice_samples(context["charge_total_samples"], start_ts, end_ts)
         battery_samples = slice_samples(context["battery_samples"], start_ts, end_ts)
@@ -2330,6 +2334,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
