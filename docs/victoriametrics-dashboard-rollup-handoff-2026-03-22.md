@@ -336,6 +336,9 @@ Practical rule going forward:
 
 - materialize only when the result is either reused in many places or hard to express efficiently from the existing daily series
 - prefer dashboard-side aggregation when the result is just a sum, average, ratio, ranking table, or other lightweight composition over existing daily rollups
+- in the current all-time dashboard, the `Monthly costs` panel should suppress `Income` series when `evcc_grid_export_credit_daily_eur` sums to zero over the selected range; this keeps the chart readable on systems without feed-in compensation
+- the `Today` main power plot now contains a PV forecast line again; it intentionally uses the same base query as `Today - Details` (`avg(tariffSolar_value)` with `interval=1h`) so the curve shape is comparable
+- the `Today` main power plot is implemented as a Grafana library panel; changes to its forecast series or styling must therefore update the library panel itself in addition to the dashboard source file
 
 ## Runtime hint
 
