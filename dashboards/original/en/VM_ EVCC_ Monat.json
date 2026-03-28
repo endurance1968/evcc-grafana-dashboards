@@ -724,8 +724,8 @@
         },
         "showPercentChange": false,
         "text": {
-          "titleSize": 12,
-          "valueSize": 20
+          "titleSize": 16,
+          "valueSize": 29
         },
         "textMode": "auto",
         "wideLayout": true
@@ -1209,7 +1209,23 @@
             "mode": "palette-classic"
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Other"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9FA7B3"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "displayLabels": [
@@ -1391,6 +1407,13 @@
               {
                 "id": "displayName",
                 "value": "Other"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#9FA7B3"
+                }
               }
             ]
           }
@@ -2097,13 +2120,13 @@
         },
         "showPercentChange": false,
         "text": {
-          "titleSize": 12,
-          "valueSize": 24
+          "titleSize": 16,
+          "valueSize": 29
         },
         "textMode": "auto",
         "wideLayout": true,
-        "titleSize": 12,
-        "valueSize": 24
+        "titleSize": 16,
+        "valueSize": 29
       },
       "targets": [
         {
@@ -2796,8 +2819,8 @@
         },
         "showPercentChange": false,
         "text": {
-          "titleSize": 10,
-          "valueSize": 18
+          "titleSize": 16,
+          "valueSize": 29
         },
         "textMode": "value_and_name",
         "wideLayout": true
@@ -3206,9 +3229,9 @@
         },
         "options": [
           {
+            "selected": true,
             "text": "^none$",
-            "value": "^none$",
-            "selected": true
+            "value": "^none$"
           }
         ]
       },

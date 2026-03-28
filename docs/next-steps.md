@@ -84,6 +84,7 @@ Latest raw-data findings to continue from:
 - likely root cause for that first imported local day: the global reimport window had started at `2025-01-01T00:00:00Z`; for `Europe/Berlin`, the local day `2025-01-01` starts already at `2024-12-31T23:00:00Z`
 - future full-history reimports therefore need a deliberate UTC lead-in before the first local midnight, so the first local day is not truncated again
 - month queries now use explicit `local_year` and `local_month` rollup labels instead of repeated inline timezone/month guards; this pattern should be reused for year/all-time dashboards
+- current year-dashboard vehicle odometer semantics use the highest known odometer value per vehicle, not the last raw point, because raw odometer series can contain later zero resets or split loadpoint-specific paths
 
 Goal:
 
@@ -97,6 +98,35 @@ Goal:
   - VM import/write time
   - monthly chunk overhead
 - only optimize after those measurements identify the real bottleneck
+- profiling output is now built into `scripts/evcc-vm-rollup.py`; the first short dry-run showed VM HTTP/query time dominating, with price aggregation the next largest block
+- in the same review, analyze which derived views are better computed directly in dashboard queries instead of being materialized as extra rollups
+- especially check whether simple ranking/aggregation views such as top-5 and top-30 PV health metrics are straightforward enough in MetricsQL to avoid dedicated rollup series
+
+Current classification after the first review:
+
+Keep as rollup:
+
+- `*_energy_daily_wh` families for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`; these are the shared long-range baseline and are cheap to reuse from Grafana
+- `battery_soc_daily_min_pct` and `battery_soc_daily_max_pct`; they are small, stable, and repeatedly reused in month/year/all-time panels
+- `grid_import_daily_wh`; now based on the real `gridEnergy` counter and therefore the cleanest daily import baseline
+- `grid_export_daily_wh`, `battery_charge_daily_wh`, and `battery_discharge_daily_wh`; they remain necessary daily long-range inputs even though export still needs separate semantic review
+- tariff-weighted daily finance series such as `grid_import_cost_daily_eur`, `grid_import_price_*_daily_ct_per_kwh`, and `grid_export_credit_daily_eur`; they depend on quarter-hour weighting and are too expensive and too ugly to rebuild ad hoc in many dashboard panels
+- `vehicle_charge_cost_daily_eur` and `potential_vehicle_charge_cost_daily_eur`; these are reused vehicle baselines and depend on the same quarter-hour weighting path
+- `potential_home_cost_daily_eur`, `potential_loadpoint_cost_daily_eur`, `battery_discharge_value_daily_eur`, and `battery_charge_feedin_cost_daily_eur`; these are accepted balance/amortization base series and should stay materialized while the all-time finance block settles
+- `pv_top30_mean_yearly_wh` and `pv_top5_mean_monthly_wh` for now; despite the general preference to avoid excess rollups, these two are not elegant to derive from the current daily-series shape in plain MetricsQL; direct VM prototypes such as `topk_avg(5, last_over_time(evcc_pv_energy_daily_wh{...}[400d]))` only rank the single month series and do not reproduce the Influx-style top-N-over-points result
+
+Better kept in dashboard queries or Grafana math:
+
+- yearly and monthly sums over existing daily rollups
+- top tables such as `highest yield`, `highest feed-in`, and `highest home consumption`
+- power-balance totals and comparisons composed from existing daily rollups
+- PV and battery amortization ratios, payback durations, and annualized projections
+- vehicle summary panels that combine already materialized daily energy/cost/distance series with lightweight dashboard math
+
+Practical rule going forward:
+
+- materialize only when the result is either reused in many places or hard to express efficiently from the existing daily series
+- prefer dashboard-side aggregation when the result is just a sum, average, ratio, ranking table, or other lightweight composition over existing daily rollups
 
 Primary references:
 
@@ -134,6 +164,14 @@ Month-cost comparison against Tibber, without the incomplete October 2025 month:
 | **Total** | **2233.29** | **2234.62** | **2252.04** | **2274.79** | **-1.8%** | **-1.8%** | **-1.0%** |
 
 ### 1. Reduce mixed-language source internals
+
+Dashboard color palette (fixed where possible):
+- PV: #73BF69
+- Grid import: #E24D42
+- Home: #5794F2
+- Feed-in: #2F8F5B
+- Other: #9FA7B3
+
 
 Current issue:
 

@@ -61,6 +61,16 @@ class ImportResponse:
     body: str
 
 
+ACTIVE_PROFILE: dict[str, float | int] | None = None
+
+
+def bump_profile_value(name: str, value: float = 1.0) -> None:
+    global ACTIVE_PROFILE
+    if ACTIVE_PROFILE is None:
+        return
+    ACTIVE_PROFILE[name] = ACTIVE_PROFILE.get(name, 0) + value
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Plan, benchmark and backfill VictoriaMetrics rollups for EVCC safely."
@@ -133,12 +143,16 @@ def http_get_json(settings: Settings, path: str, params: dict[str, str | list[st
     if params:
         url = url + "?" + urllib.parse.urlencode(params, doseq=True)
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    started_at = time.perf_counter()
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"HTTP {exc.code} for {url}: {body}") from exc
+    finally:
+        bump_profile_value("http_get_json_s", time.perf_counter() - started_at)
+        bump_profile_value("http_get_json_calls")
 
 
 def http_get_text(settings: Settings, path: str, params: dict[str, str | list[str]] | None = None) -> str:
@@ -146,12 +160,16 @@ def http_get_text(settings: Settings, path: str, params: dict[str, str | list[st
     if params:
         url = url + "?" + urllib.parse.urlencode(params, doseq=True)
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
+    started_at = time.perf_counter()
     try:
         with urllib.request.urlopen(request, timeout=30) as response:
             return response.read().decode("utf-8")
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"HTTP {exc.code} for {url}: {body}") from exc
+    finally:
+        bump_profile_value("http_get_text_s", time.perf_counter() - started_at)
+        bump_profile_value("http_get_text_calls")
 
 
 def http_post_bytes(
@@ -166,11 +184,17 @@ def http_post_bytes(
         method="POST",
         headers={"Content-Type": content_type},
     )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return ImportResponse(
-            status_code=response.getcode(),
-            body=response.read().decode("utf-8", errors="replace"),
-        )
+    started_at = time.perf_counter()
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return ImportResponse(
+                status_code=response.getcode(),
+                body=response.read().decode("utf-8", errors="replace"),
+            )
+    finally:
+        bump_profile_value("http_post_bytes_s", time.perf_counter() - started_at)
+        bump_profile_value("http_post_bytes_calls")
+        bump_profile_value("http_post_bytes_payload_mb", len(payload) / (1024 * 1024))
 
 
 def quote_label(value: str) -> str:
@@ -1511,6 +1535,10 @@ def serialize_import_jsonl(series_rows: list[dict]) -> bytes:
     return ("\n".join(lines) + ("\n" if lines else "")).encode("utf-8")
 
 
+def add_duration(profile: dict[str, float], key: str, started_at: float) -> None:
+    profile[key] = profile.get(key, 0.0) + (time.perf_counter() - started_at)
+
+
 def mean_of_top(values: list[float], limit: int) -> float | None:
     finite = [value for value in values if math.isfinite(value)]
     if not finite:
@@ -1574,11 +1602,37 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     if args.batch_size < 1:
         raise SystemExit("--batch-size must be at least 1.")
 
+    total_started_at = time.perf_counter()
+    global ACTIVE_PROFILE
+    ACTIVE_PROFILE = {
+        "build_windows_s": 0.0,
+        "build_chunks_s": 0.0,
+        "build_catalog_s": 0.0,
+        "chunk_processing_s": 0.0,
+        "window_processing_s": 0.0,
+        "vehicle_distance_s": 0.0,
+        "battery_soc_s": 0.0,
+        "positive_energy_s": 0.0,
+        "price_rollups_s": 0.0,
+        "vehicle_price_s": 0.0,
+        "aggregate_price_s": 0.0,
+        "grid_energy_s": 0.0,
+        "battery_energy_s": 0.0,
+        "generic_rollup_s": 0.0,
+        "import_s": 0.0,
+        "health_rollup_s": 0.0,
+    }
+    started_at = time.perf_counter()
     start_day = parse_local_day(args.start_day, "--start-day")
     end_day = parse_local_day(args.end_day, "--end-day")
     windows = build_day_windows(settings, start_day, end_day)
+    add_duration(ACTIVE_PROFILE, "build_windows_s", started_at)
+    started_at = time.perf_counter()
     chunks = build_window_chunks(windows, args.chunk_by)
+    add_duration(ACTIVE_PROFILE, "build_chunks_s", started_at)
+    started_at = time.perf_counter()
     catalog = [item for item in build_catalog(settings) if item.implemented]
+    add_duration(ACTIVE_PROFILE, "build_catalog_s", started_at)
 
     previous_vehicle_odometer: dict[str, float] = {}
     seen_series_keys: set[tuple[tuple[str, str], ...]] = set()
@@ -1626,6 +1680,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     }
 
     for chunk_index, (chunk_name, chunk_windows) in enumerate(chunks, start=1):
+        chunk_started_at = time.perf_counter()
         series_map: dict[tuple[tuple[str, str], ...], dict] = {}
         chunk_start_samples = emitted_samples
         chunk_start_skipped = skipped
@@ -1638,12 +1693,14 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             )
 
         for window in chunk_windows:
+            window_started_at = time.perf_counter()
             processed_days += 1
             price_rollups: dict[str, float | None] | None = None
             grid_energy_rollups: dict[str, float] | None = None
             battery_energy_rollups: dict[str, float] | None = None
             for item in catalog:
                 if item.key == "vehicle_daily_distance":
+                    started_at = time.perf_counter()
                     for result_item in fetch_vehicle_odometer_vector(settings, window):
                         value = sample_value(result_item)
                         if value is None:
@@ -1670,8 +1727,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                             delta,
                         )
                         emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "vehicle_distance_s", started_at)
                     continue
                 if item.key in {"battery_soc_daily_min", "battery_soc_daily_max"}:
+                    started_at = time.perf_counter()
                     day_min, day_max = fetch_battery_soc_extrema(settings, window)
                     selected_value = day_min if item.key == "battery_soc_daily_min" else day_max
                     if selected_value is None:
@@ -1684,8 +1743,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "battery_soc_s", started_at)
                     continue
                 if item.key in positive_energy_metric_keys:
+                    started_at = time.perf_counter()
                     for labels, value in fetch_positive_energy_rollups(settings, item, window):
                         if not math.isfinite(value):
                             skipped += 1
@@ -1711,8 +1772,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                             month_bucket["values"].append(value)
                             month_bucket["timestamp_ms"] = max(int(month_bucket["timestamp_ms"]), window.sample_timestamp_ms)
                         emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
                     continue
                 if item.key in price_metric_keys:
+                    started_at = time.perf_counter()
                     if price_rollups is None:
                         price_rollups = fetch_grid_price_rollups(settings, window)
                     selected_value = price_rollups.get(item.key)
@@ -1726,8 +1789,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "price_rollups_s", started_at)
                     continue
                 if item.key in vehicle_price_metric_keys:
+                    started_at = time.perf_counter()
                     for labels, value in fetch_vehicle_price_rollups(settings, item, window):
                         if not math.isfinite(value):
                             skipped += 1
@@ -1739,8 +1804,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                             value,
                         )
                         emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "vehicle_price_s", started_at)
                     continue
                 if item.key in aggregate_price_metric_keys:
+                    started_at = time.perf_counter()
                     aggregate_price_rollups = fetch_aggregate_price_rollups(settings, item, window)
                     selected_value = aggregate_price_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
@@ -1753,8 +1820,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "aggregate_price_s", started_at)
                     continue
                 if item.key in grid_energy_metric_keys:
+                    started_at = time.perf_counter()
                     if grid_energy_rollups is None:
                         grid_energy_rollups = fetch_grid_energy_rollups(settings, window)
                     selected_value = grid_energy_rollups.get(item.key)
@@ -1768,8 +1837,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "grid_energy_s", started_at)
                     continue
                 if item.key in battery_energy_metric_keys:
+                    started_at = time.perf_counter()
                     if battery_energy_rollups is None:
                         battery_energy_rollups = fetch_battery_energy_rollups(settings, window)
                     selected_value = battery_energy_rollups.get(item.key)
@@ -1783,7 +1854,9 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         selected_value,
                     )
                     emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "battery_energy_s", started_at)
                     continue
+                started_at = time.perf_counter()
                 for result_item in fetch_rollup_vector(settings, item, window):
                     value = sample_value(result_item)
                     if value is None:
@@ -1792,6 +1865,8 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                     labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
                     append_series_sample(series_map, labels, window.sample_timestamp_ms, value)
                     emitted_samples += 1
+                add_duration(ACTIVE_PROFILE, "generic_rollup_s", started_at)
+            add_duration(ACTIVE_PROFILE, "window_processing_s", window_started_at)
 
         seen_series_keys.update(series_map.keys())
         series_rows = list(series_map.values())
@@ -1799,6 +1874,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         total_batches += len(batches)
 
         if args.write and batches:
+            import_started_at = time.perf_counter()
             for batch_index, batch in enumerate(batches, start=1):
                 response = http_post_bytes(settings, "/api/v1/import", serialize_import_jsonl(batch))
                 import_results.append(
@@ -1810,6 +1886,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                         "series": len(batch),
                     }
                 )
+            add_duration(ACTIVE_PROFILE, "import_s", import_started_at)
 
         chunk_summary = {
             "chunk": chunk_name,
@@ -1818,8 +1895,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             "series": len(series_rows),
             "skipped": skipped - chunk_start_skipped,
             "batches": len(batches),
+            "duration_s": round(time.perf_counter() - chunk_started_at, 6),
         }
         chunk_summaries.append(chunk_summary)
+        add_duration(ACTIVE_PROFILE, "chunk_processing_s", chunk_started_at)
 
         if args.progress:
             print(
@@ -1828,11 +1907,13 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                 flush=True,
             )
 
+    health_started_at = time.perf_counter()
     health_series_rows = build_pv_health_rollups(
         settings,
         pv_daily_values_by_year,
         pv_daily_values_by_year_month,
     )
+    add_duration(ACTIVE_PROFILE, "health_rollup_s", health_started_at)
     if args.write and health_series_rows:
         for batch_index, batch in enumerate(chunked(health_series_rows, args.batch_size), start=1):
             response = http_post_bytes(settings, "/api/v1/import", serialize_import_jsonl(batch))
@@ -1847,6 +1928,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             )
         total_batches += len(chunked(health_series_rows, args.batch_size))
     seen_series_keys.update(tuple(sorted(row["metric"].items())) for row in health_series_rows)
+    ACTIVE_PROFILE["total_s"] = time.perf_counter() - total_started_at
 
     summary = {
         "mode": "write" if args.write else "dry-run",
@@ -1871,6 +1953,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "batches": total_batches,
         "batch_size": args.batch_size,
         "import_results": import_results,
+        "profile": {key: round(float(value), 6) for key, value in ACTIVE_PROFILE.items()},
     }
     print(json.dumps(summary, indent=2, ensure_ascii=True))
     return 0

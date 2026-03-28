@@ -202,6 +202,11 @@ Historical note: a dedicated clamp month comparison dashboard existed during eva
 
 Current status after interactive review:
 
+Current year-dashboard note:
+
+- the VM year dashboard source now exists as [VM_ EVCC_ Jahr.json](/D:/AI-Workspaces/evcc-grafana-dashboards/dashboards/original/en/VM_%20EVCC_%20Jahr.json) and is under active panel-by-panel review against the Influx reference
+- for vehicle odometer in the year dashboard, the accepted semantics are currently `max known odometer per vehicle`; this matches the legacy Influx view better than `last raw odometer point`, because raw VM odometer series can split by loadpoint and later emit zero values
+
 - month dashboard is now close to the Influx legacy layout for the most important panels
 - `Monthly energy totals`, `Energy`, `Metrics`, `Home: Energy consumption`, `Total: Energy distribution`, `Battery summary`, `Home battery levels`, and `Metric gauges` are implemented and rendering in Grafana
 - `Metric gauges` now uses stable monthly inputs via hidden daily series plus `reduce(sum)` rather than long-range direct integrate queries
@@ -302,6 +307,35 @@ Important operational note:
   - VM import time
   - monthly chunk overhead on multi-year history
 - only optimize after those measurements identify the real bottleneck
+- profiling output is now built into `scripts/evcc-vm-rollup.py`; the first short dry-run indicated VM HTTP/query time as the main cost center, with price aggregation the next biggest bucket
+- additionally review whether some current or planned derived metrics should stay as dashboard-side MetricsQL aggregations instead of extra stored rollups
+- concrete first candidates: top-5 / top-30 PV-health style aggregates, which may be simple enough to compute on demand
+
+Current classification after the first review:
+
+Keep as rollup:
+
+- `*_energy_daily_wh` families for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`; these are the shared long-range baseline and should stay materialized
+- `battery_soc_daily_min_pct` and `battery_soc_daily_max_pct`; small, stable, and reused across multiple dashboards
+- `grid_import_daily_wh`; now tied to the real `gridEnergy` counter and therefore the cleanest import baseline
+- `grid_export_daily_wh`, `battery_charge_daily_wh`, and `battery_discharge_daily_wh`; still needed as reusable long-range daily baselines
+- quarter-hour-weighted finance series such as `grid_import_cost_daily_eur`, `grid_import_price_*_daily_ct_per_kwh`, and `grid_export_credit_daily_eur`; these are too expensive and too awkward to rebuild ad hoc in many panels
+- `vehicle_charge_cost_daily_eur` and `potential_vehicle_charge_cost_daily_eur`; reused daily vehicle-cost baselines with the same quarter-hour tariff dependency
+- `potential_home_cost_daily_eur`, `potential_loadpoint_cost_daily_eur`, `battery_discharge_value_daily_eur`, and `battery_charge_feedin_cost_daily_eur`; accepted balance/amortization base series
+- `pv_top30_mean_yearly_wh` and `pv_top5_mean_monthly_wh` for now; despite the general preference to avoid excess rollups, these two are not elegant to derive from the current daily-series shape in plain MetricsQL; direct VM prototypes such as `topk_avg(5, last_over_time(evcc_pv_energy_daily_wh{...}[400d]))` only rank the single month series and do not reproduce the Influx-style top-N-over-points result
+
+Better kept in dashboard queries or Grafana math:
+
+- yearly and monthly sums over existing daily rollups
+- top tables such as `highest yield`, `highest feed-in`, and `highest home consumption`
+- power-balance totals and comparisons composed from existing daily rollups
+- PV and battery amortization ratios, payback durations, and annualized projections
+- vehicle summary panels that combine already materialized daily energy/cost/distance series with lightweight dashboard math
+
+Practical rule going forward:
+
+- materialize only when the result is either reused in many places or hard to express efficiently from the existing daily series
+- prefer dashboard-side aggregation when the result is just a sum, average, ratio, ranking table, or other lightweight composition over existing daily rollups
 
 ## Runtime hint
 
@@ -327,4 +361,13 @@ Important deployment note:
 2. [victoriametrics-rollup-design.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/victoriametrics-rollup-design.md)
 3. [victoriametrics-handoff-2026-03-21.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/victoriametrics-handoff-2026-03-21.md)
 4. [vm-thread-restart-handoff-2026-03-21.md](/D:/AI-Workspaces/evcc-grafana-dashboards/docs/vm-thread-restart-handoff-2026-03-21.md)
+
+
+
+Dashboard color palette (fixed where possible):
+- PV: #73BF69
+- Grid import: #E24D42
+- Home: #5794F2
+- Feed-in: #2F8F5B
+- Other: #9FA7B3
 
