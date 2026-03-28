@@ -308,6 +308,11 @@ Important operational note:
   - monthly chunk overhead on multi-year history
 - only optimize after those measurements identify the real bottleneck
 - profiling output is now built into `scripts/evcc-vm-rollup.py`; the first short dry-run indicated VM HTTP/query time as the main cost center, with price aggregation the next biggest bucket
+- after a full production rebuild from `2025-01-01` to `2026-03-27`, total runtime was about `562.65s`; the dominant cost was `http_get_json_s ~= 472.56s` over `14883` calls, while import/write time stayed negligible at about `0.4s`
+- this means the next real optimization work should target read/query consolidation, not the VM write path
+- priority 1 is to merge tariff/cost data fetches so shared grid/tariff/feed-in/vehicle inputs are loaded once per chunk and reused locally for the quarter-hour and daily price/cost rollups
+- priority 2 is to merge the positive-energy raw fetches for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`, then split them by day and label in Python instead of repeating many day-local range queries
+- smaller candidates such as `batterySoc` step size or catalog fetch overhead should only be revisited after those two larger query-count reductions land
 - additionally review whether some current or planned derived metrics should stay as dashboard-side MetricsQL aggregations instead of extra stored rollups
 - concrete first candidates: top-5 / top-30 PV-health style aggregates, which may be simple enough to compute on demand
 
