@@ -33,72 +33,57 @@
     },
     {
       "id": 12,
-      "title": "Energy",
-      "type": "barchart",
+      "title": "Energy totals",
+      "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 11,
-        "w": 3,
+        "h": 6,
+        "w": 4,
         "x": 0,
         "y": 1
       },
       "pluginVersion": "12.3.3",
-      "transparent": true,
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
-            "fixedColor": "orange",
-            "mode": "fixed"
+            "mode": "palette-classic"
           },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "hidden",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
-                "value": null
+                "value": 0
               }
             ]
           },
-          "unit": "kWh"
+          "unit": "locale",
+          "min": 0,
+          "custom": {
+            "barRadius": 0.18
+          }
         },
         "overrides": [
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "PV"
             },
             "properties": [
               {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
                 "id": "color",
                 "value": {
-                  "fixedColor": "dark-yellow",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
                 }
               }
             ]
@@ -106,14 +91,18 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Grid import"
             },
             "properties": [
               {
+                "id": "displayName",
+                "value": "Grid import"
+              },
+              {
                 "id": "color",
                 "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
                 }
               }
             ]
@@ -125,10 +114,33 @@
             },
             "properties": [
               {
+                "id": "displayName",
+                "value": "Home"
+              },
+              {
                 "id": "color",
                 "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#5794F2"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Feed-in"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Feed-in"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#2F8F5B"
                 }
               }
             ]
@@ -142,8 +154,8 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#FF9830"
                 }
               }
             ]
@@ -157,23 +169,8 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "dark-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "PV"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#FADE2A"
                 }
               }
             ]
@@ -187,8 +184,8 @@
               {
                 "id": "color",
                 "value": {
-                  "fixedColor": "super-light-orange",
-                  "mode": "fixed"
+                  "mode": "fixed",
+                  "fixedColor": "#FFB357"
                 }
               }
             ]
@@ -196,26 +193,21 @@
         ]
       },
       "options": {
-        "barRadius": 0.2,
-        "barWidth": 0.7,
-        "fullHighlight": false,
-        "groupWidth": 1,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "displayMode": "gradient",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         },
-        "orientation": "auto",
-        "showValue": "always",
-        "stacking": "none",
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        "showUnfilled": true,
+        "sizing": "auto",
+        "text": {
+          "titleSize": 10,
+          "valueSize": 12
+        }
       },
       "targets": [
         {
@@ -228,7 +220,8 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
           "legendFormat": "Grid import",
-          "range": false
+          "range": false,
+          "format": "time_series"
         },
         {
           "refId": "pvTotal",
@@ -240,7 +233,8 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
           "legendFormat": "PV",
-          "range": false
+          "range": false,
+          "format": "time_series"
         },
         {
           "refId": "homeTotal",
@@ -252,7 +246,8 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
           "legendFormat": "Home",
-          "range": false
+          "range": false,
+          "format": "time_series"
         },
         {
           "refId": "loadpointTotals",
@@ -264,7 +259,8 @@
           "expr": "sort_by_label(sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
           "instant": true,
           "legendFormat": "{{loadpoint}}",
-          "range": false
+          "range": false,
+          "format": "time_series"
         },
         {
           "refId": "feedInTotal",
@@ -276,9 +272,12 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
           "legendFormat": "Feed-in",
-          "range": false
+          "range": false,
+          "format": "time_series"
         }
-      ]
+      ],
+      "description": "",
+      "transparent": true
     },
     {
       "id": 19,
@@ -289,9 +288,9 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 11,
-        "w": 5,
-        "x": 3,
+        "h": 6,
+        "w": 4,
+        "x": 4,
         "y": 1
       },
       "pluginVersion": "12.3.3",
@@ -436,7 +435,7 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 11,
+        "h": 6,
         "w": 16,
         "x": 8,
         "y": 1
@@ -690,9 +689,9 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 3,
+        "w": 4,
         "x": 0,
-        "y": 12
+        "y": 7
       },
       "pluginVersion": "12.3.3",
       "transparent": true,
@@ -894,9 +893,9 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 5,
-        "x": 3,
-        "y": 12
+        "w": 4,
+        "x": 4,
+        "y": 7
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -1043,7 +1042,7 @@
         "h": 6,
         "w": 16,
         "x": 8,
-        "y": 12
+        "y": 7
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -1295,9 +1294,9 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 5,
-        "x": 3,
-        "y": 18
+        "w": 4,
+        "x": 4,
+        "y": 13
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -1444,7 +1443,7 @@
         "h": 6,
         "w": 16,
         "x": 8,
-        "y": 18
+        "y": 13
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -1821,9 +1820,9 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 3,
+        "w": 4,
         "x": 0,
-        "y": 24
+        "y": 19
       },
       "id": 16,
       "options": {
@@ -1923,9 +1922,9 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 5,
-        "x": 3,
-        "y": 24
+        "w": 4,
+        "x": 4,
+        "y": 19
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2072,7 +2071,7 @@
         "h": 6,
         "w": 16,
         "x": 8,
-        "y": 24
+        "y": 19
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2326,7 +2325,7 @@
         "h": 11,
         "w": 8,
         "x": 0,
-        "y": 36
+        "y": 25
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2446,7 +2445,7 @@
         "h": 11,
         "w": 8,
         "x": 8,
-        "y": 36
+        "y": 25
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2566,7 +2565,7 @@
         "h": 11,
         "w": 8,
         "x": 16,
-        "y": 36
+        "y": 25
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
