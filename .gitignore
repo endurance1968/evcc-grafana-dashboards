@@ -4,7 +4,11 @@
 .env.local
 
 # Test artifacts
-tests/artifacts/
+tests/artifacts/*
+!tests/artifacts/screenshots/
+tests/artifacts/screenshots/*
+!tests/artifacts/screenshots/vm/
+!tests/artifacts/screenshots/vm/**
 
 # Playwright cache/state
 .playwright/
