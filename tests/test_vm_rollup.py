@@ -234,6 +234,23 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(len(chunks[0][1]), 4)
 
 
+    def test_build_fetch_blocks_splits_large_month_into_multiple_blocks(self):
+        windows = MODULE.build_day_windows(
+            self.settings,
+            MODULE.parse_local_day("2026-01-01", "--start-day"),
+            MODULE.parse_local_day("2026-01-08", "--end-day"),
+        )
+        blocks, block_by_day = MODULE.build_fetch_blocks("2026-01", windows, step_seconds=10, max_points_per_series=28000)
+        self.assertGreater(len(blocks), 1)
+        self.assertEqual(block_by_day["2026-01-01"].name, "2026-01-b1")
+        self.assertEqual(block_by_day["2026-01-08"].name, blocks[-1].name)
+
+    def test_slice_samples_can_include_last_sample_before_range(self):
+        samples = [(90, 1.0), (100, 2.0), (110, 3.0)]
+        sliced = MODULE.slice_samples(samples, 100, 111, include_last_before=True)
+        self.assertEqual(sliced, [(90, 1.0), (100, 2.0), (110, 3.0)])
+
+
     def test_quarter_hour_price_rollups_calculates_all_price_metrics(self):
         bucket_starts = [0, 900]
         grid_samples = []
