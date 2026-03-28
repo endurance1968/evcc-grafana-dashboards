@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "总计"
             },
             "properties": [
               {
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "总计"
             },
             "properties": [
               {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "总计"
             },
             "properties": [
               {
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "总计"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "预测"
             },
             "properties": [
               {
@@ -782,7 +782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "实际"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "预报",
+          "legendFormat": "预测",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -854,7 +854,7 @@
           "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "实际值",
+          "legendFormat": "实际",
           "range": true,
           "refId": "pvStringEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "预报",
+      "title": "预测",
       "transformations": [
         {
           "id": "reduce",
@@ -967,7 +967,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "实际"
             },
             "properties": [
               {
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "预测"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "预报",
+          "legendFormat": "预测",
           "range": true,
           "refId": "forecast"
         },
@@ -1048,12 +1048,12 @@
           "editorMode": "code",
           "expr": "avg(pvPower_value{id=\"\"})",
           "format": "time_series",
-          "legendFormat": "实际值",
+          "legendFormat": "实际",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "预报",
+      "title": "预测",
       "type": "timeseries"
     },
     {
@@ -1095,7 +1095,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1282,7 +1282,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1413,7 +1413,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "总计"
             },
             "properties": [
               {
@@ -1630,7 +1630,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1762,7 +1762,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "家"
             },
             "properties": [
               {
@@ -1941,7 +1941,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "家"
             },
             "properties": [
               {
@@ -2096,7 +2096,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2266,7 +2266,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "电网购电"
             },
             "properties": [
               {
@@ -2305,7 +2305,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "价格"
             },
             "properties": [
               {
@@ -2607,7 +2607,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einkauf"
+              "options": "购入"
             },
             "properties": [
               {
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkauf"
+              "options": "售出"
             },
             "properties": [
               {
@@ -2733,7 +2733,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2903,7 +2903,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "电网购电"
             },
             "properties": [
               {
@@ -2946,7 +2946,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CO2"
+              "options": "二氧化碳"
             },
             "properties": [
               {
@@ -4051,7 +4051,7 @@
       {
         "current": {
           "selected": true,
-          "text": "All",
+          "text": "全部",
           "value": "$__all"
         },
         "datasource": {

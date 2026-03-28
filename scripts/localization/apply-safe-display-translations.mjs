@@ -26,6 +26,24 @@ const safePropertyIds = new Set([
   "displayNameFromDS",
 ]);
 
+function translateMatcherOptions(node, mapping) {
+  if (!node || typeof node !== "object") {
+    return node;
+  }
+
+  if (
+    node.id === "byName" &&
+    typeof node.options === "string"
+  ) {
+    return {
+      ...node,
+      options: translateString(node.options, mapping),
+    };
+  }
+
+  return node;
+}
+
 const aliasRiskyKeys = new Set([
   "refId",
   "expression",
@@ -248,7 +266,7 @@ function translateSafeNode(node, mapping) {
     };
   }
 
-  return result;
+  return translateMatcherOptions(result, mapping);
 }
 
 function main() {

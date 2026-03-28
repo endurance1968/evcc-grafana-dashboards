@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "Previsione"
             },
             "properties": [
               {
@@ -782,7 +782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "Reale"
             },
             "properties": [
               {
@@ -967,7 +967,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "Reale"
             },
             "properties": [
               {
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "Previsione"
             },
             "properties": [
               {
@@ -1095,7 +1095,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1282,7 +1282,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1413,7 +1413,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -1630,7 +1630,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1762,7 +1762,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1941,7 +1941,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -2096,7 +2096,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2266,7 +2266,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Prelievo dalla rete"
             },
             "properties": [
               {
@@ -2305,7 +2305,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "Prezzo"
             },
             "properties": [
               {
@@ -2607,7 +2607,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einkauf"
+              "options": "Acquisto"
             },
             "properties": [
               {
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkauf"
+              "options": "Vendita"
             },
             "properties": [
               {
@@ -2733,7 +2733,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2903,7 +2903,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Prelievo dalla rete"
             },
             "properties": [
               {
@@ -4051,7 +4051,7 @@
       {
         "current": {
           "selected": true,
-          "text": "All",
+          "text": "Tutti",
           "value": "$__all"
         },
         "datasource": {

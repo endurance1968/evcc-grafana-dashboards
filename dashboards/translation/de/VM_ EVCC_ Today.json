@@ -248,7 +248,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV forecast"
+                "options": "PV Vorhersage"
               },
               "properties": [
                 {
@@ -387,7 +387,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "1h",
-            "legendFormat": "PV forecast",
+            "legendFormat": "PV Vorhersage",
             "range": true,
             "refId": "pvForecast"
           }

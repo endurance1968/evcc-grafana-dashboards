@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "Voorspelling"
             },
             "properties": [
               {
@@ -782,7 +782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "Werkelijk"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "Voorsp",
+          "legendFormat": "Voorspelling",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "Voorsp",
+      "title": "Voorspelling",
       "transformations": [
         {
           "id": "reduce",
@@ -967,7 +967,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "Werkelijk"
             },
             "properties": [
               {
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "Voorspelling"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Voorsp",
+          "legendFormat": "Voorspelling",
           "range": true,
           "refId": "forecast"
         },
@@ -1053,7 +1053,7 @@
           "refId": "A"
         }
       ],
-      "title": "Voorsp",
+      "title": "Voorspelling",
       "type": "timeseries"
     },
     {
@@ -1095,7 +1095,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1282,7 +1282,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1413,7 +1413,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -1630,7 +1630,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1762,7 +1762,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Huis"
             },
             "properties": [
               {
@@ -1941,7 +1941,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Huis"
             },
             "properties": [
               {
@@ -2096,7 +2096,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Gemiddelde"
             },
             "properties": [
               {
@@ -2266,7 +2266,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Netafname"
             },
             "properties": [
               {
@@ -2305,7 +2305,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "Prijs"
             },
             "properties": [
               {
@@ -2607,7 +2607,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einkauf"
+              "options": "Aankoop"
             },
             "properties": [
               {
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkauf"
+              "options": "Verkoop"
             },
             "properties": [
               {
@@ -2733,7 +2733,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Gemiddelde"
             },
             "properties": [
               {
@@ -2903,7 +2903,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Netafname"
             },
             "properties": [
               {
@@ -4051,7 +4051,7 @@
       {
         "current": {
           "selected": true,
-          "text": "All",
+          "text": "Alle",
           "value": "$__all"
         },
         "datasource": {

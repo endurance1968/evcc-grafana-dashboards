@@ -4051,7 +4051,7 @@
       {
         "current": {
           "selected": true,
-          "text": "All",
+          "text": "Alle",
           "value": "$__all"
         },
         "datasource": {

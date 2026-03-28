@@ -20,7 +20,7 @@
   "panels": [
     {
       "id": 33,
-      "title": "Energy",
+      "title": "ऊर्जा",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -33,7 +33,7 @@
     },
     {
       "id": 12,
-      "title": "Energy totals",
+      "title": "ऊर्जा कुल",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -72,7 +72,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -91,12 +91,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "ग्रिड आयात"
               },
               {
                 "id": "color",
@@ -110,12 +110,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "घर"
               },
               {
                 "id": "color",
@@ -129,12 +129,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "ग्रिड में आपूर्ति"
               },
               {
                 "id": "color",
@@ -219,7 +219,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
-          "legendFormat": "Grid import",
+          "legendFormat": "ग्रिड आयात",
           "range": false,
           "format": "time_series"
         },
@@ -245,7 +245,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": false,
           "format": "time_series"
         },
@@ -271,7 +271,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "instant": true,
-          "legendFormat": "Feed-in",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "range": false,
           "format": "time_series"
         }
@@ -281,7 +281,7 @@
     },
     {
       "id": 19,
-      "title": "Yearly yield",
+      "title": "वार्षिक उपज",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -428,7 +428,7 @@
     },
     {
       "id": 25,
-      "title": "Monthly yield/year",
+      "title": "मासिक उपज/वर्ष",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -497,7 +497,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               },
               {
                 "id": "decimals",
@@ -681,7 +681,7 @@
     },
     {
       "id": 24,
-      "title": "Metric gauges",
+      "title": "मेट्रिक गेज",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -719,7 +719,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -740,14 +740,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "आत्मनिर्भरता"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "स्व-उपभोग"
             },
             "properties": [
               {
@@ -768,7 +768,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "स्व-उपभोग"
               }
             ]
           }
@@ -815,7 +815,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Grid import",
+          "legendFormat": "ग्रिड आयात",
           "range": false,
           "refId": "gridEnergyIn"
         },
@@ -828,7 +828,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Feed-in",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "range": false,
           "refId": "gridEnergyOut"
         },
@@ -841,7 +841,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": false,
           "refId": "homeEnergy"
         },
@@ -854,7 +854,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Loadpoints",
+          "legendFormat": "लोडपॉइंट",
           "range": false,
           "refId": "loadpointEnergy"
         },
@@ -884,7 +884,7 @@
     },
     {
       "id": 29,
-      "title": "Yearly home consumption",
+      "title": "वार्षिक घरेलू खपत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1031,7 +1031,7 @@
     },
     {
       "id": 14,
-      "title": "Monthly home consumption/year",
+      "title": "मासिक घरेलू खपत/वर्ष",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1101,7 +1101,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               },
               {
                 "id": "decimals",
@@ -1285,7 +1285,7 @@
     },
     {
       "id": 27,
-      "title": "Yearly grid import",
+      "title": "वार्षिक ग्रिड आयात",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1432,7 +1432,7 @@
     },
     {
       "id": 15,
-      "title": "Monthly grid import/year",
+      "title": "मासिक ग्रिड आयात/वर्ष",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1502,7 +1502,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               },
               {
                 "id": "decimals",
@@ -1717,7 +1717,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "बैटरी चार्ज"
               },
               {
                 "id": "decimals",
@@ -1737,7 +1737,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "बैटरी डिस्चार्ज"
               },
               {
                 "id": "decimals",
@@ -1757,7 +1757,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "बैटरी दक्षता"
               },
               {
                 "id": "decimals",
@@ -1784,7 +1784,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "औसत अधिकतम SOC"
               },
               {
                 "id": "unit",
@@ -1804,7 +1804,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "औसत न्यूनतम SOC"
               },
               {
                 "id": "unit",
@@ -1908,12 +1908,12 @@
           "refId": "minSoc"
         }
       ],
-      "title": "Battery summary",
+      "title": "बैटरी सारांश",
       "type": "stat"
     },
     {
       "id": 17,
-      "title": "Yearly feed-in",
+      "title": "वार्षिक आपूर्ति",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2060,7 +2060,7 @@
     },
     {
       "id": 18,
-      "title": "Monthly feed-in/year",
+      "title": "मासिक आपूर्ति/वर्ष",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2130,7 +2130,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               },
               {
                 "id": "decimals",
@@ -2314,7 +2314,7 @@
     },
     {
       "id": 38,
-      "title": "Days with highest yield",
+      "title": "सबसे अधिक उपज वाले दिन",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2434,7 +2434,7 @@
     },
     {
       "id": 39,
-      "title": "Highest feed-in",
+      "title": "सबसे अधिक आपूर्ति",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2501,7 +2501,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -2532,7 +2532,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Feed-in"
+            "displayName": "ग्रिड में आपूर्ति"
           }
         ]
       },
@@ -2546,7 +2546,7 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_grid_export_daily_wh{db=\"$dbLabel\"}) / 1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "range": true,
           "interval": "1d"
         }
@@ -2554,7 +2554,7 @@
     },
     {
       "id": 40,
-      "title": "Highest home consumption",
+      "title": "सबसे अधिक घरेलू खपत",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2621,7 +2621,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "घरेलू खपत"
             },
             "properties": [
               {
@@ -2652,7 +2652,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Home consumption"
+            "displayName": "घरेलू खपत"
           }
         ]
       },
@@ -2666,7 +2666,7 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_home_energy_daily_wh{db=\"$dbLabel\"}) / 1000",
           "format": "time_series",
-          "legendFormat": "Home consumption",
+          "legendFormat": "घरेलू खपत",
           "range": true,
           "interval": "1d"
         }
@@ -2674,7 +2674,7 @@
     },
     {
       "id": 52,
-      "title": "Plant health",
+      "title": "प्लांट स्वास्थ्य",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2687,7 +2687,7 @@
     },
     {
       "id": 53,
-      "title": "Average top 30 days/year",
+      "title": "प्रति वर्ष शीर्ष 30 दिनों का औसत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2834,7 +2834,7 @@
     },
     {
       "id": 54,
-      "title": "Average top 5 days/month",
+      "title": "प्रति माह शीर्ष 5 दिनों का औसत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2903,7 +2903,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               },
               {
                 "id": "decimals",
@@ -3088,7 +3088,7 @@
     },
     {
       "id": 41,
-      "title": "Finances",
+      "title": "वित्त",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3101,7 +3101,7 @@
     },
     {
       "id": 28,
-      "title": "Monthly costs",
+      "title": "मासिक लागत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3170,7 +3170,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "माह"
               }
             ]
           },
@@ -3326,7 +3326,7 @@
     },
     {
       "id": 46,
-      "title": "Balance",
+      "title": "संतुलन",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3339,7 +3339,7 @@
     },
     {
       "id": 47,
-      "title": "Power balance",
+      "title": "शक्ति संतुलन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3384,7 +3384,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "बिजली कीमत: अंकगणितीय औसत"
               },
               {
                 "id": "color",
@@ -3407,7 +3407,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "प्रभावी बिजली कीमत, गतिशील"
               },
               {
                 "id": "color",
@@ -3430,7 +3430,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "गतिशील टैरिफ से बचाई गई बिजली कीमत"
               },
               {
                 "id": "unit",
@@ -3446,7 +3446,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "अंकगणितीय कीमत पर संभावित खरीद"
               }
             ]
           },
@@ -3458,7 +3458,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "खरीदा गया, गतिशील"
               }
             ]
           },
@@ -3470,7 +3470,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "गतिशील टैरिफ से बचत"
               }
             ]
           },
@@ -3482,7 +3482,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "बेचा गया (आपूर्ति)"
               },
               {
                 "id": "color",
@@ -3501,7 +3501,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "संतुलन"
               }
             ]
           }
@@ -3636,7 +3636,7 @@
     },
     {
       "id": 50,
-      "title": "PV Anlage Amortisation",
+      "title": "PV सिस्टम अमोर्टाइजेशन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3678,7 +3678,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far without PV"
+                "value": "PV के बिना अब तक ऊर्जा लागत"
               },
               {
                 "id": "color",
@@ -3697,7 +3697,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased energy costs so far"
+                "value": "अब तक खरीदी गई ऊर्जा लागत"
               },
               {
                 "id": "color",
@@ -3716,7 +3716,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in compensation so far"
+                "value": "अब तक आपूर्ति प्रतिफल"
               },
               {
                 "id": "color",
@@ -3735,7 +3735,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far"
+                "value": "अब तक ऊर्जा लागत"
               },
               {
                 "id": "thresholds",
@@ -3763,7 +3763,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Capital backflow so far"
+                "value": "अब तक पूंजी वापसी"
               },
               {
                 "id": "color",
@@ -3782,7 +3782,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "पूर्वानुमान आधारित"
               },
               {
                 "id": "unit",
@@ -3809,7 +3809,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly capital backflow"
+                "value": "वार्षिक पूंजी वापसी"
               }
             ]
           },
@@ -3821,7 +3821,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "वापसी अवधि"
               },
               {
                 "id": "unit",
@@ -3837,7 +3837,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "वार्षिक वापसी दर"
               },
               {
                 "id": "unit",
@@ -4002,7 +4002,7 @@
     },
     {
       "id": 51,
-      "title": "Speicher Amortisation",
+      "title": "बैटरी अमोर्टाइजेशन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4044,7 +4044,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Charged energy"
+                "value": "चार्ज की गई ऊर्जा"
               },
               {
                 "id": "unit",
@@ -4067,7 +4067,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Discharged energy"
+                "value": "डिस्चार्ज की गई ऊर्जा"
               },
               {
                 "id": "unit",
@@ -4090,7 +4090,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Storage losses"
+                "value": "स्टोरेज हानि"
               },
               {
                 "id": "unit",
@@ -4113,7 +4113,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Full cycles"
+                "value": "पूर्ण चक्र"
               },
               {
                 "id": "unit",
@@ -4133,7 +4133,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "पूर्वानुमान आधारित"
               },
               {
                 "id": "unit",
@@ -4160,7 +4160,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback"
+                "value": "वार्षिक वापसी"
               }
             ]
           },
@@ -4172,7 +4172,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "वापसी अवधि"
               },
               {
                 "id": "unit",
@@ -4188,7 +4188,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "वार्षिक वापसी दर"
               },
               {
                 "id": "unit",
@@ -4342,7 +4342,7 @@
     },
     {
       "id": 48,
-      "title": "Fahrzeuge",
+      "title": "वाहन",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4355,7 +4355,7 @@
     },
     {
       "id": 49,
-      "title": "Driving costs $vehicle",
+      "title": "$vehicle ड्राइविंग लागत",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4411,7 +4411,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Driven kilometers"
+                "value": "चले हुए किलोमीटर"
               },
               {
                 "id": "color",
@@ -4434,7 +4434,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Estimated consumption"
+                "value": "अनुमानित खपत"
               },
               {
                 "id": "decimals",
@@ -4465,7 +4465,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Solar share"
+                "value": "सौर हिस्सा"
               },
               {
                 "id": "color",
@@ -4492,7 +4492,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effective charging price/kWh"
+                "value": "प्रभावी चार्जिंग कीमत/kWh"
               },
               {
                 "id": "color",
@@ -4511,7 +4511,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle without PV"
+                "value": "$vehicle ड्राइविंग लागत PV के बिना"
               },
               {
                 "id": "color",
@@ -4530,7 +4530,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle with PV"
+                "value": "$vehicle ड्राइविंग लागत PV के साथ"
               },
               {
                 "id": "color",
@@ -4549,7 +4549,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings thanks to PV"
+                "value": "PV से ड्राइविंग लागत की बचत"
               },
               {
                 "id": "thresholds",
@@ -4577,7 +4577,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Combustion engine driving costs"
+                "value": "इंजन वाहन चलाने की लागत"
               }
             ]
           },
@@ -4589,7 +4589,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings vs combustion engine"
+                "value": "इंजन वाहन की तुलना में बचत"
               },
               {
                 "id": "thresholds",
@@ -4766,7 +4766,7 @@
         "name": "dbLabel",
         "type": "constant",
         "query": "evcc",
-        "label": "DB Label",
+        "label": "DB लेबल",
         "current": {
           "text": "evcc",
           "value": "evcc"
@@ -4783,7 +4783,7 @@
         "name": "peakPowerLimit",
         "type": "constant",
         "query": "25000",
-        "label": "Peak Power Limit",
+        "label": "अधिकतम शक्ति सीमा",
         "current": {
           "text": "25000",
           "value": "25000"
@@ -4800,7 +4800,7 @@
         "name": "energySampleInterval",
         "type": "constant",
         "query": "30s",
-        "label": "Energy Sample Interval",
+        "label": "ऊर्जा सैंपल अंतराल",
         "current": {
           "text": "30s",
           "value": "30s"
@@ -4817,7 +4817,7 @@
         "name": "tariffPriceInterval",
         "type": "constant",
         "query": "15m",
-        "label": "Tariff Price Interval",
+        "label": "टैरिफ अंतराल",
         "current": {
           "text": "15m",
           "value": "15m"
@@ -4834,7 +4834,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Loadpoint Blocklist",
+        "label": "लोडपॉइंट ब्लॉकलिस्ट",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4851,7 +4851,7 @@
         "name": "extBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "EXT Blocklist",
+        "label": "EXT ब्लॉकलिस्ट",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4868,7 +4868,7 @@
         "name": "auxBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "AUX Blocklist",
+        "label": "AUX ब्लॉकलिस्ट",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4898,9 +4898,9 @@
         "label": "installedWattPeak"
       },
       {
-        "description": "Regex fuer Fahrzeuge, die nicht angezeigt werden sollen.",
+        "description": "छिपाए जाने वाले वाहनों के लिए Regex।",
         "hide": 2,
-        "label": "Vehicle Blocklist",
+        "label": "वाहन ब्लॉकलिस्ट",
         "name": "vehicleBlocklist",
         "query": "^Altherma-3$",
         "skipUrlSync": true,
@@ -4927,7 +4927,7 @@
         "definition": "label_values(sessionPricePerKWh_value{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
         "hide": 0,
         "includeAll": true,
-        "label": "Vehicle",
+        "label": "वाहन",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -4947,7 +4947,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "ICE consumption l/100km",
+        "label": "इंजन खपत l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -4965,7 +4965,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "Fuel price/l",
+        "label": "ईंधन मूल्य/लीटर",
         "name": "spritKosten",
         "options": [
           {
@@ -4983,7 +4983,7 @@
           "value": "24884"
         },
         "includeAll": false,
-        "label": "PV purchase price",
+        "label": "PV खरीद मूल्य",
         "name": "purchasePricePv",
         "options": [
           {
@@ -4994,7 +4994,7 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "PV system investment cost"
+        "description": "PV सिस्टम निवेश लागत"
       },
       {
         "current": {
@@ -5002,7 +5002,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "Battery purchase price",
+        "label": "बैटरी खरीद मूल्य",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -5013,7 +5013,7 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "Battery investment cost"
+        "description": "बैटरी निवेश लागत"
       },
       {
         "current": {
@@ -5021,7 +5021,7 @@
           "value": "100"
         },
         "includeAll": false,
-        "label": "Running costs",
+        "label": "चालू लागत",
         "name": "runningCosts",
         "options": [
           {
@@ -5032,7 +5032,7 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "Yearly recurring system costs"
+        "description": "वार्षिक आवर्ती सिस्टम लागत"
       },
       {
         "current": {
@@ -5040,7 +5040,7 @@
           "value": "9500"
         },
         "includeAll": false,
-        "label": "Battery capacity / Wh",
+        "label": "बैटरी क्षमता / Wh",
         "name": "speicherkapazitaet",
         "options": [
           {
@@ -5051,7 +5051,7 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "Usable home battery capacity in Wh"
+        "description": "Wh में उपयोगी घरेलू बैटरी क्षमता"
       }
     ]
   },
@@ -5061,7 +5061,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: All-time",
+  "title": "VM: EVCC: ऑल-टाइम",
   "uid": "vm-alltime-en-orig",
   "version": 6,
   "weekStart": ""

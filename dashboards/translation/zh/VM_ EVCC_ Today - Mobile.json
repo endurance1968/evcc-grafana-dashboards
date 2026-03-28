@@ -143,7 +143,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "光伏发电"
               },
               "properties": [
                 {
@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "家"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netz"
+                "options": "电网"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "电池"
               },
               "properties": [
                 {
@@ -413,7 +413,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "光伏发电"
               },
               "properties": [
                 {
@@ -428,7 +428,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "家"
               },
               "properties": [
                 {
@@ -443,7 +443,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "电网购电"
               },
               "properties": [
                 {
@@ -473,7 +473,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "电池放电"
               },
               "properties": [
                 {
@@ -503,7 +503,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "馈入"
               },
               "properties": [
                 {
@@ -518,7 +518,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "电池充电"
               },
               "properties": [
                 {
@@ -737,7 +737,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "电池"
               },
               "properties": [
                 {
@@ -923,7 +923,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einkauf"
+                "options": "购入"
               },
               "properties": [
                 {
@@ -938,7 +938,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Verkauf"
+                "options": "售出"
               },
               "properties": [
                 {
@@ -1084,7 +1084,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "自给率"
               },
               "properties": [
                 {
@@ -1112,7 +1112,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "自耗率"
               },
               "properties": [
                 {
@@ -1325,7 +1325,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "自给率"
               },
               "properties": [
                 {
@@ -1344,7 +1344,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "自耗率"
               },
               "properties": [
                 {
@@ -1551,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "电网购电"
               },
               "properties": [
                 {
@@ -1566,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "馈入"
               },
               "properties": [
                 {
@@ -1581,7 +1581,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "家"
               },
               "properties": [
                 {
@@ -1611,7 +1611,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "电池充电"
               },
               "properties": [
                 {
@@ -1626,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "电池放电"
               },
               "properties": [
                 {
@@ -1656,7 +1656,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "光伏发电"
               },
               "properties": [
                 {
@@ -2044,7 +2044,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -2090,7 +2090,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netz"
+              "options": "电网"
             },
             "properties": [
               {
@@ -2135,7 +2135,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Speicher"
+              "options": "电池"
             },
             "properties": [
               {
@@ -2171,7 +2171,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "家"
             },
             "properties": [
               {

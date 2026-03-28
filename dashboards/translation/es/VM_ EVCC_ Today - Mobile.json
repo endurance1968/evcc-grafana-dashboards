@@ -143,7 +143,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "fotovoltaica"
               },
               "properties": [
                 {
@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Hogar"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netz"
+                "options": "Red"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "Batería"
               },
               "properties": [
                 {
@@ -413,7 +413,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "fotovoltaica"
               },
               "properties": [
                 {
@@ -428,7 +428,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Hogar"
               },
               "properties": [
                 {
@@ -443,7 +443,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "Consumo de red"
               },
               "properties": [
                 {
@@ -473,7 +473,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "Descargar bateria"
               },
               "properties": [
                 {
@@ -503,7 +503,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "Alimentación"
               },
               "properties": [
                 {
@@ -518,7 +518,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "Cargar bateria"
               },
               "properties": [
                 {
@@ -737,7 +737,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "Batería"
               },
               "properties": [
                 {
@@ -923,7 +923,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einkauf"
+                "options": "Compra"
               },
               "properties": [
                 {
@@ -938,7 +938,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Verkauf"
+                "options": "Venta"
               },
               "properties": [
                 {
@@ -1084,7 +1084,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autosuficiencia"
               },
               "properties": [
                 {
@@ -1112,7 +1112,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "Autoconsumo"
               },
               "properties": [
                 {
@@ -1325,7 +1325,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autosuficiencia"
               },
               "properties": [
                 {
@@ -1344,7 +1344,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "Autoconsumo"
               },
               "properties": [
                 {
@@ -1551,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "Consumo de red"
               },
               "properties": [
                 {
@@ -1566,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "Alimentación"
               },
               "properties": [
                 {
@@ -1581,7 +1581,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Hogar"
               },
               "properties": [
                 {
@@ -1611,7 +1611,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "Cargar bateria"
               },
               "properties": [
                 {
@@ -1626,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "Descargar bateria"
               },
               "properties": [
                 {
@@ -1656,7 +1656,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV"
+                "options": "fotovoltaica"
               },
               "properties": [
                 {
@@ -2044,7 +2044,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "fotovoltaica"
             },
             "properties": [
               {
@@ -2090,7 +2090,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netz"
+              "options": "Red"
             },
             "properties": [
               {
@@ -2135,7 +2135,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Speicher"
+              "options": "Batería"
             },
             "properties": [
               {
@@ -2171,7 +2171,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Hogar"
             },
             "properties": [
               {
