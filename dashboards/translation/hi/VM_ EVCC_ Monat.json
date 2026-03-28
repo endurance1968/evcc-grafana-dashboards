@@ -33,7 +33,7 @@
     },
     {
       "id": 19,
-      "title": "Monthly energy totals",
+      "title": "मासिक ऊर्जा कुल",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -89,7 +89,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "ग्रिड आयात"
               }
             ]
           },
@@ -101,7 +101,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "घर"
               }
             ]
           },
@@ -113,7 +113,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "ग्रिड में आपूर्ति"
               }
             ]
           },
@@ -132,7 +132,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -147,7 +147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -162,7 +162,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -222,7 +222,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -276,7 +276,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "ग्रिड आयात",
           "range": true,
           "refId": "gridMonthlyDaily",
           "hide": true,
@@ -290,7 +290,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": true,
           "refId": "homeMonthlyDaily",
           "hide": true,
@@ -318,7 +318,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "range": true,
           "refId": "feedInMonthlyDaily",
           "hide": true,
@@ -403,7 +403,7 @@
     },
     {
       "id": 25,
-      "title": "Energy",
+      "title": "ऊर्जा",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -476,7 +476,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -491,7 +491,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -506,7 +506,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -566,7 +566,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -626,7 +626,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "ग्रिड आयात",
           "range": true,
           "refId": "gridImport",
           "hide": false,
@@ -640,7 +640,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": true,
           "refId": "homeEnergy",
           "hide": false,
@@ -668,7 +668,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "range": true,
           "refId": "feedInEnergy",
           "hide": false,
@@ -757,12 +757,12 @@
           "type": "math"
         }
       ],
-      "title": "Specific yield",
+      "title": "विशिष्ट उपज",
       "type": "stat"
     },
     {
       "id": 24,
-      "title": "Metric gauges",
+      "title": "मेट्रिक गेज",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -800,7 +800,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -821,14 +821,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "आत्मनिर्भरता"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "स्व-उपभोग"
             },
             "properties": [
               {
@@ -849,7 +849,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "स्व-उपभोग"
               }
             ]
           }
@@ -1045,7 +1045,7 @@
     },
     {
       "id": 6,
-      "title": "Metrics",
+      "title": "मेट्रिक्स",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1104,7 +1104,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -1116,7 +1116,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-sufficiency"
+                "value": "आत्मनिर्भरता"
               }
             ]
           },
@@ -1176,7 +1176,7 @@
     },
     {
       "id": 34,
-      "title": "Home",
+      "title": "घर",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -1189,7 +1189,7 @@
     },
     {
       "id": 32,
-      "title": "Home: Energy distribution",
+      "title": "घर: ऊर्जा वितरण",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1213,7 +1213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1258,7 +1258,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Ext total",
+          "legendFormat": "EXT कुल",
           "range": false,
           "refId": "extSum",
           "hide": true
@@ -1271,7 +1271,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Aux total",
+          "legendFormat": "AUX कुल",
           "range": false,
           "refId": "auxSum",
           "hide": true
@@ -1284,7 +1284,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Home total",
+          "legendFormat": "घर कुल",
           "range": false,
           "refId": "homeTotalPie",
           "hide": true
@@ -1330,7 +1330,7 @@
     },
     {
       "id": 31,
-      "title": "Home: Energy consumption",
+      "title": "घर: ऊर्जा खपत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1406,7 +1406,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "अन्य"
               },
               {
                 "id": "color",
@@ -1451,7 +1451,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home total",
+          "legendFormat": "घर कुल",
           "range": true,
           "refId": "homeTotalDaily",
           "hide": true,
@@ -1465,7 +1465,7 @@
           "editorMode": "code",
           "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
-          "legendFormat": "Ext total",
+          "legendFormat": "EXT कुल",
           "range": true,
           "refId": "extTotalDaily",
           "hide": true,
@@ -1479,7 +1479,7 @@
           "editorMode": "code",
           "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
-          "legendFormat": "Aux total",
+          "legendFormat": "AUX कुल",
           "range": true,
           "refId": "auxTotalDaily",
           "hide": true,
@@ -1496,7 +1496,7 @@
           "refId": "OtherDaily",
           "type": "math",
           "settings": {
-            "displayName": "Other"
+            "displayName": "अन्य"
           }
         },
         {
@@ -1532,7 +1532,7 @@
     },
     {
       "id": 36,
-      "title": "Total: Energy distribution",
+      "title": "कुल: ऊर्जा वितरण",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1556,7 +1556,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1571,7 +1571,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "बैटरी"
             },
             "properties": [
               {
@@ -1619,7 +1619,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": true,
           "refId": "homeTotalPie",
           "hide": false,
@@ -1647,7 +1647,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge",
+          "legendFormat": "बैटरी चार्ज",
           "range": true,
           "refId": "batteryChargeTotal",
           "hide": true,
@@ -1661,7 +1661,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge",
+          "legendFormat": "बैटरी डिस्चार्ज",
           "range": true,
           "refId": "batteryDischargeTotal",
           "hide": true,
@@ -1682,7 +1682,7 @@
     },
     {
       "id": 37,
-      "title": "Total: Energy distribution",
+      "title": "कुल: ऊर्जा वितरण",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1741,7 +1741,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1768,7 +1768,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "बैटरी"
               }
             ]
           },
@@ -1818,7 +1818,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge",
+          "legendFormat": "बैटरी चार्ज",
           "range": true,
           "refId": "batteryChargeDaily",
           "hide": true,
@@ -1832,7 +1832,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge",
+          "legendFormat": "बैटरी डिस्चार्ज",
           "range": true,
           "refId": "batteryDischargeDaily",
           "hide": true,
@@ -1857,7 +1857,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "घर",
           "range": true,
           "refId": "homeDailyTotal",
           "hide": false,
@@ -1882,7 +1882,7 @@
     },
     {
       "id": 30,
-      "title": "Power balance",
+      "title": "शक्ति संतुलन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1927,7 +1927,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid price: arithmetic mean"
+                "value": "ग्रिड कीमत: अंकगणितीय औसत"
               },
               {
                 "id": "unit",
@@ -1950,7 +1950,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective price, dyn."
+                "value": "प्रभावी मूल्य, गतिशील"
               },
               {
                 "id": "unit",
@@ -1973,7 +1973,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved vs arith."
+                "value": "अंकगणितीय की तुलना में बचत"
               },
               {
                 "id": "unit",
@@ -1996,7 +1996,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential at arith."
+                "value": "अंकगणितीय पर संभावित"
               },
               {
                 "id": "unit",
@@ -2019,7 +2019,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "खरीदा गया, गतिशील"
               },
               {
                 "id": "unit",
@@ -2042,7 +2042,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings dyn."
+                "value": "गतिशील बचत"
               },
               {
                 "id": "unit",
@@ -2065,7 +2065,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "बेचा गया (आपूर्ति)"
               },
               {
                 "id": "unit",
@@ -2088,7 +2088,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "संतुलन"
               },
               {
                 "id": "unit",
@@ -2180,7 +2180,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Purchased energy daily",
+          "legendFormat": "दैनिक खरीदी गई ऊर्जा",
           "range": true,
           "refId": "energyPurchasedDaily",
           "hide": true,
@@ -2209,7 +2209,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Purchased daily",
+          "legendFormat": "दैनिक खरीदा गया",
           "range": true,
           "refId": "purchasedDaily",
           "hide": true,
@@ -2282,7 +2282,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Sold daily raw",
+          "legendFormat": "दैनिक बेचा गया कच्चा",
           "range": true,
           "refId": "soldDailyRaw",
           "hide": true,
@@ -2340,7 +2340,7 @@
     },
     {
       "id": 26,
-      "title": "Dynamic electricity price (ct/kWh)",
+      "title": "गतिशील बिजली कीमत (ct/kWh)",
       "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2423,7 +2423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2438,7 +2438,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "प्रभावी बिजली कीमत"
             },
             "properties": [
               {
@@ -2500,7 +2500,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Average",
+          "legendFormat": "औसत",
           "range": true,
           "refId": "avgPrice",
           "interval": "1d"
@@ -2513,7 +2513,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Effective electricity price",
+          "legendFormat": "प्रभावी बिजली कीमत",
           "range": true,
           "refId": "weightedAveragePrice",
           "interval": "1d"
@@ -2535,7 +2535,7 @@
     },
     {
       "id": 28,
-      "title": "Electricity costs",
+      "title": "बिजली लागत",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2596,12 +2596,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased"
+                "value": "खरीदा गया"
               }
             ]
           },
@@ -2651,7 +2651,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Purchased",
+          "legendFormat": "खरीदा गया",
           "range": true,
           "refId": "purchased",
           "interval": "1d"
@@ -2660,7 +2660,7 @@
     },
     {
       "id": 35,
-      "title": "Battery",
+      "title": "बैटरी",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2703,7 +2703,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "बैटरी चार्ज"
               },
               {
                 "id": "unit",
@@ -2723,7 +2723,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "बैटरी डिस्चार्ज"
               },
               {
                 "id": "unit",
@@ -2743,7 +2743,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "बैटरी दक्षता"
               },
               {
                 "id": "unit",
@@ -2763,7 +2763,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "औसत अधिकतम SOC"
               },
               {
                 "id": "unit",
@@ -2783,7 +2783,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "औसत न्यूनतम SOC"
               },
               {
                 "id": "unit",
@@ -2835,7 +2835,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge daily",
+          "legendFormat": "दैनिक बैटरी चार्ज",
           "range": true,
           "refId": "batteryChargeDaily",
           "hide": true,
@@ -2849,7 +2849,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge daily",
+          "legendFormat": "दैनिक बैटरी डिस्चार्ज",
           "range": true,
           "refId": "batteryDischargeDaily",
           "hide": true,
@@ -2904,7 +2904,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "Max SOC series",
+          "legendFormat": "अधिकतम SOC श्रृंखला",
           "range": true,
           "refId": "socMaxSeries",
           "hide": true,
@@ -2918,7 +2918,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "Min SOC series",
+          "legendFormat": "न्यूनतम SOC श्रृंखला",
           "range": true,
           "refId": "socMinSeries",
           "hide": true,
@@ -2955,12 +2955,12 @@
           "type": "reduce"
         }
       ],
-      "title": "Battery summary",
+      "title": "बैटरी सारांश",
       "type": "stat"
     },
     {
       "id": 11,
-      "title": "Home battery levels",
+      "title": "होम बैटरी स्तर",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3019,7 +3019,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC max"
+              "options": "SOC अधिकतम"
             },
             "properties": [
               {
@@ -3038,7 +3038,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC min"
+              "options": "SOC न्यूनतम"
             },
             "properties": [
               {
@@ -3100,7 +3100,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "SOC max",
+          "legendFormat": "SOC अधिकतम",
           "range": true,
           "refId": "socMax",
           "hide": false,
@@ -3114,7 +3114,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "SOC min",
+          "legendFormat": "SOC न्यूनतम",
           "range": true,
           "refId": "socMin",
           "hide": false,
@@ -3137,7 +3137,7 @@
         "name": "dbLabel",
         "type": "constant",
         "query": "evcc",
-        "label": "DB Label",
+        "label": "DB लेबल",
         "current": {
           "text": "evcc",
           "value": "evcc"
@@ -3154,7 +3154,7 @@
         "name": "peakPowerLimit",
         "type": "constant",
         "query": "25000",
-        "label": "Peak Power Limit",
+        "label": "अधिकतम शक्ति सीमा",
         "current": {
           "text": "25000",
           "value": "25000"
@@ -3171,7 +3171,7 @@
         "name": "energySampleInterval",
         "type": "constant",
         "query": "30s",
-        "label": "Energy Sample Interval",
+        "label": "ऊर्जा सैंपल अंतराल",
         "current": {
           "text": "30s",
           "value": "30s"
@@ -3188,7 +3188,7 @@
         "name": "tariffPriceInterval",
         "type": "constant",
         "query": "15m",
-        "label": "Tariff Price Interval",
+        "label": "टैरिफ अंतराल",
         "current": {
           "text": "15m",
           "value": "15m"
@@ -3205,7 +3205,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Loadpoint Blocklist",
+        "label": "लोडपॉइंट ब्लॉकलिस्ट",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -3222,7 +3222,7 @@
         "name": "extBlocklist",
         "type": "constant",
         "query": ".*Car.*|.*Haupt.*",
-        "label": "EXT Blocklist",
+        "label": "EXT ब्लॉकलिस्ट",
         "current": {
           "selected": true,
           "text": ".*Car.*|.*Haupt.*",
@@ -3240,7 +3240,7 @@
         "name": "auxBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "AUX Blocklist",
+        "label": "AUX ब्लॉकलिस्ट",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -3277,7 +3277,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Monat",
+  "title": "VM: EVCC: महीना",
   "uid": "vm-month-en-orig",
   "version": 2,
   "weekStart": ""

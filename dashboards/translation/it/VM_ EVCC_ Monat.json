@@ -33,7 +33,7 @@
     },
     {
       "id": 19,
-      "title": "Monthly energy totals",
+      "title": "Totali energia mensili",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -89,7 +89,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Prelievo rete"
               }
             ]
           },
@@ -101,7 +101,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "Casa"
               }
             ]
           },
@@ -113,7 +113,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "Immissione"
               }
             ]
           },
@@ -147,7 +147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -162,7 +162,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -222,7 +222,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -276,7 +276,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "Prelievo rete",
           "range": true,
           "refId": "gridMonthlyDaily",
           "hide": true,
@@ -290,7 +290,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "Casa",
           "range": true,
           "refId": "homeMonthlyDaily",
           "hide": true,
@@ -318,7 +318,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "Immissione",
           "range": true,
           "refId": "feedInMonthlyDaily",
           "hide": true,
@@ -403,7 +403,7 @@
     },
     {
       "id": 25,
-      "title": "Energy",
+      "title": "Energia",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -491,7 +491,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -506,7 +506,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -566,7 +566,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -626,7 +626,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "Prelievo rete",
           "range": true,
           "refId": "gridImport",
           "hide": false,
@@ -640,7 +640,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "Casa",
           "range": true,
           "refId": "homeEnergy",
           "hide": false,
@@ -668,7 +668,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "Immissione",
           "range": true,
           "refId": "feedInEnergy",
           "hide": false,
@@ -757,12 +757,12 @@
           "type": "math"
         }
       ],
-      "title": "Specific yield",
+      "title": "Resa specifica",
       "type": "stat"
     },
     {
       "id": 24,
-      "title": "Metric gauges",
+      "title": "Indicatori",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -800,7 +800,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarchia"
             },
             "properties": [
               {
@@ -821,14 +821,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "Autarchia"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -849,7 +849,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "Autoconsumo"
               }
             ]
           }
@@ -1045,7 +1045,7 @@
     },
     {
       "id": 6,
-      "title": "Metrics",
+      "title": "Metriche",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1104,7 +1104,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autosufficienza"
             },
             "properties": [
               {
@@ -1116,7 +1116,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-sufficiency"
+                "value": "Autosufficienza"
               }
             ]
           },
@@ -1176,7 +1176,7 @@
     },
     {
       "id": 34,
-      "title": "Home",
+      "title": "Casa",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -1189,7 +1189,7 @@
     },
     {
       "id": 32,
-      "title": "Home: Energy distribution",
+      "title": "Casa: distribuzione energia",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1213,7 +1213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1258,7 +1258,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Ext total",
+          "legendFormat": "Totale EXT",
           "range": false,
           "refId": "extSum",
           "hide": true
@@ -1271,7 +1271,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Aux total",
+          "legendFormat": "Totale AUX",
           "range": false,
           "refId": "auxSum",
           "hide": true
@@ -1284,7 +1284,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Home total",
+          "legendFormat": "Totale casa",
           "range": false,
           "refId": "homeTotalPie",
           "hide": true
@@ -1330,7 +1330,7 @@
     },
     {
       "id": 31,
-      "title": "Home: Energy consumption",
+      "title": "Casa: consumo energetico",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1406,7 +1406,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "Altro"
               },
               {
                 "id": "color",
@@ -1451,7 +1451,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home total",
+          "legendFormat": "Totale casa",
           "range": true,
           "refId": "homeTotalDaily",
           "hide": true,
@@ -1465,7 +1465,7 @@
           "editorMode": "code",
           "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
-          "legendFormat": "Ext total",
+          "legendFormat": "Totale EXT",
           "range": true,
           "refId": "extTotalDaily",
           "hide": true,
@@ -1479,7 +1479,7 @@
           "editorMode": "code",
           "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
-          "legendFormat": "Aux total",
+          "legendFormat": "Totale AUX",
           "range": true,
           "refId": "auxTotalDaily",
           "hide": true,
@@ -1496,7 +1496,7 @@
           "refId": "OtherDaily",
           "type": "math",
           "settings": {
-            "displayName": "Other"
+            "displayName": "Altro"
           }
         },
         {
@@ -1532,7 +1532,7 @@
     },
     {
       "id": 36,
-      "title": "Total: Energy distribution",
+      "title": "Totale: distribuzione energia",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1556,7 +1556,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1571,7 +1571,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -1619,7 +1619,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "Casa",
           "range": true,
           "refId": "homeTotalPie",
           "hide": false,
@@ -1647,7 +1647,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge",
+          "legendFormat": "Carica batteria",
           "range": true,
           "refId": "batteryChargeTotal",
           "hide": true,
@@ -1661,7 +1661,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge",
+          "legendFormat": "Scarica batteria",
           "range": true,
           "refId": "batteryDischargeTotal",
           "hide": true,
@@ -1682,7 +1682,7 @@
     },
     {
       "id": 37,
-      "title": "Total: Energy distribution",
+      "title": "Totale: distribuzione energia",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1741,7 +1741,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1768,7 +1768,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Batteria"
               }
             ]
           },
@@ -1818,7 +1818,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge",
+          "legendFormat": "Carica batteria",
           "range": true,
           "refId": "batteryChargeDaily",
           "hide": true,
@@ -1832,7 +1832,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge",
+          "legendFormat": "Scarica batteria",
           "range": true,
           "refId": "batteryDischargeDaily",
           "hide": true,
@@ -1857,7 +1857,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "Casa",
           "range": true,
           "refId": "homeDailyTotal",
           "hide": false,
@@ -1882,7 +1882,7 @@
     },
     {
       "id": 30,
-      "title": "Power balance",
+      "title": "Bilancio elettrico",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1927,7 +1927,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid price: arithmetic mean"
+                "value": "Prezzo rete: media aritmetica"
               },
               {
                 "id": "unit",
@@ -1950,7 +1950,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective price, dyn."
+                "value": "Prezzo effettivo, din."
               },
               {
                 "id": "unit",
@@ -1973,7 +1973,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved vs arith."
+                "value": "Risparmiato vs arit."
               },
               {
                 "id": "unit",
@@ -1996,7 +1996,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential at arith."
+                "value": "Potenziale al prezzo arit."
               },
               {
                 "id": "unit",
@@ -2019,7 +2019,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "Acquistato, dinamico"
               },
               {
                 "id": "unit",
@@ -2042,7 +2042,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings dyn."
+                "value": "Risparmio din."
               },
               {
                 "id": "unit",
@@ -2065,7 +2065,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "Venduto (immissione)"
               },
               {
                 "id": "unit",
@@ -2088,7 +2088,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "Bilancio"
               },
               {
                 "id": "unit",
@@ -2180,7 +2180,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Purchased energy daily",
+          "legendFormat": "Energia acquistata giornaliera",
           "range": true,
           "refId": "energyPurchasedDaily",
           "hide": true,
@@ -2209,7 +2209,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Purchased daily",
+          "legendFormat": "Acquistato giornaliero",
           "range": true,
           "refId": "purchasedDaily",
           "hide": true,
@@ -2282,7 +2282,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Sold daily raw",
+          "legendFormat": "Venduto giornaliero grezzo",
           "range": true,
           "refId": "soldDailyRaw",
           "hide": true,
@@ -2340,7 +2340,7 @@
     },
     {
       "id": 26,
-      "title": "Dynamic electricity price (ct/kWh)",
+      "title": "Prezzo dinamico dell’elettricità (ct/kWh)",
       "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2423,7 +2423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2438,7 +2438,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Prezzo effettivo dell’elettricità"
             },
             "properties": [
               {
@@ -2500,7 +2500,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Average",
+          "legendFormat": "Media",
           "range": true,
           "refId": "avgPrice",
           "interval": "1d"
@@ -2513,7 +2513,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Effective electricity price",
+          "legendFormat": "Prezzo effettivo dell’elettricità",
           "range": true,
           "refId": "weightedAveragePrice",
           "interval": "1d"
@@ -2535,7 +2535,7 @@
     },
     {
       "id": 28,
-      "title": "Electricity costs",
+      "title": "Costi elettrici",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2596,12 +2596,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased"
+                "value": "Acquistato"
               }
             ]
           },
@@ -2651,7 +2651,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Purchased",
+          "legendFormat": "Acquistato",
           "range": true,
           "refId": "purchased",
           "interval": "1d"
@@ -2660,7 +2660,7 @@
     },
     {
       "id": 35,
-      "title": "Battery",
+      "title": "Batteria",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2703,7 +2703,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "Carica batteria"
               },
               {
                 "id": "unit",
@@ -2723,7 +2723,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "Scarica batteria"
               },
               {
                 "id": "unit",
@@ -2743,7 +2743,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Efficienza batteria"
               },
               {
                 "id": "unit",
@@ -2763,7 +2763,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "SOC max medio"
               },
               {
                 "id": "unit",
@@ -2783,7 +2783,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "SOC min medio"
               },
               {
                 "id": "unit",
@@ -2835,7 +2835,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery charge daily",
+          "legendFormat": "Carica batteria giornaliera",
           "range": true,
           "refId": "batteryChargeDaily",
           "hide": true,
@@ -2849,7 +2849,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Battery discharge daily",
+          "legendFormat": "Scarica batteria giornaliera",
           "range": true,
           "refId": "batteryDischargeDaily",
           "hide": true,
@@ -2904,7 +2904,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "Max SOC series",
+          "legendFormat": "Serie SOC max",
           "range": true,
           "refId": "socMaxSeries",
           "hide": true,
@@ -2918,7 +2918,7 @@
           "editorMode": "code",
           "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
-          "legendFormat": "Min SOC series",
+          "legendFormat": "Serie SOC min",
           "range": true,
           "refId": "socMinSeries",
           "hide": true,
@@ -2955,12 +2955,12 @@
           "type": "reduce"
         }
       ],
-      "title": "Battery summary",
+      "title": "Batteria",
       "type": "stat"
     },
     {
       "id": 11,
-      "title": "Home battery levels",
+      "title": "Livelli batteria casa",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3137,7 +3137,7 @@
         "name": "dbLabel",
         "type": "constant",
         "query": "evcc",
-        "label": "DB Label",
+        "label": "Etichetta DB",
         "current": {
           "text": "evcc",
           "value": "evcc"
@@ -3154,7 +3154,7 @@
         "name": "peakPowerLimit",
         "type": "constant",
         "query": "25000",
-        "label": "Peak Power Limit",
+        "label": "Limite potenza massima",
         "current": {
           "text": "25000",
           "value": "25000"
@@ -3171,7 +3171,7 @@
         "name": "energySampleInterval",
         "type": "constant",
         "query": "30s",
-        "label": "Energy Sample Interval",
+        "label": "Intervallo di campionamento energia",
         "current": {
           "text": "30s",
           "value": "30s"
@@ -3188,7 +3188,7 @@
         "name": "tariffPriceInterval",
         "type": "constant",
         "query": "15m",
-        "label": "Tariff Price Interval",
+        "label": "Intervallo tariffa",
         "current": {
           "text": "15m",
           "value": "15m"
@@ -3205,7 +3205,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Loadpoint Blocklist",
+        "label": "Blocco punto di ricarica",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -3222,7 +3222,7 @@
         "name": "extBlocklist",
         "type": "constant",
         "query": ".*Car.*|.*Haupt.*",
-        "label": "EXT Blocklist",
+        "label": "Blocco EXT",
         "current": {
           "selected": true,
           "text": ".*Car.*|.*Haupt.*",
@@ -3240,7 +3240,7 @@
         "name": "auxBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "AUX Blocklist",
+        "label": "Blocco AUX",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -3277,7 +3277,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Monat",
+  "title": "VM: EVCC: Mese",
   "uid": "vm-month-en-orig",
   "version": 2,
   "weekStart": ""

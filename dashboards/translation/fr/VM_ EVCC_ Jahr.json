@@ -41,7 +41,7 @@
       },
       "id": 68,
       "panels": [],
-      "title": "Home",
+      "title": "Maison",
       "type": "row"
     },
     {
@@ -54,7 +54,7 @@
       },
       "id": 62,
       "panels": [],
-      "title": "Battery",
+      "title": "Batterie",
       "type": "row"
     },
     {
@@ -67,7 +67,7 @@
       },
       "id": 56,
       "panels": [],
-      "title": "Vehicles",
+      "title": "Véhicules",
       "type": "row",
       "options": {
         "text": {
@@ -87,7 +87,7 @@
     },
     {
       "id": 41,
-      "title": "Energy totals",
+      "title": "Totaux énergie",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -145,12 +145,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Import réseau"
               },
               {
                 "id": "color",
@@ -164,12 +164,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "Maison"
               },
               {
                 "id": "color",
@@ -183,12 +183,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Injection"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "Injection"
               },
               {
                 "id": "color",
@@ -285,7 +285,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "Import réseau",
           "range": false,
           "instant": true,
           "refId": "gridYearly"
@@ -298,7 +298,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Home",
+          "legendFormat": "Maison",
           "range": false,
           "instant": true,
           "refId": "homeYearly"
@@ -324,7 +324,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Feed-in",
+          "legendFormat": "Injection",
           "range": false,
           "instant": true,
           "refId": "feedInYearly"
@@ -333,7 +333,7 @@
     },
     {
       "id": 47,
-      "title": "Energy",
+      "title": "Énergie",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -402,7 +402,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               },
               {
                 "id": "decimals",
@@ -428,7 +428,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
@@ -443,7 +443,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -458,7 +458,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Injection"
             },
             "properties": [
               {
@@ -607,7 +607,7 @@
     },
     {
       "id": 44,
-      "title": "Metric gauges",
+      "title": "Jauges indicateurs",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -645,7 +645,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarcie"
             },
             "properties": [
               {
@@ -666,14 +666,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "Autarcie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsommation"
             },
             "properties": [
               {
@@ -694,7 +694,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "Autoconsommation"
               }
             ]
           }
@@ -741,7 +741,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Grid import",
+          "legendFormat": "Import réseau",
           "range": false,
           "refId": "gridEnergyIn"
         },
@@ -754,7 +754,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Feed-in",
+          "legendFormat": "Injection",
           "range": false,
           "refId": "gridEnergyOut"
         },
@@ -767,7 +767,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Home",
+          "legendFormat": "Maison",
           "range": false,
           "refId": "homeEnergy"
         },
@@ -780,7 +780,7 @@
           "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "instant": true,
-          "legendFormat": "Loadpoints",
+          "legendFormat": "Points de charge",
           "range": false,
           "refId": "loadpointEnergy"
         },
@@ -812,7 +812,7 @@
     },
     {
       "id": 25,
-      "title": "Metrics",
+      "title": "Indicateurs",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -881,14 +881,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarcie"
             },
             "properties": [
               {
@@ -903,7 +903,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsommation"
             },
             "properties": [
               {
@@ -1032,12 +1032,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/day"
+              "options": "PV/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV/day"
+                "value": "PV/jour"
               },
               {
                 "id": "color",
@@ -1051,12 +1051,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consommation/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Consumption/day"
+                "value": "Consommation/jour"
               },
               {
                 "id": "color",
@@ -1070,12 +1070,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import/day"
+              "options": "Import réseau/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import/day"
+                "value": "Import réseau/jour"
               },
               {
                 "id": "color",
@@ -1161,12 +1161,12 @@
           "legendFormat": "{{series}}"
         }
       ],
-      "title": "Daily energy avg",
+      "title": "Énergie moyenne/jour",
       "type": "stat"
     },
     {
       "id": 2,
-      "title": "Energy/day",
+      "title": "Énergie/jour",
       "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1260,7 +1260,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
@@ -1272,14 +1272,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Import réseau"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consommation/jour"
             },
             "properties": [
               {
@@ -1291,7 +1291,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consumption"
+                "value": "Consommation"
               }
             ]
           }
@@ -1373,7 +1373,7 @@
           "editorMode": "code",
           "expr": "sum(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Grid import",
+          "legendFormat": "Import réseau",
           "range": true,
           "refId": "gridImport",
           "hide": false,
@@ -1385,7 +1385,7 @@
     },
     {
       "id": 67,
-      "title": "Home: Energy distribution",
+      "title": "Maison : répartition d’énergie",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1409,7 +1409,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Autre"
             },
             "properties": [
               {
@@ -1424,7 +1424,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -1469,7 +1469,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Ext total",
+          "legendFormat": "Total EXT",
           "range": false,
           "refId": "extSum",
           "hide": true
@@ -1482,7 +1482,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Aux total",
+          "legendFormat": "Total AUX",
           "range": false,
           "refId": "auxSum",
           "hide": true
@@ -1495,7 +1495,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Home total",
+          "legendFormat": "Total maison",
           "range": false,
           "refId": "homeTotalPie",
           "hide": true
@@ -1542,7 +1542,7 @@
     },
     {
       "id": 66,
-      "title": "Home: Energy consumption",
+      "title": "Maison : consommation d’énergie",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1618,7 +1618,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "Autre"
               },
               {
                 "id": "color",
@@ -1720,7 +1720,7 @@
     },
     {
       "id": 69,
-      "title": "Total: Energy distribution",
+      "title": "Total : répartition d’énergie",
       "type": "piechart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1744,7 +1744,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -1759,7 +1759,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batterie"
             },
             "properties": [
               {
@@ -1808,7 +1808,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Home",
+          "legendFormat": "Maison",
           "range": false,
           "refId": "homeTotal",
           "hide": false
@@ -1834,7 +1834,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Battery charge",
+          "legendFormat": "Charge batterie",
           "range": false,
           "refId": "chargeEnergy",
           "hide": true
@@ -1847,7 +1847,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "table",
-          "legendFormat": "Battery discharge",
+          "legendFormat": "Décharge batterie",
           "range": false,
           "refId": "dischargeEnergy",
           "hide": true
@@ -1863,14 +1863,14 @@
           "refId": "batteryTotal",
           "type": "math",
           "settings": {
-            "displayName": "Battery"
+            "displayName": "Batterie"
           }
         }
       ]
     },
     {
       "id": 70,
-      "title": "Home: Energy distribution",
+      "title": "Maison : répartition d’énergie",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2014,7 +2014,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -2041,14 +2041,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Batterie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Autre"
             },
             "properties": [
               {
@@ -2151,7 +2151,7 @@
     },
     {
       "id": 65,
-      "title": "Power balance",
+      "title": "Bilan électrique",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2196,7 +2196,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "Prix de l’électricité : moyenne arithmétique"
               },
               {
                 "id": "color",
@@ -2219,7 +2219,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "Prix effectif de l’électricité, dynamique"
               },
               {
                 "id": "color",
@@ -2242,7 +2242,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "Prix économisé grâce au tarif dynamique"
               },
               {
                 "id": "unit",
@@ -2258,7 +2258,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "Achat potentiel au prix arithmétique"
               }
             ]
           },
@@ -2270,7 +2270,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "Acheté, dynamique"
               }
             ]
           },
@@ -2282,7 +2282,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "Économies grâce au tarif dynamique"
               }
             ]
           },
@@ -2294,7 +2294,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "Vendu (injection)"
               },
               {
                 "id": "color",
@@ -2313,7 +2313,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "Bilan"
               }
             ]
           }
@@ -2453,7 +2453,7 @@
     },
     {
       "id": 54,
-      "title": "Dynamic electricity price",
+      "title": "Prix dynamique de l’électricité",
       "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2536,7 +2536,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Moyenne"
             },
             "properties": [
               {
@@ -2551,7 +2551,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Prix effectif de l’électricité"
             },
             "properties": [
               {
@@ -2614,7 +2614,7 @@
           "editorMode": "code",
           "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d])))",
           "format": "time_series",
-          "legendFormat": "Average",
+          "legendFormat": "Moyenne",
           "range": true,
           "refId": "avgPrice",
           "interval": "1d",
@@ -2628,7 +2628,7 @@
           "editorMode": "code",
           "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d])))",
           "format": "time_series",
-          "legendFormat": "Effective electricity price",
+          "legendFormat": "Prix effectif de l’électricité",
           "range": true,
           "refId": "weightedAveragePrice",
           "interval": "1d",
@@ -2652,7 +2652,7 @@
     },
     {
       "id": 63,
-      "title": "Electricity costs",
+      "title": "Coûts d’électricité",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2721,14 +2721,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acheté"
             },
             "properties": [
               {
@@ -2877,7 +2877,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "Charge batterie"
               },
               {
                 "id": "unit",
@@ -2897,7 +2897,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "Décharge batterie"
               },
               {
                 "id": "unit",
@@ -2917,7 +2917,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Rendement batterie"
               },
               {
                 "id": "unit",
@@ -2944,7 +2944,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "SOC max moyen"
               },
               {
                 "id": "unit",
@@ -2964,7 +2964,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "SOC min moyen"
               },
               {
                 "id": "unit",
@@ -3069,7 +3069,7 @@
           "refId": "minSoc"
         }
       ],
-      "title": "Battery summary",
+      "title": "Batterie",
       "type": "stat"
     },
     {
@@ -3160,13 +3160,13 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Max SOC",
+          "legendFormat": "SOC max",
           "range": true,
           "refId": "A",
           "interval": "1d"
         }
       ],
-      "title": "Battery: Maximum values",
+      "title": "Batterie : valeurs maximales",
       "type": "heatmap"
     },
     {
@@ -3344,7 +3344,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Discharge"
+              "options": "Décharge"
             },
             "properties": [
               {
@@ -3356,7 +3356,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Discharge"
+                "value": "Décharge"
               }
             ]
           }
@@ -3402,7 +3402,7 @@
           "expr": "label_set(sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Charge\") or label_set(sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Discharge\")"
         }
       ],
-      "title": "Battery charge",
+      "title": "Charge batterie",
       "type": "barchart",
       "transformations": [
         {
@@ -3542,13 +3542,13 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "Min SOC",
+          "legendFormat": "SOC min",
           "range": true,
           "refId": "A",
           "interval": "1d"
         }
       ],
-      "title": "Battery: Minimum values",
+      "title": "Batterie : valeurs minimales",
       "type": "heatmap"
     },
     {
@@ -3694,7 +3694,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Rendement batterie"
               },
               {
                 "id": "unit",
@@ -3741,7 +3741,7 @@
           "expr": "label_set((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Battery efficiency\")"
         }
       ],
-      "title": "Battery efficiency",
+      "title": "Rendement batterie",
       "type": "barchart",
       "transformations": [
         {
@@ -3947,7 +3947,7 @@
           "editorMode": "code",
           "expr": "sort_by_label(max by (vehicle) (max_over_time(vehicleOdometer_value{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}[10y])), \"vehicle\")",
           "format": "time_series",
-          "legendFormat": "Max odometer: {{vehicle}}",
+          "legendFormat": "Kilométrage max : {{vehicle}}",
           "range": false,
           "instant": true,
           "refId": "vehicleOdometer"
@@ -3960,7 +3960,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle)",
           "format": "time_series",
-          "legendFormat": "Driven: {{vehicle}}",
+          "legendFormat": "Parcourus: {{vehicle}}",
           "range": false,
           "instant": true,
           "refId": "vehicleDrivenKm"
@@ -3973,7 +3973,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle) / 1000",
           "format": "time_series",
-          "legendFormat": "Energy: {{vehicle}}",
+          "legendFormat": "Énergie : {{vehicle}}",
           "range": false,
           "instant": true,
           "refId": "vehicleChargedEnergy"
@@ -3990,7 +3990,7 @@
           "hide": false
         }
       ],
-      "title": "Vehicles",
+      "title": "Véhicules",
       "transparent": true,
       "type": "stat",
       "transformations": [
@@ -4065,7 +4065,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -4110,7 +4110,7 @@
           "refId": "A"
         }
       ],
-      "title": "Monthly driven kilometers",
+      "title": "Kilomètres mensuels",
       "type": "barchart",
       "transformations": [
         {
@@ -4223,7 +4223,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -4268,7 +4268,7 @@
           "refId": "A"
         }
       ],
-      "title": "Monthly charged energy",
+      "title": "Énergie chargée mensuelle",
       "type": "barchart",
       "transformations": [
         {
@@ -4382,7 +4382,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -4427,7 +4427,7 @@
           "refId": "A"
         }
       ],
-      "title": "Consumption (kWh/100km)",
+      "title": "Consommation (kWh/100km)",
       "type": "barchart",
       "transformations": [
         {
@@ -4494,7 +4494,7 @@
         "name": "dbLabel",
         "type": "constant",
         "query": "evcc",
-        "label": "DB Label",
+        "label": "Label DB",
         "current": {
           "text": "evcc",
           "value": "evcc"
@@ -4511,7 +4511,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Loadpoint Blocklist",
+        "label": "Liste de blocage point de charge",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4528,7 +4528,7 @@
         "name": "vehicleBlocklist",
         "type": "constant",
         "query": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
-        "label": "Vehicle Blocklist",
+        "label": "Liste de blocage véhicule",
         "current": {
           "text": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
           "value": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$"
@@ -4545,7 +4545,7 @@
         "name": "extBlocklist",
         "type": "constant",
         "query": ".*Car.*|.*Haupt.*",
-        "label": "EXT Blocklist",
+        "label": "Liste de blocage EXT",
         "current": {
           "selected": true,
           "text": ".*Car.*|.*Haupt.*",
@@ -4563,7 +4563,7 @@
         "name": "auxBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "AUX Blocklist",
+        "label": "Liste de blocage AUX",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4601,7 +4601,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Year",
+  "title": "VM : EVCC : Année",
   "uid": "vm-year-en-orig",
   "version": 1,
   "weekStart": "",

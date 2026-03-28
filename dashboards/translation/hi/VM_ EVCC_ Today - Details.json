@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -782,7 +782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -967,7 +967,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tatsächlich"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vorhersage"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -1095,7 +1095,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1282,7 +1282,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1413,7 +1413,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Gesamt"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -1630,7 +1630,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1762,7 +1762,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1941,7 +1941,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "घर"
             },
             "properties": [
               {
@@ -2096,7 +2096,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2266,7 +2266,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2305,7 +2305,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "मूल्य"
             },
             "properties": [
               {
@@ -2607,7 +2607,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einkauf"
+              "options": "खरीद"
             },
             "properties": [
               {
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkauf"
+              "options": "बिक्री"
             },
             "properties": [
               {
@@ -2733,7 +2733,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2903,7 +2903,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2946,7 +2946,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CO2"
+              "options": "सीओ 2"
             },
             "properties": [
               {
@@ -4051,7 +4051,7 @@
       {
         "current": {
           "selected": true,
-          "text": "All",
+          "text": "सभी",
           "value": "$__all"
         },
         "datasource": {
