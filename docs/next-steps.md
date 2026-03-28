@@ -67,6 +67,9 @@ Current issue:
 - import-side daily price and cost rollups now exist in `test_evcc_*`, but they still need tighter validation against Influx legacy and Tibber reality
 - the remaining drift is mainly in imported grid energy, not in the tariff series itself
 - export-side credit rollups are implemented on the same validated 15-minute path; in the current history they evaluate to zero because `tariffFeedIn` is historically zero
+- the all-time `Monthly costs` panel now hides `Income` series automatically when export-credit values are zero over the selected range; this keeps the chart readable on setups without feed-in compensation
+- the `Today` main power plot now includes a PV forecast line again; it uses `avg(tariffSolar_value)` with `interval=1h`, is shown only in the main plot, and intentionally mirrors the smoother `Today - Details` forecast shape
+- important maintenance note: the `Today` main power plot is backed by a Grafana library panel, so visual forecast changes must be applied there as well, not only in the dashboard wrapper JSON
 - the positive-only 10s -> 60s bucket path has now also been adopted for `pv`, `home`, `loadpoint`, `vehicle`, `ext`, and `aux`; representative month checks improved drift versus Influx for those families
 - the VM month dashboard now has an explicit `loadpointBlocklist` and separate `extBlocklist` / `auxBlocklist` controls for counters/meters
 - local test default for the meter-side blocklist is currently `.*Car.*|.*Haupt.*`; any publicized dashboard should reset these blocklist defaults to `^none$`
