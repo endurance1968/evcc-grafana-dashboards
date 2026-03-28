@@ -555,29 +555,20 @@
       "id": 12,
       "maxDataPoints": 1400,
       "options": {
-        "barRadius": 0.2,
-        "barWidth": 0.7,
-        "fullHighlight": false,
-        "groupWidth": 1,
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
+        "displayMode": "gradient",
         "orientation": "horizontal",
-        "showValue": "always",
-        "stacking": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
         "text": {
           "valueSize": 20
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        }
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -587,11 +578,10 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(avg by (title) (last_over_time(batterySoc_value{id!=\"\", title!=\"\"})), \"title\")",
+          "expr": "sort_by_label(avg by (title) (batterySoc_value{id!=\"\", title!=\"\"}), \"title\")",
           "format": "time_series",
-          "interval": "1y",
           "legendFormat": "{{title}}",
-          "range": true,
+          "range": false,
           "refId": "batterySoc"
         },
         {
@@ -600,17 +590,16 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(batterySoc_value{id=\"\"})",
+          "expr": "batterySoc_value{id=\"\"}",
           "format": "time_series",
-          "interval": "1y",
           "legendFormat": "Totaal",
-          "range": true,
+          "range": false,
           "refId": "totalSoc"
         }
       ],
       "title": "Laadniveau accu",
       "transparent": true,
-      "type": "barchart"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -3982,13 +3971,13 @@
         "hide": 2,
         "label": "Filter voor maximaal vermogen / W",
         "name": "peakPowerLimit",
-        "query": "${VAR_PEAKPOWERLIMIT}",
+        "query": "25000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_PEAKPOWERLIMIT}",
-          "text": "${VAR_PEAKPOWERLIMIT}",
-          "selected": false
+          "selected": true,
+          "text": "25000",
+          "value": "25000"
         },
         "options": [
           {
@@ -4003,13 +3992,13 @@
         "hide": 2,
         "label": "Blokkeerlijst voor laadpunten",
         "name": "loadpointBlocklist",
-        "query": "${VAR_LOADPOINTBLOCKLIST}",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_LOADPOINTBLOCKLIST}",
-          "text": "${VAR_LOADPOINTBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4023,13 +4012,13 @@
         "description": "Lijst met EXT-apparaten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Erdgeschoss' uit: /^Erdgeschoss$/\nFilter 'Erdgeschoss' en 'Erster Stock' uit: /^Erdgeschoss$|^Erster Stock$/\nFilter alles dat met 'Verteiler' begint uit: /^Verteiler.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": "${VAR_EXTBLOCKLIST}",
+        "query": ".*Car.*|.*Haupt.*",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_EXTBLOCKLIST}",
-          "text": "${VAR_EXTBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": ".*Car.*|.*Haupt.*",
+          "value": ".*Car.*|.*Haupt.*"
         },
         "options": [
           {
@@ -4043,13 +4032,13 @@
         "description": "Lijst met EXT-apparaten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Erdgeschoss' uit: ^Erdgeschoss$\nFilter 'Erdgeschoss' en 'Erster Stock' uit: ^Erdgeschoss$|^Erster Stock$\nFilter alles dat met 'Verteiler' begint uit: ^Verteiler.*$",
         "hide": 2,
         "name": "auxBlocklist",
-        "query": "${VAR_AUXBLOCKLIST}",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_AUXBLOCKLIST}",
-          "text": "${VAR_AUXBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4060,22 +4049,22 @@
         ]
       },
       {
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "definition": "label_values(loadpoint)",
+        "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
         "label": "Laadpunt",
         "multi": true,
         "name": "loadpoint",
         "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(loadpoint)",
-          "refId": "VariableQueryEditor-VariableQuery"
-        },
+        "query": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
@@ -4086,13 +4075,13 @@
         "hide": 2,
         "label": "Energiemonsterinterval",
         "name": "energySampleInterval",
-        "query": "${VAR_ENERGYSAMPLEINTERVAL}",
+        "query": "30s",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_ENERGYSAMPLEINTERVAL}",
-          "text": "${VAR_ENERGYSAMPLEINTERVAL}",
-          "selected": false
+          "selected": true,
+          "text": "30s",
+          "value": "30s"
         },
         "options": [
           {
@@ -4107,13 +4096,13 @@
         "hide": 2,
         "label": "Tariefinterval",
         "name": "tariffPriceInterval",
-        "query": "${VAR_TARIFFPRICEINTERVAL}",
+        "query": "15m",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_TARIFFPRICEINTERVAL}",
-          "text": "${VAR_TARIFFPRICEINTERVAL}",
-          "selected": false
+          "selected": true,
+          "text": "15m",
+          "value": "15m"
         },
         "options": [
           {
