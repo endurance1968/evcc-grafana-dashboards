@@ -20,3 +20,6 @@ node_modules/
 __pycache__/
 *.pyc
 
+# Local backups and temporary work files
+tmp/
+
