@@ -3221,11 +3221,12 @@
       {
         "name": "extBlocklist",
         "type": "constant",
-        "query": "^none$",
+        "query": ".*Car.*|.*Haupt.*",
         "label": "EXT Blocklist",
         "current": {
-          "text": "^none$",
-          "value": "^none$"
+          "selected": true,
+          "text": ".*Car.*|.*Haupt.*",
+          "value": ".*Car.*|.*Haupt.*"
         },
         "options": [
           {

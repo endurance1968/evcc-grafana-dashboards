@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "Filter für maximale Leistung / W",
         "name": "peakPowerLimit",
-        "query": "${VAR_PEAKPOWERLIMIT}",
+        "query": "25000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_PEAKPOWERLIMIT}",
-          "text": "${VAR_PEAKPOWERLIMIT}",
-          "selected": false
+          "selected": true,
+          "text": "25000",
+          "value": "25000"
         },
         "options": [
           {
@@ -3992,13 +3992,13 @@
         "hide": 2,
         "label": "Blocklist für Loadpoints",
         "name": "loadpointBlocklist",
-        "query": "${VAR_LOADPOINTBLOCKLIST}",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_LOADPOINTBLOCKLIST}",
-          "text": "${VAR_LOADPOINTBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Erdgeschoss' aus: /^Erdgeschoss$/\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: /^Erdgeschoss$|^Erster Stock$/\nFiltere alles, das mit 'Verteiler' beginnt aus: /^Verteiler.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": "${VAR_EXTBLOCKLIST}",
+        "query": ".*Car.*|.*Haupt.*",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_EXTBLOCKLIST}",
-          "text": "${VAR_EXTBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": ".*Car.*|.*Haupt.*",
+          "value": ".*Car.*|.*Haupt.*"
         },
         "options": [
           {
@@ -4032,13 +4032,13 @@
         "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Erdgeschoss' aus: ^Erdgeschoss$\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: ^Erdgeschoss$|^Erster Stock$\nFiltere alles, das mit 'Verteiler' beginnt aus: ^Verteiler.*$",
         "hide": 2,
         "name": "auxBlocklist",
-        "query": "${VAR_AUXBLOCKLIST}",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_AUXBLOCKLIST}",
-          "text": "${VAR_AUXBLOCKLIST}",
-          "selected": false
+          "selected": true,
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4049,22 +4049,22 @@
         ]
       },
       {
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "definition": "label_values(loadpoint)",
+        "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
         "label": "Ladepunkt",
         "multi": true,
         "name": "loadpoint",
         "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(loadpoint)",
-          "refId": "VariableQueryEditor-VariableQuery"
-        },
+        "query": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
@@ -4075,13 +4075,13 @@
         "hide": 2,
         "label": "Energie Abtast Interval",
         "name": "energySampleInterval",
-        "query": "${VAR_ENERGYSAMPLEINTERVAL}",
+        "query": "30s",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_ENERGYSAMPLEINTERVAL}",
-          "text": "${VAR_ENERGYSAMPLEINTERVAL}",
-          "selected": false
+          "selected": true,
+          "text": "30s",
+          "value": "30s"
         },
         "options": [
           {
@@ -4096,13 +4096,13 @@
         "hide": 2,
         "label": "Stromtarif Interval",
         "name": "tariffPriceInterval",
-        "query": "${VAR_TARIFFPRICEINTERVAL}",
+        "query": "15m",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_TARIFFPRICEINTERVAL}",
-          "text": "${VAR_TARIFFPRICEINTERVAL}",
-          "selected": false
+          "selected": true,
+          "text": "15m",
+          "value": "15m"
         },
         "options": [
           {
