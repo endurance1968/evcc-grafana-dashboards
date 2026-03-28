@@ -7,7 +7,6 @@ metric_prefix = evcc
 raw_sample_step = 10s
 energy_rollup_step = 60s
 price_bucket_minutes = 15
-fetch_strategy = compat
 max_fetch_points_per_series = 28000
 
 [benchmark]
