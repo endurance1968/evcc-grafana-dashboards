@@ -5,6 +5,9 @@ EVCC Dashboard mit Grafana für 2 Loadpoints und 2 Fahrzeuge. Loadpoints und Fah
 > [!NOTE]
 > Diese README beschreibt den bestehenden Influx-basierten Legacy-Pfad. Die Legacy-Dashboards liegen jetzt unter dashboards/influx-legacy/. VictoriaMetrics wird separat aufgebaut.
 
+> [!NOTE]
+> Das aktuelle VictoriaMetrics-Rollup-Design und das sichere Test-Tooling liegen unter [docs/victoriametrics-rollup-design.md](./docs/victoriametrics-rollup-design.md), [docs/victoriametrics-aggregation-guide.md](./docs/victoriametrics-aggregation-guide.md) und [scripts/README.md](./scripts/README.md).
+
 - Realtime Dashboard for Desktop, Tablet und Mobile.
 - Monatliche und jährliche Übersicht.
 - Berechnungen für Autarkie, Eigenverbrauch, sowie finanzielles Dashboard mit Kaptialrückflüssen und Amortisation.
@@ -158,5 +161,6 @@ Hast Du die Upgrade Schritte, insbesondere das Löschen der Library Panels befol
 # Danke
 
 Herzlichen Dank an alle, die im Thread ["InfluxDB und Grafana"](https://github.com/evcc-io/evcc/discussions/4213) im EVCC Repository aktiv mitgeholfen haben. Ohne Eure Hilfe wäre das hier entweder nichts geworden oder hätte deutlich länger gedauert.
+
 
 
