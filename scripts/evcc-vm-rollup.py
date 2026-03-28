@@ -27,6 +27,8 @@ class Settings:
     raw_sample_step: str
     energy_rollup_step: str
     price_bucket_minutes: int
+    fetch_strategy: str
+    max_fetch_points_per_series: int
     benchmark_start: str
     benchmark_end: str
     benchmark_step: str
@@ -71,6 +73,70 @@ class ChunkWindow:
 
 
 ACTIVE_PROFILE: dict[str, float | int] | None = None
+
+
+def current_memory_usage_mb() -> float | None:
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        class PROCESS_MEMORY_COUNTERS_EX(ctypes.Structure):
+            _fields_ = [
+                ("cb", wintypes.DWORD),
+                ("PageFaultCount", wintypes.DWORD),
+                ("PeakWorkingSetSize", ctypes.c_size_t),
+                ("WorkingSetSize", ctypes.c_size_t),
+                ("QuotaPeakPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaPeakNonPagedPoolUsage", ctypes.c_size_t),
+                ("QuotaNonPagedPoolUsage", ctypes.c_size_t),
+                ("PagefileUsage", ctypes.c_size_t),
+                ("PeakPagefileUsage", ctypes.c_size_t),
+                ("PrivateUsage", ctypes.c_size_t),
+            ]
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        psapi = ctypes.WinDLL("psapi", use_last_error=True)
+        kernel32.GetCurrentProcess.restype = wintypes.HANDLE
+        psapi.GetProcessMemoryInfo.argtypes = (
+            wintypes.HANDLE,
+            ctypes.c_void_p,
+            wintypes.DWORD,
+        )
+        psapi.GetProcessMemoryInfo.restype = wintypes.BOOL
+        counters = PROCESS_MEMORY_COUNTERS_EX()
+        counters.cb = ctypes.sizeof(counters)
+        if psapi.GetProcessMemoryInfo(
+            kernel32.GetCurrentProcess(),
+            ctypes.byref(counters),
+            counters.cb,
+        ):
+            return counters.WorkingSetSize / (1024 * 1024)
+    except Exception:
+        pass
+
+    try:
+        import resource
+
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        if rss > 10_000_000:
+            return rss / (1024 * 1024)
+        return rss / 1024
+    except Exception:
+        return None
+
+
+
+def update_peak_memory() -> None:
+    global ACTIVE_PROFILE
+    if ACTIVE_PROFILE is None:
+        return
+    current = current_memory_usage_mb()
+    if current is None:
+        return
+    ACTIVE_PROFILE["memory_last_mb"] = current
+    ACTIVE_PROFILE["memory_peak_mb"] = max(float(ACTIVE_PROFILE.get("memory_peak_mb", 0.0)), current)
+
 
 
 def bump_profile_value(name: str, value: float = 1.0) -> None:
@@ -132,6 +198,13 @@ def load_settings(path: str) -> Settings:
     with open(path, "r", encoding="utf-8") as handle:
         parser.read_file(handle)
 
+    fetch_strategy = parser.get("victoriametrics", "fetch_strategy", fallback="compat").strip().lower()
+    if fetch_strategy not in {"compat", "chunk-cache"}:
+        raise SystemExit(f"Unsupported fetch_strategy: {fetch_strategy}")
+    max_fetch_points_per_series = parser.getint("victoriametrics", "max_fetch_points_per_series", fallback=28000)
+    if max_fetch_points_per_series < 1000:
+        raise SystemExit("max_fetch_points_per_series must be at least 1000")
+
     return Settings(
         base_url=parser.get("victoriametrics", "base_url").rstrip("/"),
         db_label=parser.get("victoriametrics", "db_label"),
@@ -141,6 +214,8 @@ def load_settings(path: str) -> Settings:
         raw_sample_step=parser.get("victoriametrics", "raw_sample_step", fallback="30s"),
         energy_rollup_step=parser.get("victoriametrics", "energy_rollup_step", fallback="60s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
+        fetch_strategy=fetch_strategy,
+        max_fetch_points_per_series=max_fetch_points_per_series,
         benchmark_start=parser.get("benchmark", "start"),
         benchmark_end=parser.get("benchmark", "end"),
         benchmark_step=parser.get("benchmark", "step"),
@@ -861,6 +936,16 @@ def build_fetch_blocks(
     return blocks, block_by_day
 
 
+def build_compat_fetch_blocks(chunk_name: str, windows: list[DayWindow]) -> tuple[list[ChunkWindow], dict[str, ChunkWindow]]:
+    blocks: list[ChunkWindow] = []
+    block_by_day: dict[str, ChunkWindow] = {}
+    for index, window in enumerate(windows, start=1):
+        block = build_chunk_window(f"{chunk_name}-d{index}", [window])
+        blocks.append(block)
+        block_by_day[window.day] = block
+    return blocks, block_by_day
+
+
 def slice_samples(
     samples: list[tuple[int, float]],
     start_ts: int,
@@ -1085,13 +1170,15 @@ def fetch_chunk_positive_energy_matrix(
     item: RollupMetric,
     chunk: ChunkWindow,
 ) -> list[dict]:
-    return fetch_series_range(
+    result = fetch_series_range(
         settings,
         positive_energy_query(settings, item),
         chunk.start_iso,
         chunk.end_iso,
         settings.raw_sample_step,
     )
+    update_peak_memory()
+    return result
 
 
 
@@ -1294,7 +1381,7 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
     raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
     extended_start_iso = to_iso_z(datetime.fromisoformat(chunk.start_iso.replace("Z", "+00:00")) - timedelta(minutes=settings.price_bucket_minutes))
     root = base_matchers(settings)
-    return {
+    context = {
         "raw_step_seconds": raw_step_seconds,
         "grid_samples": fetch_single_series_range(
             settings,
@@ -1360,6 +1447,8 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
             settings.raw_sample_step,
         ),
     }
+    update_peak_memory()
+    return context
 
 
 def bucket_price_rollups(
@@ -1827,6 +1916,8 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     global ACTIVE_PROFILE
     ACTIVE_PROFILE = {
         "build_windows_s": 0.0,
+        "memory_peak_mb": 0.0,
+        "memory_last_mb": 0.0,
         "build_chunks_s": 0.0,
         "build_catalog_s": 0.0,
         "chunk_processing_s": 0.0,
@@ -1843,6 +1934,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "import_s": 0.0,
         "health_rollup_s": 0.0,
     }
+    update_peak_memory()
     started_at = time.perf_counter()
     start_day = parse_local_day(args.start_day, "--start-day")
     end_day = parse_local_day(args.end_day, "--end-day")
@@ -1905,14 +1997,19 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         series_map: dict[tuple[tuple[str, str], ...], dict] = {}
         chunk_start_samples = emitted_samples
         chunk_start_skipped = skipped
-        fetch_blocks, fetch_block_by_day = build_fetch_blocks(
-            chunk_name,
-            chunk_windows,
-            parse_step_seconds(settings.raw_sample_step),
-        )
+        if settings.fetch_strategy == "chunk-cache":
+            fetch_blocks, fetch_block_by_day = build_fetch_blocks(
+                chunk_name,
+                chunk_windows,
+                parse_step_seconds(settings.raw_sample_step),
+                settings.max_fetch_points_per_series,
+            )
+        else:
+            fetch_blocks, fetch_block_by_day = build_compat_fetch_blocks(chunk_name, chunk_windows)
         positive_energy_cache: dict[tuple[str, str], list[dict]] = {}
         shared_price_contexts: dict[str, dict[str, object]] = {}
 
+        update_peak_memory()
         if args.progress:
             print(
                 f"[chunk {chunk_index}/{len(chunks)}] start {chunk_name} days={len(chunk_windows)}",
@@ -2114,6 +2211,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
                     append_series_sample(series_map, labels, window.sample_timestamp_ms, value)
                     emitted_samples += 1
                 add_duration(ACTIVE_PROFILE, "generic_rollup_s", started_at)
+            update_peak_memory()
             add_duration(ACTIVE_PROFILE, "window_processing_s", window_started_at)
 
         seen_series_keys.update(series_map.keys())
@@ -2146,8 +2244,10 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             "duration_s": round(time.perf_counter() - chunk_started_at, 6),
         }
         chunk_summaries.append(chunk_summary)
+        update_peak_memory()
         add_duration(ACTIVE_PROFILE, "chunk_processing_s", chunk_started_at)
 
+        update_peak_memory()
         if args.progress:
             print(
                 f"[chunk {chunk_index}/{len(chunks)}] done {chunk_name} days={processed_days}/{len(windows)} samples={chunk_summary['samples']} series={chunk_summary['series']} skipped={chunk_summary['skipped']} batches={chunk_summary['batches']}",
@@ -2176,6 +2276,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
             )
         total_batches += len(chunked(health_series_rows, args.batch_size))
     seen_series_keys.update(tuple(sorted(row["metric"].items())) for row in health_series_rows)
+    update_peak_memory()
     ACTIVE_PROFILE["total_s"] = time.perf_counter() - total_started_at
 
     summary = {
@@ -2184,6 +2285,8 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "raw_sample_step": settings.raw_sample_step,
         "energy_rollup_step": settings.energy_rollup_step,
         "price_bucket_minutes": settings.price_bucket_minutes,
+        "fetch_strategy": settings.fetch_strategy,
+        "max_fetch_points_per_series": settings.max_fetch_points_per_series,
         "range": {
             "start_day": start_day.isoformat(),
             "end_day": end_day.isoformat(),

@@ -23,6 +23,8 @@ class VmRollupTests(unittest.TestCase):
             raw_sample_step="10s",
             energy_rollup_step="60s",
             price_bucket_minutes=15,
+            fetch_strategy="compat",
+            max_fetch_points_per_series=28000,
             benchmark_start="2026-02-20T00:00:00Z",
             benchmark_end="2026-03-22T00:00:00Z",
             benchmark_step="1d",
@@ -244,6 +246,17 @@ class VmRollupTests(unittest.TestCase):
         self.assertGreater(len(blocks), 1)
         self.assertEqual(block_by_day["2026-01-01"].name, "2026-01-b1")
         self.assertEqual(block_by_day["2026-01-08"].name, blocks[-1].name)
+
+    def test_build_compat_fetch_blocks_keeps_one_day_per_block(self):
+        windows = MODULE.build_day_windows(
+            self.settings,
+            MODULE.parse_local_day("2026-01-01", "--start-day"),
+            MODULE.parse_local_day("2026-01-03", "--end-day"),
+        )
+        blocks, block_by_day = MODULE.build_compat_fetch_blocks("2026-01", windows)
+        self.assertEqual(len(blocks), 3)
+        self.assertEqual(block_by_day["2026-01-02"].start_iso, windows[1].start_iso)
+        self.assertEqual(block_by_day["2026-01-02"].end_iso, windows[1].end_iso)
 
     def test_slice_samples_can_include_last_sample_before_range(self):
         samples = [(90, 1.0), (100, 2.0), (110, 3.0)]

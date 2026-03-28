@@ -315,6 +315,10 @@ Important operational note:
 - the first implementation of priorities 1 and 2 now writes to a separate comparison namespace `evcc_cmp_*` via `scripts/evcc-vm-rollup-compare.conf.example`, so the production namespace `evcc_*` remains untouched during profiling and semantic review
 - first full comparison rebuild on `evcc_cmp_*` reduced total runtime from about `562.65s` to about `248.34s`; `http_get_json_calls` dropped from `14883` to `3708`, and `http_get_json_s` dropped from about `472.56s` to about `152.07s`
 - the optimized comparison path is not yet production-identical: first year-level checks still showed a small residual delta against the current `evcc_*` baseline (about `0.89 kWh` on 2025 grid import and about `5.72 EUR` on 2025 grid-import cost), so semantic verification is still required before any promotion
+- full dry-run memory profiling is now included as memory_peak_mb / memory_last_mb; on the current Windows host over 2025-01-01 .. 2026-03-27, compat peaked at about 1270.9 MB and chunk-cache at about 1266.2 MB, so the faster mode is currently not meaningfully more memory-hungry
+- on the same full dry-run, `compat` took about `298.53s` vs `218.47s` for `chunk-cache`; `http_get_json_calls` dropped from `8118` to `3708`
+- semantic delta versus `evcc_*` is already tiny for most metrics (`pv` effectively identical, `vehicle_charge_cost_daily_eur` off by about `0.0015 EUR`, `grid_import_daily_wh` off by about `888.93 Wh` in 2025 = about `0.12‰`), but `grid_import_cost_daily_eur` is still off by about `5.72 EUR` in 2025 = about `3.33‰`
+- because RAM is currently almost identical between both modes, keeping two fetch strategies is probably only justified temporarily until the remaining import-cost delta is closed
 - smaller candidates such as `batterySoc` step size or catalog fetch overhead should only be revisited after those two larger query-count reductions land
 - additionally review whether some current or planned derived metrics should stay as dashboard-side MetricsQL aggregations instead of extra stored rollups
 - concrete first candidates: top-5 / top-30 PV-health style aggregates, which may be simple enough to compute on demand
@@ -381,4 +385,5 @@ Dashboard color palette (fixed where possible):
 - Home: #5794F2
 - Feed-in: #2F8F5B
 - Other: #9FA7B3
+
 

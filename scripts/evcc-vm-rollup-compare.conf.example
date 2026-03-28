@@ -7,6 +7,8 @@ metric_prefix = evcc_cmp
 raw_sample_step = 10s
 energy_rollup_step = 60s
 price_bucket_minutes = 15
+fetch_strategy = chunk-cache
+max_fetch_points_per_series = 28000
 
 [benchmark]
 start = 2026-02-20T00:00:00Z
