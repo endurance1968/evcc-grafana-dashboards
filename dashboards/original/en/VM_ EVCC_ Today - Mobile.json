@@ -672,7 +672,7 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "description": "Schwarz: Prioritisierunggrenze für Autoladung",
+        "description": "Black: prioritization threshold for vehicle charging",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -1254,7 +1254,7 @@
             "refId": "Self-consumption"
           }
         ],
-        "title": "Kennzahlen",
+        "title": "Metrics",
         "transparent": true,
         "type": "gauge"
       }
@@ -1723,7 +1723,7 @@
             "mode": "single",
             "sort": "none"
           },
-          "xField": "Energie",
+          "xField": "Energy",
           "xTickLabelRotation": 0,
           "xTickLabelSpacing": 0
         },
@@ -1817,7 +1817,7 @@
             "hide": false,
             "legendFormat": "{{vehicle}}",
             "range": true,
-            "refId": "vehiclesEnergies"
+            "refId": "vehiclesEnergys"
           },
           {
             "datasource": {
@@ -1841,12 +1841,12 @@
             "expr": "1",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Energie",
+            "legendFormat": "Energy",
             "range": true,
             "refId": "workaround"
           }
         ],
-        "title": "Energie (kWh)",
+        "title": "Energy (kWh)",
         "transformations": [
           {
             "id": "reduce",
@@ -2497,7 +2497,7 @@
   "templating": {
     "list": [
       {
-        "description": "Grenze der maximalen Leistung in W, über diese hinaus Leistungswerte als Ausreißer ignoriert werden.",
+        "description": "Maximum power filter in W. Power values above this limit are ignored as outliers.",
         "hide": 2,
         "label": "Max power filter / W",
         "name": "peakPowerLimit",
@@ -2518,7 +2518,7 @@
         ]
       },
       {
-        "description": "URL unter der EVCC geöffnet wird.",
+        "description": "URL used to open EVCC.",
         "hide": 2,
         "label": "EVCC URL",
         "name": "evccUrl",
@@ -2539,7 +2539,7 @@
         ]
       },
       {
-        "description": "Name des Wechselrichterportals für den Link auf das Portal.",
+        "description": "Name of the inverter portal for the portal link.",
         "hide": 2,
         "label": "Inverter portal name",
         "name": "inverterPortalTitle",
@@ -2560,7 +2560,7 @@
         ]
       },
       {
-        "description": "URL unter der das Wechselrichterportal geöffnet wird.",
+        "description": "URL used to open the inverter portal.",
         "hide": 2,
         "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
@@ -2581,7 +2581,7 @@
         ]
       },
       {
-        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression, die mit. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
+        "description": "List of loadpoints that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Garage': ^Garage$\nFilter out 'Garage' and 'Parking space': ^Garage$|^Parking space$\nFilter out everything starting with 'foo': ^foo.*$",
         "hide": 2,
         "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
@@ -2602,7 +2602,7 @@
         ]
       },
       {
-        "description": "Liste der Fahrzeuge, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Garage' aus: /^Garage$/\nFiltere 'Garage' und 'Stellplatz' aus: /^Garage$|^Stellplatz$/\nFiltere Fahrzeuge mit (offline) am Ende aus: /^.*\\(offline\\)$/",
+        "description": "List of vehicles that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Parking space': /^Garage$|^Parking space$/\nFilter out vehicles ending with (offline): /^.*\\(offline\\)$/",
         "hide": 2,
         "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
@@ -2623,7 +2623,7 @@
         ]
       },
       {
-        "description": "Das Abtastinterval für die Energieberechnung. Sollte mindestens 2x dem Abfrageintervall von EVCC entsprechen. Default: 60s, da das Default Intervall von EVCC 60s beträgt.",
+        "description": "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.",
         "hide": 2,
         "label": "Energy sample interval",
         "name": "energySampleInterval",
@@ -2644,7 +2644,7 @@
         ]
       },
       {
-        "description": "Abrechnungstakt des Strompreises.",
+        "description": "Billing interval of the electricity price.",
         "hide": 2,
         "label": "Tariff price interval",
         "name": "tariffPriceInterval",

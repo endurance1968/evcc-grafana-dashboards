@@ -282,7 +282,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energie",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -309,7 +309,7 @@
           "editorMode": "code",
           "expr": "min(chargePower_value)",
           "format": "time_series",
-          "legendFormat": "Energie",
+          "legendFormat": "Energy",
           "range": true,
           "refId": "workaround"
         },
@@ -826,7 +826,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energie",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -866,7 +866,7 @@
           "editorMode": "code",
           "expr": "min(chargePower_value)",
           "format": "time_series",
-          "legendFormat": "Energie",
+          "legendFormat": "Energy",
           "range": true,
           "refId": "workaround"
         }
@@ -1211,7 +1211,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Haus: Aktuelle Leistung",
+      "title": "Home: Current power",
       "transparent": true,
       "type": "piechart"
     },
@@ -1384,7 +1384,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Haus: Leistung",
+      "title": "Home: Power",
       "type": "timeseries"
     },
     {
@@ -1513,7 +1513,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1526,10 +1526,10 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Haus: Energieverteilung",
+      "title": "Home: Energy distribution",
       "transparent": true,
       "type": "piechart"
     },
@@ -1716,7 +1716,7 @@
           "interval": "1h",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1729,10 +1729,10 @@
           "interval": "1h",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Haus: Energie",
+      "title": "Home: Energy",
       "type": "timeseries"
     },
     {
@@ -1870,7 +1870,7 @@
           "refId": "loadpointEnergy"
         }
       ],
-      "title": "Gesamt: Energieverteilung",
+      "title": "Total: Energy distribution",
       "transparent": true,
       "type": "piechart"
     },
@@ -2032,10 +2032,10 @@
           "interval": "1h",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointEnergies"
+          "refId": "loadpointEnergys"
         }
       ],
-      "title": "Gesamt: Energie",
+      "title": "Total: Energy",
       "type": "timeseries"
     },
     {
@@ -3343,7 +3343,7 @@
           "refId": "powerL3"
         }
       ],
-      "title": "Leistung/Phase",
+      "title": "Power/phase",
       "transparent": true,
       "type": "stat"
     },
@@ -3470,7 +3470,7 @@
           "refId": "powerL3"
         }
       ],
-      "title": "Leistung/Phase",
+      "title": "Power/phase",
       "type": "timeseries"
     },
     {
@@ -3777,7 +3777,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^1 phasig.*/"
+              "options": "/^1-phase.*/"
             },
             "properties": [
               {
@@ -3792,7 +3792,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^3 phasig.*/"
+              "options": "/^3-phase.*/"
             },
             "properties": [
               {
@@ -3967,7 +3967,7 @@
   "templating": {
     "list": [
       {
-        "description": "Grenze der maximalen Leistung in W, über diese hinaus Leistungswerte als Ausreißer ignoriert werden.",
+        "description": "Maximum power filter in W. Power values above this limit are ignored as outliers.",
         "hide": 2,
         "label": "Max power filter / W",
         "name": "peakPowerLimit",
@@ -3988,7 +3988,7 @@
         ]
       },
       {
-        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
+        "description": "List of loadpoints that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Garage': ^Garage$\nFilter out 'Garage' and 'Parking space': ^Garage$|^Parking space$\nFilter out everything starting with 'foo': ^foo.*$",
         "hide": 2,
         "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
@@ -4009,7 +4009,7 @@
         ]
       },
       {
-        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Erdgeschoss' aus: /^Erdgeschoss$/\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: /^Erdgeschoss$|^Erster Stock$/\nFiltere alles, das mit 'Verteiler' beginnt aus: /^Verteiler.*$/",
+        "description": "List of EXT devices that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Ground floor': /^Ground floor$/\nFilter out 'Ground floor' and 'First floor': /^Ground floor$|^First floor$/\nFilter out everything starting with 'Distribution': /^Distribution.*$/",
         "hide": 2,
         "name": "extBlocklist",
         "query": ".*Car.*|.*Haupt.*",
@@ -4029,7 +4029,7 @@
         ]
       },
       {
-        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Erdgeschoss' aus: ^Erdgeschoss$\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: ^Erdgeschoss$|^Erster Stock$\nFiltere alles, das mit 'Verteiler' beginnt aus: ^Verteiler.*$",
+        "description": "List of EXT devices that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Ground floor': ^Ground floor$\nFilter out 'Ground floor' and 'First floor': ^Ground floor$|^First floor$\nFilter out everything starting with 'Distribution': ^Distribution.*$",
         "hide": 2,
         "name": "auxBlocklist",
         "query": "^none$",
@@ -4071,7 +4071,7 @@
         "type": "query"
       },
       {
-        "description": "Das Abtastinterval für die Energieberechnung. Sollte mindestens 2x dem Abfrageintervall von EVCC entsprechen. Default: 60s, da das Default Intervall von EVCC 60s beträgt.",
+        "description": "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.",
         "hide": 2,
         "label": "Energy sample interval",
         "name": "energySampleInterval",
