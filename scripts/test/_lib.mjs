@@ -1,4 +1,4 @@
-﻿import fs from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 
 export function loadEnvFile(filePath = ".env") {
@@ -36,13 +36,22 @@ export function parseArg(name, fallback = "") {
   return hit.slice(prefix.length);
 }
 
-export function listJsonFiles(dirPath) {
-  const abs = path.resolve(dirPath);
+export function listJsonFiles(inputPath) {
+  const abs = path.resolve(inputPath);
+  if (!fs.existsSync(abs)) {
+    throw new Error(`Path not found: ${inputPath}`);
+  }
+  const stat = fs.statSync(abs);
+  if (stat.isFile()) {
+    if (!abs.toLowerCase().endsWith('.json')) return [];
+    return [abs];
+  }
+
   const out = [];
   for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
     const full = path.join(abs, entry.name);
     if (entry.isDirectory()) out.push(...listJsonFiles(full));
-    else if (entry.isFile() && entry.name.endsWith(".json")) out.push(full);
+    else if (entry.isFile() && entry.name.endsWith('.json')) out.push(full);
   }
   return out.sort((a, b) => a.localeCompare(b));
 }

@@ -1,0 +1,16 @@
+{
+  "variables": {
+    "extBlocklist": ".*Car.*|.*Haupt.*",
+    "loadpointBlocklist": "^none$",
+    "auxBlocklist": "^none$",
+    "peakPowerLimit": "25000",
+    "energySampleInterval": "30s",
+    "tariffPriceInterval": "15m"
+  },
+  "colors": {
+    "Autarky": "#73BF69",
+    "Autarkie": "#73BF69",
+    "Self-consumption": "#B877D9",
+    "Eigenverbrauch": "#B877D9"
+  }
+}

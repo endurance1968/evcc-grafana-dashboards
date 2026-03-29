@@ -32,8 +32,8 @@ const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
 const source = parseArg("source", defaultSourceFromConfig());
 const tag = sanitizeTag(parseArg("tag", path.basename(path.resolve(source))));
-const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-l10n-test");
-const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Localization Test");
+const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc");
+const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC");
 const manifestOut = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 const titlePrefix = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX", "");
 

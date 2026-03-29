@@ -199,3 +199,12 @@ Still deferred beyond the current baseline:
 - productivizing `test_evcc_*` into `evcc_*`
 - any optional monthly rollup layer
 
+
+
+## End-user install
+
+For end users, prefer:
+
+- D:\AI-Workspaces\evcc-grafana-dashboards\scripts\install-vm.ps1
+- D:\AI-Workspaces\evcc-grafana-dashboards\scripts\install-vm.sh
+- D:\AI-Workspaces\evcc-grafana-dashboards\docs\vm-dashboard-install.md

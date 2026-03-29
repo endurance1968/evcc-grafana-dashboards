@@ -15,6 +15,9 @@ Without `--family=...`, the scripts use the default VM path.
 ## Script overview
 
 - `deploy-dashboards.mjs`: high-level deploy workflow for a single language or variant
+  - supports local repo sources and GitHub repo sources
+  - stages dashboards into a temporary deploy source before import
+  - applies optional variable/color overrides before import
 - `import-dashboards-raw.mjs`: import via Grafana's raw dashboard import endpoint
 - `smoke-check.mjs`: post-import validation
 - `capture-screenshots.mjs`: browser-based screenshot capture
@@ -56,8 +59,8 @@ Required for screenshots:
 
 Optional:
 
-- `GRAFANA_TEST_FOLDER_UID` default: `evcc-l10n-test`
-- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC Localization Test`
+- `GRAFANA_TEST_FOLDER_UID` default: `evcc`
+- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC`
 - `GRAFANA_SCREENSHOT_WAIT_MS` default: `3500`
 - `GRAFANA_TIME_FROM` and `GRAFANA_TIME_TO` for a global screenshot time override
 
@@ -246,3 +249,41 @@ Avoid:
 ## Maintenance note
 
 Update this README whenever script defaults, family handling, tags, screenshot layout, or workflow assumptions change.
+
+### Deploy defaults and overrides
+
+`deploy-dashboards.mjs` now supports these practical defaults for VM:
+
+- default language: `en`
+- default variant: `orig`
+- default source mode: `github`
+- default GitHub repo: the configured local `github` remote
+- default override file for VM: `scripts/test/deploy-overrides.vm.default.json`
+- local user override file if present: `scripts/test/deploy-overrides.local.json`
+
+Supported arguments:
+
+- `--source-mode=local|github`
+- `--source=<local path or repo-relative path>`
+- `--github-repo=<owner/repo>`
+- `--github-ref=<branch-or-tag>`
+- `--overrides=<json file>` or `--overrides=none`
+- `--language=<code>`
+- `--variant=orig|generated`
+
+Override JSON currently supports:
+
+- `variables`: set Grafana variable defaults by variable name
+- `colors`: set fixed colors for any field override matched by `byName`
+
+Example VM deploy from the local repo:
+
+```bash
+node scripts/test/deploy-dashboards.mjs --env=.env.local --source-mode=local --purge=true --smoke=true
+```
+
+Example VM deploy from GitHub default remote/ref:
+
+```bash
+node scripts/test/deploy-dashboards.mjs --env=.env.local --purge=true --smoke=true
+```
