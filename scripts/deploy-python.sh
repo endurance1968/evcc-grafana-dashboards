@@ -6,6 +6,7 @@ CONFIG_PATH="$SCRIPT_DIR/vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
+CLI_YES="false"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -25,9 +26,13 @@ while [ "$#" -gt 0 ]; do
       CLI_PURGE="$2"
       shift 2
       ;;
+    --yes|-y)
+      CLI_YES="true"
+      shift 1
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--yes]
 EOF
       exit 0
       ;;
@@ -43,7 +48,7 @@ EOF
   esac
 done
 
-export CLI_URL CLI_TOKEN CLI_PURGE
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_YES
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -89,6 +94,8 @@ if os.environ.get("CLI_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = os.environ["CLI_TOKEN"]
 if os.environ.get("CLI_PURGE"):
     settings["PURGE"] = os.environ["CLI_PURGE"]
+if os.environ.get("CLI_YES"):
+    settings["CLI_YES"] = os.environ["CLI_YES"]
 if "DEPLOY_PURGE" in settings and "PURGE" not in settings:
     settings["PURGE"] = settings["DEPLOY_PURGE"]
 
@@ -160,8 +167,16 @@ def build_inputs(raw):
     return out
 
 def confirm_apply():
-    answer = input("Proceed with dashboard deployment? [y/N] ").strip().lower()
-    return answer in ("y", "yes")
+    if settings.get("CLI_YES", "").lower() == "true":
+        return True
+    try:
+        with open("/dev/tty", "r", encoding="utf-8", errors="replace") as tty:
+            sys.stdout.write("Proceed with dashboard deployment? [y/N] ")
+            sys.stdout.flush()
+            answer = tty.readline()
+    except OSError:
+        return False
+    return answer.strip().lower() in ("y", "yes")
 
 def delete_and_report(kind, name, uid, path):
     existing = api("GET", path, allow_404=True)
