@@ -50,12 +50,12 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
   }
   try {
     if ($null -ne $jsonBody) {
-      $response = Invoke-WebRequest -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody
+      $response = Invoke-WebRequest -UseBasicParsing -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody
     } else {
-      $response = Invoke-WebRequest -Method $Method -Uri $uri -Headers $headers
+      $response = Invoke-WebRequest -UseBasicParsing -Method $Method -Uri $uri -Headers $headers
     }
     if (-not $response.Content) { return $null }
-    return $response.Content | ConvertFrom-Json -Depth 100
+    return $response.Content | ConvertFrom-Json
   } catch {
     if ($Allow404 -and $_.Exception.Response -and $_.Exception.Response.StatusCode.value__ -eq 404) {
       return $null
@@ -76,7 +76,7 @@ function Get-SourceFileContent([string]$FileName) {
     ($subDir -replace '\\', '/').Trim('/'),
     [Uri]::EscapeDataString($FileName)
   ) -join '/'
-  return (Invoke-WebRequest -Method Get -Uri $sourceUrl).Content
+  return (Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl).Content
 }
 
 function Replace-DatasourcePlaceholders($Node) {
@@ -116,7 +116,7 @@ function Build-Inputs($Raw) {
 }
 
 function Prepare-DashboardForImport($DashboardRaw) {
-  $prepared = ($DashboardRaw | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100)
+  $prepared = ($DashboardRaw | ConvertTo-Json -Depth 100 | ConvertFrom-Json)
   if ($null -ne $prepared.PSObject.Properties['__elements']) {
     $prepared.PSObject.Properties.Remove('__elements')
   }
@@ -150,7 +150,7 @@ $settings = @{
   GITHUB_REPO = 'endurance1968/evcc-grafana-dashboards'
   GITHUB_REF = 'main'
   DASHBOARD_LANGUAGE = 'en'
-  DASHBOARD_VARIANT = 'orig'
+  DASHBOARD_VARIANT = 'gen'
   DASHBOARD_LOCAL_DIR = ''
   PURGE = 'false'
 }
@@ -191,7 +191,7 @@ $dashboardFiles = @(
 $dashboards = @()
 $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
-  $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json -Depth 100
+  $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json
   $dashboards += @{ fileName = $fileName; raw = $raw; inputs = (Build-Inputs $raw) }
   if ($null -ne $raw.PSObject.Properties['__elements']) {
     foreach ($prop in $raw.__elements.PSObject.Properties) { $libraryElements[$prop.Name] = $prop.Value }
@@ -273,7 +273,7 @@ foreach ($dashboard in $dashboards) {
   $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + '/api/dashboards/import'
   $jsonBody = $body | ConvertTo-Json -Depth 100
   Write-Host "Importing dashboard: $($dashboard.raw.title) [$($dashboard.raw.uid)]"
-  Invoke-WebRequest -Method Post -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody | Out-Null
+  Invoke-WebRequest -UseBasicParsing -Method Post -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody | Out-Null
   Write-Host "Imported dashboard: $($dashboard.raw.title)"
 }
 
