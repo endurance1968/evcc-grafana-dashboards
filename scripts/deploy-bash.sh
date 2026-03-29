@@ -62,7 +62,7 @@ DASHBOARD_SOURCE_MODE="github"
 GITHUB_REPO="endurance1968/evcc-grafana-dashboards"
 GITHUB_REF="main"
 DASHBOARD_LANGUAGE="en"
-DASHBOARD_VARIANT="orig"
+DASHBOARD_VARIANT="gen"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
 
@@ -332,9 +332,13 @@ if [[ "${PURGE,,}" == "true" ]]; then
     if [[ -n "$uid" ]]; then
       purge_out="$TMP_DIR/purge-dashboard.json"
       status=$(api DELETE "/api/dashboards/uid/$(urlencode "$uid")" "" "$purge_out")
-      if [[ "$status" != "404" && ( "$status" -lt 200 || "$status" -ge 300 ) ]]; then
+      if [[ "$status" == "404" ]]; then
+        echo "Skipping dashboard delete (not found): $(jq -r '.title // ""' "$raw_file") [$uid]"
+      elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
         echo "Failed to purge dashboard $uid: $(cat "$purge_out")" >&2
         exit 1
+      else
+        echo "Deleted dashboard: $(jq -r '.title // ""' "$raw_file") [$uid]"
       fi
     fi
   done
@@ -343,9 +347,13 @@ if [[ "${PURGE,,}" == "true" ]]; then
     uid=$(jq -r '.uid' "$lib_file")
     purge_out="$TMP_DIR/purge-library.json"
     status=$(api DELETE "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
-    if [[ "$status" != "404" && ( "$status" -lt 200 || "$status" -ge 300 ) ]]; then
+    if [[ "$status" == "404" ]]; then
+      echo "Skipping library panel delete (not found): $(jq -r '.name' "$lib_file") [$uid]"
+    elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
       echo "Failed to purge library panel $uid: $(cat "$purge_out")" >&2
       exit 1
+    else
+      echo "Deleted library panel: $(jq -r '.name' "$lib_file") [$uid]"
     fi
   done
 fi

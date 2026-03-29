@@ -25,12 +25,12 @@ This is simpler and safer than using username/password automation.
 
 ## Default behavior
 
-The deployer defaults to:
+The deployer defaults to the generated dashboard set:
 
 - source repo: `endurance1968/evcc-grafana-dashboards`
 - ref: `main`
 - language: `en`
-- variant: `orig`
+- variant: `gen`
 - folder UID/title: `evcc` / `EVCC`
 - datasource UID: `vm-evcc`
 - purge before import: `false`

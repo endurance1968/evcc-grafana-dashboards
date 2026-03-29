@@ -66,7 +66,7 @@ settings = {
     "GITHUB_REPO": "endurance1968/evcc-grafana-dashboards",
     "GITHUB_REF": "main",
     "DASHBOARD_LANGUAGE": "en",
-    "DASHBOARD_VARIANT": "orig",
+    "DASHBOARD_VARIANT": "gen",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
 }
@@ -163,6 +163,17 @@ def confirm_apply():
     answer = input("Proceed with dashboard deployment? [y/N] ").strip().lower()
     return answer in ("y", "yes")
 
+def delete_and_report(kind, name, uid, path):
+    existing = api("GET", path, allow_404=True)
+    if existing is None:
+        print(f"Skipping {kind} delete (not found): {name} [{uid}]")
+        return
+    api("DELETE", path, allow_404=True)
+    after_delete = api("GET", path, allow_404=True)
+    if after_delete is None:
+        print(f"Deleted {kind}: {name} [{uid}]")
+    else:
+        raise RuntimeError(f"Failed to delete {kind} {name} [{uid}]")
 dashboards = []
 library = {}
 for filename in DASHBOARD_FILES:
@@ -247,10 +258,9 @@ if settings["PURGE"].lower() == "true":
     for dashboard in dashboards:
         uid = dashboard["raw"].get("uid")
         if uid:
-            api("DELETE", f"/api/dashboards/uid/{urllib.parse.quote(uid)}", allow_404=True)
-    for uid in existing_library:
-        api("DELETE", f"/api/library-elements/{urllib.parse.quote(uid)}", allow_404=True)
-
+            delete_and_report("dashboard", dashboard["raw"].get("title"), uid, f"/api/dashboards/uid/{urllib.parse.quote(uid)}")
+    for uid, item in existing_library.items():
+        delete_and_report("library panel", item.get("name"), uid, f"/api/library-elements/{urllib.parse.quote(uid)}")
 for element in library.values():
     uid = element.get("uid")
     if settings["PURGE"].lower() != "true" and uid in existing_library:

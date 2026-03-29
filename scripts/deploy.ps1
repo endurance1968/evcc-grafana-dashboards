@@ -42,15 +42,17 @@ function Merge-Setting([hashtable]$Settings, [string]$Key, [object]$Value) {
 }
 
 function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switch]$Allow404) {
-  $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + $Path
+  $uri = ($settings.GRAFANA_URL.TrimEnd('/') ) + $Path
   $headers = @{ Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"; Accept = 'application/json' }
   $jsonBody = $null
+  $jsonBytes = $null
   if ($null -ne $Body) {
     $jsonBody = $Body | ConvertTo-Json -Depth 100
+    $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($jsonBody)
   }
   try {
     if ($null -ne $jsonBody) {
-      $response = Invoke-WebRequest -UseBasicParsing -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody
+      $response = Invoke-WebRequest -UseBasicParsing -Method $Method -Uri $uri -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $jsonBytes
     } else {
       $response = Invoke-WebRequest -UseBasicParsing -Method $Method -Uri $uri -Headers $headers
     }
@@ -66,17 +68,25 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
 
 function Get-SourceFileContent([string]$FileName) {
   if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
-    return Get-Content -Raw -LiteralPath (Join-Path $settings.DASHBOARD_LOCAL_DIR $FileName)
+    return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $settings.DASHBOARD_LOCAL_DIR $FileName)
   }
   $subDir = if ($settings.DASHBOARD_VARIANT -eq 'orig') { "dashboards/original/$($settings.DASHBOARD_LANGUAGE)" } else { "dashboards/translation/$($settings.DASHBOARD_LANGUAGE)" }
   $sourceUrl = @(
     'https://raw.githubusercontent.com',
     $settings.GITHUB_REPO,
     $settings.GITHUB_REF,
-    ($subDir -replace '\\', '/').Trim('/'),
+    $subDir.Replace('\\','/').Trim('/'),
     [Uri]::EscapeDataString($FileName)
   ) -join '/'
-  return (Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl).Content
+  $response = Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl
+  if ($null -ne $response.RawContentStream) {
+    try {
+      $response.RawContentStream.Position = 0
+      $reader = New-Object System.IO.StreamReader($response.RawContentStream, [System.Text.Encoding]::UTF8, $true)
+      try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+    } catch { }
+  }
+  return $response.Content
 }
 
 function Replace-DatasourcePlaceholders($Node) {
@@ -133,6 +143,34 @@ function Ensure-Folder() {
 
 function Remove-IfExists([string]$Path) {
   Invoke-GrafanaApi DELETE $Path -Allow404 | Out-Null
+}
+
+function Remove-And-Report([string]$Kind, [string]$Name, [string]$Uid, [string]$Path) {
+  $existing = Invoke-GrafanaApi GET $Path -Allow404
+  if ($null -eq $existing) {
+    Write-Host "Skipping ${Kind} delete (not found): $Name [$Uid]" -ForegroundColor DarkYellow
+    return
+  }
+  Invoke-GrafanaApi DELETE $Path -Allow404 | Out-Null
+  $afterDelete = Invoke-GrafanaApi GET $Path -Allow404
+  if ($null -eq $afterDelete) {
+    Write-Host "Deleted ${Kind}: $Name [$Uid]" -ForegroundColor Green
+  } else {
+    throw "Failed to delete ${Kind} $Name [$Uid]"
+  }
+}
+
+function Wait-LibraryPanel([string]$Uid, [string]$Name) {
+  $path = "/api/library-elements/$([Uri]::EscapeDataString($Uid))"
+  for ($i = 0; $i -lt 20; $i++) {
+    $existing = Invoke-GrafanaApi GET $path -Allow404
+    if ($null -ne $existing -and $null -ne $existing.result -and $null -ne $existing.result.model -and $existing.result.model.type) {
+      Write-Host "Verified library panel: $Name [$Uid]" -ForegroundColor Green
+      return
+    }
+    Start-Sleep -Milliseconds 250
+  }
+  throw "Library panel not readable after import: $Name [$Uid]"
 }
 
 function Confirm-Apply() {
@@ -251,9 +289,14 @@ if (-not (Confirm-Apply)) {
 Ensure-Folder
 if ($settings.PURGE -eq 'true') {
   foreach ($dashboard in $dashboards) {
-    if ($dashboard.raw.uid) { Remove-IfExists "/api/dashboards/uid/$([Uri]::EscapeDataString($dashboard.raw.uid))" }
+    if ($dashboard.raw.uid) {
+      Remove-And-Report 'dashboard' $dashboard.raw.title $dashboard.raw.uid "/api/dashboards/uid/$([Uri]::EscapeDataString($dashboard.raw.uid))"
+    }
   }
-  foreach ($uid in $existingLibrary.Keys) { Remove-IfExists "/api/library-elements/$([Uri]::EscapeDataString($uid))" }
+  foreach ($uid in $existingLibrary.Keys) {
+    $item = $existingLibrary[$uid]
+    Remove-And-Report 'library panel' $item.name $uid "/api/library-elements/$([Uri]::EscapeDataString($uid))"
+  }
 }
 
 foreach ($element in $libraryElements.Values) {
@@ -264,6 +307,7 @@ foreach ($element in $libraryElements.Values) {
   $body = @{ uid = $element.uid; name = $element.name; kind = $(if ($element.kind) { $element.kind } else { 1 }); folderUid = $settings.GRAFANA_FOLDER_UID; model = (Replace-DatasourcePlaceholders $element.model) }
   Invoke-GrafanaApi POST '/api/library-elements' $body | Out-Null
   Write-Host "Imported library panel: $($element.name)"
+  Wait-LibraryPanel $element.uid $element.name
 }
 
 foreach ($dashboard in $dashboards) {
@@ -272,8 +316,9 @@ foreach ($dashboard in $dashboards) {
   $headers = @{ Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"; Accept = 'application/json' }
   $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + '/api/dashboards/import'
   $jsonBody = $body | ConvertTo-Json -Depth 100
+  $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($jsonBody)
   Write-Host "Importing dashboard: $($dashboard.raw.title) [$($dashboard.raw.uid)]"
-  Invoke-WebRequest -UseBasicParsing -Method Post -Uri $uri -Headers $headers -ContentType 'application/json' -Body $jsonBody | Out-Null
+  Invoke-WebRequest -UseBasicParsing -Method Post -Uri $uri -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $jsonBytes | Out-Null
   Write-Host "Imported dashboard: $($dashboard.raw.title)"
 }
 
