@@ -207,7 +207,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   echo "- $(jq -r '.title' "$raw_file") [$(jq -r '.uid // ""' "$raw_file")]"
 done
 echo
-echo "Will import library panels:"
+echo "Dashboards embed these library panels:"
 for lib_file in "$LIB_DIR"/*.json; do
   [[ -e "$lib_file" ]] || continue
   echo "- $(jq -r '.name' "$lib_file") [$(jq -r '.uid' "$lib_file")]"
@@ -229,11 +229,11 @@ done
 
 if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo
-  echo "Existing library panels already present and will be kept because purge=false:"
+  echo "Existing library panels already present and will be left in place because purge=false:"
   for item in "${existing_library[@]}"; do
     echo "- $item"
   done
-  echo "Only missing library panels will be imported. Existing ones are skipped."
+  echo "Dashboard import will rely on the embedded __elements definitions."
 fi
 
 if [[ "${PURGE,,}" == "true" ]]; then
@@ -318,11 +318,11 @@ done
 
 if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo
-  echo "Existing library panels already present and will be kept because purge=false:"
+  echo "Existing library panels already present and will be left in place because purge=false:"
   for item in "${existing_library[@]}"; do
     echo "- $item"
   done
-  echo "Only missing library panels will be imported. Existing ones are skipped."
+  echo "Dashboard import will rely on the embedded __elements definitions."
 fi
 
 if [[ "${PURGE,,}" == "true" ]]; then
@@ -357,32 +357,6 @@ if [[ "${PURGE,,}" == "true" ]]; then
     fi
   done
 fi
-
-for lib_file in "$LIB_DIR"/*.json; do
-  [[ -e "$lib_file" ]] || continue
-  uid=$(jq -r '.uid' "$lib_file")
-  if [[ "${PURGE,,}" != "true" ]]; then
-    skip_existing=0
-    for item in "${existing_library[@]}"; do
-      case "$item" in
-        *"[$uid]") skip_existing=1 ;;&
-      esac
-    done
-    if [[ "$skip_existing" -eq 1 ]]; then
-      echo "Keeping existing library panel: $(jq -r '.name' "$lib_file") [$uid]"
-      continue
-    fi
-  fi
-  body_file="$TMP_DIR/library-body.json"
-  jq --arg folderUid "$GRAFANA_FOLDER_UID" '{uid:.uid,name:.name,kind:.kind,folderUid:$folderUid,model:.model}' "$lib_file" > "$body_file"
-  out_file="$TMP_DIR/library-import.json"
-  status=$(api POST "/api/library-elements" "$body_file" "$out_file")
-  if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
-    echo "Failed to import library panel: $(cat "$out_file")" >&2
-    exit 1
-  fi
-  echo "Imported library panel: $(jq -r '.name' "$lib_file")"
-done
 
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"

@@ -125,14 +125,6 @@ function Build-Inputs($Raw) {
   return $inputs
 }
 
-function Prepare-DashboardForImport($DashboardRaw) {
-  $prepared = ($DashboardRaw | ConvertTo-Json -Depth 100 | ConvertFrom-Json)
-  if ($null -ne $prepared.PSObject.Properties['__elements']) {
-    $prepared.PSObject.Properties.Remove('__elements')
-  }
-  return $prepared
-}
-
 function Ensure-Folder() {
   $folderUid = [Uri]::EscapeDataString($settings.GRAFANA_FOLDER_UID)
   $existing = Invoke-GrafanaApi GET "/api/folders/$folderUid" -Allow404
@@ -158,19 +150,6 @@ function Remove-And-Report([string]$Kind, [string]$Name, [string]$Uid, [string]$
   } else {
     throw "Failed to delete ${Kind} $Name [$Uid]"
   }
-}
-
-function Wait-LibraryPanel([string]$Uid, [string]$Name) {
-  $path = "/api/library-elements/$([Uri]::EscapeDataString($Uid))"
-  for ($i = 0; $i -lt 20; $i++) {
-    $existing = Invoke-GrafanaApi GET $path -Allow404
-    if ($null -ne $existing -and $null -ne $existing.result -and $null -ne $existing.result.model -and $existing.result.model.type) {
-      Write-Host "Verified library panel: $Name [$Uid]" -ForegroundColor Green
-      return
-    }
-    Start-Sleep -Milliseconds 250
-  }
-  throw "Library panel not readable after import: $Name [$Uid]"
 }
 
 function Confirm-Apply() {
@@ -249,7 +228,7 @@ Write-Host ''
 Write-Host 'Will import dashboards:'
 foreach ($dashboard in $dashboards) { Write-Host "- $($dashboard.raw.title) [$($dashboard.raw.uid)]" }
 Write-Host ''
-Write-Host 'Will import library panels:'
+Write-Host 'Dashboards embed these library panels:'
 foreach ($element in $libraryElements.Values) { Write-Host "- $($element.name) [$($element.uid)]" }
 
 $existingLibrary = @{}
@@ -260,9 +239,9 @@ foreach ($element in $libraryElements.Values) {
 }
 if ($settings.PURGE -ne 'true' -and $existingLibrary.Count -gt 0) {
   Write-Host ''
-  Write-Host 'Existing library panels already present and will be kept because purge=false:' -ForegroundColor Yellow
+  Write-Host 'Existing library panels already present and will be left in place because purge=false:' -ForegroundColor Yellow
   foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" }
-  Write-Host 'Only missing library panels will be imported. Existing ones are skipped.' -ForegroundColor Yellow
+  Write-Host 'Dashboard import will rely on the embedded __elements definitions.' -ForegroundColor Yellow
 }
 
 if ($settings.PURGE -eq 'true') {
@@ -299,20 +278,8 @@ if ($settings.PURGE -eq 'true') {
   }
 }
 
-foreach ($element in $libraryElements.Values) {
-  if ($settings.PURGE -ne 'true' -and $existingLibrary.ContainsKey($element.uid)) {
-    Write-Host "Keeping existing library panel: $($element.name) [$($element.uid)]"
-    continue
-  }
-  $body = @{ uid = $element.uid; name = $element.name; kind = $(if ($element.kind) { $element.kind } else { 1 }); folderUid = $settings.GRAFANA_FOLDER_UID; model = (Replace-DatasourcePlaceholders $element.model) }
-  Invoke-GrafanaApi POST '/api/library-elements' $body | Out-Null
-  Write-Host "Imported library panel: $($element.name)"
-  Wait-LibraryPanel $element.uid $element.name
-}
-
 foreach ($dashboard in $dashboards) {
-  $dashboardToImport = Prepare-DashboardForImport $dashboard.raw
-  $body = @{ dashboard = $dashboardToImport; folderUid = $settings.GRAFANA_FOLDER_UID; overwrite = $true; message = 'EVCC VM dashboard install'; inputs = [object[]]@($dashboard.inputs) }
+  $body = @{ dashboard = $dashboard.raw; folderUid = $settings.GRAFANA_FOLDER_UID; overwrite = $true; message = 'EVCC VM dashboard install'; inputs = [object[]]@($dashboard.inputs) }
   $headers = @{ Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"; Accept = 'application/json' }
   $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + '/api/dashboards/import'
   $jsonBody = $body | ConvertTo-Json -Depth 100

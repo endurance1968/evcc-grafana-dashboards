@@ -199,7 +199,7 @@ print("Will import dashboards:")
 for dashboard in dashboards:
     print(f"- {dashboard['raw'].get('title')} [{dashboard['raw'].get('uid')}]")
 print()
-print("Will import library panels:")
+print("Dashboards embed these library panels:")
 for element in library.values():
     print(f"- {element.get('name')} [{element.get('uid')}]")
 
@@ -214,10 +214,10 @@ for element in library.values():
 
 if settings["PURGE"].lower() != "true" and existing_library:
     print()
-    print("Existing library panels already present and will be kept because purge=false:")
+    print("Existing library panels already present and will be left in place because purge=false:")
     for item in existing_library.values():
         print(f"- {item.get('name')} [{item.get('uid')}]")
-    print("Only missing library panels will be imported. Existing ones are skipped.")
+    print("Dashboard import will rely on the embedded __elements definitions.")
 
 if settings["PURGE"].lower() == "true":
     existing_dashboards = []
@@ -261,26 +261,9 @@ if settings["PURGE"].lower() == "true":
             delete_and_report("dashboard", dashboard["raw"].get("title"), uid, f"/api/dashboards/uid/{urllib.parse.quote(uid)}")
     for uid, item in existing_library.items():
         delete_and_report("library panel", item.get("name"), uid, f"/api/library-elements/{urllib.parse.quote(uid)}")
-for element in library.values():
-    uid = element.get("uid")
-    if settings["PURGE"].lower() != "true" and uid in existing_library:
-        print(f"Keeping existing library panel: {element['name']} [{uid}]")
-        continue
-    body = {
-        "uid": element["uid"],
-        "name": element["name"],
-        "kind": element.get("kind", 1),
-        "folderUid": settings["GRAFANA_FOLDER_UID"],
-        "model": replace_ds(element["model"]),
-    }
-    api("POST", "/api/library-elements", body)
-    print(f"Imported library panel: {element['name']}")
-
 for dashboard in dashboards:
-    prepared = dict(dashboard["raw"])
-    prepared.pop("__elements", None)
     body = {
-        "dashboard": prepared,
+        "dashboard": dashboard["raw"],
         "folderUid": settings["GRAFANA_FOLDER_UID"],
         "overwrite": True,
         "message": "EVCC VM dashboard install",
