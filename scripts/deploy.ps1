@@ -201,8 +201,8 @@ $dashboardFiles = @(
   'VM_ EVCC_ Jahr.json',
   'VM_ EVCC_ Monat.json',
   'VM_ EVCC_ Today - Details.json',
-  'VM_ EVCC_ Today - Mobile.json',
-  'VM_ EVCC_ Today.json'
+  'VM_ EVCC_ Today.json',
+  'VM_ EVCC_ Today - Mobile.json'
 )
 
 $dashboards = @()
