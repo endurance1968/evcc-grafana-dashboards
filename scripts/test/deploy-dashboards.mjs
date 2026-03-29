@@ -14,7 +14,7 @@ import {
   familyTranslationDir,
   parseFamilyArg,
   resolveDashboardFamily,
-} from "../_dashboard-family.mjs";
+} from "../helper/_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -420,3 +420,4 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+

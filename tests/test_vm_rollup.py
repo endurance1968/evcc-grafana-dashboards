@@ -4,7 +4,7 @@ import sys
 import unittest
 
 
-MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "evcc-vm-rollup.py"
+MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "rollup" / "evcc-vm-rollup.py"
 SPEC = importlib.util.spec_from_file_location("evcc_vm_rollup", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = MODULE
@@ -19,7 +19,7 @@ class VmRollupTests(unittest.TestCase):
             db_label="evcc",
             host_label="",
             timezone="Europe/Berlin",
-            metric_prefix="test_evcc",
+            metric_prefix="evcc",
             raw_sample_step="10s",
             energy_rollup_step="60s",
             price_bucket_minutes=15,
@@ -32,18 +32,18 @@ class VmRollupTests(unittest.TestCase):
     def test_record_name_uses_prefix(self):
         self.assertEqual(
             MODULE.record_name(self.settings, "pv_energy_daily_wh"),
-            "test_evcc_pv_energy_daily_wh",
+            "evcc_pv_energy_daily_wh",
         )
 
     def test_catalog_contains_phase_one_metrics(self):
         catalog = MODULE.build_catalog(self.settings)
         records = {item.record for item in catalog if item.implemented}
-        self.assertIn("test_evcc_pv_energy_daily_wh", records)
-        self.assertIn("test_evcc_vehicle_distance_daily_km", records)
-        self.assertIn("test_evcc_vehicle_charge_cost_daily_eur", records)
-        self.assertIn("test_evcc_potential_vehicle_charge_cost_daily_eur", records)
-        self.assertIn("test_evcc_grid_import_cost_daily_eur", records)
-        self.assertIn("test_evcc_grid_import_price_effective_daily_ct_per_kwh", records)
+        self.assertIn("evcc_pv_energy_daily_wh", records)
+        self.assertIn("evcc_vehicle_distance_daily_km", records)
+        self.assertIn("evcc_vehicle_charge_cost_daily_eur", records)
+        self.assertIn("evcc_potential_vehicle_charge_cost_daily_eur", records)
+        self.assertIn("evcc_grid_import_cost_daily_eur", records)
+        self.assertIn("evcc_grid_import_price_effective_daily_ct_per_kwh", records)
 
     def test_catalog_marks_only_remaining_phase_two_items_as_deferred(self):
         catalog = MODULE.build_catalog(self.settings)
@@ -152,7 +152,7 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(
             labels,
             {
-                "__name__": "test_evcc_vehicle_energy_daily_wh",
+                "__name__": "evcc_vehicle_energy_daily_wh",
                 "db": "evcc",
                 "local_year": "2026",
                 "local_month": "03",
@@ -191,7 +191,7 @@ class VmRollupTests(unittest.TestCase):
             [
                 {
                     "metric": {
-                        "__name__": "test_evcc_pv_energy_daily_wh",
+                        "__name__": "evcc_pv_energy_daily_wh",
                         "db": "evcc",
                             },
                     "values": [12.5],
@@ -199,7 +199,7 @@ class VmRollupTests(unittest.TestCase):
                 },
                 {
                     "metric": {
-                        "__name__": "test_evcc_home_energy_daily_wh",
+                        "__name__": "evcc_home_energy_daily_wh",
                         "db": "evcc",
                             },
                     "values": [8.0],
@@ -210,7 +210,7 @@ class VmRollupTests(unittest.TestCase):
         lines = [line for line in payload.splitlines() if line.strip()]
         self.assertEqual(len(lines), 2)
         decoded = [MODULE.json.loads(line) for line in lines]
-        self.assertEqual(decoded[0]["metric"]["__name__"], "test_evcc_pv_energy_daily_wh")
+        self.assertEqual(decoded[0]["metric"]["__name__"], "evcc_pv_energy_daily_wh")
         self.assertEqual(decoded[1]["values"], [8.0])
 
     def test_build_window_chunks_groups_days_by_month(self):
@@ -483,16 +483,19 @@ class VmRollupTests(unittest.TestCase):
         )
 
         self.assertEqual(len(result), 2)
-        yearly = next(row for row in result if row["metric"]["__name__"] == "test_evcc_pv_top30_mean_yearly_wh")
-        monthly = next(row for row in result if row["metric"]["__name__"] == "test_evcc_pv_top5_mean_monthly_wh")
-        self.assertEqual(yearly["metric"], {"__name__": "test_evcc_pv_top30_mean_yearly_wh", "db": "evcc", "local_year": "2025"})
-        self.assertEqual(monthly["metric"], {"__name__": "test_evcc_pv_top5_mean_monthly_wh", "db": "evcc", "local_year": "2025", "local_month": "01"})
+        yearly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top30_mean_yearly_wh")
+        monthly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top5_mean_monthly_wh")
+        self.assertEqual(yearly["metric"], {"__name__": "evcc_pv_top30_mean_yearly_wh", "db": "evcc", "local_year": "2025"})
+        self.assertEqual(monthly["metric"], {"__name__": "evcc_pv_top5_mean_monthly_wh", "db": "evcc", "local_year": "2025", "local_month": "01"})
         self.assertAlmostEqual(yearly["values"][0], 20.0, places=6)
         self.assertAlmostEqual(monthly["values"][0], 10.0, places=6)
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
+
 
 
 

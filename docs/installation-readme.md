@@ -28,9 +28,9 @@ sudo apt install curl python3
 ### Linux / Raspberry Pi
 
 ```bash
-curl -fsSLo install-vm.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/install-vm.sh
+curl -fsSLo install-vm-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/install-vm-python.sh
 curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example
-chmod +x install-vm.sh
+chmod +x install-vm-python.sh
 ```
 
 ### Windows / PowerShell
@@ -81,7 +81,7 @@ Für den ersten Lauf reichen normalerweise nur URL und Token. Mit `purge` steuer
 ### Linux / Raspberry Pi
 
 ```bash
-./install-vm.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
+./install-vm-python.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
 ```
 
 ### Windows
@@ -118,7 +118,7 @@ Danach reicht:
 ### Linux / Raspberry Pi
 
 ```bash
-./install-vm.sh
+./install-vm-python.sh
 ```
 
 ### Windows
@@ -163,6 +163,7 @@ Prüfen:
 Die technische Doku liegt hier:
 
 - `docs/vm-dashboard-install.md`
+
 
 
 

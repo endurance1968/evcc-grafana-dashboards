@@ -135,19 +135,19 @@ sudo apt install python3
 Run:
 
 ```bash
-sh ./install-vm.sh
+sh ./install-vm-python.sh
 ```
 
 With explicit config:
 
 ```bash
-sh ./install-vm.sh --config ./vm-dashboard-install.env
+sh ./install-vm-python.sh --config ./vm-dashboard-install.env
 ```
 
 Or directly with the important values:
 
 ```bash
-sh ./install-vm.sh --url http://<grafana-host>:3000 --token <token> --purge false
+sh ./install-vm-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
 ## Maintainer note
@@ -160,3 +160,4 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the installer scripts above.
+

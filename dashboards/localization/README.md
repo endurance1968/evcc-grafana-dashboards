@@ -31,4 +31,7 @@ node scripts/localization/audit-localization.mjs --target=fr
 
 The audit writes `missing-<source>_to_<target>.exact.json` with candidate keys that still need translations.
 
-For the full end-to-end Grafana validation workflow, see `../../docs/grafana-localization-testing.md`.
+For the full end-to-end Grafana validation workflow, see `../../docs/design/grafana-localization-testing.md`.
+
+
+

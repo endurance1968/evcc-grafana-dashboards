@@ -280,3 +280,4 @@ foreach ($dashboard in $dashboards) {
 Write-Host ''
 Write-Host 'Install finished.' -ForegroundColor Green
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
+

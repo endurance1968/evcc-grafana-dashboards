@@ -17,7 +17,7 @@ import {
   parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
-} from "../_dashboard-family.mjs";
+} from "../helper/_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
 const family = resolveDashboardFamily(parseFamilyArg());
@@ -37,21 +37,9 @@ const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Test");
 const manifestOut = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 const titlePrefix = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX", "");
 
-const legacyAggUid = optionalEnv("GRAFANA_DS_EVCC_AGGREGRATIONS_UID", "");
-const canonicalAggUid = optionalEnv("GRAFANA_DS_EVCC_AGGREGATIONS_UID", "");
-if (legacyAggUid && !canonicalAggUid) {
-  console.warn("WARN using legacy env var GRAFANA_DS_EVCC_AGGREGRATIONS_UID. Prefer GRAFANA_DS_EVCC_AGGREGATIONS_UID.");
-}
-
-const dsMap =
-  family.name === "influx-legacy"
-    ? {
-        DS_EVCC_INFLUXDB: optionalEnv("GRAFANA_DS_EVCC_INFLUXDB_UID", ""),
-        DS_EVCC_AGGREGRATIONS: legacyAggUid || canonicalAggUid,
-      }
-    : {
-        "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
-      };
+const dsMap = {
+  "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
+};
 
 function buildInputs(raw) {
   const list = Array.isArray(raw.__inputs) ? raw.__inputs : [];
@@ -258,3 +246,7 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+
+
+
+

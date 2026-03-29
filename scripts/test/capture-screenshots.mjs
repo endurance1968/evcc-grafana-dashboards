@@ -57,7 +57,7 @@ function familyFolderName(manifest) {
 function tagFolderName(manifest) {
   const rawTag = String(manifest?.tag || "set").trim() || "set";
   const family = familyFolderName(manifest);
-  const prefix = family === "influx-legacy" ? "influx-" : family === "vm" ? "vm-" : "";
+  const prefix = family === "vm" ? "vm-" : "";
   if (prefix && rawTag.startsWith(prefix)) {
     return rawTag.slice(prefix.length);
   }
@@ -334,4 +334,5 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+
 

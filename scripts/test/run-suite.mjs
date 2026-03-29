@@ -7,7 +7,7 @@ import {
   parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
-} from "../_dashboard-family.mjs";
+} from "../helper/_dashboard-family.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -63,3 +63,7 @@ if (withFinalCleanup) {
 }
 
 console.log(`\nGrafana dashboard test suite finished for family '${family.name}'.`);
+
+
+
+
