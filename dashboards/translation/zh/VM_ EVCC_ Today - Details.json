@@ -18,14 +18,14 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "最大功率过滤 / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "充电点屏蔽列表",
       "value": "^none$",
       "description": ""
     },
@@ -46,14 +46,14 @@
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "能量采样间隔",
       "value": "60s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "电价间隔",
       "value": "15m",
       "description": ""
     }
@@ -129,7 +129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "今天",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
@@ -141,7 +141,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "昨天",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -322,12 +322,12 @@
           "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
           "format": "time_series",
           "interval": "$__interval",
-          "legendFormat": "Total",
+          "legendFormat": "总计",
           "range": true,
           "refId": "pvEnergy"
         }
       ],
-      "title": "PV energy",
+      "title": "光伏能量",
       "transformations": [
         {
           "id": "reduce",
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -477,7 +477,7 @@
           "refId": "pvPowerPerString"
         }
       ],
-      "title": "PV power",
+      "title": "光伏功率",
       "type": "timeseries"
     },
     {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -592,7 +592,7 @@
           "editorMode": "code",
           "expr": "batterySoc_value{id=\"\"}",
           "format": "time_series",
-          "legendFormat": "Total",
+          "legendFormat": "总计",
           "range": false,
           "refId": "totalSoc"
         }
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "预测"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "Forecast",
+          "legendFormat": "预测",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "Forecast",
+      "title": "预测",
       "transformations": [
         {
           "id": "reduce",
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "预测"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Forecast",
+          "legendFormat": "预测",
           "range": true,
           "refId": "forecast"
         },
@@ -1053,7 +1053,7 @@
           "refId": "A"
         }
       ],
-      "title": "Forecast",
+      "title": "预测",
       "type": "timeseries"
     },
     {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -2433,7 +2433,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Sold"
+                "value": "售电"
               }
             ]
           },
@@ -2522,7 +2522,7 @@
           "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "售电",
           "range": true,
           "refId": "sold"
         },
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -2680,7 +2680,7 @@
           "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "售电",
           "range": true,
           "refId": "sold"
         }
@@ -3018,7 +3018,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Grid",
+      "title": "电网",
       "type": "row"
     },
     {
@@ -3314,7 +3314,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l1))",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "功率 L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3326,7 +3326,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l2))",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "功率 L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3338,7 +3338,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l3))",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "功率 L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3441,7 +3441,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l1)",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "功率 L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3453,7 +3453,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l2)",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "功率 L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3465,7 +3465,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l3)",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "功率 L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3484,7 +3484,7 @@
       "id": 10,
       "panels": [],
       "repeat": "loadpoint",
-      "title": "Loadpoint $loadpoint",
+      "title": "充电点 $loadpoint",
       "type": "row"
     },
     {
@@ -3855,7 +3855,7 @@
           "refId": "3P"
         }
       ],
-      "title": "Phases: $loadpoint",
+      "title": "相位: $loadpoint",
       "type": "timeseries"
     },
     {
@@ -3969,7 +3969,7 @@
       {
         "description": "最大功率限制（以 W 为单位）。高于此阈值的值将被视为异常值。",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "最大功率过滤 / W",
         "name": "peakPowerLimit",
         "query": "25000",
         "skipUrlSync": true,
@@ -3990,7 +3990,7 @@
       {
         "description": "不应显示的充电点列表。该表达式必须是正则表达式，且不能为空。如果无需过滤，请填写一个不会匹配任何条目的表达式。\n\n示例：\n无条目：^none$\n过滤 'Garage'：^Garage$\n过滤 'Garage' 和 'Stellplatz'：^Garage$|^Stellplatz$\n过滤所有以 'foo' 开头的条目：^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "充电点屏蔽列表",
         "name": "loadpointBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -4060,7 +4060,7 @@
         },
         "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
-        "label": "Loadpoint",
+        "label": "充电点",
         "multi": true,
         "name": "loadpoint",
         "options": [],
@@ -4073,7 +4073,7 @@
       {
         "description": "能量计算的采样间隔。应至少是 EVCC 查询间隔的 2 倍。默认：60s，因为EVCC默认间隔为60s。",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "能量采样间隔",
         "name": "energySampleInterval",
         "query": "30s",
         "skipUrlSync": true,
@@ -4094,7 +4094,7 @@
       {
         "description": "电价变化的时间间隔。如果每 15 分钟变化一次，可设置为 '15m'。如果是固定电价，则可设置为 '1d'。",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "电价间隔",
         "name": "tariffPriceInterval",
         "query": "15m",
         "skipUrlSync": true,

@@ -112,7 +112,42 @@ function prepareDashboard(raw, filePath) {
 
   const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
   dashboard.title = `${prefix}${dashboard.title || path.basename(filePath, ".json")}`;
+  namespaceLibraryRefs(dashboard, prefix);
   return dashboard;
+}
+
+function namespaceLibraryUid(uid, name = "") {
+  return buildUid(tag, uid || name || "library");
+}
+
+function namespaceLibraryName(name = "", uid = "") {
+  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
+  return `${prefix}${name || uid || "Library panel"}`;
+}
+
+function namespaceLibraryRefs(node, prefix) {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      namespaceLibraryRefs(item, prefix);
+    }
+    return;
+  }
+
+  if (!node || typeof node !== "object") {
+    return;
+  }
+
+  if (node.libraryPanel && typeof node.libraryPanel === "object") {
+    node.libraryPanel = {
+      ...node.libraryPanel,
+      uid: namespaceLibraryUid(node.libraryPanel.uid, node.libraryPanel.name),
+      name: namespaceLibraryName(node.libraryPanel.name, node.libraryPanel.uid),
+    };
+  }
+
+  for (const value of Object.values(node)) {
+    namespaceLibraryRefs(value, prefix);
+  }
 }
 
 function collectLibraryElements(rawDashboards) {
@@ -128,7 +163,11 @@ function collectLibraryElements(rawDashboards) {
       if (!element || typeof element.uid !== "string" || !element.uid) {
         continue;
       }
-      byUid.set(element.uid, JSON.parse(JSON.stringify(element)));
+      const cloned = JSON.parse(JSON.stringify(element));
+      const namespacedUid = namespaceLibraryUid(cloned.uid, cloned.name);
+      cloned.uid = namespacedUid;
+      cloned.name = namespaceLibraryName(cloned.name, element.uid);
+      byUid.set(namespacedUid, cloned);
     }
   }
 

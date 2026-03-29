@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "Filtre de puissance max / W",
       "value": "25000",
       "description": ""
     },
@@ -25,42 +25,42 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Inverter portal name",
+      "label": "Nom du portail de l’onduleur",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "Inverter portal URL",
+      "label": "URL du portail de l’onduleur",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "Liste de blocage des points de charge",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Vehicle blocklist",
+      "label": "Liste de blocage des véhicules",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "Intervalle d’échantillonnage énergie",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "Intervalle tarifaire",
       "value": "15m",
       "description": ""
     }
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Grid"
+                "options": "Réseau"
               },
               "properties": [
                 {
@@ -331,7 +331,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Grid",
+            "legendFormat": "Réseau",
             "range": true,
             "refId": "gridPower"
           },
@@ -1804,7 +1804,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "Plus de détails",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Sold"
+                "options": "Vendu"
               },
               "properties": [
                 {
@@ -1935,7 +1935,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Sold",
+            "legendFormat": "Vendu",
             "range": true,
             "refId": "soldTotal"
           },
@@ -2009,7 +2009,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Aujourd’hui",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -2021,7 +2021,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Hier",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2128,7 +2128,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Réseau"
             },
             "properties": [
               {
@@ -2201,7 +2201,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2278,7 +2278,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Plus de détails",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2409,7 +2409,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value / 1000)",
           "format": "time_series",
-          "legendFormat": "Grid",
+          "legendFormat": "Réseau",
           "range": true,
           "refId": "gridPower"
         },
@@ -2450,7 +2450,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Power",
+      "title": "Puissance",
       "transparent": true,
       "type": "gauge"
     },
@@ -2557,7 +2557,7 @@
       {
         "description": "Limite de puissance maximale en W. Les valeurs supérieures à ce seuil sont traitées comme des valeurs aberrantes.",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "Filtre de puissance max / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2599,7 +2599,7 @@
       {
         "description": "Nom du portail de l'onduleur utilisé pour le lien du portail.",
         "hide": 2,
-        "label": "Inverter portal name",
+        "label": "Nom du portail de l’onduleur",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2620,7 +2620,7 @@
       {
         "description": "URL où le portail de l'onduleur s'ouvre.",
         "hide": 2,
-        "label": "Inverter portal URL",
+        "label": "URL du portail de l’onduleur",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2641,7 +2641,7 @@
       {
         "description": "Liste des points de charge qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Stellplatz' : ^Garage$|^Stellplatz$\nFiltrer tout ce qui commence par 'foo' : ^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "Liste de blocage des points de charge",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2662,7 +2662,7 @@
       {
         "description": "Liste des véhicules qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Stellplatz' : ^Garage$|^Stellplatz$\nFiltrer les véhicules se terminant par (offline) : ^.*\\(offline\\)$",
         "hide": 2,
-        "label": "Vehicle blocklist",
+        "label": "Liste de blocage des véhicules",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2683,7 +2683,7 @@
       {
         "description": "Intervalle d'échantillonnage pour le calcul de l'énergie. Doit être au moins 2 fois l'intervalle de requête EVCC. Par défaut : 60 s, car l'intervalle par défaut de l'EVCC est de 60 s.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Intervalle d’échantillonnage énergie",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2704,7 +2704,7 @@
       {
         "description": "Cycle de facturation du prix de l'électricité.",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "Intervalle tarifaire",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

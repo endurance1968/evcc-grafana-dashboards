@@ -18,14 +18,14 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "अधिकतम पावर फ़िल्टर / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "लोडपॉइंट ब्लॉकलिस्ट",
       "value": "^none$",
       "description": ""
     },
@@ -46,14 +46,14 @@
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "ऊर्जा सैंपल अंतराल",
       "value": "60s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "टैरिफ मूल्य अंतराल",
       "value": "15m",
       "description": ""
     }
@@ -129,7 +129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "आज",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
@@ -141,7 +141,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "कल",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -322,12 +322,12 @@
           "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
           "format": "time_series",
           "interval": "$__interval",
-          "legendFormat": "Total",
+          "legendFormat": "कुल",
           "range": true,
           "refId": "pvEnergy"
         }
       ],
-      "title": "PV energy",
+      "title": "PV ऊर्जा",
       "transformations": [
         {
           "id": "reduce",
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -477,7 +477,7 @@
           "refId": "pvPowerPerString"
         }
       ],
-      "title": "PV power",
+      "title": "PV शक्ति",
       "type": "timeseries"
     },
     {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -592,7 +592,7 @@
           "editorMode": "code",
           "expr": "batterySoc_value{id=\"\"}",
           "format": "time_series",
-          "legendFormat": "Total",
+          "legendFormat": "कुल",
           "range": false,
           "refId": "totalSoc"
         }
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "Forecast",
+          "legendFormat": "पूर्वानुमान",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "Forecast",
+      "title": "पूर्वानुमान",
       "transformations": [
         {
           "id": "reduce",
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Forecast",
+          "legendFormat": "पूर्वानुमान",
           "range": true,
           "refId": "forecast"
         },
@@ -1053,7 +1053,7 @@
           "refId": "A"
         }
       ],
-      "title": "Forecast",
+      "title": "पूर्वानुमान",
       "type": "timeseries"
     },
     {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -2433,7 +2433,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Sold"
+                "value": "बेचा गया"
               }
             ]
           },
@@ -2522,7 +2522,7 @@
           "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "बेचा गया",
           "range": true,
           "refId": "sold"
         },
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "बेचा गया"
             },
             "properties": [
               {
@@ -2680,7 +2680,7 @@
           "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "बेचा गया",
           "range": true,
           "refId": "sold"
         }
@@ -3018,7 +3018,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Grid",
+      "title": "ग्रिड",
       "type": "row"
     },
     {
@@ -3314,7 +3314,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l1))",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "शक्ति L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3326,7 +3326,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l2))",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "शक्ति L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3338,7 +3338,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l3))",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "शक्ति L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3441,7 +3441,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l1)",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "शक्ति L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3453,7 +3453,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l2)",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "शक्ति L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3465,7 +3465,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l3)",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "शक्ति L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3484,7 +3484,7 @@
       "id": 10,
       "panels": [],
       "repeat": "loadpoint",
-      "title": "Loadpoint $loadpoint",
+      "title": "लोडपॉइंट $loadpoint",
       "type": "row"
     },
     {
@@ -3855,7 +3855,7 @@
           "refId": "3P"
         }
       ],
-      "title": "Phases: $loadpoint",
+      "title": "फेज़: $loadpoint",
       "type": "timeseries"
     },
     {
@@ -3969,7 +3969,7 @@
       {
         "description": "डब्ल्यू में अधिकतम शक्ति सीमा। इस सीमा से ऊपर के मूल्यों को आउटलेयर के रूप में माना जाता है।",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "अधिकतम पावर फ़िल्टर / W",
         "name": "peakPowerLimit",
         "query": "25000",
         "skipUrlSync": true,
@@ -3990,7 +3990,7 @@
       {
         "description": "उन चार्जिंग पॉइंट्स की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Garage' फ़िल्टर करें: ^Garage$\n'Garage' और 'Stellplatz' फ़िल्टर करें: ^Garage$|^Stellplatz$\n'foo' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: ^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "लोडपॉइंट ब्लॉकलिस्ट",
         "name": "loadpointBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -4060,7 +4060,7 @@
         },
         "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
-        "label": "Loadpoint",
+        "label": "लोडपॉइंट",
         "multi": true,
         "name": "loadpoint",
         "options": [],
@@ -4073,7 +4073,7 @@
       {
         "description": "ऊर्जा गणना के लिए नमूनाकरण अंतराल। EVCC क्वेरी अंतराल कम से कम 2x होना चाहिए। डिफ़ॉल्ट: 60s, क्योंकि EVCC डिफ़ॉल्ट अंतराल 60s है।",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "ऊर्जा सैंपल अंतराल",
         "name": "energySampleInterval",
         "query": "30s",
         "skipUrlSync": true,
@@ -4094,7 +4094,7 @@
       {
         "description": "बिजली टैरिफ बदलने का अंतराल। यदि यह हर 15 मिनट में बदलता है तो इसे '15m' पर सेट करें। यदि टैरिफ स्थिर है तो एक दिन के लिए '1d' उपयोग करें।",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "टैरिफ मूल्य अंतराल",
         "name": "tariffPriceInterval",
         "query": "15m",
         "skipUrlSync": true,

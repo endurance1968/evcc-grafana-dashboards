@@ -2381,7 +2381,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV ऊर्जा"
             },
             "properties": [
               {
@@ -2412,7 +2412,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV energy"
+            "displayName": "PV ऊर्जा"
           }
         ]
       },
@@ -2426,7 +2426,7 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh{db=\"$dbLabel\"}) / 1000",
           "format": "time_series",
-          "legendFormat": "PV energy",
+          "legendFormat": "PV ऊर्जा",
           "range": true,
           "interval": "1d"
         }
@@ -2700,7 +2700,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "Uses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
+      "description": "यह प्रति वर्ष सर्वोत्तम 30 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक वर्ष अपने आप में निर्णायक नहीं होता।",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3084,7 +3084,7 @@
           }
         }
       ],
-      "description": "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
+      "description": "यह प्रति माह सर्वोत्तम 5 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक महीना अपने आप में निर्णायक नहीं होता।"
     },
     {
       "id": 41,
@@ -3453,7 +3453,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
@@ -3477,7 +3477,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "बेचा गया"
             },
             "properties": [
               {
@@ -3561,7 +3561,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d])) * -1",
-          "legendFormat": "purchased",
+          "legendFormat": "खरीदा गया",
           "instant": true,
           "range": false
         },
@@ -3617,7 +3617,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d]))",
-          "legendFormat": "sold",
+          "legendFormat": "बेचा गया",
           "instant": true,
           "range": false
         },
@@ -3642,7 +3642,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4008,7 +4008,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4361,7 +4361,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Values are rough estimates based on averages. External charging sessions are not included.",
+      "description": "मान औसतों पर आधारित मोटे अनुमान हैं। बाहरी चार्जिंग सत्र शामिल नहीं हैं。",
       "gridPos": {
         "h": 10,
         "w": 12,

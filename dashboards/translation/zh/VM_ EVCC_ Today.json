@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "最大功率过滤 / W",
       "value": "25000",
       "description": ""
     },
@@ -25,42 +25,42 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Inverter portal name",
+      "label": "逆变器门户名称",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "Inverter portal URL",
+      "label": "逆变器门户网址",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "充电点屏蔽列表",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Vehicle blocklist",
+      "label": "车辆屏蔽列表",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "能量采样间隔",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "电价间隔",
       "value": "15m",
       "description": ""
     }
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Grid"
+                "options": "电网"
               },
               "properties": [
                 {
@@ -331,7 +331,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Grid",
+            "legendFormat": "电网",
             "range": true,
             "refId": "gridPower"
           },
@@ -1804,7 +1804,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "更多详情",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Sold"
+                "options": "售电"
               },
               "properties": [
                 {
@@ -1935,7 +1935,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Sold",
+            "legendFormat": "售电",
             "range": true,
             "refId": "soldTotal"
           },
@@ -2009,7 +2009,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "今天",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -2021,7 +2021,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "昨天",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2128,7 +2128,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "更多详情",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "电网"
             },
             "properties": [
               {
@@ -2201,7 +2201,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "更多详情",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2278,7 +2278,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "更多详情",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2409,7 +2409,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value / 1000)",
           "format": "time_series",
-          "legendFormat": "Grid",
+          "legendFormat": "电网",
           "range": true,
           "refId": "gridPower"
         },
@@ -2450,7 +2450,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Power",
+      "title": "功率",
       "transparent": true,
       "type": "gauge"
     },
@@ -2557,7 +2557,7 @@
       {
         "description": "最大功率限制（以 W 为单位）。高于此阈值的值将被视为异常值。",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "最大功率过滤 / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2599,7 +2599,7 @@
       {
         "description": "用于门户链接的逆变器门户的名称。",
         "hide": 2,
-        "label": "Inverter portal name",
+        "label": "逆变器门户名称",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2620,7 +2620,7 @@
       {
         "description": "逆变器门户打开的 URL。",
         "hide": 2,
-        "label": "Inverter portal URL",
+        "label": "逆变器门户网址",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2641,7 +2641,7 @@
       {
         "description": "不应显示的充电点列表。该表达式必须是正则表达式，且不能为空。如果无需过滤，请填写一个不会匹配任何条目的表达式。\n\n示例：\n无条目：^none$\n过滤 'Garage'：^Garage$\n过滤 'Garage' 和 'Stellplatz'：^Garage$|^Stellplatz$\n过滤所有以 'foo' 开头的条目：^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "充电点屏蔽列表",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2662,7 +2662,7 @@
       {
         "description": "不应显示的车辆列表。该表达式必须是正则表达式，且不能为空。如果无需过滤，请填写一个不会匹配任何条目的表达式。\n\n示例：\n无条目：^none$\n过滤 'Garage'：^Garage$\n过滤 'Garage' 和 'Stellplatz'：^Garage$|^Stellplatz$\n过滤所有以 (offline) 结尾的车辆：^.*\\(offline\\)$",
         "hide": 2,
-        "label": "Vehicle blocklist",
+        "label": "车辆屏蔽列表",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2683,7 +2683,7 @@
       {
         "description": "能量计算的采样间隔。应至少是 EVCC 查询间隔的 2 倍。默认：60s，因为EVCC默认间隔为60s。",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "能量采样间隔",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2704,7 +2704,7 @@
       {
         "description": "电价计费周期。",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "电价间隔",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

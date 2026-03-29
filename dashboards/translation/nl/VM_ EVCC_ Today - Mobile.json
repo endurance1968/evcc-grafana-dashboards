@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "Max vermogensfilter / W",
       "value": "25000",
       "description": ""
     },
@@ -25,42 +25,42 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Inverter portal name",
+      "label": "Naam omvormerportaal",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "Inverter portal URL",
+      "label": "URL omvormerportaal",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "Blokkeerlijst laadpunten",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Vehicle blocklist",
+      "label": "Blokkeerlijst voertuigen",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "Energie-sample-interval",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "Tariefprijs-interval",
       "value": "15m",
       "description": ""
     }
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Grid"
+                "options": "Net"
               },
               "properties": [
                 {
@@ -286,7 +286,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Grid",
+            "legendFormat": "Net",
             "range": true,
             "refId": "gridPower"
           },
@@ -899,7 +899,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "Meer details",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -938,7 +938,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Sold"
+                "options": "Verkocht"
               },
               "properties": [
                 {
@@ -1030,7 +1030,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Sold",
+            "legendFormat": "Verkocht",
             "range": true,
             "refId": "soldTotal"
           },
@@ -1950,7 +1950,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Vandaag",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -1962,7 +1962,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Gisteren",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2055,7 +2055,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "Meer details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2093,7 +2093,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Net"
             },
             "properties": [
               {
@@ -2128,7 +2128,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Meer details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2205,7 +2205,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "Meer details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2338,7 +2338,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value) / 1000",
           "format": "time_series",
-          "legendFormat": "Grid",
+          "legendFormat": "Net",
           "range": true,
           "refId": "gridPower"
         },
@@ -2379,7 +2379,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Power",
+      "title": "Vermogen",
       "transparent": true,
       "type": "stat"
     },
@@ -2432,7 +2432,7 @@
       },
       "id": 78,
       "panels": [],
-      "title": "Summary",
+      "title": "Samenvatting",
       "type": "row"
     },
     {
@@ -2499,7 +2499,7 @@
       {
         "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "Max vermogensfilter / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2541,7 +2541,7 @@
       {
         "description": "Naam van het omvormerportaal dat wordt gebruikt voor de portaallink.",
         "hide": 2,
-        "label": "Inverter portal name",
+        "label": "Naam omvormerportaal",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2562,7 +2562,7 @@
       {
         "description": "URL waar het omvormerportaal wordt geopend.",
         "hide": 2,
-        "label": "Inverter portal URL",
+        "label": "URL omvormerportaal",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2583,7 +2583,7 @@
       {
         "description": "Lijst met laadpunten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Stellplatz' uit: ^Garage$|^Stellplatz$\nFilter alles dat met 'foo' begint uit: ^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "Blokkeerlijst laadpunten",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2604,7 +2604,7 @@
       {
         "description": "Lijst met voertuigen die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Garage' uit: /^Garage$/\nFilter 'Garage' en 'Stellplatz' uit: /^Garage$|^Stellplatz$/\nFilter voertuigen die eindigen op (offline) uit: /^.*\\(offline\\)$/",
         "hide": 2,
-        "label": "Vehicle blocklist",
+        "label": "Blokkeerlijst voertuigen",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2625,7 +2625,7 @@
       {
         "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Energie-sample-interval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2646,7 +2646,7 @@
       {
         "description": "Verrekeninterval van de stroomprijs.",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "Tariefprijs-interval",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

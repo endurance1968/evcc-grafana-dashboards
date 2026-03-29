@@ -2381,7 +2381,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV-energie"
             },
             "properties": [
               {
@@ -2412,7 +2412,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV energy"
+            "displayName": "PV-energie"
           }
         ]
       },
@@ -2426,7 +2426,7 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh{db=\"$dbLabel\"}) / 1000",
           "format": "time_series",
-          "legendFormat": "PV energy",
+          "legendFormat": "PV-energie",
           "range": true,
           "interval": "1d"
         }
@@ -2700,7 +2700,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "Uses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
+      "description": "Gebruikt het gemiddelde rendement van de beste 30 dagen per jaar. Dit kan helpen mogelijke degradatie te herkennen, maar moet in context worden geïnterpreteerd. Afzonderlijke jaren zijn op zichzelf niet doorslaggevend.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3084,7 +3084,7 @@
           }
         }
       ],
-      "description": "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
+      "description": "Gebruikt het gemiddelde rendement van de beste 5 dagen per maand. Dit kan helpen mogelijke degradatie te herkennen, maar moet in context worden geïnterpreteerd. Afzonderlijke maanden zijn op zichzelf niet doorslaggevend."
     },
     {
       "id": 41,
@@ -3453,7 +3453,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Ingekocht"
             },
             "properties": [
               {
@@ -3477,7 +3477,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Verkocht"
             },
             "properties": [
               {
@@ -3561,7 +3561,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d])) * -1",
-          "legendFormat": "purchased",
+          "legendFormat": "Ingekocht",
           "instant": true,
           "range": false
         },
@@ -3617,7 +3617,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d]))",
-          "legendFormat": "sold",
+          "legendFormat": "Verkocht",
           "instant": true,
           "range": false
         },
@@ -3642,7 +3642,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4008,7 +4008,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4361,7 +4361,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Values are rough estimates based on averages. External charging sessions are not included.",
+      "description": "Waarden zijn grove schattingen op basis van gemiddelden. Externe laadsessies zijn niet inbegrepen.",
       "gridPos": {
         "h": 10,
         "w": 12,

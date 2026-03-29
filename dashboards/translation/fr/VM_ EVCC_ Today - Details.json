@@ -18,14 +18,14 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "Filtre de puissance max / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "Liste de blocage des points de charge",
       "value": "^none$",
       "description": ""
     },
@@ -46,14 +46,14 @@
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "Intervalle d’échantillonnage énergie",
       "value": "60s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "Intervalle tarifaire",
       "value": "15m",
       "description": ""
     }
@@ -129,7 +129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "Aujourd’hui",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
@@ -141,7 +141,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "Hier",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
@@ -327,7 +327,7 @@
           "refId": "pvEnergy"
         }
       ],
-      "title": "PV energy",
+      "title": "Énergie PV",
       "transformations": [
         {
           "id": "reduce",
@@ -477,7 +477,7 @@
           "refId": "pvPowerPerString"
         }
       ],
-      "title": "PV power",
+      "title": "Puissance PV",
       "type": "timeseries"
     },
     {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Prévision"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "Forecast",
+          "legendFormat": "Prévision",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "Forecast",
+      "title": "Prévision",
       "transformations": [
         {
           "id": "reduce",
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Prévision"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Forecast",
+          "legendFormat": "Prévision",
           "range": true,
           "refId": "forecast"
         },
@@ -1053,7 +1053,7 @@
           "refId": "A"
         }
       ],
-      "title": "Forecast",
+      "title": "Prévision",
       "type": "timeseries"
     },
     {
@@ -2433,7 +2433,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Sold"
+                "value": "Vendu"
               }
             ]
           },
@@ -2522,7 +2522,7 @@
           "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "Vendu",
           "range": true,
           "refId": "sold"
         },
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Vendu"
             },
             "properties": [
               {
@@ -2680,7 +2680,7 @@
           "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Sold",
+          "legendFormat": "Vendu",
           "range": true,
           "refId": "sold"
         }
@@ -3018,7 +3018,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Grid",
+      "title": "Réseau",
       "type": "row"
     },
     {
@@ -3314,7 +3314,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l1))",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "Puissance L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3326,7 +3326,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l2))",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "Puissance L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3338,7 +3338,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l3))",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "Puissance L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3441,7 +3441,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l1)",
           "format": "time_series",
-          "legendFormat": "Power L1",
+          "legendFormat": "Puissance L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3453,7 +3453,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l2)",
           "format": "time_series",
-          "legendFormat": "Power L2",
+          "legendFormat": "Puissance L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3465,7 +3465,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l3)",
           "format": "time_series",
-          "legendFormat": "Power L3",
+          "legendFormat": "Puissance L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3484,7 +3484,7 @@
       "id": 10,
       "panels": [],
       "repeat": "loadpoint",
-      "title": "Loadpoint $loadpoint",
+      "title": "Point de charge $loadpoint",
       "type": "row"
     },
     {
@@ -3855,7 +3855,7 @@
           "refId": "3P"
         }
       ],
-      "title": "Phases: $loadpoint",
+      "title": "Phases : $loadpoint",
       "type": "timeseries"
     },
     {
@@ -3969,7 +3969,7 @@
       {
         "description": "Limite de puissance maximale en W. Les valeurs supérieures à ce seuil sont traitées comme des valeurs aberrantes.",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "Filtre de puissance max / W",
         "name": "peakPowerLimit",
         "query": "25000",
         "skipUrlSync": true,
@@ -3990,7 +3990,7 @@
       {
         "description": "Liste des points de charge qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Stellplatz' : ^Garage$|^Stellplatz$\nFiltrer tout ce qui commence par 'foo' : ^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "Liste de blocage des points de charge",
         "name": "loadpointBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -4060,7 +4060,7 @@
         },
         "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
-        "label": "Loadpoint",
+        "label": "Point de charge",
         "multi": true,
         "name": "loadpoint",
         "options": [],
@@ -4073,7 +4073,7 @@
       {
         "description": "Intervalle d'échantillonnage pour le calcul de l'énergie. Doit être au moins 2 fois l'intervalle de requête EVCC. Par défaut : 60 s, car l'intervalle par défaut de l'EVCC est de 60 s.",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "Intervalle d’échantillonnage énergie",
         "name": "energySampleInterval",
         "query": "30s",
         "skipUrlSync": true,
@@ -4094,7 +4094,7 @@
       {
         "description": "Intervalle de variation du tarif d'électricité. S'il change toutes les 15 minutes, vous pouvez le définir sur '15m'. Avec un tarif constant, utilisez '1d' pour une journée.",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "Intervalle tarifaire",
         "name": "tariffPriceInterval",
         "query": "15m",
         "skipUrlSync": true,

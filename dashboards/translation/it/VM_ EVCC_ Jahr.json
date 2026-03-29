@@ -1334,7 +1334,7 @@
           "editorMode": "code",
           "expr": "sum(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "home",
+          "legendFormat": "Casa",
           "range": true,
           "refId": "homeEnergy",
           "hide": true,
@@ -1348,7 +1348,7 @@
           "editorMode": "code",
           "expr": "sum(last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "loadpoints",
+          "legendFormat": "Punti di ricarica",
           "range": true,
           "refId": "loadpointEnergy",
           "hide": true,
@@ -2265,7 +2265,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
@@ -2289,7 +2289,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Venduto"
             },
             "properties": [
               {
@@ -2373,7 +2373,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) * -1",
-          "legendFormat": "purchased",
+          "legendFormat": "Acquistato",
           "instant": true,
           "range": false
         },
@@ -2433,7 +2433,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
-          "legendFormat": "sold",
+          "legendFormat": "Venduto",
           "instant": true,
           "range": false
         },
@@ -2743,7 +2743,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Venduto"
             },
             "properties": [
               {
@@ -4008,7 +4008,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Kilometers are captured only while a vehicle is plugged in. If plugged in rarely, kilometers can be missing.",
+      "description": "I chilometri vengono registrati solo mentre un veicolo è collegato. Se viene collegato raramente, alcuni chilometri possono mancare.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4325,7 +4325,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Values are approximate. External charging is not included and captured kilometers depend on how often a vehicle is plugged in.",
+      "description": "I valori sono approssimativi. La ricarica esterna non è inclusa e i chilometri registrati dipendono da quanto spesso un veicolo viene collegato.",
       "fieldConfig": {
         "defaults": {
           "color": {

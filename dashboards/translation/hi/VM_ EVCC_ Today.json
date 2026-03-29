@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Max power filter / W",
+      "label": "अधिकतम पावर फ़िल्टर / W",
       "value": "25000",
       "description": ""
     },
@@ -25,42 +25,42 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Inverter portal name",
+      "label": "इन्वर्टर पोर्टल नाम",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "Inverter portal URL",
+      "label": "इन्वर्टर पोर्टल URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Loadpoint blocklist",
+      "label": "लोडपॉइंट ब्लॉकलिस्ट",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Vehicle blocklist",
+      "label": "वाहन ब्लॉकलिस्ट",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energy sample interval",
+      "label": "ऊर्जा सैंपल अंतराल",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariff price interval",
+      "label": "टैरिफ मूल्य अंतराल",
       "value": "15m",
       "description": ""
     }
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Grid"
+                "options": "ग्रिड"
               },
               "properties": [
                 {
@@ -331,7 +331,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Grid",
+            "legendFormat": "ग्रिड",
             "range": true,
             "refId": "gridPower"
           },
@@ -1804,7 +1804,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "More details",
+                "title": "अधिक विवरण",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Sold"
+                "options": "बेचा गया"
               },
               "properties": [
                 {
@@ -1935,7 +1935,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Sold",
+            "legendFormat": "बेचा गया",
             "range": true,
             "refId": "soldTotal"
           },
@@ -2009,7 +2009,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Today",
+      "title": "आज",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -2021,7 +2021,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Yesterday",
+      "title": "कल",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2128,7 +2128,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "More details",
+                    "title": "अधिक विवरण",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "ग्रिड"
             },
             "properties": [
               {
@@ -2201,7 +2201,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "अधिक विवरण",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2278,7 +2278,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "More details",
+                    "title": "अधिक विवरण",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2409,7 +2409,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value / 1000)",
           "format": "time_series",
-          "legendFormat": "Grid",
+          "legendFormat": "ग्रिड",
           "range": true,
           "refId": "gridPower"
         },
@@ -2450,7 +2450,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Power",
+      "title": "शक्ति",
       "transparent": true,
       "type": "gauge"
     },
@@ -2557,7 +2557,7 @@
       {
         "description": "डब्ल्यू में अधिकतम शक्ति सीमा। इस सीमा से ऊपर के मूल्यों को आउटलेयर के रूप में माना जाता है।",
         "hide": 2,
-        "label": "Max power filter / W",
+        "label": "अधिकतम पावर फ़िल्टर / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2599,7 +2599,7 @@
       {
         "description": "पोर्टल लिंक के लिए प्रयुक्त इन्वर्टर पोर्टल का नाम।",
         "hide": 2,
-        "label": "Inverter portal name",
+        "label": "इन्वर्टर पोर्टल नाम",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2620,7 +2620,7 @@
       {
         "description": "यूआरएल जहां इन्वर्टर पोर्टल खुलता है।",
         "hide": 2,
-        "label": "Inverter portal URL",
+        "label": "इन्वर्टर पोर्टल URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2641,7 +2641,7 @@
       {
         "description": "उन चार्जिंग पॉइंट्स की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Garage' फ़िल्टर करें: ^Garage$\n'Garage' और 'Stellplatz' फ़िल्टर करें: ^Garage$|^Stellplatz$\n'foo' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: ^foo.*$",
         "hide": 2,
-        "label": "Loadpoint blocklist",
+        "label": "लोडपॉइंट ब्लॉकलिस्ट",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2662,7 +2662,7 @@
       {
         "description": "उन वाहनों की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Garage' फ़िल्टर करें: ^Garage$\n'Garage' और 'Stellplatz' फ़िल्टर करें: ^Garage$|^Stellplatz$\n(offline) पर समाप्त होने वाले वाहनों को फ़िल्टर करें: ^.*\\(offline\\)$",
         "hide": 2,
-        "label": "Vehicle blocklist",
+        "label": "वाहन ब्लॉकलिस्ट",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2683,7 +2683,7 @@
       {
         "description": "ऊर्जा गणना के लिए नमूनाकरण अंतराल। EVCC क्वेरी अंतराल कम से कम 2x होना चाहिए। डिफ़ॉल्ट: 60s, क्योंकि EVCC डिफ़ॉल्ट अंतराल 60s है।",
         "hide": 2,
-        "label": "Energy sample interval",
+        "label": "ऊर्जा सैंपल अंतराल",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2704,7 +2704,7 @@
       {
         "description": "बिजली मूल्य का बिलिंग अंतराल।",
         "hide": 2,
-        "label": "Tariff price interval",
+        "label": "टैरिफ मूल्य अंतराल",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

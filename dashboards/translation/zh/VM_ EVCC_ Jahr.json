@@ -1334,7 +1334,7 @@
           "editorMode": "code",
           "expr": "sum(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "home",
+          "legendFormat": "家庭",
           "range": true,
           "refId": "homeEnergy",
           "hide": true,
@@ -1348,7 +1348,7 @@
           "editorMode": "code",
           "expr": "sum(last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "loadpoints",
+          "legendFormat": "充电点",
           "range": true,
           "refId": "loadpointEnergy",
           "hide": true,
@@ -2265,7 +2265,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "购电"
             },
             "properties": [
               {
@@ -2289,7 +2289,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -2373,7 +2373,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) * -1",
-          "legendFormat": "purchased",
+          "legendFormat": "购电",
           "instant": true,
           "range": false
         },
@@ -2433,7 +2433,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
-          "legendFormat": "sold",
+          "legendFormat": "售电",
           "instant": true,
           "range": false
         },
@@ -2743,7 +2743,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -4008,7 +4008,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Kilometers are captured only while a vehicle is plugged in. If plugged in rarely, kilometers can be missing.",
+      "description": "只有在车辆接入时才会记录公里数。如果接入频率较低，公里数可能会缺失。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4325,7 +4325,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Values are approximate. External charging is not included and captured kilometers depend on how often a vehicle is plugged in.",
+      "description": "这些值为近似值。不包含外部充电，记录到的公里数取决于车辆接入的频率。",
       "fieldConfig": {
         "defaults": {
           "color": {

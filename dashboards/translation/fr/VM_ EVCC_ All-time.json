@@ -2381,7 +2381,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "Énergie PV"
             },
             "properties": [
               {
@@ -2412,7 +2412,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV energy"
+            "displayName": "Énergie PV"
           }
         ]
       },
@@ -2426,7 +2426,7 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh{db=\"$dbLabel\"}) / 1000",
           "format": "time_series",
-          "legendFormat": "PV energy",
+          "legendFormat": "Énergie PV",
           "range": true,
           "interval": "1d"
         }
@@ -2700,7 +2700,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "Uses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
+      "description": "Utilise le rendement moyen des 30 meilleurs jours par an. Cela peut aider à identifier une dégradation possible, mais doit être interprété dans son contexte. Une année isolée n’est pas concluante.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3084,7 +3084,7 @@
           }
         }
       ],
-      "description": "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
+      "description": "Utilise le rendement moyen des 5 meilleurs jours par mois. Cela peut aider à identifier une dégradation possible, mais doit être interprété dans son contexte. Un mois isolé n’est pas concluant."
     },
     {
       "id": 41,
@@ -3453,7 +3453,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Acheté"
             },
             "properties": [
               {
@@ -3477,7 +3477,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Vendu"
             },
             "properties": [
               {
@@ -3561,7 +3561,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d])) * -1",
-          "legendFormat": "purchased",
+          "legendFormat": "Acheté",
           "instant": true,
           "range": false
         },
@@ -3617,7 +3617,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\"}[1d]))[$__range:1d]))",
-          "legendFormat": "sold",
+          "legendFormat": "Vendu",
           "instant": true,
           "range": false
         },
@@ -3642,7 +3642,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Pour moins de 365 jours de données, les valeurs sont extrapolées sur une année complète avec une imprécision dépendant de la période couverte.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4008,7 +4008,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
+      "description": "Pour moins de 365 jours de données, les valeurs sont extrapolées sur une année complète avec une imprécision dépendant de la période couverte.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4361,7 +4361,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Values are rough estimates based on averages. External charging sessions are not included.",
+      "description": "Les valeurs sont des estimations approximatives basées sur des moyennes. Les sessions de charge externes ne sont pas incluses.",
       "gridPos": {
         "h": 10,
         "w": 12,
