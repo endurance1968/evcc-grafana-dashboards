@@ -114,6 +114,6 @@ Still deferred beyond the current baseline:
 
 For end users, prefer:
 
-- `scripts/install-vm.ps1`
-- `scripts/install-vm-python.sh`
+- `scripts/deploy.ps1`
+- `scripts/deploy-python.sh`
 - `docs/vm-dashboard-install.md`

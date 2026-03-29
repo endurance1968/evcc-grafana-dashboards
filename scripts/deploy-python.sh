@@ -27,7 +27,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./install-vm-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
 EOF
       exit 0
       ;;

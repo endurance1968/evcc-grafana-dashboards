@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./install-vm-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
+Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
 Requires: bash, curl, jq
 EOF
       exit 0

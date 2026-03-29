@@ -28,15 +28,15 @@ sudo apt install curl python3
 ### Linux / Raspberry Pi
 
 ```bash
-curl -fsSLo install-vm-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/install-vm-python.sh
+curl -fsSLo deploy-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-python.sh
 curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example
-chmod +x install-vm-python.sh
+chmod +x deploy-python.sh
 ```
 
 ### Windows / PowerShell
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/install-vm.ps1 -OutFile install-vm.ps1
+Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy.ps1 -OutFile deploy.ps1
 Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
 ```
 
@@ -81,13 +81,13 @@ Für den ersten Lauf reichen normalerweise nur URL und Token. Mit `purge` steuer
 ### Linux / Raspberry Pi
 
 ```bash
-./install-vm-python.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
+./deploy-python.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
 ```
 
 ### Windows
 
 ```powershell
-./install-vm.ps1 -url http://<deine-grafana-ip>:3000 -token <dein_token> -purge false
+./deploy.ps1 -url http://<deine-grafana-ip>:3000 -token <dein_token> -purge false
 ```
 
 ## 5. Optional: Config-Datei
@@ -118,13 +118,13 @@ Danach reicht:
 ### Linux / Raspberry Pi
 
 ```bash
-./install-vm-python.sh
+./deploy-python.sh
 ```
 
 ### Windows
 
 ```powershell
-.\install-vm.ps1
+.\deploy.ps1
 ```
 
 ## 6. Ergebnis prüfen

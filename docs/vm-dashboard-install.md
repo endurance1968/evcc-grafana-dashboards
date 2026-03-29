@@ -107,19 +107,19 @@ The installer intentionally does not rewrite:
 PowerShell only, no Node required:
 
 ```powershell
-.\scripts\install-vm.ps1
+.\scripts\deploy.ps1
 ```
 
 With explicit config:
 
 ```powershell
-.\install-vm.ps1 -config .\vm-dashboard-install.env
+.\deploy.ps1 -config .\vm-dashboard-install.env
 ```
 
 Or directly with the important values:
 
 ```powershell
-.\install-vm.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
+.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
 ```
 
 ## Linux / Raspberry Pi
@@ -135,19 +135,19 @@ sudo apt install python3
 Run:
 
 ```bash
-sh ./install-vm-python.sh
+sh ./deploy-python.sh
 ```
 
 With explicit config:
 
 ```bash
-sh ./install-vm-python.sh --config ./vm-dashboard-install.env
+sh ./deploy-python.sh --config ./vm-dashboard-install.env
 ```
 
 Or directly with the important values:
 
 ```bash
-sh ./install-vm-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
+sh ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
 ## Maintainer note
