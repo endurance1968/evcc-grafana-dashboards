@@ -160,7 +160,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   fetch_source "$file_name" "$raw_file"
 
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
-    [. __inputs[]? | select(.name and .type) |
+    [.__inputs[]? | select(.name and .type) |
       if .type == "datasource" then
         if .name == "DS_VM-EVCC" then
           {name: .name, type: .type, pluginId: .pluginId, value: $ds}
@@ -174,7 +174,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
       end]
   ' "$raw_file" > "$inputs_file"
 
-  jq -c --arg ds "$GRAFANA_DS_VM_EVCC_UID" "(. __elements // {}) | to_entries[]? | {uid: .value.uid, name: .value.name, kind: (.value.kind // 1), model: (.value.model | $replace_ds_filter)}" "$raw_file" |
+  jq -c --arg ds "$GRAFANA_DS_VM_EVCC_UID" "(.__elements // {}) | to_entries[]? | {uid: .value.uid, name: .value.name, kind: (.value.kind // 1), model: (.value.model | $replace_ds_filter)}" "$raw_file" |
   while IFS= read -r entry; do
     uid=$(printf '%s' "$entry" | jq -r '.uid')
     printf '%s' "$entry" > "$LIB_DIR/$uid.json"
