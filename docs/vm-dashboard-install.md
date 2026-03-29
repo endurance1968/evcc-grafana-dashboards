@@ -2,9 +2,9 @@
 
 For a simple end-user walkthrough, see:
 
-- `docs/installation-readme.md`
+- `docs/deployment-readme.md`
 
-This is the end-user install path for the VM dashboards.
+This is the end-user deploy path for the VM dashboards.
 
 Goal:
 
@@ -25,7 +25,7 @@ This is simpler and safer than using username/password automation.
 
 ## Default behavior
 
-The installer defaults to:
+The deployer defaults to:
 
 - source repo: `endurance1968/evcc-grafana-dashboards`
 - ref: `main`
@@ -37,14 +37,14 @@ The installer defaults to:
 
 Default is `PURGE=false`, so existing dashboards are kept unless you explicitly opt into deleting them before import.
 
-When `PURGE=true`, the installer deletes only the dashboards whose `uid` is present in the 6 VM dashboard JSON files and only the library panels whose `uid` is referenced under `__elements` in those same files.
+When `PURGE=true`, the deployer deletes only the dashboards whose `uid` is present in the 6 VM dashboard JSON files and only the library panels whose `uid` is referenced under `__elements` in those same files.
 
 For the first deploy, only these two values normally need to be changed:
 
 - `GRAFANA_URL`
 - `GRAFANA_API_TOKEN`
 
-It does **not** patch dashboard internals during install.
+It does **not** patch dashboard internals during deploy.
 
 That means:
 
@@ -83,20 +83,21 @@ Optional:
 Runtime override parameters are also available:
 
 - PowerShell: `-url`, `-token`, `-purge`
-- Shell: `--url`, `--token`, `--purge`
+- Python shell deployer: `--url`, `--token`, `--purge`
+- Bash-only deployer: `--url`, `--token`, `--purge`
 
 These override the config values for a single run.
 
 ## User customization
 
-The installer is intentionally import-only.
+The deployer is intentionally import-only.
 
 Recommended ways to customize:
 
 - change dashboard variables in Grafana and save the dashboard
 - or deploy from a local dashboard directory via `DASHBOARD_SOURCE_MODE=local`
 
-The installer intentionally does not rewrite:
+The deployer intentionally does not rewrite:
 
 - colors
 - blocklist defaults
@@ -122,9 +123,9 @@ Or directly with the important values:
 .\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
 ```
 
-## Linux / Raspberry Pi
+## Linux / Raspberry Pi with Python shell deployer
 
-The shell installer uses `python3`, which is usually already present.
+This variant uses `python3`, which is usually already present.
 
 If not:
 
@@ -150,6 +151,32 @@ Or directly with the important values:
 sh ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
+## Linux / Raspberry Pi with Bash-only deployer
+
+This variant needs:
+
+```bash
+sudo apt install jq
+```
+
+Run:
+
+```bash
+sh ./deploy-bash.sh
+```
+
+With explicit config:
+
+```bash
+sh ./deploy-bash.sh --config ./vm-dashboard-install.env
+```
+
+Or directly with the important values:
+
+```bash
+sh ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
+```
+
 ## Maintainer note
 
 The Node.js scripts under `scripts/test` remain the maintainer workflow for:
@@ -159,5 +186,4 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - screenshot automation
 - smoke checks
 
-End users should prefer the installer scripts above.
-
+End users should prefer the deploy scripts above.

@@ -12,7 +12,7 @@ Aktive Bereiche:
 Wichtige Einstiege:
 
 - Installation für Endnutzer:
-  - [`docs/installation-readme.md`](./docs/installation-readme.md)
+  - [`docs/deployment-readme.md`](./docs/deployment-readme.md)
 - technische Installationsdetails:
   - [`docs/vm-dashboard-install.md`](./docs/vm-dashboard-install.md)
 - Rollup- und Datenmodell:
