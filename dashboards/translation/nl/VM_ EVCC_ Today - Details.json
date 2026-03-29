@@ -18,14 +18,14 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filter voor maximaal vermogen / W",
+      "label": "Max power filter / W",
       "value": "25000",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blokkeerlijst voor laadpunten",
+      "label": "Loadpoint blocklist",
       "value": "^none$",
       "description": ""
     },
@@ -46,14 +46,14 @@
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energiemonsterinterval",
+      "label": "Energy sample interval",
       "value": "60s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tariefinterval",
+      "label": "Tariff price interval",
       "value": "15m",
       "description": ""
     }
@@ -129,7 +129,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Vandaag",
+      "title": "Today",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
@@ -141,7 +141,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Gisteren",
+      "title": "Yesterday",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
@@ -153,7 +153,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "eergisteren",
+      "title": "Eergisteren",
       "tooltip": "",
       "type": "link",
       "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
@@ -239,7 +239,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Totaal"
+              "options": "Total"
             },
             "properties": [
               {
@@ -322,12 +322,12 @@
           "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
           "format": "time_series",
           "interval": "$__interval",
-          "legendFormat": "Totaal",
+          "legendFormat": "Total",
           "range": true,
           "refId": "pvEnergy"
         }
       ],
-      "title": "PV-energie",
+      "title": "PV energy",
       "transformations": [
         {
           "id": "reduce",
@@ -423,7 +423,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Totaal"
+              "options": "Total"
             },
             "properties": [
               {
@@ -477,7 +477,7 @@
           "refId": "pvPowerPerString"
         }
       ],
-      "title": "PV-vermogen",
+      "title": "PV power",
       "type": "timeseries"
     },
     {
@@ -533,7 +533,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Totaal"
+              "options": "Total"
             },
             "properties": [
               {
@@ -592,12 +592,12 @@
           "editorMode": "code",
           "expr": "batterySoc_value{id=\"\"}",
           "format": "time_series",
-          "legendFormat": "Totaal",
+          "legendFormat": "Total",
           "range": false,
           "refId": "totalSoc"
         }
       ],
-      "title": "Laadniveau accu",
+      "title": "Batterijniveau",
       "transparent": true,
       "type": "bargauge"
     },
@@ -667,7 +667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Totaal"
+              "options": "Total"
             },
             "properties": [
               {
@@ -716,7 +716,7 @@
           "refId": "A"
         }
       ],
-      "title": "Batterijvoeding",
+      "title": "Batterijvermogen",
       "type": "timeseries"
     },
     {
@@ -767,7 +767,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Voorspelling"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -841,7 +841,7 @@
           "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
           "format": "time_series",
           "interval": "",
-          "legendFormat": "Voorspelling",
+          "legendFormat": "Forecast",
           "range": true,
           "refId": "pvEnergy"
         },
@@ -871,7 +871,7 @@
           "refId": "workaround"
         }
       ],
-      "title": "Voorspelling",
+      "title": "Forecast",
       "transformations": [
         {
           "id": "reduce",
@@ -982,7 +982,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Voorspelling"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -1036,7 +1036,7 @@
           "expr": "avg(tariffSolar_value)",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Voorspelling",
+          "legendFormat": "Forecast",
           "range": true,
           "refId": "forecast"
         },
@@ -1053,7 +1053,7 @@
           "refId": "A"
         }
       ],
-      "title": "Voorspelling",
+      "title": "Forecast",
       "type": "timeseries"
     },
     {
@@ -1600,7 +1600,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Totaal"
+              "options": "Total"
             },
             "properties": [
               {
@@ -1762,7 +1762,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Huis"
+              "options": "Thuis"
             },
             "properties": [
               {
@@ -1852,7 +1852,7 @@
           "expr": "range_sum(integrate(avg(homePower_value)))/3600",
           "format": "time_series",
           "interval": "$energySampleInterval",
-          "legendFormat": "Huis",
+          "legendFormat": "Thuis",
           "range": true,
           "refId": "totalHomeEnergy"
         },
@@ -1941,7 +1941,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Huis"
+              "options": "Thuis"
             },
             "properties": [
               {
@@ -2017,7 +2017,7 @@
           "expr": "sum(integrate(homePower_value offset -1h))/3600",
           "format": "time_series",
           "interval": "1h",
-          "legendFormat": "Huis",
+          "legendFormat": "Thuis",
           "range": true,
           "refId": "totalHomeEnergy"
         },
@@ -2414,7 +2414,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Aankoop"
+                "value": "Aangekocht"
               }
             ]
           },
@@ -2433,7 +2433,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Verkoop"
+                "value": "Sold"
               }
             ]
           },
@@ -2509,7 +2509,7 @@
           "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Aankoop",
+          "legendFormat": "Aangekocht",
           "range": true,
           "refId": "bought"
         },
@@ -2522,7 +2522,7 @@
           "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Verkoop",
+          "legendFormat": "Sold",
           "range": true,
           "refId": "sold"
         },
@@ -2607,7 +2607,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Aankoop"
+              "options": "Aangekocht"
             },
             "properties": [
               {
@@ -2622,7 +2622,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkoop"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2667,7 +2667,7 @@
           "expr": "avg(tariffGrid_value offset -$tariffPriceInterval) * integrate(clamp_min(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Aankoop",
+          "legendFormat": "Aangekocht",
           "range": true,
           "refId": "bought"
         },
@@ -2680,7 +2680,7 @@
           "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
-          "legendFormat": "Verkoop",
+          "legendFormat": "Sold",
           "range": true,
           "refId": "sold"
         }
@@ -3018,7 +3018,7 @@
       },
       "id": 9,
       "panels": [],
-      "title": "Net",
+      "title": "Grid",
       "type": "row"
     },
     {
@@ -3314,7 +3314,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l1))",
           "format": "time_series",
-          "legendFormat": "Vermogen L1",
+          "legendFormat": "Power L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3326,7 +3326,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l2))",
           "format": "time_series",
-          "legendFormat": "Vermogen L2",
+          "legendFormat": "Power L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3338,7 +3338,7 @@
           "editorMode": "code",
           "expr": "last_over_time(avg(gridPowers_l3))",
           "format": "time_series",
-          "legendFormat": "Vermogen L3",
+          "legendFormat": "Power L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3441,7 +3441,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l1)",
           "format": "time_series",
-          "legendFormat": "Vermogen L1",
+          "legendFormat": "Power L1",
           "range": true,
           "refId": "powerL1"
         },
@@ -3453,7 +3453,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l2)",
           "format": "time_series",
-          "legendFormat": "Vermogen L2",
+          "legendFormat": "Power L2",
           "range": true,
           "refId": "powerL2"
         },
@@ -3465,7 +3465,7 @@
           "editorMode": "code",
           "expr": "avg(gridPowers_l3)",
           "format": "time_series",
-          "legendFormat": "Vermogen L3",
+          "legendFormat": "Power L3",
           "range": true,
           "refId": "powerL3"
         }
@@ -3484,7 +3484,7 @@
       "id": 10,
       "panels": [],
       "repeat": "loadpoint",
-      "title": "Laadpunt $loadpoint",
+      "title": "Loadpoint $loadpoint",
       "type": "row"
     },
     {
@@ -3837,7 +3837,7 @@
           "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) < 2",
           "format": "time_series",
           "interval": "1m",
-          "legendFormat": "1 fase",
+          "legendFormat": "1-fase",
           "range": true,
           "refId": "1P"
         },
@@ -3850,12 +3850,12 @@
           "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) > 2",
           "format": "time_series",
           "interval": "1m",
-          "legendFormat": "3 fasen",
+          "legendFormat": "3-fase",
           "range": true,
           "refId": "3P"
         }
       ],
-      "title": "Fasen: $loadpoint",
+      "title": "Phases: $loadpoint",
       "type": "timeseries"
     },
     {
@@ -3951,7 +3951,7 @@
           "format": "time_series",
           "legendFormat": "Laadvermogen",
           "range": true,
-          "refId": "Ladeleistung"
+          "refId": "Charge power"
         }
       ],
       "title": "Laadvermogen: $loadpoint",
@@ -3969,7 +3969,7 @@
       {
         "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
         "hide": 2,
-        "label": "Filter voor maximaal vermogen / W",
+        "label": "Max power filter / W",
         "name": "peakPowerLimit",
         "query": "25000",
         "skipUrlSync": true,
@@ -3990,7 +3990,7 @@
       {
         "description": "Lijst met laadpunten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Stellplatz' uit: ^Garage$|^Stellplatz$\nFilter alles dat met 'foo' begint uit: ^foo.*$",
         "hide": 2,
-        "label": "Blokkeerlijst voor laadpunten",
+        "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -4060,7 +4060,7 @@
         },
         "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
         "includeAll": true,
-        "label": "Laadpunt",
+        "label": "Loadpoint",
         "multi": true,
         "name": "loadpoint",
         "options": [],
@@ -4073,7 +4073,7 @@
       {
         "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
         "hide": 2,
-        "label": "Energiemonsterinterval",
+        "label": "Energy sample interval",
         "name": "energySampleInterval",
         "query": "30s",
         "skipUrlSync": true,
@@ -4094,7 +4094,7 @@
       {
         "description": "Interval waarin het stroomtarief verandert. Verandert het per kwartier, dan kun je dit op '15m' zetten. Bij een vast tarief gebruik je '1d' voor één dag.",
         "hide": 2,
-        "label": "Tariefinterval",
+        "label": "Tariff price interval",
         "name": "tariffPriceInterval",
         "query": "15m",
         "skipUrlSync": true,

@@ -76,18 +76,18 @@ Für einfache lokale Installationen reicht in der Regel:
 
 ## 4. Schnellstart
 
-Für den ersten Lauf reichen normalerweise nur URL und Token.
+Für den ersten Lauf reichen normalerweise nur URL und Token. Mit `purge` steuerst du, ob vorhandene EVCC-Dashboards vor dem Import gelöscht werden sollen.
 
 ### Linux / Raspberry Pi
 
 ```bash
-./install-vm.sh --url http://<deine-grafana-ip>:3000 --token <dein_token>
+./install-vm.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
 ```
 
 ### Windows
 
 ```powershell
-.\install-vm.ps1 -url http://<deine-grafana-ip>:3000 -token <dein_token>
+./install-vm.ps1 -url http://<deine-grafana-ip>:3000 -token <dein_token> -purge false
 ```
 
 ## 5. Optional: Config-Datei
@@ -105,6 +105,12 @@ Minimalinhalt:
 ```env
 GRAFANA_URL=http://<deine-grafana-ip>:3000
 GRAFANA_API_TOKEN=<dein_token>
+```
+
+Wenn du alte EVCC-Dashboards und Library Panels vor dem Import bewusst entfernen willst, setze in der Config oder beim Aufruf `purge=true`. In der Config sieht das so aus:
+
+```env
+PURGE=true
 ```
 
 Danach reicht:
@@ -157,3 +163,6 @@ Prüfen:
 Die technische Doku liegt hier:
 
 - `docs/vm-dashboard-install.md`
+
+
+

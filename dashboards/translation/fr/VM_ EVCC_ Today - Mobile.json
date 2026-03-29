@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filtre pour une puissance maximale/ W",
+      "label": "Max power filter / W",
       "value": "25000",
       "description": ""
     },
@@ -25,49 +25,49 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Nom, portail de l'onduleur",
+      "label": "Inverter portal name",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL, portail de l'onduleur",
+      "label": "Inverter portal URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Liste de blocage pour les points de charge",
+      "label": "Loadpoint blocklist",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Liste de blocage pour les véhicules",
+      "label": "Vehicle blocklist",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Intervalle d'échantillon d'énergie",
+      "label": "Energy sample interval",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Intervalle du prix du tarif",
+      "label": "Tariff price interval",
       "value": "15m",
       "description": ""
     }
   ],
   "__elements": {
     "afc1nq1oy29s0a": {
-      "name": "EVCC: VM: Historique de puissance",
+      "name": "EVCC: VM: Power history",
       "uid": "afc1nq1oy29s0a",
       "kind": 1,
       "model": {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Réseau"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -286,7 +286,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Réseau",
+            "legendFormat": "Grid",
             "range": true,
             "refId": "gridPower"
           },
@@ -337,7 +337,7 @@
       }
     },
     "afc1nrf3k9hc0e": {
-      "name": "EVCC: VM: Répartition de puissance",
+      "name": "EVCC: VM: Power distribution",
       "uid": "afc1nrf3k9hc0e",
       "kind": 1,
       "model": {
@@ -503,7 +503,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Alimentation"
+                "options": "Injection"
               },
               "properties": [
                 {
@@ -612,7 +612,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Alimentation",
+            "legendFormat": "Injection",
             "range": true,
             "refId": "gridPowerOut"
           },
@@ -664,7 +664,7 @@
       }
     },
     "ffc1nfxu4it4wd": {
-      "name": "EVCC: VM: Niveaux de la batterie",
+      "name": "EVCC: VM: Battery levels",
       "uid": "ffc1nfxu4it4wd",
       "kind": 1,
       "model": {
@@ -853,7 +853,7 @@
             "refId": "prioritySoc"
           }
         ],
-        "title": "Niveaux de la batterie",
+        "title": "Niveaux batterie",
         "transformations": [
           {
             "id": "configFromData",
@@ -882,7 +882,7 @@
       }
     },
     "afc1no2uz7u9sf": {
-      "name": "EVCC: VM: Coûts",
+      "name": "EVCC: VM: Costs",
       "uid": "afc1no2uz7u9sf",
       "kind": 1,
       "model": {
@@ -899,7 +899,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "Plus de détails",
+                "title": "More details",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -923,7 +923,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Achat"
+                "options": "Acheté"
               },
               "properties": [
                 {
@@ -938,7 +938,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Vente"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -1016,7 +1016,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Achat",
+            "legendFormat": "Acheté",
             "range": true,
             "refId": "boughtTotal"
           },
@@ -1030,7 +1030,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Vente",
+            "legendFormat": "Sold",
             "range": true,
             "refId": "soldTotal"
           },
@@ -1051,7 +1051,7 @@
       }
     },
     "afc1njs05twqoc": {
-      "name": "EVCC: VM: Jauges de métriques",
+      "name": "EVCC: VM: Metric gauges",
       "uid": "afc1njs05twqoc",
       "kind": 1,
       "model": {
@@ -1084,7 +1084,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autonomie"
+                "options": "Autarcie"
               },
               "properties": [
                 {
@@ -1105,7 +1105,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autonomie"
+                  "value": "Autarcie"
                 }
               ]
             },
@@ -1236,19 +1236,22 @@
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
             "hide": false,
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
             "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
+              "type": "victoriametrics-metrics-datasource",
+              "uid": "bfbufhesv65fkc"
             },
-            "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
+            "editorMode": "code",
+            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[1d:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600), 0.001), 0), 1)",
+            "format": "time_series",
             "hide": false,
-            "refId": "Eigenverbrauch",
-            "type": "math"
+            "interval": "$energySampleInterval",
+            "legendFormat": "Autoconsommation",
+            "range": false,
+            "refId": "Self-consumption"
           }
         ],
         "title": "Métriques",
@@ -1257,7 +1260,7 @@
       }
     },
     "dfc1nkrqu10qoc": {
-      "name": "EVCC: VM: Historique des métriques",
+      "name": "EVCC: VM: Metric history",
       "uid": "dfc1nkrqu10qoc",
       "kind": 1,
       "model": {
@@ -1325,7 +1328,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autonomie"
+                "options": "Autarcie"
               },
               "properties": [
                 {
@@ -1335,7 +1338,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "green",
+                    "fixedColor": "#73BF69",
                     "mode": "fixed"
                   }
                 }
@@ -1354,7 +1357,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "purple",
+                    "fixedColor": "#B877D9",
                     "mode": "fixed"
                   }
                 }
@@ -1479,7 +1482,7 @@
               "uid": "__expr__"
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
@@ -1489,7 +1492,7 @@
               "uid": "__expr__"
             },
             "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
-            "refId": "Eigenverbrauch",
+            "refId": "Self-consumption",
             "type": "math"
           }
         ],
@@ -1498,7 +1501,7 @@
       }
     },
     "dfc1nml5oazuoc": {
-      "name": "EVCC: VM: Énergie",
+      "name": "EVCC: VM: Energy",
       "uid": "dfc1nml5oazuoc",
       "kind": 1,
       "model": {
@@ -1566,7 +1569,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Alimentation"
+                "options": "Injection"
               },
               "properties": [
                 {
@@ -1760,7 +1763,7 @@
             "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Alimentation",
+            "legendFormat": "Injection",
             "range": true,
             "refId": "gridEnergyOut"
           },
@@ -1947,7 +1950,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Aujourd’hui",
+      "title": "Today",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -1959,7 +1962,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Hier",
+      "title": "Yesterday",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2052,7 +2055,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "Plus de détails",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2090,7 +2093,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réseau"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2125,7 +2128,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Plus de détails",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2202,7 +2205,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Plus de détails",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2335,7 +2338,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value) / 1000",
           "format": "time_series",
-          "legendFormat": "Réseau",
+          "legendFormat": "Grid",
           "range": true,
           "refId": "gridPower"
         },
@@ -2376,7 +2379,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Puissance",
+      "title": "Power",
       "transparent": true,
       "type": "stat"
     },
@@ -2390,7 +2393,7 @@
       "id": 2,
       "libraryPanel": {
         "uid": "afc1nq1oy29s0a",
-        "name": "EVCC: VM: Historique de puissance"
+        "name": "EVCC: VM: Power history"
       }
     },
     {
@@ -2403,7 +2406,7 @@
       "id": 75,
       "libraryPanel": {
         "uid": "afc1nrf3k9hc0e",
-        "name": "EVCC: VM: Répartition de puissance"
+        "name": "EVCC: VM: Power distribution"
       }
     },
     {
@@ -2416,7 +2419,7 @@
       "id": 66,
       "libraryPanel": {
         "uid": "ffc1nfxu4it4wd",
-        "name": "EVCC: VM: Niveaux de la batterie"
+        "name": "EVCC: VM: Battery levels"
       }
     },
     {
@@ -2429,7 +2432,7 @@
       },
       "id": 78,
       "panels": [],
-      "title": "Résumé",
+      "title": "Summary",
       "type": "row"
     },
     {
@@ -2442,7 +2445,7 @@
       "id": 79,
       "libraryPanel": {
         "uid": "afc1no2uz7u9sf",
-        "name": "EVCC: VM: Coûts"
+        "name": "EVCC: VM: Costs"
       }
     },
     {
@@ -2455,7 +2458,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "afc1njs05twqoc",
-        "name": "EVCC: VM: Jauges de métriques"
+        "name": "EVCC: VM: Metric gauges"
       }
     },
     {
@@ -2468,7 +2471,7 @@
       "id": 76,
       "libraryPanel": {
         "uid": "dfc1nkrqu10qoc",
-        "name": "EVCC: VM: Historique des métriques"
+        "name": "EVCC: VM: Metric history"
       }
     },
     {
@@ -2481,7 +2484,7 @@
       "id": 40,
       "libraryPanel": {
         "uid": "dfc1nml5oazuoc",
-        "name": "EVCC: VM: Énergie"
+        "name": "EVCC: VM: Energy"
       }
     }
   ],
@@ -2496,7 +2499,7 @@
       {
         "description": "Limite de puissance maximale en W. Les valeurs supérieures à ce seuil sont traitées comme des valeurs aberrantes.",
         "hide": 2,
-        "label": "Filtre pour une puissance maximale/ W",
+        "label": "Max power filter / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2538,7 +2541,7 @@
       {
         "description": "Nom du portail de l'onduleur utilisé pour le lien du portail.",
         "hide": 2,
-        "label": "Nom, portail de l'onduleur",
+        "label": "Inverter portal name",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2559,7 +2562,7 @@
       {
         "description": "URL où le portail de l'onduleur s'ouvre.",
         "hide": 2,
-        "label": "URL, portail de l'onduleur",
+        "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2580,7 +2583,7 @@
       {
         "description": "Liste des points de charge qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Stellplatz' : ^Garage$|^Stellplatz$\nFiltrer tout ce qui commence par 'foo' : ^foo.*$",
         "hide": 2,
-        "label": "Liste de blocage pour les points de charge",
+        "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2601,7 +2604,7 @@
       {
         "description": "Liste des véhicules qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : /^none$/\nFiltrer 'Garage' : /^Garage$/\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$/\nFiltrer les véhicules se terminant par (offline) : /^.*\\(offline\\)$/",
         "hide": 2,
-        "label": "Liste de blocage pour les véhicules",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2622,7 +2625,7 @@
       {
         "description": "Intervalle d'échantillonnage pour le calcul de l'énergie. Doit être au moins 2 fois l'intervalle de requête EVCC. Par défaut : 60 s, car l'intervalle par défaut de l'EVCC est de 60 s.",
         "hide": 2,
-        "label": "Intervalle d'échantillon d'énergie",
+        "label": "Energy sample interval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2643,7 +2646,7 @@
       {
         "description": "Cycle de facturation du prix de l'électricité.",
         "hide": 2,
-        "label": "Intervalle du prix du tarif",
+        "label": "Tariff price interval",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

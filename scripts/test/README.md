@@ -59,8 +59,8 @@ Required for screenshots:
 
 Optional:
 
-- `GRAFANA_TEST_FOLDER_UID` default: `evcc`
-- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC`
+- `GRAFANA_TEST_FOLDER_UID` default: `evcc-test`
+- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC Test`
 - `GRAFANA_SCREENSHOT_WAIT_MS` default: `3500`
 - `GRAFANA_TIME_FROM` and `GRAFANA_TIME_TO` for a global screenshot time override
 

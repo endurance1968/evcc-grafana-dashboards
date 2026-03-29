@@ -256,7 +256,27 @@
     "Sold daily raw": "Venduto giornaliero grezzo",
     "PV Anlage Amortisation": "Ammortamento impianto FV",
     "Speicher Amortisation": "Ammortamento batteria",
-    "Usable home battery capacity in Wh": "Capacità utile batteria domestica in Wh"
+    "Usable home battery capacity in Wh": "Capacità utile batteria domestica in Wh",
+    "Battery max": "Batteria max",
+    "Battery power": "Potenza batteria",
+    "Battery levels": "Livelli batteria",
+    "3-phase": "3 fasi",
+    "Battery level": "Livello batteria",
+    "1-phase": "1 fase",
+    "Actual": "Reale",
+    "Battery min": "Batteria min",
+    "avg price daily": "prezzo medio giornaliero",
+    "Charge power": "Potenza di carica",
+    "Consumption needs several months before it becomes meaningful. External charging is ignored and distorts the result.": "Il consumo diventa significativo solo dopo diversi mesi. La ricarica esterna viene ignorata e distorce il risultato.",
+    "Charge currents/phase: $loadpoint": "Correnti di carica/fase: $loadpoint",
+    "Charge power: $loadpoint": "Potenza di carica: $loadpoint",
+    "Costs": "Costi",
+    "Current": "Attuale",
+    "Day total": "Totale giornaliero",
+    "Current L2": "Corrente L2",
+    "Current L3": "Corrente L3",
+    "Current L1": "Corrente L1",
+    "Day before yesterday": "L’altro ieri"
   },
   "contains": []
 }

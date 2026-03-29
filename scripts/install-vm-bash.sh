@@ -4,6 +4,7 @@ set -euo pipefail
 CONFIG_PATH="./vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
+CLI_PURGE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -19,9 +20,13 @@ while [[ $# -gt 0 ]]; do
       CLI_TOKEN="$2"
       shift 2
       ;;
+    --purge)
+      CLI_PURGE="$2"
+      shift 2
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./install-vm-bash.sh [--config <path>] [--url <url>] [--token <token>]
+Usage: ./install-vm-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
 Requires: bash, curl, jq
 EOF
       exit 0
@@ -59,7 +64,7 @@ GITHUB_REF="main"
 DASHBOARD_LANGUAGE="en"
 DASHBOARD_VARIANT="orig"
 DASHBOARD_LOCAL_DIR=""
-DEPLOY_PURGE="true"
+PURGE="false"
 
 if [[ -f "$CONFIG_PATH" ]]; then
   set -a
@@ -73,6 +78,12 @@ if [[ -n "$CLI_URL" ]]; then
 fi
 if [[ -n "$CLI_TOKEN" ]]; then
   GRAFANA_API_TOKEN="$CLI_TOKEN"
+fi
+if [[ -n "$CLI_PURGE" ]]; then
+  PURGE="$CLI_PURGE"
+fi
+if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
+  PURGE="$DEPLOY_PURGE"
 fi
 
 if [[ -z "$GRAFANA_API_TOKEN" ]]; then
@@ -170,6 +181,111 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   done
 done
 
+health_out="$TMP_DIR/health.json"
+health_status=$(api GET "/api/search?limit=1" "" "$health_out")
+if [[ "$health_status" -lt 200 || "$health_status" -ge 300 ]]; then
+  echo "Grafana check failed: $(cat "$health_out")" >&2
+  exit 1
+fi
+
+echo "Grafana check: OK"
+echo "URL: $GRAFANA_URL"
+echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
+echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
+if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
+  echo "Source: local / $DASHBOARD_LOCAL_DIR"
+else
+  echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+fi
+echo "Language: $DASHBOARD_LANGUAGE"
+echo "Variant: $DASHBOARD_VARIANT"
+echo "Purge: $PURGE"
+echo
+echo "Will import dashboards:"
+for file_name in "${DASHBOARD_FILES[@]}"; do
+  raw_file="$TMP_DIR/$file_name"
+  echo "- $(jq -r '.title' "$raw_file") [$(jq -r '.uid // ""' "$raw_file")]"
+done
+echo
+echo "Will import library panels:"
+for lib_file in "$LIB_DIR"/*.json; do
+  [[ -e "$lib_file" ]] || continue
+  echo "- $(jq -r '.name' "$lib_file") [$(jq -r '.uid' "$lib_file")]"
+done
+
+existing_library=()
+for lib_file in "$LIB_DIR"/*.json; do
+  [[ -e "$lib_file" ]] || continue
+  uid=$(jq -r '.uid' "$lib_file")
+  purge_out="$TMP_DIR/check-library-existing.json"
+  status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
+  if [[ "$status" == "200" ]]; then
+    existing_library+=("$(jq -r '.result.name' "$purge_out") [$uid]")
+  elif [[ "$status" != "404" ]]; then
+    echo "Failed to inspect library panel $uid: $(cat "$purge_out")" >&2
+    exit 1
+  fi
+done
+
+if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
+  echo
+  echo "Existing library panels already present and will be kept because purge=false:"
+  for item in "${existing_library[@]}"; do
+    echo "- $item"
+  done
+  echo "Only missing library panels will be imported. Existing ones are skipped."
+fi
+
+if [[ "${PURGE,,}" == "true" ]]; then
+  echo
+  echo "Will delete existing dashboards before import:"
+  found=0
+  for file_name in "${DASHBOARD_FILES[@]}"; do
+    raw_file="$TMP_DIR/$file_name"
+    uid=$(jq -r '.uid // empty' "$raw_file")
+    [[ -n "$uid" ]] || continue
+    purge_out="$TMP_DIR/check-dashboard.json"
+    status=$(api GET "/api/dashboards/uid/$(urlencode "$uid")" "" "$purge_out")
+    if [[ "$status" == "200" ]]; then
+      echo "- $(jq -r '.dashboard.title' "$purge_out") [$uid]"
+      found=1
+    elif [[ "$status" != "404" ]]; then
+      echo "Failed to inspect dashboard $uid: $(cat "$purge_out")" >&2
+      exit 1
+    fi
+  done
+  [[ "$found" -eq 1 ]] || echo "- none"
+
+  echo
+  echo "Will delete existing library panels before import:"
+  found=0
+  for lib_file in "$LIB_DIR"/*.json; do
+    [[ -e "$lib_file" ]] || continue
+    uid=$(jq -r '.uid' "$lib_file")
+    purge_out="$TMP_DIR/check-library.json"
+    status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
+    if [[ "$status" == "200" ]]; then
+      echo "- $(jq -r '.result.name' "$purge_out") [$uid]"
+      found=1
+    elif [[ "$status" != "404" ]]; then
+      echo "Failed to inspect library panel $uid: $(cat "$purge_out")" >&2
+      exit 1
+    fi
+  done
+  [[ "$found" -eq 1 ]] || echo "- none"
+fi
+
+echo
+printf 'Proceed with dashboard deployment? [y/N] '
+read -r answer
+case "${answer:-}" in
+  y|Y|yes|YES|Yes) ;;
+  *)
+    echo "Aborted. No changes applied."
+    exit 0
+    ;;
+esac
+
 folder_resp="$TMP_DIR/folder.json"
 folder_status=$(api GET "/api/folders/$(urlencode "$GRAFANA_FOLDER_UID")" "" "$folder_resp")
 if [[ "$folder_status" == "404" ]]; then
@@ -186,7 +302,30 @@ elif [[ "$folder_status" -lt 200 || "$folder_status" -ge 300 ]]; then
   exit 1
 fi
 
-if [[ "${DEPLOY_PURGE,,}" == "true" ]]; then
+existing_library=()
+for lib_file in "$LIB_DIR"/*.json; do
+  [[ -e "$lib_file" ]] || continue
+  uid=$(jq -r '.uid' "$lib_file")
+  purge_out="$TMP_DIR/check-library-existing.json"
+  status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
+  if [[ "$status" == "200" ]]; then
+    existing_library+=("$(jq -r '.result.name' "$purge_out") [$uid]")
+  elif [[ "$status" != "404" ]]; then
+    echo "Failed to inspect library panel $uid: $(cat "$purge_out")" >&2
+    exit 1
+  fi
+done
+
+if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
+  echo
+  echo "Existing library panels already present and will be kept because purge=false:"
+  for item in "${existing_library[@]}"; do
+    echo "- $item"
+  done
+  echo "Only missing library panels will be imported. Existing ones are skipped."
+fi
+
+if [[ "${PURGE,,}" == "true" ]]; then
   for file_name in "${DASHBOARD_FILES[@]}"; do
     raw_file="$TMP_DIR/$file_name"
     uid=$(jq -r '.uid // empty' "$raw_file")
@@ -213,6 +352,19 @@ fi
 
 for lib_file in "$LIB_DIR"/*.json; do
   [[ -e "$lib_file" ]] || continue
+  uid=$(jq -r '.uid' "$lib_file")
+  if [[ "${PURGE,,}" != "true" ]]; then
+    skip_existing=0
+    for item in "${existing_library[@]}"; do
+      case "$item" in
+        *"[$uid]") skip_existing=1 ;;&
+      esac
+    done
+    if [[ "$skip_existing" -eq 1 ]]; then
+      echo "Keeping existing library panel: $(jq -r '.name' "$lib_file") [$uid]"
+      continue
+    fi
+  fi
   body_file="$TMP_DIR/library-body.json"
   jq --arg folderUid "$GRAFANA_FOLDER_UID" '{uid:.uid,name:.name,kind:.kind,folderUid:$folderUid,model:.model}' "$lib_file" > "$body_file"
   out_file="$TMP_DIR/library-import.json"
@@ -251,3 +403,4 @@ if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
 else
   echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
 fi
+

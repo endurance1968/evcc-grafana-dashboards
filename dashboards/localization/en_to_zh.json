@@ -256,7 +256,27 @@
     "Sold daily raw": "每日售出原始值",
     "PV Anlage Amortisation": "光伏系统摊销",
     "Speicher Amortisation": "电池摊销",
-    "Usable home battery capacity in Wh": "可用家庭电池容量（Wh）"
+    "Usable home battery capacity in Wh": "可用家庭电池容量（Wh）",
+    "Battery max": "电池最大值",
+    "Battery power": "电池功率",
+    "Battery levels": "电池电量",
+    "3-phase": "三相",
+    "Battery level": "电池电量",
+    "1-phase": "单相",
+    "Actual": "实际",
+    "Battery min": "电池最小值",
+    "avg price daily": "日均价格",
+    "Charge power": "充电功率",
+    "Consumption needs several months before it becomes meaningful. External charging is ignored and distorts the result.": "消费数据需要数月后才有意义。外部充电被忽略，会扭曲结果。",
+    "Charge currents/phase: $loadpoint": "每相充电电流: $loadpoint",
+    "Charge power: $loadpoint": "充电功率: $loadpoint",
+    "Costs": "成本",
+    "Current": "当前",
+    "Day total": "当日总计",
+    "Current L2": "电流 L2",
+    "Current L3": "电流 L3",
+    "Current L1": "电流 L1",
+    "Day before yesterday": "前天"
   },
   "contains": []
 }

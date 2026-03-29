@@ -2137,7 +2137,7 @@
           "editorMode": "code",
           "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
-          "legendFormat": "avg price daily",
+          "legendFormat": "औसत दैनिक मूल्य",
           "range": true,
           "refId": "averagePriceDaily",
           "hide": true,
@@ -3031,7 +3031,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery max"
+                "value": "बैटरी अधिकतम"
               }
             ]
           },
@@ -3050,7 +3050,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery min"
+                "value": "बैटरी न्यूनतम"
               }
             ]
           },
@@ -3126,10 +3126,7 @@
   "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
-    "VM",
-    "test",
-    "rollup",
-    "month"
+    "EVCC"
   ],
   "templating": {
     "list": [

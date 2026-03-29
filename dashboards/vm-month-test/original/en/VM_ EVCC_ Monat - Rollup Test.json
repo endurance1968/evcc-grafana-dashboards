@@ -3103,10 +3103,7 @@
   "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
-    "VM",
-    "test",
-    "rollup",
-    "month"
+    "EVCC"
   ],
   "templating": {
     "list": [

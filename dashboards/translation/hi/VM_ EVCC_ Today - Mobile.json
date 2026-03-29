@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "अधिकतम शक्ति/डब्ल्यू के लिए फ़िल्टर",
+      "label": "Max power filter / W",
       "value": "25000",
       "description": ""
     },
@@ -25,49 +25,49 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "नाम, इन्वर्टर पोर्टल",
+      "label": "Inverter portal name",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "यूआरएल, इन्वर्टर पोर्टल",
+      "label": "Inverter portal URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "लोडप्वाइंट के लिए ब्लॉकलिस्ट",
+      "label": "Loadpoint blocklist",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "वाहनों के लिए ब्लॉकलिस्ट",
+      "label": "Vehicle blocklist",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "ऊर्जा नमूना अंतराल",
+      "label": "Energy sample interval",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "टैरिफ मूल्य अंतराल",
+      "label": "Tariff price interval",
       "value": "15m",
       "description": ""
     }
   ],
   "__elements": {
     "afc1nq1oy29s0a": {
-      "name": "EVCC: VM: पावर इतिहास",
+      "name": "EVCC: VM: Power history",
       "uid": "afc1nq1oy29s0a",
       "kind": 1,
       "model": {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "नेटवर्क"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -286,7 +286,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "नेटवर्क",
+            "legendFormat": "Grid",
             "range": true,
             "refId": "gridPower"
           },
@@ -337,7 +337,7 @@
       }
     },
     "afc1nrf3k9hc0e": {
-      "name": "EVCC: VM: पावर वितरण",
+      "name": "EVCC: VM: Power distribution",
       "uid": "afc1nrf3k9hc0e",
       "kind": 1,
       "model": {
@@ -503,7 +503,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "जमा करो"
+                "options": "ग्रिड में आपूर्ति"
               },
               "properties": [
                 {
@@ -612,7 +612,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "जमा करो",
+            "legendFormat": "ग्रिड में आपूर्ति",
             "range": true,
             "refId": "gridPowerOut"
           },
@@ -664,7 +664,7 @@
       }
     },
     "ffc1nfxu4it4wd": {
-      "name": "EVCC: VM: बैटरी स्तर",
+      "name": "EVCC: VM: Battery levels",
       "uid": "ffc1nfxu4it4wd",
       "kind": 1,
       "model": {
@@ -882,7 +882,7 @@
       }
     },
     "afc1no2uz7u9sf": {
-      "name": "EVCC: VM: लागत",
+      "name": "EVCC: VM: Costs",
       "uid": "afc1no2uz7u9sf",
       "kind": 1,
       "model": {
@@ -899,7 +899,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "अधिक जानकारी",
+                "title": "More details",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -923,7 +923,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "खरीद"
+                "options": "खरीदा गया"
               },
               "properties": [
                 {
@@ -938,7 +938,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "बिक्री"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -977,7 +977,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "दैनिक योग"
+                  "value": "दिन का कुल"
                 }
               ]
             }
@@ -1016,7 +1016,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "खरीद",
+            "legendFormat": "खरीदा गया",
             "range": true,
             "refId": "boughtTotal"
           },
@@ -1030,7 +1030,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "बिक्री",
+            "legendFormat": "Sold",
             "range": true,
             "refId": "soldTotal"
           },
@@ -1051,7 +1051,7 @@
       }
     },
     "afc1njs05twqoc": {
-      "name": "EVCC: VM: मेट्रिक गेज",
+      "name": "EVCC: VM: Metric gauges",
       "uid": "afc1njs05twqoc",
       "kind": 1,
       "model": {
@@ -1236,19 +1236,22 @@
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
             "hide": false,
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
             "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
+              "type": "victoriametrics-metrics-datasource",
+              "uid": "bfbufhesv65fkc"
             },
-            "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
+            "editorMode": "code",
+            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[1d:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600), 0.001), 0), 1)",
+            "format": "time_series",
             "hide": false,
-            "refId": "Eigenverbrauch",
-            "type": "math"
+            "interval": "$energySampleInterval",
+            "legendFormat": "स्व-उपभोग",
+            "range": false,
+            "refId": "Self-consumption"
           }
         ],
         "title": "मेट्रिक्स",
@@ -1257,7 +1260,7 @@
       }
     },
     "dfc1nkrqu10qoc": {
-      "name": "EVCC: VM: मेट्रिक इतिहास",
+      "name": "EVCC: VM: Metric history",
       "uid": "dfc1nkrqu10qoc",
       "kind": 1,
       "model": {
@@ -1335,7 +1338,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "green",
+                    "fixedColor": "#73BF69",
                     "mode": "fixed"
                   }
                 }
@@ -1354,7 +1357,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "purple",
+                    "fixedColor": "#B877D9",
                     "mode": "fixed"
                   }
                 }
@@ -1479,7 +1482,7 @@
               "uid": "__expr__"
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
@@ -1489,7 +1492,7 @@
               "uid": "__expr__"
             },
             "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
-            "refId": "Eigenverbrauch",
+            "refId": "Self-consumption",
             "type": "math"
           }
         ],
@@ -1498,7 +1501,7 @@
       }
     },
     "dfc1nml5oazuoc": {
-      "name": "EVCC: VM: ऊर्जा",
+      "name": "EVCC: VM: Energy",
       "uid": "dfc1nml5oazuoc",
       "kind": 1,
       "model": {
@@ -1566,7 +1569,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "जमा करो"
+                "options": "ग्रिड में आपूर्ति"
               },
               "properties": [
                 {
@@ -1760,7 +1763,7 @@
             "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "जमा करो",
+            "legendFormat": "ग्रिड में आपूर्ति",
             "range": true,
             "refId": "gridEnergyOut"
           },
@@ -1947,7 +1950,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "आज",
+      "title": "Today",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -1959,7 +1962,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "कल",
+      "title": "Yesterday",
       "tooltip": "",
       "type": "link",
       "url": "/d/adtcx74?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2003,7 +2006,7 @@
       },
       "id": 77,
       "panels": [],
-      "title": "मौजूदा",
+      "title": "वर्तमान",
       "type": "row"
     },
     {
@@ -2052,7 +2055,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "अधिक जानकारी",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2090,7 +2093,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "नेटवर्क"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2125,7 +2128,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "अधिक जानकारी",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2202,7 +2205,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "अधिक जानकारी",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2335,7 +2338,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value) / 1000",
           "format": "time_series",
-          "legendFormat": "नेटवर्क",
+          "legendFormat": "Grid",
           "range": true,
           "refId": "gridPower"
         },
@@ -2376,7 +2379,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "शक्ति",
+      "title": "Power",
       "transparent": true,
       "type": "stat"
     },
@@ -2390,7 +2393,7 @@
       "id": 2,
       "libraryPanel": {
         "uid": "afc1nq1oy29s0a",
-        "name": "EVCC: VM: पावर इतिहास"
+        "name": "EVCC: VM: Power history"
       }
     },
     {
@@ -2403,7 +2406,7 @@
       "id": 75,
       "libraryPanel": {
         "uid": "afc1nrf3k9hc0e",
-        "name": "EVCC: VM: पावर वितरण"
+        "name": "EVCC: VM: Power distribution"
       }
     },
     {
@@ -2416,7 +2419,7 @@
       "id": 66,
       "libraryPanel": {
         "uid": "ffc1nfxu4it4wd",
-        "name": "EVCC: VM: बैटरी स्तर"
+        "name": "EVCC: VM: Battery levels"
       }
     },
     {
@@ -2429,7 +2432,7 @@
       },
       "id": 78,
       "panels": [],
-      "title": "सारांश",
+      "title": "Summary",
       "type": "row"
     },
     {
@@ -2442,7 +2445,7 @@
       "id": 79,
       "libraryPanel": {
         "uid": "afc1no2uz7u9sf",
-        "name": "EVCC: VM: लागत"
+        "name": "EVCC: VM: Costs"
       }
     },
     {
@@ -2455,7 +2458,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "afc1njs05twqoc",
-        "name": "EVCC: VM: मेट्रिक गेज"
+        "name": "EVCC: VM: Metric gauges"
       }
     },
     {
@@ -2468,7 +2471,7 @@
       "id": 76,
       "libraryPanel": {
         "uid": "dfc1nkrqu10qoc",
-        "name": "EVCC: VM: मेट्रिक इतिहास"
+        "name": "EVCC: VM: Metric history"
       }
     },
     {
@@ -2481,7 +2484,7 @@
       "id": 40,
       "libraryPanel": {
         "uid": "dfc1nml5oazuoc",
-        "name": "EVCC: VM: ऊर्जा"
+        "name": "EVCC: VM: Energy"
       }
     }
   ],
@@ -2496,7 +2499,7 @@
       {
         "description": "डब्ल्यू में अधिकतम शक्ति सीमा। इस सीमा से ऊपर के मूल्यों को आउटलेयर के रूप में माना जाता है।",
         "hide": 2,
-        "label": "अधिकतम शक्ति/डब्ल्यू के लिए फ़िल्टर",
+        "label": "Max power filter / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2538,7 +2541,7 @@
       {
         "description": "पोर्टल लिंक के लिए प्रयुक्त इन्वर्टर पोर्टल का नाम।",
         "hide": 2,
-        "label": "नाम, इन्वर्टर पोर्टल",
+        "label": "Inverter portal name",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2559,7 +2562,7 @@
       {
         "description": "यूआरएल जहां इन्वर्टर पोर्टल खुलता है।",
         "hide": 2,
-        "label": "यूआरएल, इन्वर्टर पोर्टल",
+        "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2580,7 +2583,7 @@
       {
         "description": "उन चार्जिंग पॉइंट्स की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: ^none$\n'Garage' फ़िल्टर करें: ^Garage$\n'Garage' और 'Stellplatz' फ़िल्टर करें: ^Garage$|^Stellplatz$\n'foo' से शुरू होने वाली सभी प्रविष्टियाँ फ़िल्टर करें: ^foo.*$",
         "hide": 2,
-        "label": "लोडप्वाइंट के लिए ब्लॉकलिस्ट",
+        "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2601,7 +2604,7 @@
       {
         "description": "उन वाहनों की सूची जिन्हें नहीं दिखाया जाना चाहिए। अभिव्यक्ति एक नियमित अभिव्यक्ति होनी चाहिए और खाली नहीं हो सकती। यदि कुछ भी फ़िल्टर नहीं करना है, तो ऐसी अभिव्यक्ति दें जो किसी भी प्रविष्टि से मेल न खाए।\n\nउदाहरण:\nकोई प्रविष्टि नहीं: /^none$/\n'Garage' फ़िल्टर करें: /^Garage$/\n'Garage' और 'Stellplatz' फ़िल्टर करें: /^Garage$|^Stellplatz$/\n(offline) पर समाप्त होने वाले वाहनों को फ़िल्टर करें: /^.*\\(offline\\)$/",
         "hide": 2,
-        "label": "वाहनों के लिए ब्लॉकलिस्ट",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2622,7 +2625,7 @@
       {
         "description": "ऊर्जा गणना के लिए नमूनाकरण अंतराल। EVCC क्वेरी अंतराल कम से कम 2x होना चाहिए। डिफ़ॉल्ट: 60s, क्योंकि EVCC डिफ़ॉल्ट अंतराल 60s है।",
         "hide": 2,
-        "label": "ऊर्जा नमूना अंतराल",
+        "label": "Energy sample interval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2643,7 +2646,7 @@
       {
         "description": "बिजली मूल्य का बिलिंग अंतराल।",
         "hide": 2,
-        "label": "टैरिफ मूल्य अंतराल",
+        "label": "Tariff price interval",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

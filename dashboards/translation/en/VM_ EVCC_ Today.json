@@ -11,7 +11,7 @@
     {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
-      "label": "Filter für maximale Leistung / W",
+      "label": "Max power filter / W",
       "value": "25000",
       "description": ""
     },
@@ -25,49 +25,49 @@
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Name, Wechselrichterportal",
+      "label": "Inverter portal name",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL, Wechselrichterportal",
+      "label": "Inverter portal URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     },
     {
       "name": "VAR_LOADPOINTBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist für Loadpoints",
+      "label": "Loadpoint blocklist",
       "value": "^none$",
       "description": ""
     },
     {
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
-      "label": "Blocklist für Fahrzeuge",
+      "label": "Vehicle blocklist",
       "value": "^Mr White.*$|^.*\\(offline\\)$",
       "description": ""
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
       "type": "constant",
-      "label": "Energie Abtast Interval",
+      "label": "Energy sample interval",
       "value": "30s",
       "description": ""
     },
     {
       "name": "VAR_TARIFFPRICEINTERVAL",
       "type": "constant",
-      "label": "Tarif Preis Interval",
+      "label": "Tariff price interval",
       "value": "15m",
       "description": ""
     }
   ],
   "__elements": {
     "afc1nq1oy29s0a": {
-      "name": "EVCC: VM: Leistungsverlauf",
+      "name": "EVCC: VM: Power history",
       "uid": "afc1nq1oy29s0a",
       "kind": 1,
       "model": {
@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netz"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -331,7 +331,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Netz",
+            "legendFormat": "Grid",
             "range": true,
             "refId": "gridPower"
           },
@@ -345,7 +345,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Haus",
+            "legendFormat": "Home",
             "range": true,
             "refId": "homePower"
           },
@@ -359,7 +359,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Speicher",
+            "legendFormat": "Battery",
             "range": true,
             "refId": "batteryPower"
           },
@@ -396,7 +396,7 @@
       }
     },
     "ffc1nfxu4it4wd": {
-      "name": "EVCC: VM: Batteriestände",
+      "name": "EVCC: VM: Battery levels",
       "uid": "ffc1nfxu4it4wd",
       "kind": 1,
       "model": {
@@ -469,7 +469,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -552,7 +552,7 @@
             "expr": "avg(batterySoc_value{id=\"\"}) < 100",
             "format": "time_series",
             "interval": "5m",
-            "legendFormat": "Speicher",
+            "legendFormat": "Battery",
             "range": true,
             "refId": "batterySoc"
           },
@@ -585,7 +585,7 @@
             "refId": "prioritySoc"
           }
         ],
-        "title": "Batteriestände",
+        "title": "Battery levels",
         "transformations": [
           {
             "id": "configFromData",
@@ -614,7 +614,7 @@
       }
     },
     "afc1njs05twqoc": {
-      "name": "EVCC: VM: Kennzahlen Gauges",
+      "name": "EVCC: VM: Metric gauges",
       "uid": "afc1njs05twqoc",
       "kind": 1,
       "model": {
@@ -647,7 +647,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -668,14 +668,14 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autarky"
                 }
               ]
             },
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -696,7 +696,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbrauch"
+                  "value": "Self-consumption"
                 }
               ]
             }
@@ -799,19 +799,22 @@
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
             "hide": false,
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
             "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
+              "type": "victoriametrics-metrics-datasource",
+              "uid": "bfbufhesv65fkc"
             },
-            "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
+            "editorMode": "code",
+            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[1d:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600), 0.001), 0), 1)",
+            "format": "time_series",
             "hide": false,
-            "refId": "Eigenverbrauch",
-            "type": "math"
+            "interval": "$energySampleInterval",
+            "legendFormat": "Self-consumption",
+            "range": false,
+            "refId": "Self-consumption"
           }
         ],
         "title": "Kennzahlen",
@@ -820,7 +823,7 @@
       }
     },
     "dfc1nkrqu10qoc": {
-      "name": "EVCC: VM: Kennzahlen Verlauf",
+      "name": "EVCC: VM: Metric history",
       "uid": "dfc1nkrqu10qoc",
       "kind": 1,
       "model": {
@@ -888,7 +891,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -898,7 +901,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "green",
+                    "fixedColor": "#73BF69",
                     "mode": "fixed"
                   }
                 }
@@ -907,7 +910,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbrauch"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -917,7 +920,7 @@
                 {
                   "id": "color",
                   "value": {
-                    "fixedColor": "purple",
+                    "fixedColor": "#B877D9",
                     "mode": "fixed"
                   }
                 }
@@ -1042,7 +1045,7 @@
               "uid": "__expr__"
             },
             "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
-            "refId": "Autarkie",
+            "refId": "Autarky",
             "type": "math"
           },
           {
@@ -1052,7 +1055,7 @@
               "uid": "__expr__"
             },
             "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
-            "refId": "Eigenverbrauch",
+            "refId": "Self-consumption",
             "type": "math"
           }
         ],
@@ -1061,7 +1064,7 @@
       }
     },
     "dfc1nml5oazuoc": {
-      "name": "EVCC: VM: Energie",
+      "name": "EVCC: VM: Energy",
       "uid": "dfc1nml5oazuoc",
       "kind": 1,
       "model": {
@@ -1114,7 +1117,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1129,7 +1132,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1144,7 +1147,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1174,7 +1177,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1189,7 +1192,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1310,7 +1313,7 @@
             "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Netzbezug",
+            "legendFormat": "Grid import",
             "range": true,
             "refId": "gridEnergyIn"
           },
@@ -1323,7 +1326,7 @@
             "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Einspeisung",
+            "legendFormat": "Feed-in",
             "range": true,
             "refId": "gridEnergyOut"
           },
@@ -1336,7 +1339,7 @@
             "expr": "sum without(host) (integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / -3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Haus",
+            "legendFormat": "Home",
             "range": true,
             "refId": "homeEnergy"
           },
@@ -1349,7 +1352,7 @@
             "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Speicher entladen",
+            "legendFormat": "Battery discharge",
             "range": true,
             "refId": "batteryDischargeEnergy"
           },
@@ -1362,7 +1365,7 @@
             "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Speicher laden",
+            "legendFormat": "Battery charge",
             "range": true,
             "refId": "batteryChargeEnergy"
           },
@@ -1457,7 +1460,7 @@
       }
     },
     "afc1nrf3k9hc0e": {
-      "name": "EVCC: VM: Leistungsverteilung",
+      "name": "EVCC: VM: Power distribution",
       "uid": "afc1nrf3k9hc0e",
       "kind": 1,
       "model": {
@@ -1548,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Haus"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1563,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netzbezug"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1593,7 +1596,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher entladen"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1623,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einspeisung"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1638,7 +1641,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Speicher laden"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1690,7 +1693,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Netzbezug",
+            "legendFormat": "Grid import",
             "range": true,
             "refId": "gridPowerIn"
           },
@@ -1704,7 +1707,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Speicher entladen",
+            "legendFormat": "Battery discharge",
             "range": true,
             "refId": "batteryPowerOut"
           },
@@ -1732,7 +1735,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Einspeisung",
+            "legendFormat": "Feed-in",
             "range": true,
             "refId": "gridPowerOut"
           },
@@ -1746,7 +1749,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Speicher laden",
+            "legendFormat": "Battery charge",
             "range": true,
             "refId": "batteryPowerIn"
           },
@@ -1774,7 +1777,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
-            "legendFormat": "Haus",
+            "legendFormat": "Home",
             "range": true,
             "refId": "homePower"
           }
@@ -1784,7 +1787,7 @@
       }
     },
     "afc1no2uz7u9sf": {
-      "name": "EVCC: VM: Kosten",
+      "name": "EVCC: VM: Costs",
       "uid": "afc1no2uz7u9sf",
       "kind": 1,
       "model": {
@@ -1801,7 +1804,7 @@
             "decimals": 2,
             "links": [
               {
-                "title": "Mehr Details",
+                "title": "More details",
                 "url": "/d/adddvtj?$__url_time_range"
               }
             ],
@@ -1825,7 +1828,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Einkauf"
+                "options": "Purchased"
               },
               "properties": [
                 {
@@ -1840,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Verkauf"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -1879,7 +1882,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Tagessumme"
+                  "value": "Day total"
                 }
               ]
             }
@@ -1918,7 +1921,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Einkauf",
+            "legendFormat": "Purchased",
             "range": true,
             "refId": "boughtTotal"
           },
@@ -1932,7 +1935,7 @@
             "format": "time_series",
             "hide": false,
             "interval": "$tariffPriceInterval",
-            "legendFormat": "Verkauf",
+            "legendFormat": "Sold",
             "range": true,
             "refId": "soldTotal"
           },
@@ -2006,7 +2009,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Heute",
+      "title": "Today",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
@@ -2018,7 +2021,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Gestern",
+      "title": "Yesterday",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
@@ -2030,7 +2033,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Vorgestern",
+      "title": "Day before yesterday",
       "tooltip": "",
       "type": "link",
       "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
@@ -2125,7 +2128,7 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "Mehr Details",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2163,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netz"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2198,7 +2201,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Mehr Details",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2208,7 +2211,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Speicher"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2244,7 +2247,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2275,7 +2278,7 @@
                 "id": "links",
                 "value": [
                   {
-                    "title": "Mehr Details",
+                    "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range"
                   }
                 ]
@@ -2406,7 +2409,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (gridPower_value / 1000)",
           "format": "time_series",
-          "legendFormat": "Netz",
+          "legendFormat": "Grid",
           "range": true,
           "refId": "gridPower"
         },
@@ -2418,7 +2421,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (homePower_value / -1000)",
           "format": "time_series",
-          "legendFormat": "Haus",
+          "legendFormat": "Home",
           "range": true,
           "refId": "homePower"
         },
@@ -2430,7 +2433,7 @@
           "editorMode": "code",
           "expr": "avg without(host) (batteryPower_value{id=\"\"} / 1000)",
           "format": "time_series",
-          "legendFormat": "Speicher",
+          "legendFormat": "Battery",
           "range": true,
           "refId": "batteryPower"
         },
@@ -2447,7 +2450,7 @@
           "refId": "loadpointPowers"
         }
       ],
-      "title": "Leistungen",
+      "title": "Power",
       "transparent": true,
       "type": "gauge"
     },
@@ -2461,7 +2464,7 @@
       "id": 2,
       "libraryPanel": {
         "uid": "afc1nq1oy29s0a",
-        "name": "EVCC: VM: Leistungsverlauf"
+        "name": "EVCC: VM: Power history"
       }
     },
     {
@@ -2474,7 +2477,7 @@
       "id": 66,
       "libraryPanel": {
         "uid": "ffc1nfxu4it4wd",
-        "name": "EVCC: VM: Batteriestände"
+        "name": "EVCC: VM: Battery levels"
       }
     },
     {
@@ -2487,7 +2490,7 @@
       "id": 64,
       "libraryPanel": {
         "uid": "afc1njs05twqoc",
-        "name": "EVCC: VM: Kennzahlen Gauges"
+        "name": "EVCC: VM: Metric gauges"
       }
     },
     {
@@ -2500,7 +2503,7 @@
       "id": 76,
       "libraryPanel": {
         "uid": "dfc1nkrqu10qoc",
-        "name": "EVCC: VM: Kennzahlen Verlauf"
+        "name": "EVCC: VM: Metric history"
       }
     },
     {
@@ -2513,7 +2516,7 @@
       "id": 77,
       "libraryPanel": {
         "uid": "dfc1nml5oazuoc",
-        "name": "EVCC: VM: Energie"
+        "name": "EVCC: VM: Energy"
       }
     },
     {
@@ -2526,7 +2529,7 @@
       "id": 75,
       "libraryPanel": {
         "uid": "afc1nrf3k9hc0e",
-        "name": "EVCC: VM: Leistungsverteilung"
+        "name": "EVCC: VM: Power distribution"
       }
     },
     {
@@ -2539,7 +2542,7 @@
       "id": 73,
       "libraryPanel": {
         "uid": "afc1no2uz7u9sf",
-        "name": "EVCC: VM: Kosten"
+        "name": "EVCC: VM: Costs"
       }
     }
   ],
@@ -2554,7 +2557,7 @@
       {
         "description": "Grenze der maximalen Leistung in W, über diese hinaus Leistungswerte als Ausreißer ignoriert werden.",
         "hide": 2,
-        "label": "Filter für maximale Leistung / W",
+        "label": "Max power filter / W",
         "name": "peakPowerLimit",
         "query": "${VAR_PEAKPOWERLIMIT}",
         "skipUrlSync": true,
@@ -2596,7 +2599,7 @@
       {
         "description": "Name des Wechselrichterportals für den Link auf das Portal.",
         "hide": 2,
-        "label": "Name, Wechselrichterportal",
+        "label": "Inverter portal name",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -2617,7 +2620,7 @@
       {
         "description": "URL unter der das Wechselrichterportal geöffnet wird.",
         "hide": 2,
-        "label": "URL, Wechselrichterportal",
+        "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -2638,7 +2641,7 @@
       {
         "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
         "hide": 2,
-        "label": "Blocklist für Loadpoints",
+        "label": "Loadpoint blocklist",
         "name": "loadpointBlocklist",
         "query": "${VAR_LOADPOINTBLOCKLIST}",
         "skipUrlSync": true,
@@ -2659,7 +2662,7 @@
       {
         "description": "Liste der Fahrzeuge, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere Fahrzeuge mit (offline) am Ende aus: ^.*\\(offline\\)$",
         "hide": 2,
-        "label": "Blocklist für Fahrzeuge",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
         "query": "${VAR_VEHICLEBLOCKLIST}",
         "skipUrlSync": true,
@@ -2680,7 +2683,7 @@
       {
         "description": "Das Abtastinterval für die Energieberechnung. Sollte mindestens 2x dem Abfrageintervall von EVCC entsprechen. Default: 60s, da das Default Intervall von EVCC 60s beträgt.",
         "hide": 2,
-        "label": "Energie Abtast Interval",
+        "label": "Energy sample interval",
         "name": "energySampleInterval",
         "query": "${VAR_ENERGYSAMPLEINTERVAL}",
         "skipUrlSync": true,
@@ -2701,7 +2704,7 @@
       {
         "description": "Abrechnungstakt des Strompreises.",
         "hide": 2,
-        "label": "Tarif Preis Interval",
+        "label": "Tariff price interval",
         "name": "tariffPriceInterval",
         "query": "${VAR_TARIFFPRICEINTERVAL}",
         "skipUrlSync": true,

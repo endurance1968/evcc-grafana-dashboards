@@ -30,7 +30,7 @@ const githubRef = parseArg("github-ref", "main").trim() || "main";
 const overridesArg = parseArg("overrides", "").trim();
 const purgeLanguage = parseArg("purge", "true") === "true";
 const withSmoke = parseArg("smoke", "true") !== "false";
-const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc");
+const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const envArg = parseArg("env", ".env");
 const repoRoot = process.cwd();
 

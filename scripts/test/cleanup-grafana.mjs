@@ -10,7 +10,7 @@ loadEnvFile(parseArg("env", ".env"));
 
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
-const folderUid = parseArg("folderUid", optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-l10n-test"));
+const folderUid = parseArg("folderUid", optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test"));
 
 async function listDashboardsInFolder() {
   const query = `/api/search?type=dash-db&limit=5000&folderUIDs=${encodeURIComponent(folderUid)}`;

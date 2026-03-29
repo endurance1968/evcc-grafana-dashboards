@@ -46,8 +46,8 @@ Required for screenshots:
 
 Optional:
 
-- `GRAFANA_TEST_FOLDER_UID` default: `evcc-l10n-test`
-- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC Localization Test`
+- `GRAFANA_TEST_FOLDER_UID` default: `evcc-test`
+- `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC Test`
 - `GRAFANA_SCREENSHOT_WAIT_MS` default: `3500`
 - `GRAFANA_TIME_FROM` and `GRAFANA_TIME_TO` if you want to override the built-in time range logic
 

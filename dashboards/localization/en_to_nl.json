@@ -256,7 +256,27 @@
     "Sold daily raw": "Dagelijks verkocht ruw",
     "PV Anlage Amortisation": "PV-installatie afschrijving",
     "Speicher Amortisation": "Batterij afschrijving",
-    "Usable home battery capacity in Wh": "Bruikbare thuisbatterijcapaciteit in Wh"
+    "Usable home battery capacity in Wh": "Bruikbare thuisbatterijcapaciteit in Wh",
+    "Battery max": "Batterij max",
+    "Battery power": "Batterijvermogen",
+    "Battery levels": "Batterijniveaus",
+    "3-phase": "3-fase",
+    "Battery level": "Batterijniveau",
+    "1-phase": "1-fase",
+    "Actual": "Werkelijk",
+    "Battery min": "Batterij min",
+    "avg price daily": "gem. prijs per dag",
+    "Charge power": "Laadvermogen",
+    "Consumption needs several months before it becomes meaningful. External charging is ignored and distorts the result.": "Het verbruik wordt pas na meerdere maanden betekenisvol. Extern laden wordt genegeerd en vertekent het resultaat.",
+    "Charge currents/phase: $loadpoint": "Laadstromen/fase: $loadpoint",
+    "Charge power: $loadpoint": "Laadvermogen: $loadpoint",
+    "Costs": "Kosten",
+    "Current": "Huidig",
+    "Day total": "Dagtotaal",
+    "Current L2": "Stroom L2",
+    "Current L3": "Stroom L3",
+    "Current L1": "Stroom L1",
+    "Day before yesterday": "Eergisteren"
   },
   "contains": []
 }

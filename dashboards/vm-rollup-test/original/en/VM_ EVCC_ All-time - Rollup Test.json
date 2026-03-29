@@ -722,9 +722,7 @@
   "refresh": "",
   "schemaVersion": 42,
   "tags": [
-    "VM",
-    "test",
-    "rollup"
+    "EVCC"
   ],
   "templating": {
     "list": [

@@ -256,7 +256,27 @@
     "Sold daily raw": "दैनिक बेचा गया कच्चा",
     "PV Anlage Amortisation": "PV सिस्टम अमोर्टाइजेशन",
     "Speicher Amortisation": "बैटरी अमोर्टाइजेशन",
-    "Usable home battery capacity in Wh": "Wh में उपयोगी घरेलू बैटरी क्षमता"
+    "Usable home battery capacity in Wh": "Wh में उपयोगी घरेलू बैटरी क्षमता",
+    "Battery max": "बैटरी अधिकतम",
+    "Battery power": "बैटरी शक्ति",
+    "Battery levels": "बैटरी स्तर",
+    "3-phase": "3-फेज",
+    "Battery level": "बैटरी स्तर",
+    "1-phase": "1-फेज",
+    "Actual": "वास्तविक",
+    "Battery min": "बैटरी न्यूनतम",
+    "avg price daily": "औसत दैनिक मूल्य",
+    "Charge power": "चार्जिंग पावर",
+    "Consumption needs several months before it becomes meaningful. External charging is ignored and distorts the result.": "उपभोग कई महीनों बाद ही सार्थक होता है। बाहरी चार्जिंग को अनदेखा किया जाता है और परिणाम विकृत हो जाता है।",
+    "Charge currents/phase: $loadpoint": "चार्ज धारा/फेज: $loadpoint",
+    "Charge power: $loadpoint": "चार्जिंग पावर: $loadpoint",
+    "Costs": "लागत",
+    "Current": "वर्तमान",
+    "Day total": "दिन का कुल",
+    "Current L2": "धारा L2",
+    "Current L3": "धारा L3",
+    "Current L1": "धारा L1",
+    "Day before yesterday": "परसों"
   },
   "contains": []
 }

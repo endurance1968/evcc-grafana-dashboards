@@ -5,6 +5,7 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CONFIG_PATH="$SCRIPT_DIR/vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
+CLI_PURGE=""
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -20,9 +21,13 @@ while [ "$#" -gt 0 ]; do
       CLI_TOKEN="$2"
       shift 2
       ;;
+    --purge)
+      CLI_PURGE="$2"
+      shift 2
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./install-vm.sh [--config <path>] [--url <url>] [--token <token>]
+Usage: sh ./install-vm.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
 EOF
       exit 0
       ;;
@@ -38,7 +43,7 @@ EOF
   esac
 done
 
-export CLI_URL CLI_TOKEN
+export CLI_URL CLI_TOKEN CLI_PURGE
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -63,7 +68,7 @@ settings = {
     "DASHBOARD_LANGUAGE": "en",
     "DASHBOARD_VARIANT": "orig",
     "DASHBOARD_LOCAL_DIR": "",
-    "DEPLOY_PURGE": "true",
+    "PURGE": "false",
 }
 
 if config_path.exists():
@@ -82,6 +87,10 @@ if os.environ.get("CLI_URL"):
     settings["GRAFANA_URL"] = os.environ["CLI_URL"]
 if os.environ.get("CLI_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = os.environ["CLI_TOKEN"]
+if os.environ.get("CLI_PURGE"):
+    settings["PURGE"] = os.environ["CLI_PURGE"]
+if "DEPLOY_PURGE" in settings and "PURGE" not in settings:
+    settings["PURGE"] = settings["DEPLOY_PURGE"]
 
 if not settings["GRAFANA_API_TOKEN"]:
     raise SystemExit("Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or --token.")
@@ -150,6 +159,10 @@ def build_inputs(raw):
             out.append({"name": item["name"], "type": item["type"], "value": item.get("value", "")})
     return out
 
+def confirm_apply():
+    answer = input("Proceed with dashboard deployment? [y/N] ").strip().lower()
+    return answer in ("y", "yes")
+
 dashboards = []
 library = {}
 for filename in DASHBOARD_FILES:
@@ -158,21 +171,91 @@ for filename in DASHBOARD_FILES:
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
 
+api("GET", "/api/search?limit=1")
+print("Grafana check: OK")
+print(f"URL: {settings['GRAFANA_URL']}")
+print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
+print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
+if settings["DASHBOARD_SOURCE_MODE"] == "local":
+    print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
+else:
+    print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
+print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
+print(f"Variant: {settings['DASHBOARD_VARIANT']}")
+print(f"Purge: {settings['PURGE']}")
+print()
+print("Will import dashboards:")
+for dashboard in dashboards:
+    print(f"- {dashboard['raw'].get('title')} [{dashboard['raw'].get('uid')}]")
+print()
+print("Will import library panels:")
+for element in library.values():
+    print(f"- {element.get('name')} [{element.get('uid')}]")
+
+existing_library = {}
+for element in library.values():
+    uid = element.get("uid")
+    if not uid:
+        continue
+    existing = api("GET", f"/api/library-elements/{urllib.parse.quote(uid)}", allow_404=True)
+    if existing is not None:
+        existing_library[uid] = existing["result"]
+
+if settings["PURGE"].lower() != "true" and existing_library:
+    print()
+    print("Existing library panels already present and will be kept because purge=false:")
+    for item in existing_library.values():
+        print(f"- {item.get('name')} [{item.get('uid')}]")
+    print("Only missing library panels will be imported. Existing ones are skipped.")
+
+if settings["PURGE"].lower() == "true":
+    existing_dashboards = []
+    for dashboard in dashboards:
+        uid = dashboard["raw"].get("uid")
+        if not uid:
+            continue
+        existing = api("GET", f"/api/dashboards/uid/{urllib.parse.quote(uid)}", allow_404=True)
+        if existing is not None:
+            existing_dashboards.append(existing["dashboard"])
+
+    print()
+    print("Will delete existing dashboards before import:")
+    if not existing_dashboards:
+        print("- none")
+    else:
+        for item in existing_dashboards:
+            print(f"- {item.get('title')} [{item.get('uid')}]")
+
+    print()
+    print("Will delete existing library panels before import:")
+    if not existing_library:
+        print("- none")
+    else:
+        for item in existing_library.values():
+            print(f"- {item.get('name')} [{item.get('uid')}]")
+
+print()
+if not confirm_apply():
+    print("Aborted. No changes applied.")
+    raise SystemExit(0)
+
 folder_uid = urllib.parse.quote(settings["GRAFANA_FOLDER_UID"])
 if api("GET", f"/api/folders/{folder_uid}", allow_404=True) is None:
     api("POST", "/api/folders", {"uid": settings["GRAFANA_FOLDER_UID"], "title": settings["GRAFANA_FOLDER_TITLE"]})
 
-if settings["DEPLOY_PURGE"].lower() == "true":
+if settings["PURGE"].lower() == "true":
     for dashboard in dashboards:
         uid = dashboard["raw"].get("uid")
         if uid:
             api("DELETE", f"/api/dashboards/uid/{urllib.parse.quote(uid)}", allow_404=True)
-    for element in library.values():
-        uid = element.get("uid")
-        if uid:
-            api("DELETE", f"/api/library-elements/{urllib.parse.quote(uid)}", allow_404=True)
+    for uid in existing_library:
+        api("DELETE", f"/api/library-elements/{urllib.parse.quote(uid)}", allow_404=True)
 
 for element in library.values():
+    uid = element.get("uid")
+    if settings["PURGE"].lower() != "true" and uid in existing_library:
+        print(f"Keeping existing library panel: {element['name']} [{uid}]")
+        continue
     body = {
         "uid": element["uid"],
         "name": element["name"],
@@ -184,8 +267,10 @@ for element in library.values():
     print(f"Imported library panel: {element['name']}")
 
 for dashboard in dashboards:
+    prepared = dict(dashboard["raw"])
+    prepared.pop("__elements", None)
     body = {
-        "dashboard": dashboard["raw"],
+        "dashboard": prepared,
         "folderUid": settings["GRAFANA_FOLDER_UID"],
         "overwrite": True,
         "message": "EVCC VM dashboard install",
@@ -194,11 +279,7 @@ for dashboard in dashboards:
     api("POST", "/api/dashboards/import", body)
     print(f"Imported dashboard: {dashboard['raw'].get('title')}")
 
-print("")
+print()
 print("Install finished.")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
-if settings["DASHBOARD_SOURCE_MODE"] == "local":
-    print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
-else:
-    print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
 PY

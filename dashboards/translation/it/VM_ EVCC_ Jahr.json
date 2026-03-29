@@ -3798,7 +3798,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Consumption needs several months before it becomes meaningful. External charging is ignored and distorts the result.",
+      "description": "Il consumo diventa significativo solo dopo diversi mesi. La ricarica esterna viene ignorata e distorce il risultato.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -4483,10 +4483,7 @@
   "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
-    "VM",
-    "test",
-    "rollup",
-    "year"
+    "EVCC"
   ],
   "templating": {
     "list": [

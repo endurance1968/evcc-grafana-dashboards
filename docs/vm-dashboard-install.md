@@ -33,7 +33,11 @@ The installer defaults to:
 - variant: `orig`
 - folder UID/title: `evcc` / `EVCC`
 - datasource UID: `vm-evcc`
-- purge before import: `true`
+- purge before import: `false`
+
+Default is `PURGE=false`, so existing dashboards are kept unless you explicitly opt into deleting them before import.
+
+When `PURGE=true`, the installer deletes only the dashboards whose `uid` is present in the 6 VM dashboard JSON files and only the library panels whose `uid` is referenced under `__elements` in those same files.
 
 For the first deploy, only these two values normally need to be changed:
 
@@ -52,11 +56,11 @@ That means:
 
 Copy:
 
-- `scripts/vm-dashboard-install.env.example`
+- `vm-dashboard-install.env.example`
 
 to:
 
-- `scripts/vm-dashboard-install.env`
+- `vm-dashboard-install.env`
 
 and set at least:
 
@@ -74,12 +78,12 @@ Optional:
 - `DASHBOARD_LOCAL_DIR`
 - `GITHUB_REPO`
 - `GITHUB_REF`
-- `DEPLOY_PURGE`
+- `PURGE`
 
 Runtime override parameters are also available:
 
-- PowerShell: `-url`, `-token`
-- Shell: `--url`, `--token`
+- PowerShell: `-url`, `-token`, `-purge`
+- Shell: `--url`, `--token`, `--purge`
 
 These override the config values for a single run.
 
@@ -109,13 +113,13 @@ PowerShell only, no Node required:
 With explicit config:
 
 ```powershell
-.\scripts\install-vm.ps1 -Config .\scripts\vm-dashboard-install.env
+.\install-vm.ps1 -config .\vm-dashboard-install.env
 ```
 
-Or directly with the two important values:
+Or directly with the important values:
 
 ```powershell
-.\scripts\install-vm.ps1 -url http://<grafana-host>:3000 -token <token>
+.\install-vm.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
 ```
 
 ## Linux / Raspberry Pi
@@ -131,19 +135,19 @@ sudo apt install python3
 Run:
 
 ```bash
-sh ./scripts/install-vm.sh
+sh ./install-vm.sh
 ```
 
 With explicit config:
 
 ```bash
-sh ./scripts/install-vm.sh --config ./scripts/vm-dashboard-install.env
+sh ./install-vm.sh --config ./vm-dashboard-install.env
 ```
 
-Or directly with the two important values:
+Or directly with the important values:
 
 ```bash
-sh ./scripts/install-vm.sh --url http://<grafana-host>:3000 --token <token>
+sh ./install-vm.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
 ## Maintainer note
@@ -156,5 +160,3 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the installer scripts above.
-
-
