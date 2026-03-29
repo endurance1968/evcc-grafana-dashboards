@@ -672,7 +672,7 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "description": "Noir : seuil de priorisation pour la charge du véhicule",
+        "description": "Noir : seuil de priorité pour la charge du véhicule",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -1254,7 +1254,7 @@
             "refId": "Self-consumption"
           }
         ],
-        "title": "Métriques",
+        "title": "Indicateurs",
         "transparent": true,
         "type": "gauge"
       }
@@ -1817,7 +1817,7 @@
             "hide": false,
             "legendFormat": "{{vehicle}}",
             "range": true,
-            "refId": "vehiclesEnergies"
+            "refId": "vehiclesEnergys"
           },
           {
             "datasource": {
@@ -2497,7 +2497,7 @@
   "templating": {
     "list": [
       {
-        "description": "Limite de puissance maximale en W. Les valeurs supérieures à ce seuil sont traitées comme des valeurs aberrantes.",
+        "description": "Filtre de puissance maximale en W. Les valeurs de puissance au-dessus de cette limite sont ignorées comme valeurs aberrantes.",
         "hide": 2,
         "label": "Filtre de puissance max / W",
         "name": "peakPowerLimit",
@@ -2518,7 +2518,7 @@
         ]
       },
       {
-        "description": "URL où EVCC s'ouvre.",
+        "description": "URL utilisée pour ouvrir EVCC.",
         "hide": 2,
         "label": "URL EVCC",
         "name": "evccUrl",
@@ -2539,7 +2539,7 @@
         ]
       },
       {
-        "description": "Nom du portail de l'onduleur utilisé pour le lien du portail.",
+        "description": "Nom du portail de l'onduleur pour le lien du portail.",
         "hide": 2,
         "label": "Nom du portail de l’onduleur",
         "name": "inverterPortalTitle",
@@ -2560,7 +2560,7 @@
         ]
       },
       {
-        "description": "URL où le portail de l'onduleur s'ouvre.",
+        "description": "URL utilisée pour ouvrir le portail de l'onduleur.",
         "hide": 2,
         "label": "URL du portail de l’onduleur",
         "name": "inverterPortalUrl",
@@ -2581,7 +2581,7 @@
         ]
       },
       {
-        "description": "Liste des points de charge qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Stellplatz' : ^Garage$|^Stellplatz$\nFiltrer tout ce qui commence par 'foo' : ^foo.*$",
+        "description": "Liste des points de charge à NE PAS afficher. L'expression est une expression régulière. Elle ne doit pas être vide ; si rien ne doit être filtré, utilisez une expression régulière qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : ^none$\nFiltrer 'Garage' : ^Garage$\nFiltrer 'Garage' et 'Place de parking' : ^Garage$|^Place de parking$\nFiltrer tout ce qui commence par 'foo' : ^foo.*$",
         "hide": 2,
         "label": "Liste de blocage des points de charge",
         "name": "loadpointBlocklist",
@@ -2602,7 +2602,7 @@
         ]
       },
       {
-        "description": "Liste des véhicules qui NE doivent PAS être affichés. L'expression doit être une expression régulière. Elle ne doit pas être vide. Si rien ne doit être filtré, utilisez une expression qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : /^none$/\nFiltrer 'Garage' : /^Garage$/\nFiltrer 'Garage' et 'Stellplatz' : /^Garage$|^Stellplatz$/\nFiltrer les véhicules se terminant par (offline) : /^.*\\(offline\\)$/",
+        "description": "Liste des véhicules à NE PAS afficher. L'expression est une expression régulière. Elle ne doit pas être vide ; si rien ne doit être filtré, utilisez une expression régulière qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : /^none$/\nFiltrer 'Garage' : /^Garage$/\nFiltrer 'Garage' et 'Place de parking' : /^Garage$|^Place de parking$/\nFiltrer les véhicules se terminant par (offline) : /^.*\\(offline\\)$/",
         "hide": 2,
         "label": "Liste de blocage des véhicules",
         "name": "vehicleBlocklist",
@@ -2623,7 +2623,7 @@
         ]
       },
       {
-        "description": "Intervalle d'échantillonnage pour le calcul de l'énergie. Doit être au moins 2 fois l'intervalle de requête EVCC. Par défaut : 60 s, car l'intervalle par défaut de l'EVCC est de 60 s.",
+        "description": "Intervalle d'échantillonnage pour les calculs d'énergie. Il doit être au moins égal à 2 fois l'intervalle d'interrogation EVCC. Par défaut : 60 s, car l'intervalle EVCC par défaut est de 60 s.",
         "hide": 2,
         "label": "Intervalle d’échantillonnage énergie",
         "name": "energySampleInterval",

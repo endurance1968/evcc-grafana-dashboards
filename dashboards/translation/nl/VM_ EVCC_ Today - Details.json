@@ -1211,7 +1211,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Huidige vermogen",
+      "title": "Huis: huidig vermogen",
       "transparent": true,
       "type": "piechart"
     },
@@ -1384,7 +1384,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Home: Stroom",
+      "title": "Huis: vermogen",
       "type": "timeseries"
     },
     {
@@ -1513,7 +1513,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1526,10 +1526,10 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Energiedistributie:",
+      "title": "Thuis: energieverdeling",
       "transparent": true,
       "type": "piechart"
     },
@@ -1716,7 +1716,7 @@
           "interval": "1h",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1729,10 +1729,10 @@
           "interval": "1h",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Huis: Energie",
+      "title": "Huis: energie",
       "type": "timeseries"
     },
     {
@@ -1870,7 +1870,7 @@
           "refId": "loadpointEnergy"
         }
       ],
-      "title": "Totaal: Energiedistributie",
+      "title": "Totaal: energieverdeling",
       "transparent": true,
       "type": "piechart"
     },
@@ -2032,10 +2032,10 @@
           "interval": "1h",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointEnergies"
+          "refId": "loadpointEnergys"
         }
       ],
-      "title": "Totaal: Energie",
+      "title": "Totaal: energie",
       "type": "timeseries"
     },
     {
@@ -3343,7 +3343,7 @@
           "refId": "powerL3"
         }
       ],
-      "title": "Stroom Fases",
+      "title": "Vermogen/fase",
       "transparent": true,
       "type": "stat"
     },
@@ -3470,7 +3470,7 @@
           "refId": "powerL3"
         }
       ],
-      "title": "Stroom Fases",
+      "title": "Vermogen/fase",
       "type": "timeseries"
     },
     {
@@ -3777,7 +3777,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^1 phasig.*/"
+              "options": "/^1-phase.*/"
             },
             "properties": [
               {
@@ -3792,7 +3792,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^3 phasig.*/"
+              "options": "/^3-phase.*/"
             },
             "properties": [
               {
@@ -3967,7 +3967,7 @@
   "templating": {
     "list": [
       {
-        "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
+        "description": "Maximaal vermogensfilter in W. Vermogenswaarden boven deze grens worden als uitschieters genegeerd.",
         "hide": 2,
         "label": "Max vermogensfilter / W",
         "name": "peakPowerLimit",
@@ -3988,7 +3988,7 @@
         ]
       },
       {
-        "description": "Lijst met laadpunten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Stellplatz' uit: ^Garage$|^Stellplatz$\nFilter alles dat met 'foo' begint uit: ^foo.*$",
+        "description": "Lijst met laadpunten die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Parkeerplaats' uit: ^Garage$|^Parkeerplaats$\nFilter alles uit dat begint met 'foo': ^foo.*$",
         "hide": 2,
         "label": "Blokkeerlijst laadpunten",
         "name": "loadpointBlocklist",
@@ -4009,7 +4009,7 @@
         ]
       },
       {
-        "description": "Lijst met EXT-apparaten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Erdgeschoss' uit: /^Erdgeschoss$/\nFilter 'Erdgeschoss' en 'Erster Stock' uit: /^Erdgeschoss$|^Erster Stock$/\nFilter alles dat met 'Verteiler' begint uit: /^Verteiler.*$/",
+        "description": "Lijst met EXT-apparaten die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Begane grond' uit: /^Begane grond$/\nFilter 'Begane grond' en 'Eerste verdieping' uit: /^Begane grond$|^Eerste verdieping$/\nFilter alles uit dat begint met 'Verdeling': /^Verdeling.*$/",
         "hide": 2,
         "name": "extBlocklist",
         "query": ".*Car.*|.*Haupt.*",
@@ -4029,7 +4029,7 @@
         ]
       },
       {
-        "description": "Lijst met EXT-apparaten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Erdgeschoss' uit: ^Erdgeschoss$\nFilter 'Erdgeschoss' en 'Erster Stock' uit: ^Erdgeschoss$|^Erster Stock$\nFilter alles dat met 'Verteiler' begint uit: ^Verteiler.*$",
+        "description": "Lijst met EXT-apparaten die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Begane grond' uit: ^Begane grond$\nFilter 'Begane grond' en 'Eerste verdieping' uit: ^Begane grond$|^Eerste verdieping$\nFilter alles uit dat begint met 'Verdeling': ^Verdeling.*$",
         "hide": 2,
         "name": "auxBlocklist",
         "query": "^none$",
@@ -4071,7 +4071,7 @@
         "type": "query"
       },
       {
-        "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
+        "description": "Bemonsteringsinterval voor energieberekeningen. Dit moet minimaal 2x het EVCC-pollinginterval zijn. Standaard: 60s, omdat het standaard EVCC-interval 60s is.",
         "hide": 2,
         "label": "Energie-sample-interval",
         "name": "energySampleInterval",

@@ -672,7 +672,7 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "description": "Negro: umbral de priorización para la carga de vehículos",
+        "description": "Negro: umbral de prioridad para la carga del vehículo",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -1254,7 +1254,7 @@
             "refId": "Self-consumption"
           }
         ],
-        "title": "Métrica",
+        "title": "Métricas",
         "transparent": true,
         "type": "gauge"
       }
@@ -1817,7 +1817,7 @@
             "hide": false,
             "legendFormat": "{{vehicle}}",
             "range": true,
-            "refId": "vehiclesEnergies"
+            "refId": "vehiclesEnergys"
           },
           {
             "datasource": {
@@ -2497,7 +2497,7 @@
   "templating": {
     "list": [
       {
-        "description": "Límite de potencia máxima en W. Los valores por encima de este umbral se tratan como valores atípicos.",
+        "description": "Filtro de potencia máxima en W. Los valores de potencia por encima de este límite se ignoran como valores atípicos.",
         "hide": 2,
         "label": "Filtro de potencia máxima / W",
         "name": "peakPowerLimit",
@@ -2518,7 +2518,7 @@
         ]
       },
       {
-        "description": "URL donde se abre EVCC.",
+        "description": "URL utilizada para abrir EVCC.",
         "hide": 2,
         "label": "URL de EVCC",
         "name": "evccUrl",
@@ -2539,7 +2539,7 @@
         ]
       },
       {
-        "description": "Nombre del portal del inversor utilizado para el enlace del portal.",
+        "description": "Nombre del portal del inversor para el enlace al portal.",
         "hide": 2,
         "label": "Nombre del portal del inversor",
         "name": "inverterPortalTitle",
@@ -2560,7 +2560,7 @@
         ]
       },
       {
-        "description": "URL donde se abre el portal del inversor.",
+        "description": "URL utilizada para abrir el portal del inversor.",
         "hide": 2,
         "label": "URL del portal del inversor",
         "name": "inverterPortalUrl",
@@ -2581,7 +2581,7 @@
         ]
       },
       {
-        "description": "Lista de puntos de carga que NO deben mostrarse. La expresión debe ser una expresión regular. No puede estar vacía. Si no se debe filtrar nada, usa una expresión que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nFiltrar 'Garage': ^Garage$\nFiltrar 'Garage' y 'Stellplatz': ^Garage$|^Stellplatz$\nFiltrar todo lo que empiece por 'foo': ^foo.*$",
+        "description": "Lista de puntos de carga que NO deben mostrarse. La expresión es una expresión regular. No debe estar vacía; si no se debe filtrar nada, usa una expresión regular que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nExcluir 'Garage': ^Garage$\nExcluir 'Garage' y 'Plaza de aparcamiento': ^Garage$|^Plaza de aparcamiento$\nExcluir todo lo que empiece por 'foo': ^foo.*$",
         "hide": 2,
         "label": "Lista de bloqueo de puntos de carga",
         "name": "loadpointBlocklist",
@@ -2602,7 +2602,7 @@
         ]
       },
       {
-        "description": "Lista de vehículos que NO deben mostrarse. La expresión debe ser una expresión regular. No puede estar vacía. Si no se debe filtrar nada, usa una expresión que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: /^none$/\nFiltrar 'Garage': /^Garage$/\nFiltrar 'Garage' y 'Stellplatz': /^Garage$|^Stellplatz$/\nFiltrar vehículos que terminan en (offline): /^.*\\(offline\\)$/",
+        "description": "Lista de vehículos que NO deben mostrarse. La expresión es una expresión regular. No debe estar vacía; si no se debe filtrar nada, usa una expresión regular que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: /^none$/\nExcluir 'Garage': /^Garage$/\nExcluir 'Garage' y 'Plaza de aparcamiento': /^Garage$|^Plaza de aparcamiento$/\nExcluir vehículos que terminan en (offline): /^.*\\(offline\\)$/",
         "hide": 2,
         "label": "Lista de bloqueo de vehículos",
         "name": "vehicleBlocklist",
@@ -2623,7 +2623,7 @@
         ]
       },
       {
-        "description": "Intervalo de muestreo para el cálculo de energía. Debe ser al menos 2 veces el intervalo de consulta EVCC. Valor predeterminado: 60 s, porque el intervalo predeterminado de EVCC es 60 s.",
+        "description": "Intervalo de muestreo para los cálculos de energía. Debe ser al menos 2 veces el intervalo de sondeo de EVCC. Predeterminado: 60s, porque el intervalo predeterminado de EVCC es 60s.",
         "hide": 2,
         "label": "Intervalo de muestreo de energía",
         "name": "energySampleInterval",
@@ -2644,7 +2644,7 @@
         ]
       },
       {
-        "description": "Ciclo de facturación del precio de la electricidad.",
+        "description": "Intervalo de facturación del precio de la electricidad.",
         "hide": 2,
         "label": "Intervalo de tarifa",
         "name": "tariffPriceInterval",

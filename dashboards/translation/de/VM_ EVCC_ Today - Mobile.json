@@ -672,7 +672,7 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "description": "Schwarz: Prioritisierunggrenze für Autoladung",
+        "description": "Schwarz: Prioritisierungsgrenze für Fahrzeugladung",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -1817,7 +1817,7 @@
             "hide": false,
             "legendFormat": "{{vehicle}}",
             "range": true,
-            "refId": "vehiclesEnergies"
+            "refId": "vehiclesEnergys"
           },
           {
             "datasource": {
@@ -2497,7 +2497,7 @@
   "templating": {
     "list": [
       {
-        "description": "Grenze der maximalen Leistung in W, über diese hinaus Leistungswerte als Ausreißer ignoriert werden.",
+        "description": "Grenze der maximalen Leistung in W. Leistungswerte darüber werden als Ausreißer ignoriert.",
         "hide": 2,
         "label": "Filter für maximale Leistung / W",
         "name": "peakPowerLimit",
@@ -2518,7 +2518,7 @@
         ]
       },
       {
-        "description": "URL unter der EVCC geöffnet wird.",
+        "description": "URL, unter der EVCC geöffnet wird.",
         "hide": 2,
         "label": "EVCC URL",
         "name": "evccUrl",
@@ -2539,7 +2539,7 @@
         ]
       },
       {
-        "description": "Name des Wechselrichterportals für den Link auf das Portal.",
+        "description": "Name des Wechselrichterportals für den Portal-Link.",
         "hide": 2,
         "label": "Name, Wechselrichterportal",
         "name": "inverterPortalTitle",
@@ -2560,7 +2560,7 @@
         ]
       },
       {
-        "description": "URL unter der das Wechselrichterportal geöffnet wird.",
+        "description": "URL, unter der das Wechselrichterportal geöffnet wird.",
         "hide": 2,
         "label": "URL, Wechselrichterportal",
         "name": "inverterPortalUrl",
@@ -2581,7 +2581,7 @@
         ]
       },
       {
-        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression, die mit. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
+        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
         "hide": 2,
         "label": "Blocklist für Loadpoints",
         "name": "loadpointBlocklist",
@@ -2602,7 +2602,7 @@
         ]
       },
       {
-        "description": "Liste der Fahrzeuge, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Garage' aus: /^Garage$/\nFiltere 'Garage' und 'Stellplatz' aus: /^Garage$|^Stellplatz$/\nFiltere Fahrzeuge mit (offline) am Ende aus: /^.*\\(offline\\)$/",
+        "description": "Liste der Fahrzeuge, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Garage' aus: /^Garage$/\nFiltere 'Garage' und 'Stellplatz' aus: /^Garage$|^Stellplatz$/\nFiltere Fahrzeuge mit (offline) am Ende aus: /^.*\\(offline\\)$/",
         "hide": 2,
         "label": "Blocklist für Fahrzeuge",
         "name": "vehicleBlocklist",
@@ -2623,7 +2623,7 @@
         ]
       },
       {
-        "description": "Das Abtastinterval für die Energieberechnung. Sollte mindestens 2x dem Abfrageintervall von EVCC entsprechen. Default: 60s, da das Default Intervall von EVCC 60s beträgt.",
+        "description": "Abtastintervall für die Energieberechnung. Sollte mindestens 2x dem EVCC-Abfrageintervall entsprechen. Standard: 60s, weil das EVCC-Standardintervall 60s beträgt.",
         "hide": 2,
         "label": "Energie Abtast Intervall",
         "name": "energySampleInterval",

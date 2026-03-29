@@ -344,7 +344,25 @@
     "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own.": "使用每月最佳5天的平均发电量。这有助于识别可能的衰减，但必须结合上下文解读。单独某个月并不能得出结论。",
     "Values are approximate. External charging is not included and captured kilometers depend on how often a vehicle is plugged in.": "这些值为近似值。不包含外部充电，记录到的公里数取决于车辆接入的频率。",
     "Values are rough estimates based on averages. External charging sessions are not included.": "这些值是基于平均值的粗略估算。不包含外部充电会话。",
-    "Phases: $loadpoint": "相位: $loadpoint"
+    "Phases: $loadpoint": "相位: $loadpoint",
+    "Billing interval of the electricity price.": "电价计费间隔。",
+    "Black: prioritization threshold for vehicle charging": "黑色：车辆充电优先阈值",
+    "Energy (kWh)": "能量（kWh）",
+    "Home: Current power": "家庭：当前功率",
+    "Home: Energy": "家庭：能量",
+    "Home: Power": "家庭：功率",
+    "List of EXT devices that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Ground floor': /^Ground floor$/\nFilter out 'Ground floor' and 'First floor': /^Ground floor$|^First floor$/\nFilter out everything starting with 'Distribution': /^Distribution.*$/": "不应显示的 EXT 设备列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：/^none$/\n过滤掉“底层”：/^底层$/\n过滤掉“底层”和“一层”：/^底层$|^一层$/\n过滤掉所有以“配电”开头的内容：/^配电.*$/",
+    "List of EXT devices that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Ground floor': ^Ground floor$\nFilter out 'Ground floor' and 'First floor': ^Ground floor$|^First floor$\nFilter out everything starting with 'Distribution': ^Distribution.*$": "不应显示的 EXT 设备列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：^none$\n过滤掉“底层”：^底层$\n过滤掉“底层”和“一层”：^底层$|^一层$\n过滤掉所有以“配电”开头的内容：^配电.*$",
+    "List of loadpoints that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Garage': ^Garage$\nFilter out 'Garage' and 'Parking space': ^Garage$|^Parking space$\nFilter out everything starting with 'foo': ^foo.*$": "不应显示的充电点列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：^none$\n过滤掉“车库”：^车库$\n过滤掉“车库”和“停车位”：^车库$|^停车位$\n过滤掉所有以“foo”开头的内容：^foo.*$",
+    "List of vehicles that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Garage': /^Garage$/\nFilter out 'Garage' and 'Parking space': /^Garage$|^Parking space$/\nFilter out vehicles ending with (offline): /^.*\\(offline\\)$/": "不应显示的车辆列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：/^none$/\n过滤掉“车库”：/^车库$/\n过滤掉“车库”和“停车位”：/^车库$|^停车位$/\n过滤掉以 (offline) 结尾的车辆：/^.*\\(offline\\)$/",
+    "List of vehicles that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: ^none$\nFilter out 'Garage': ^Garage$\nFilter out 'Garage' and 'Parking space': ^Garage$|^Parking space$\nFilter out vehicles ending with (offline): ^.*\\(offline\\)$": "不应显示的车辆列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：^none$\n过滤掉“车库”：^车库$\n过滤掉“车库”和“停车位”：^车库$|^停车位$\n过滤掉以 (offline) 结尾的车辆：^.*\\(offline\\)$",
+    "Maximum power filter in W. Power values above this limit are ignored as outliers.": "最大功率过滤阈值（W）。高于此限制的功率值将被视为异常值并忽略。",
+    "Name of the inverter portal for the portal link.": "门户链接使用的逆变器门户名称。",
+    "Power/phase": "功率/相位",
+    "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "能量计算的采样间隔。它应至少为 EVCC 轮询间隔的 2 倍。默认值：60s，因为 EVCC 的默认间隔为 60s。",
+    "Total: Energy": "总计：能量",
+    "URL used to open EVCC.": "用于打开 EVCC 的 URL。",
+    "URL used to open the inverter portal.": "用于打开逆变器门户的 URL。"
   },
   "contains": []
 }

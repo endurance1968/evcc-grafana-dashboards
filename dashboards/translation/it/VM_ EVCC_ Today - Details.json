@@ -1384,7 +1384,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Casa: potere",
+      "title": "Casa: potenza",
       "type": "timeseries"
     },
     {
@@ -1513,7 +1513,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1526,10 +1526,10 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Casa: distribuzione dell'energia",
+      "title": "Casa: distribuzione energia",
       "transparent": true,
       "type": "piechart"
     },
@@ -1716,7 +1716,7 @@
           "interval": "1h",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1729,10 +1729,10 @@
           "interval": "1h",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Casa: Energia",
+      "title": "Casa: energia",
       "type": "timeseries"
     },
     {
@@ -1870,7 +1870,7 @@
           "refId": "loadpointEnergy"
         }
       ],
-      "title": "Totale: distribuzione dell'energia",
+      "title": "Totale: distribuzione energia",
       "transparent": true,
       "type": "piechart"
     },
@@ -2032,10 +2032,10 @@
           "interval": "1h",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointEnergies"
+          "refId": "loadpointEnergys"
         }
       ],
-      "title": "Totale: Energia",
+      "title": "Totale: energia",
       "type": "timeseries"
     },
     {
@@ -3777,7 +3777,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^1 phasig.*/"
+              "options": "/^1-phase.*/"
             },
             "properties": [
               {
@@ -3792,7 +3792,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^3 phasig.*/"
+              "options": "/^3-phase.*/"
             },
             "properties": [
               {
@@ -3967,7 +3967,7 @@
   "templating": {
     "list": [
       {
-        "description": "Limite di potenza massimo in W. I valori superiori a questa soglia vengono trattati come valori anomali.",
+        "description": "Filtro della potenza massima in W. I valori di potenza superiori a questo limite vengono ignorati come anomalie.",
         "hide": 2,
         "label": "Filtro potenza massima / W",
         "name": "peakPowerLimit",
@@ -3988,7 +3988,7 @@
         ]
       },
       {
-        "description": "Elenco dei punti di ricarica che NON devono essere mostrati. L'espressione deve essere una regex. Non può essere vuota. Se non deve essere filtrato nulla, usa un'espressione che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: ^none$\nFiltra 'Garage': ^Garage$\nFiltra 'Garage' e 'Stellplatz': ^Garage$|^Stellplatz$\nFiltra tutto ciò che inizia con 'foo': ^foo.*$",
+        "description": "Elenco dei punti di carica che NON devono essere mostrati. L'espressione è una espressione regolare. Non deve essere vuota; se non deve essere filtrato nulla, usa un'espressione regolare che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: ^none$\nEscludi 'Garage': ^Garage$\nEscludi 'Garage' e 'Posto auto': ^Garage$|^Posto auto$\nEscludi tutto ciò che inizia con 'foo': ^foo.*$",
         "hide": 2,
         "label": "Blocklist punti di ricarica",
         "name": "loadpointBlocklist",
@@ -4009,7 +4009,7 @@
         ]
       },
       {
-        "description": "Elenco dei dispositivi EXT che NON devono essere mostrati. L'espressione deve essere una regex. Non può essere vuota. Se non deve essere filtrato nulla, usa un'espressione che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: /^none$/\nFiltra 'Erdgeschoss': /^Erdgeschoss$/\nFiltra 'Erdgeschoss' e 'Erster Stock': /^Erdgeschoss$|^Erster Stock$/\nFiltra tutto ciò che inizia con 'Verteiler': /^Verteiler.*$/",
+        "description": "Elenco dei dispositivi EXT che NON devono essere mostrati. L'espressione è una espressione regolare. Non deve essere vuota; se non deve essere filtrato nulla, usa un'espressione regolare che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: /^none$/\nEscludi 'Piano terra': /^Piano terra$/\nEscludi 'Piano terra' e 'Primo piano': /^Piano terra$|^Primo piano$/\nEscludi tutto ciò che inizia con 'Distribuzione': /^Distribuzione.*$/",
         "hide": 2,
         "name": "extBlocklist",
         "query": ".*Car.*|.*Haupt.*",
@@ -4029,7 +4029,7 @@
         ]
       },
       {
-        "description": "Elenco dei dispositivi EXT che NON devono essere mostrati. L'espressione deve essere una regex. Non può essere vuota. Se non deve essere filtrato nulla, usa un'espressione che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: ^none$\nFiltra 'Erdgeschoss': ^Erdgeschoss$\nFiltra 'Erdgeschoss' e 'Erster Stock': ^Erdgeschoss$|^Erster Stock$\nFiltra tutto ciò che inizia con 'Verteiler': ^Verteiler.*$",
+        "description": "Elenco dei dispositivi EXT che NON devono essere mostrati. L'espressione è una espressione regolare. Non deve essere vuota; se non deve essere filtrato nulla, usa un'espressione regolare che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: ^none$\nEscludi 'Piano terra': ^Piano terra$\nEscludi 'Piano terra' e 'Primo piano': ^Piano terra$|^Primo piano$\nEscludi tutto ciò che inizia con 'Distribuzione': ^Distribuzione.*$",
         "hide": 2,
         "name": "auxBlocklist",
         "query": "^none$",
@@ -4071,7 +4071,7 @@
         "type": "query"
       },
       {
-        "description": "Intervallo di campionamento per il calcolo dell'energia. Dovrebbe essere almeno il doppio dell'intervallo di query EVCC. Predefinito: 60s, perché l'intervallo predefinito dell'EVCC è 60s.",
+        "description": "Intervallo di campionamento per i calcoli energetici. Deve essere almeno 2 volte l'intervallo di polling di EVCC. Predefinito: 60s, perché l'intervallo predefinito di EVCC è 60s.",
         "hide": 2,
         "label": "Intervallo di campionamento energia",
         "name": "energySampleInterval",

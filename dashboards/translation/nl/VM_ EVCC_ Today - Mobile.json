@@ -672,7 +672,7 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "description": "Zwart: prioriteringsdrempel voor het opladen van voertuigen",
+        "description": "Zwart: prioriteitsdrempel voor voertuigladen",
         "fieldConfig": {
           "defaults": {
             "color": {
@@ -1254,7 +1254,7 @@
             "refId": "Self-consumption"
           }
         ],
-        "title": "Meting",
+        "title": "Kengetallen",
         "transparent": true,
         "type": "gauge"
       }
@@ -1817,7 +1817,7 @@
             "hide": false,
             "legendFormat": "{{vehicle}}",
             "range": true,
-            "refId": "vehiclesEnergies"
+            "refId": "vehiclesEnergys"
           },
           {
             "datasource": {
@@ -2497,7 +2497,7 @@
   "templating": {
     "list": [
       {
-        "description": "Maximale vermogenslimiet in W. Waarden boven deze drempel worden behandeld als uitschieters.",
+        "description": "Maximaal vermogensfilter in W. Vermogenswaarden boven deze grens worden als uitschieters genegeerd.",
         "hide": 2,
         "label": "Max vermogensfilter / W",
         "name": "peakPowerLimit",
@@ -2518,7 +2518,7 @@
         ]
       },
       {
-        "description": "URL waar EVCC opent.",
+        "description": "URL die wordt gebruikt om EVCC te openen.",
         "hide": 2,
         "label": "EVCC-URL",
         "name": "evccUrl",
@@ -2539,7 +2539,7 @@
         ]
       },
       {
-        "description": "Naam van het omvormerportaal dat wordt gebruikt voor de portaallink.",
+        "description": "Naam van het omvormerportaal voor de portaallink.",
         "hide": 2,
         "label": "Naam omvormerportaal",
         "name": "inverterPortalTitle",
@@ -2560,7 +2560,7 @@
         ]
       },
       {
-        "description": "URL waar het omvormerportaal wordt geopend.",
+        "description": "URL die wordt gebruikt om het omvormerportaal te openen.",
         "hide": 2,
         "label": "URL omvormerportaal",
         "name": "inverterPortalUrl",
@@ -2581,7 +2581,7 @@
         ]
       },
       {
-        "description": "Lijst met laadpunten die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Stellplatz' uit: ^Garage$|^Stellplatz$\nFilter alles dat met 'foo' begint uit: ^foo.*$",
+        "description": "Lijst met laadpunten die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: ^none$\nFilter 'Garage' uit: ^Garage$\nFilter 'Garage' en 'Parkeerplaats' uit: ^Garage$|^Parkeerplaats$\nFilter alles uit dat begint met 'foo': ^foo.*$",
         "hide": 2,
         "label": "Blokkeerlijst laadpunten",
         "name": "loadpointBlocklist",
@@ -2602,7 +2602,7 @@
         ]
       },
       {
-        "description": "Lijst met voertuigen die NIET getoond mogen worden. De uitdrukking moet een reguliere expressie zijn. Ze mag niet leeg zijn. Als niets gefilterd moet worden, gebruik dan een expressie die geen van de items matcht.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Garage' uit: /^Garage$/\nFilter 'Garage' en 'Stellplatz' uit: /^Garage$|^Stellplatz$/\nFilter voertuigen die eindigen op (offline) uit: /^.*\\(offline\\)$/",
+        "description": "Lijst met voertuigen die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Garage' uit: /^Garage$/\nFilter 'Garage' en 'Parkeerplaats' uit: /^Garage$|^Parkeerplaats$/\nFilter voertuigen uit die eindigen op (offline): /^.*\\(offline\\)$/",
         "hide": 2,
         "label": "Blokkeerlijst voertuigen",
         "name": "vehicleBlocklist",
@@ -2623,7 +2623,7 @@
         ]
       },
       {
-        "description": "Bemonsteringsinterval voor energieberekening. Moet ten minste 2x het EVCC-zoekinterval zijn. Standaard: 60s, omdat EVCC standaardinterval 60s is.",
+        "description": "Bemonsteringsinterval voor energieberekeningen. Dit moet minimaal 2x het EVCC-pollinginterval zijn. Standaard: 60s, omdat het standaard EVCC-interval 60s is.",
         "hide": 2,
         "label": "Energie-sample-interval",
         "name": "energySampleInterval",
@@ -2644,7 +2644,7 @@
         ]
       },
       {
-        "description": "Verrekeninterval van de stroomprijs.",
+        "description": "Afrekeninterval van de elektriciteitsprijs.",
         "hide": 2,
         "label": "Tariefprijs-interval",
         "name": "tariffPriceInterval",

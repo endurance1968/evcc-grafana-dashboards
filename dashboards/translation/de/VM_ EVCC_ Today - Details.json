@@ -1513,7 +1513,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1526,7 +1526,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
       "title": "Haus: Energieverteilung",
@@ -1716,7 +1716,7 @@
           "interval": "1h",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1729,7 +1729,7 @@
           "interval": "1h",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
       "title": "Haus: Energie",
@@ -2032,7 +2032,7 @@
           "interval": "1h",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointEnergies"
+          "refId": "loadpointEnergys"
         }
       ],
       "title": "Gesamt: Energie",
@@ -3777,7 +3777,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^1 phasig.*/"
+              "options": "/^1-phase.*/"
             },
             "properties": [
               {
@@ -3792,7 +3792,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^3 phasig.*/"
+              "options": "/^3-phase.*/"
             },
             "properties": [
               {
@@ -3967,7 +3967,7 @@
   "templating": {
     "list": [
       {
-        "description": "Grenze der maximalen Leistung in W, über diese hinaus Leistungswerte als Ausreißer ignoriert werden.",
+        "description": "Grenze der maximalen Leistung in W. Leistungswerte darüber werden als Ausreißer ignoriert.",
         "hide": 2,
         "label": "Filter für maximale Leistung / W",
         "name": "peakPowerLimit",
@@ -3988,7 +3988,7 @@
         ]
       },
       {
-        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
+        "description": "Liste der Loadpoints, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Garage' aus: ^Garage$\nFiltere 'Garage' und 'Stellplatz' aus: ^Garage$|^Stellplatz$\nFiltere alles, das mit 'foo' beginnt aus: ^foo.*$",
         "hide": 2,
         "label": "Blocklist für Loadpoints",
         "name": "loadpointBlocklist",
@@ -4009,7 +4009,7 @@
         ]
       },
       {
-        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Erdgeschoss' aus: /^Erdgeschoss$/\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: /^Erdgeschoss$|^Erster Stock$/\nFiltere alles, das mit 'Verteiler' beginnt aus: /^Verteiler.*$/",
+        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Erdgeschoss' aus: /^Erdgeschoss$/\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: /^Erdgeschoss$|^Erster Stock$/\nFiltere alles, das mit 'Verteiler' beginnt aus: /^Verteiler.*$/",
         "hide": 2,
         "name": "extBlocklist",
         "query": ".*Car.*|.*Haupt.*",
@@ -4029,7 +4029,7 @@
         ]
       },
       {
-        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein, wenn also nichts gefiltert werden sollte, muss hier eine reguläre Expression stehen, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Erdgeschoss' aus: ^Erdgeschoss$\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: ^Erdgeschoss$|^Erster Stock$\nFiltere alles, das mit 'Verteiler' beginnt aus: ^Verteiler.*$",
+        "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: ^none$\nFiltere 'Erdgeschoss' aus: ^Erdgeschoss$\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: ^Erdgeschoss$|^Erster Stock$\nFiltere alles, das mit 'Verteiler' beginnt aus: ^Verteiler.*$",
         "hide": 2,
         "name": "auxBlocklist",
         "query": "^none$",
@@ -4071,7 +4071,7 @@
         "type": "query"
       },
       {
-        "description": "Das Abtastinterval für die Energieberechnung. Sollte mindestens 2x dem Abfrageintervall von EVCC entsprechen. Default: 60s, da das Default Intervall von EVCC 60s beträgt.",
+        "description": "Abtastintervall für die Energieberechnung. Sollte mindestens 2x dem EVCC-Abfrageintervall entsprechen. Standard: 60s, weil das EVCC-Standardintervall 60s beträgt.",
         "hide": 2,
         "label": "Energie Abtast Intervall",
         "name": "energySampleInterval",

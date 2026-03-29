@@ -1211,7 +1211,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Hogar: Potencia actual",
+      "title": "Casa: potencia actual",
       "transparent": true,
       "type": "piechart"
     },
@@ -1384,7 +1384,7 @@
           "refId": "auxPowers"
         }
       ],
-      "title": "Hogar: Potencia",
+      "title": "Casa: potencia",
       "type": "timeseries"
     },
     {
@@ -1513,7 +1513,7 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1526,10 +1526,10 @@
           "interval": "$energySampleInterval",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Hogar: Distribución de energía",
+      "title": "Casa: distribución de energía",
       "transparent": true,
       "type": "piechart"
     },
@@ -1716,7 +1716,7 @@
           "interval": "1h",
           "legendFormat": "{{title}}",
           "range": true,
-          "refId": "extEnergies"
+          "refId": "extEnergys"
         },
         {
           "datasource": {
@@ -1729,10 +1729,10 @@
           "interval": "1h",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "auxEnergies"
+          "refId": "auxEnergys"
         }
       ],
-      "title": "Casa: Energía",
+      "title": "Casa: energía",
       "type": "timeseries"
     },
     {
@@ -1870,7 +1870,7 @@
           "refId": "loadpointEnergy"
         }
       ],
-      "title": "Total: Distribución de energía",
+      "title": "Total: distribución de energía",
       "transparent": true,
       "type": "piechart"
     },
@@ -2032,10 +2032,10 @@
           "interval": "1h",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointEnergies"
+          "refId": "loadpointEnergys"
         }
       ],
-      "title": "Total: Energía",
+      "title": "Total: energía",
       "type": "timeseries"
     },
     {
@@ -3777,7 +3777,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^1 phasig.*/"
+              "options": "/^1-phase.*/"
             },
             "properties": [
               {
@@ -3792,7 +3792,7 @@
           {
             "matcher": {
               "id": "byRegexp",
-              "options": "/^3 phasig.*/"
+              "options": "/^3-phase.*/"
             },
             "properties": [
               {
@@ -3967,7 +3967,7 @@
   "templating": {
     "list": [
       {
-        "description": "Límite de potencia máxima en W. Los valores por encima de este umbral se tratan como valores atípicos.",
+        "description": "Filtro de potencia máxima en W. Los valores de potencia por encima de este límite se ignoran como valores atípicos.",
         "hide": 2,
         "label": "Filtro de potencia máxima / W",
         "name": "peakPowerLimit",
@@ -3988,7 +3988,7 @@
         ]
       },
       {
-        "description": "Lista de puntos de carga que NO deben mostrarse. La expresión debe ser una expresión regular. No puede estar vacía. Si no se debe filtrar nada, usa una expresión que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nFiltrar 'Garage': ^Garage$\nFiltrar 'Garage' y 'Stellplatz': ^Garage$|^Stellplatz$\nFiltrar todo lo que empiece por 'foo': ^foo.*$",
+        "description": "Lista de puntos de carga que NO deben mostrarse. La expresión es una expresión regular. No debe estar vacía; si no se debe filtrar nada, usa una expresión regular que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nExcluir 'Garage': ^Garage$\nExcluir 'Garage' y 'Plaza de aparcamiento': ^Garage$|^Plaza de aparcamiento$\nExcluir todo lo que empiece por 'foo': ^foo.*$",
         "hide": 2,
         "label": "Lista de bloqueo de puntos de carga",
         "name": "loadpointBlocklist",
@@ -4009,7 +4009,7 @@
         ]
       },
       {
-        "description": "Lista de dispositivos EXT que NO deben mostrarse. La expresión debe ser una expresión regular. No puede estar vacía. Si no se debe filtrar nada, usa una expresión que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: /^none$/\nFiltrar 'Erdgeschoss': /^Erdgeschoss$/\nFiltrar 'Erdgeschoss' y 'Erster Stock': /^Erdgeschoss$|^Erster Stock$/\nFiltrar todo lo que empiece por 'Verteiler': /^Verteiler.*$/",
+        "description": "Lista de dispositivos EXT que NO deben mostrarse. La expresión es una expresión regular. No debe estar vacía; si no se debe filtrar nada, usa una expresión regular que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: /^none$/\nExcluir 'Planta baja': /^Planta baja$/\nExcluir 'Planta baja' y 'Primer piso': /^Planta baja$|^Primer piso$/\nExcluir todo lo que empiece por 'Distribución': /^Distribución.*$/",
         "hide": 2,
         "name": "extBlocklist",
         "query": ".*Car.*|.*Haupt.*",
@@ -4029,7 +4029,7 @@
         ]
       },
       {
-        "description": "Lista de dispositivos EXT que NO deben mostrarse. La expresión debe ser una expresión regular. No puede estar vacía. Si no se debe filtrar nada, usa una expresión que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nFiltrar 'Erdgeschoss': ^Erdgeschoss$\nFiltrar 'Erdgeschoss' y 'Erster Stock': ^Erdgeschoss$|^Erster Stock$\nFiltrar todo lo que empiece por 'Verteiler': ^Verteiler.*$",
+        "description": "Lista de dispositivos EXT que NO deben mostrarse. La expresión es una expresión regular. No debe estar vacía; si no se debe filtrar nada, usa una expresión regular que no coincida con ninguna entrada.\n\nEjemplos:\nSin entradas: ^none$\nExcluir 'Planta baja': ^Planta baja$\nExcluir 'Planta baja' y 'Primer piso': ^Planta baja$|^Primer piso$\nExcluir todo lo que empiece por 'Distribución': ^Distribución.*$",
         "hide": 2,
         "name": "auxBlocklist",
         "query": "^none$",
@@ -4071,7 +4071,7 @@
         "type": "query"
       },
       {
-        "description": "Intervalo de muestreo para el cálculo de energía. Debe ser al menos 2 veces el intervalo de consulta EVCC. Valor predeterminado: 60 s, porque el intervalo predeterminado de EVCC es 60 s.",
+        "description": "Intervalo de muestreo para los cálculos de energía. Debe ser al menos 2 veces el intervalo de sondeo de EVCC. Predeterminado: 60s, porque el intervalo predeterminado de EVCC es 60s.",
         "hide": 2,
         "label": "Intervalo de muestreo de energía",
         "name": "energySampleInterval",

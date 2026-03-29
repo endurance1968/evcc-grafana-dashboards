@@ -7,7 +7,7 @@ import {
   parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
-} from "../_dashboard-family.mjs";
+} from "../helper/_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
 const family = resolveDashboardFamily(parseFamilyArg());
