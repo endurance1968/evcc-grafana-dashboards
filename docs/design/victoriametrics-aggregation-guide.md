@@ -118,21 +118,15 @@ That means:
 - partial reruns are easier to reason about
 - the vehicle odometer state is carried across month boundaries
 
-### Optional chunk control
+### Chunking
 
-Default:
+The current implementation processes and flushes backfills month by month.
+
+Use the normal backfill command:
 
 ```bash
 python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day 2025-01-01 --end-day 2026-03-21 --progress --write
 ```
-
-Force one single flush at the end:
-
-```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day 2025-01-01 --end-day 2026-03-21 --chunk-by all --progress --write
-```
-
-Use monthly chunking unless you have a measured reason not to.
 
 ### Safety rules
 
@@ -180,6 +174,4 @@ If a long-range dashboard still feels slow:
 ## Legacy note
 
 The old Influx dashboard set is retained only as static German reference JSON under `dashboards/influx-legacy/original/de`.
-
-
 

@@ -13,6 +13,10 @@ Wichtige Einstiege:
 
 - Installation für Endnutzer:
   - [`docs/deployment-readme.md`](./docs/deployment-readme.md)
+- Migration von InfluxDB zu VictoriaMetrics:
+  - [`docs/influx-to-vm-migration.md`](./docs/influx-to-vm-migration.md)
+- VictoriaMetrics auf Debian 13 installieren:
+  - [`docs/victoriametrics-install-debian-13.md`](./docs/victoriametrics-install-debian-13.md)
 - technische Installationsdetails:
   - [`docs/vm-dashboard-install.md`](./docs/vm-dashboard-install.md)
 - Rollup- und Datenmodell:
@@ -28,8 +32,4 @@ Legacy-Referenz:
 
 - Der alte Influx-Dashboard-Satz bleibt nur noch als statische Referenz unter
   [`dashboards/influx-legacy/original/de`](./dashboards/influx-legacy/original/de).
-
-
-
-
 

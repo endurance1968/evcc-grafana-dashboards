@@ -179,12 +179,6 @@ def parse_args() -> argparse.Namespace:
         help="Number of time series per import batch during backfill-test.",
     )
     parser.add_argument(
-        "--chunk-by",
-        choices=["all", "month"],
-        default="month",
-        help="Flush generated rollups per month or only once at the end.",
-    )
-    parser.add_argument(
         "--progress",
         action="store_true",
         help="Print chunk progress to stderr while backfill-test is running.",
@@ -626,19 +620,13 @@ def build_day_windows(settings: Settings, start_day: date, end_day: date) -> lis
     return windows
 
 
-def chunk_label(window: DayWindow, chunk_by: str) -> str:
-    if chunk_by == "month":
-        return window.day[:7]
-    return "all"
-
-
-def build_window_chunks(windows: list[DayWindow], chunk_by: str) -> list[tuple[str, list[DayWindow]]]:
+def build_window_chunks(windows: list[DayWindow]) -> list[tuple[str, list[DayWindow]]]:
     chunks: list[tuple[str, list[DayWindow]]] = []
     current_label = ""
     current_windows: list[DayWindow] = []
 
     for window in windows:
-        label = chunk_label(window, chunk_by)
+        label = window.day[:7]
         if not current_windows:
             current_label = label
             current_windows = [window]
@@ -1930,7 +1918,7 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
     windows = build_day_windows(settings, start_day, end_day)
     add_duration(ACTIVE_PROFILE, "build_windows_s", started_at)
     started_at = time.perf_counter()
-    chunks = build_window_chunks(windows, args.chunk_by)
+    chunks = build_window_chunks(windows)
     add_duration(ACTIVE_PROFILE, "build_chunks_s", started_at)
     started_at = time.perf_counter()
     catalog = [item for item in build_catalog(settings) if item.implemented]
@@ -2284,7 +2272,6 @@ def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
         "samples": emitted_samples,
         "series": len(seen_series_keys),
         "skipped": skipped,
-        "chunk_by": args.chunk_by,
         "chunks": chunk_summaries,
         "batches": total_batches,
         "batch_size": args.batch_size,
@@ -2315,10 +2302,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-
-
-
-
 
