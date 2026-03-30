@@ -2,7 +2,7 @@
 
 For a simple end-user walkthrough, see:
 
-- `docs/deployment-readme.md`
+- `deployment-readme.md`
 
 This is the end-user deploy path for the VM dashboards.
 
@@ -187,3 +187,4 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the deploy scripts above.
+

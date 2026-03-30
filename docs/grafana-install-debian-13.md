@@ -17,11 +17,11 @@ Nicht Bestandteil dieser Anleitung:
 Dafür gibt es bereits eigene Anleitungen:
 
 - VictoriaMetrics installieren:
-  - `docs/victoriametrics-install-debian-13.md`
+  - `victoriametrics-install-debian-13.md`
 - InfluxDB -> VictoriaMetrics Migration:
-  - `docs/influx-to-vm-migration.md`
+  - `influx-to-vm-migration.md`
 - Grafana mit VictoriaMetrics verbinden und EVCC-Dashboards deployen:
-  - `docs/grafana-vm-dashboard-setup.md`
+  - `grafana-vm-dashboard-setup.md`
 
 ## Empfohlener Installationsweg
 
@@ -178,7 +178,7 @@ Wenn Grafana läuft, ist der nächste Schritt normalerweise:
 
 Dafür weiter mit:
 
-- `docs/grafana-vm-dashboard-setup.md`
+- `grafana-vm-dashboard-setup.md`
 
 ## Hinweise für LXC
 
@@ -211,3 +211,4 @@ Quelle:
 
 - [Grafana auf Debian oder Ubuntu installieren](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
 - [Grafana Installation allgemein](https://grafana.com/docs/grafana/latest/setup-grafana/installation/)
+

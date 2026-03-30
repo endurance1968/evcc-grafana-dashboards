@@ -11,9 +11,9 @@ Diese Anleitung setzt voraus, dass VictoriaMetrics bereits läuft.
 Falls noch nicht:
 
 - Installation von VictoriaMetrics auf Debian 13:
-  - `docs/victoriametrics-install-debian-13.md`
+  - `victoriametrics-install-debian-13.md`
 - Migration der EVCC-Rohdaten und Rollups:
-  - `docs/influx-to-vm-migration.md`
+  - `influx-to-vm-migration.md`
 
 ## Zielbild
 
@@ -374,18 +374,18 @@ Dann fehlen meistens noch die Rollups.
 
 Dafür siehe:
 
-- `docs/influx-to-vm-migration.md`
+- `influx-to-vm-migration.md`
 
 ## Verweise
 
 Für mehr Details nicht doppelt lesen, sondern direkt hier weiter:
 
 - allgemeiner Deployer-Einstieg:
-  - `docs/deployment-readme.md`
+  - `deployment-readme.md`
 - technische Deploy-Details:
-  - `docs/vm-dashboard-install.md`
+  - `vm-dashboard-install.md`
 - VictoriaMetrics auf Debian 13:
-  - `docs/victoriametrics-install-debian-13.md`
+  - `victoriametrics-install-debian-13.md`
 - InfluxDB -> VictoriaMetrics Migration und Rollups:
-  - `docs/influx-to-vm-migration.md`
+  - `influx-to-vm-migration.md`
 
