@@ -4,7 +4,7 @@ Dieses Repository bündelt einen aktuellen Dashboard-Satz für [EVCC](https://ev
 
 Ausgangspunkt war der frühere EVCC-Grafana-Dashboard-Satz für InfluxDB von Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
-Dieser alte Stand bleibt hier nur noch als statische Referenz erhalten. Dieses Repository ergänzt ihn um einen produktiv nutzbaren VictoriaMetrics-Pfad mit Migration, Rollups, mehrsprachigen Dashboard-Varianten und einfachen Deploy-Skripten für Grafana.
+Vielen Dank an Carsten für die hervorragende Arbeit. Ohne diese Grundlage wäre dieses Projekt in dieser Form nicht möglich gewesen. Dieses Repository ergänzt den ursprünglichen Ansatz um einen produktiv nutzbaren VictoriaMetrics-Pfad mit Migration, Rollups, mehrsprachigen Dashboard-Varianten und einfachen Deploy-Skripten für Grafana.
 
 Speziell bietet dieses Repository:
 
@@ -39,12 +39,3 @@ Damit kann man unter anderem:
 Für einen kompletten Neueinstieg oder Umstieg von EVCC + InfluxDB auf EVCC + VictoriaMetrics geht es hier weiter:
 
 - [docs/README.md](./docs/README.md)
-
-Dort ist der End-to-End-Weg beschrieben:
-
-1. VictoriaMetrics installieren
-2. Grafana installieren
-3. InfluxDB-Daten nach VictoriaMetrics migrieren
-4. Rollups erzeugen
-5. Grafana anbinden
-6. Dashboards deployen
