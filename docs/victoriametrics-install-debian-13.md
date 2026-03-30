@@ -27,7 +27,7 @@ Am Ende läuft VictoriaMetrics als `systemd`-Service:
 
 Stand heute ist die aktuelle Community-Version laut GitHub Releases:
 
-- `v1.133.0`
+- `v1.138.0`
 
 Quelle:
 
@@ -52,12 +52,12 @@ Für Debian 13 auf `amd64`:
 
 ```bash
 cd /tmp
-curl -fL -o victoria-metrics-linux-amd64-v1.133.0.tar.gz https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.133.0/victoria-metrics-linux-amd64-v1.133.0.tar.gz
+curl -fL -o victoria-metrics-linux-amd64-v1.138.0.tar.gz https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.138.0/victoria-metrics-linux-amd64-v1.138.0.tar.gz
 ```
 
 Für `arm64` muss der Dateiname entsprechend angepasst werden:
 
-- `victoria-metrics-linux-arm64-v1.133.0.tar.gz`
+- `victoria-metrics-linux-arm64-v1.138.0.tar.gz`
 
 Wenn du vor dem Download prüfen willst, welche Architektur dein System hat:
 
@@ -73,7 +73,7 @@ Typische Werte:
 ## Schritt 3: Binary installieren
 
 ```bash
-sudo tar -xvf /tmp/victoria-metrics-linux-amd64-v1.133.0.tar.gz -C /usr/local/bin
+sudo tar -xvf /tmp/victoria-metrics-linux-amd64-v1.138.0.tar.gz -C /usr/local/bin
 ```
 
 Danach prüfen:
@@ -111,7 +111,7 @@ User=victoriametrics
 Group=victoriametrics
 ExecStart=/usr/local/bin/victoria-metrics-prod \
   -storageDataPath=/var/lib/victoria-metrics \
-  -retentionPeriod=365d \
+  -retentionPeriod=10y \
   -selfScrapeInterval=10s
 SyslogIdentifier=victoriametrics
 Restart=always
@@ -128,8 +128,10 @@ WantedBy=multi-user.target
 Hinweise:
 
 - `-storageDataPath` ist dein lokaler Datenpfad
-- `-retentionPeriod=365d` ist nur ein Beispiel
-- `-selfScrapeInterval=10s` ist praktisch für erste Funktionstests
+- `-retentionPeriod=10y` hält Daten für zehn Jahre
+- `-selfScrapeInterval=10s` lässt VictoriaMetrics die eigenen internen Metriken von `/metrics` alle 10 Sekunden selbst einsammeln
+
+Das ist nützlich, wenn du die VM-eigenen Metriken schnell in `vmui` sehen willst. Wenn du diese internen Metriken nicht brauchst, kannst du den Parameter auch weglassen.
 
 ## Schritt 6: Service starten und aktivieren
 

@@ -13,6 +13,8 @@ Wichtige Einstiege:
 
 - Installation für Endnutzer:
   - [`docs/deployment-readme.md`](./docs/deployment-readme.md)
+- Grafana mit VictoriaMetrics und EVCC-Dashboards:
+  - [`docs/grafana-vm-dashboard-setup.md`](./docs/grafana-vm-dashboard-setup.md)
 - Migration von InfluxDB zu VictoriaMetrics:
   - [`docs/influx-to-vm-migration.md`](./docs/influx-to-vm-migration.md)
 - VictoriaMetrics auf Debian 13 installieren:
