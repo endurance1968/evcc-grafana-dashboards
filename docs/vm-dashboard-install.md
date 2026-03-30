@@ -2,7 +2,7 @@
 
 For a simple end-user walkthrough, see:
 
-- `deployment-readme.md`
+- [deployment-readme.md](./deployment-readme.md)
 
 This is the end-user deploy path for the VM dashboards.
 

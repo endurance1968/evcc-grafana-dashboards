@@ -17,9 +17,9 @@ Nicht Bestandteil dieser Anleitung:
 Dafür weiter mit:
 
 - InfluxDB -> VictoriaMetrics Migration:
-  - `influx-to-vm-migration.md`
+  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 - Grafana mit VictoriaMetrics und EVCC-Dashboards:
-  - `grafana-vm-dashboard-setup.md`
+  - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
 ## Verwendetes Image
 
@@ -133,7 +133,7 @@ Wichtig:
 
 Wenn VictoriaMetrics läuft, weiter mit:
 
-- `grafana-vm-dashboard-setup.md`
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 - oder bei bestehender InfluxDB zuerst mit:
-  - `influx-to-vm-migration.md`
+  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 

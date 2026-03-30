@@ -21,22 +21,22 @@ Diese Datei ist der schnellste Einstieg für einen Neueinsteiger, der heute:
 ### Klassische Debian-VM oder LXC
 
 - VictoriaMetrics:
-  - `victoriametrics-install-debian-13.md`
+  - [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
 - Grafana:
-  - `grafana-install-debian-13.md`
+  - [grafana-install-debian-13.md](./grafana-install-debian-13.md)
 
 ### Docker
 
 - VictoriaMetrics:
-  - `victoriametrics-install-docker.md`
+  - [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
 - Grafana:
-  - `grafana-install-docker.md`
+  - [grafana-install-docker.md](./grafana-install-docker.md)
 
 ## Danach: InfluxDB nach VictoriaMetrics migrieren
 
 Wenn du schon EVCC + InfluxDB hast, geht es hier weiter:
 
-- `influx-to-vm-migration.md`
+- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 
 Diese Anleitung enthält:
 
@@ -48,7 +48,7 @@ Diese Anleitung enthält:
 
 Wenn VictoriaMetrics läuft und die Daten vorhanden sind, geht es hier weiter:
 
-- `grafana-vm-dashboard-setup.md`
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
 Diese Anleitung enthält:
 
@@ -60,9 +60,9 @@ Diese Anleitung enthält:
 ## Zusätzliche Enduser-Dokus
 
 - kurzer Deploy-Einstieg:
-  - `deployment-readme.md`
+  - [deployment-readme.md](./deployment-readme.md)
 - technische Deploy-Details:
-  - `vm-dashboard-install.md`
+  - [vm-dashboard-install.md](./vm-dashboard-install.md)
 
 ## Merksatz
 

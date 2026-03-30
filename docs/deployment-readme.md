@@ -182,5 +182,5 @@ Pruefen:
 
 Die technische Doku liegt hier:
 
-- `vm-dashboard-install.md`
+- [vm-dashboard-install.md](./vm-dashboard-install.md)
 

@@ -17,9 +17,9 @@ Nicht Bestandteil dieser Anleitung:
 Dafür weiter mit:
 
 - VictoriaMetrics mit Docker installieren:
-  - `victoriametrics-install-docker.md`
+  - [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
 - Grafana mit VictoriaMetrics und EVCC-Dashboards:
-  - `grafana-vm-dashboard-setup.md`
+  - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
 ## Verwendetes Image
 
@@ -134,5 +134,5 @@ Wichtig:
 
 Wenn Grafana und VictoriaMetrics laufen, weiter mit:
 
-- `grafana-vm-dashboard-setup.md`
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
