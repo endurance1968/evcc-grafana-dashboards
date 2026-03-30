@@ -1,63 +1,61 @@
-# Grafana mit Docker installieren
+# Install Grafana with Docker
 
-Diese Anleitung beschreibt eine einfache Grafana-Installation mit Docker.
+This guide covers a simple Grafana installation with Docker.
 
-Annahmen:
+Assumptions:
 
-- Docker ist bereits installiert
-- Grafana soll lokal mit persistentem Datenverzeichnis laufen
-- Grafana soll später mit VictoriaMetrics als Datasource genutzt werden
+- Docker is already installed
+- Grafana should run locally with persistent storage
+- Grafana will later use VictoriaMetrics as its datasource
 
-Nicht Bestandteil dieser Anleitung:
+Not covered here:
 
-- Installation von Docker selbst
-- Installation von VictoriaMetrics selbst
-- Dashboard-Deployment selbst
+- installing Docker itself
+- installing VictoriaMetrics itself
+- deploying dashboards
 
-Dafür weiter mit:
+Continue with:
 
-- VictoriaMetrics mit Docker installieren:
-  - [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
-- Grafana mit VictoriaMetrics und EVCC-Dashboards:
-  - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+- [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-## Verwendetes Image
+## Docker image
 
-Grafana empfiehlt aktuell die Verwendung von:
+Grafana currently recommends:
 
 - `grafana/grafana`
 
-Wichtig:
+Important:
 
-- `grafana/grafana-oss` wird laut offizieller Doku nicht mehr weiter aktualisiert
-- `grafana/grafana` ist der richtige OSS-Dockerpfad
+- `grafana/grafana-oss` is no longer the main maintained image path
+- `grafana/grafana` is the correct current OSS-friendly Docker image path
 
-Quelle:
+Reference:
 
 - [Run Grafana Docker image](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/)
 
-## Ziel
+## Goal
 
-Am Ende läuft Grafana:
+At the end, Grafana runs:
 
-- auf Port `3000`
-- mit persistentem Datenverzeichnis auf dem Host
-- mit Webzugriff unter `http://<host>:3000`
+- on port `3000`
+- with persistent host storage
+- reachable at `http://<host>:3000`
 
-## Schritt 1: Verzeichnis anlegen
+## 1. Create the data directory
 
 ```bash
 mkdir -p /opt/grafana/data
 cd /opt/grafana
 ```
 
-## Schritt 2: Image laden
+## 2. Pull the image
 
 ```bash
 docker pull grafana/grafana
 ```
 
-## Schritt 3: Container starten
+## 3. Start the container
 
 ```bash
 docker run -d \
@@ -68,24 +66,24 @@ docker run -d \
   grafana/grafana
 ```
 
-## Bedeutung der wichtigsten Optionen
+## Important options
 
 - `-p 3000:3000`
-  - veröffentlicht Grafana auf Port `3000`
+  - publishes Grafana on port `3000`
 - `-v /opt/grafana/data:/var/lib/grafana`
-  - speichert Benutzer, Datasources und Dashboards persistent auf dem Host
+  - keeps users, datasources, and dashboards persistent on the host
 - `--restart unless-stopped`
-  - startet Grafana nach Reboots automatisch neu
+  - starts Grafana again automatically after reboots
 
-## Schritt 4: Funktion prüfen
+## 4. Verify the installation
 
-Containerstatus:
+Container status:
 
 ```bash
 docker ps | grep grafana
 ```
 
-HTTP-Test:
+HTTP check:
 
 ```bash
 curl -I http://127.0.0.1:3000
@@ -93,22 +91,22 @@ curl -I http://127.0.0.1:3000
 
 Browser:
 
-- `http://<dein-host>:3000`
+- `http://<your-host>:3000`
 
-Standard-Login bei einer frischen Installation ist typischerweise:
+A fresh installation typically starts with:
 
-- Benutzer: `admin`
-- Passwort: `admin`
+- username: `admin`
+- password: `admin`
 
-Beim ersten Login verlangt Grafana normalerweise direkt ein neues Passwort.
+Grafana will normally force a password change on first login.
 
-## Schritt 5: Logs prüfen
+## 5. Check logs
 
 ```bash
 docker logs --tail 100 grafana
 ```
 
-## Schritt 6: Container später aktualisieren
+## 6. Update the container later
 
 ```bash
 docker pull grafana/grafana
@@ -116,23 +114,22 @@ docker stop grafana
 docker rm grafana
 ```
 
-Danach denselben `docker run`-Befehl erneut ausführen.
+Then run the same `docker run` command again.
 
-Wichtig:
+Important:
 
-- das Host-Verzeichnis `/opt/grafana/data` bleibt bestehen
-- dadurch bleiben Benutzer, Datasources und Dashboards erhalten
+- the host directory `/opt/grafana/data` remains in place
+- users, datasources, and dashboards stay available
 
-## Typische Stolperfallen
+## Common issues
 
-- Port `3000` ist schon belegt
-- Volume fehlt, dadurch gehen Daten bei Container-Neustart verloren
-- Standardpasswort wurde noch nicht geändert
-- Grafana läuft, aber VictoriaMetrics-Datasource ist noch nicht angelegt
+- port `3000` is already in use
+- the volume is missing, so data disappears after container recreation
+- the default password was not changed
+- Grafana is running but the VictoriaMetrics datasource does not exist yet
 
-## Nächster Schritt
+## Next step
 
-Wenn Grafana und VictoriaMetrics laufen, weiter mit:
+Once Grafana and VictoriaMetrics are running, continue with:
 
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
-

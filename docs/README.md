@@ -1,24 +1,24 @@
-# EVCC mit VictoriaMetrics und Grafana: Einstieg
+# EVCC with VictoriaMetrics and Grafana
 
-Diese Datei ist der schnellste Einstieg für einen Neueinsteiger, der heute:
+This is the fastest end-to-end entry point for a user who:
 
-- EVCC nutzt
-- bisher InfluxDB nutzt
-- und auf VictoriaMetrics plus den neuen EVCC-Dashboard-Satz umsteigen will
+- already runs EVCC
+- currently stores EVCC history in InfluxDB
+- wants to move to VictoriaMetrics and the new EVCC dashboard set
 
-## Empfohlene Reihenfolge
+## Recommended order
 
-1. VictoriaMetrics installieren
-2. Grafana installieren
-3. bestehende InfluxDB-Rohdaten einmalig nach VictoriaMetrics übernehmen
-4. tägliche Rollups erzeugen
-5. Grafana mit VictoriaMetrics verbinden
-6. EVCC-Dashboards deployen
-7. stündlichen Rollup-Lauf einrichten
+1. Install VictoriaMetrics
+2. Install Grafana
+3. Import historic InfluxDB raw data into VictoriaMetrics
+4. Generate the daily rollups
+5. Connect Grafana to VictoriaMetrics
+6. Deploy the EVCC dashboards
+7. Set up the hourly rollup refresh
 
-## Je nach Betriebsart
+## Choose your runtime
 
-### Klassische Debian-VM oder LXC
+### Debian 13 VM or LXC
 
 - VictoriaMetrics:
   - [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
@@ -32,43 +32,42 @@ Diese Datei ist der schnellste Einstieg für einen Neueinsteiger, der heute:
 - Grafana:
   - [grafana-install-docker.md](./grafana-install-docker.md)
 
-## Danach: InfluxDB nach VictoriaMetrics migrieren
+## Then migrate data and build rollups
 
-Wenn du schon EVCC + InfluxDB hast, geht es hier weiter:
+If you already have EVCC + InfluxDB, continue with:
 
 - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 
-Diese Anleitung enthält:
+That guide covers:
 
-- einmaligen Rohdatenimport von InfluxDB nach VictoriaMetrics
-- initialen Rollup-Backfill
-- laufenden stündlichen Rollup-Betrieb
+- one-time raw-data import from InfluxDB into VictoriaMetrics
+- initial rollup backfill
+- ongoing hourly rollup refresh
 
-## Danach: Grafana und Dashboards einrichten
+## Then connect Grafana and deploy dashboards
 
-Wenn VictoriaMetrics läuft und die Daten vorhanden sind, geht es hier weiter:
+Once VictoriaMetrics is running and the data is present, continue with:
 
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-Diese Anleitung enthält:
+That guide covers:
 
-- VictoriaMetrics-Datasource in Grafana anlegen
-- Service-Account-Token erzeugen
-- ersten Dashboard-Deploy
-- späteres Dashboard-Update
+- creating the VictoriaMetrics datasource in Grafana
+- creating a Grafana service-account token
+- the first dashboard deployment
+- later dashboard updates
 
-## Zusätzliche Enduser-Dokus
+## Additional end-user deploy docs
 
-- kurzer Deploy-Einstieg:
+- quick deploy guide:
   - [deployment-readme.md](./deployment-readme.md)
-- technische Deploy-Details:
+- technical deploy details:
   - [vm-dashboard-install.md](./vm-dashboard-install.md)
 
-## Merksatz
+## Short version
 
-Für den Umstieg von EVCC + InfluxDB auf EVCC + VictoriaMetrics brauchst du praktisch immer genau diese drei Blöcke:
+For a typical migration from EVCC + InfluxDB to EVCC + VictoriaMetrics, there are really only three major blocks:
 
-1. VictoriaMetrics zum Laufen bringen
-2. InfluxDB-Daten und Rollups nach VictoriaMetrics bringen
-3. Grafana mit VictoriaMetrics verbinden und Dashboards deployen
-
+1. Get VictoriaMetrics running
+2. Move raw data and rollups into VictoriaMetrics
+3. Connect Grafana and deploy the dashboards

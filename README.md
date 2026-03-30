@@ -1,41 +1,42 @@
 # EVCC Grafana Dashboards
 
-Dieses Repository bündelt einen aktuellen Dashboard-Satz für [EVCC](https://evcc.io/) auf Basis von VictoriaMetrics statt InfluxDB. Es richtet sich an Nutzer, die ihre bestehende EVCC-Visualisierung modernisieren oder neu aufbauen wollen, ohne die gewohnte fachliche Sicht auf PV, Netz, Hausverbrauch, Batterie, Fahrzeuge und Kosten zu verlieren.
+> **Preview status:** This repository is still in preview. A first release is planned for the next few weeks.
 
-Ausgangspunkt war der frühere EVCC-Grafana-Dashboard-Satz für InfluxDB von Carsten:
+This repository provides a VictoriaMetrics-based dashboard set for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
+
+It builds on the earlier InfluxDB-based EVCC dashboard work by Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
-Vielen Dank an Carsten für die hervorragende Arbeit. Ohne diese Grundlage wäre dieses Projekt in dieser Form nicht möglich gewesen. Dieses Repository ergänzt den ursprünglichen Ansatz um einen produktiv nutzbaren VictoriaMetrics-Pfad mit Migration, Rollups, mehrsprachigen Dashboard-Varianten und einfachen Deploy-Skripten für Grafana.
+Many thanks to Carsten for the excellent groundwork. This repository extends that foundation with a production-ready VictoriaMetrics path, migration guidance, rollups, localized dashboard variants, and simple Grafana deploy scripts.
 
-Speziell bietet dieses Repository:
+## What this repository adds
 
-- einen vollständigen VictoriaMetrics-basierten Dashboard-Satz für EVCC
-- Übersetzungen für mehrere Sprachen auf Basis eines englischen Originals
-- Skripte für das initiale Dashboard-Deployment und spätere Updates
-- ein Rollup-Skript für tägliche Aggregationen auf VictoriaMetrics
-- Migrationsdokumentation für den Umstieg von InfluxDB auf VictoriaMetrics
-- Enduser-Dokumentation für Installation, Migration, Grafana-Anbindung und Betrieb
+- a complete VictoriaMetrics-based EVCC dashboard set
+- generated dashboard translations based on an English source set
+- deploy scripts for first-time imports and later updates
+- a rollup script for daily long-range dashboard metrics
+- documentation for InfluxDB to VictoriaMetrics migration
+- end-user guides for VictoriaMetrics, Grafana, migration, and dashboard deployment
 
-## Was die Dashboards bieten
+## What the dashboards cover
 
-Die Dashboards decken die wichtigsten EVCC-Sichten für Tages-, Monats-, Jahres- und Gesamtauswertungen ab.
+The dashboard set includes day, month, year, and all-time views.
 
-- `Today` zeigt die aktuelle Leistungs- und Zustandslage über den Tag:
-  PV, Netz, Haus, Batterie, Ladepunkte, Leistungsfluss, Forecast, Autarkie, Eigenverbrauch und laufende Kosten.
-- `Today - Details` geht tiefer in Einzelverläufe, Phasen, Ladepunkte, Metriken und Preise.
-- `Today - Mobile` liefert eine kompaktere Ansicht für kleinere Displays.
-- `Monat`, `Jahr` und `All-time` zeigen Energie-, Kosten-, Batterie- und Fahrzeugauswertungen über längere Zeiträume.
+- `Today` focuses on the current day: PV, grid, home, battery, charging points, energy flow, forecast, autarky, self-consumption, and costs.
+- `Today - Details` goes deeper into phases, charging metrics, raw histories, and pricing details.
+- `Today - Mobile` is a compact layout for smaller screens.
+- `Month`, `Year`, and `All-time` provide longer-range energy, cost, battery, and vehicle analysis based on daily rollups.
 
-Damit kann man unter anderem:
+Typical use cases:
 
-- PV-Erzeugung, Eigenverbrauch und Autarkie nachvollziehen
-- Netzbezug und Einspeisung über verschiedene Zeiträume vergleichen
-- Ladepunkte und Fahrzeuge hinsichtlich Energie, Kosten und Nutzung auswerten
-- Batterieverhalten inklusive Lade-/Entladeenergie und SOC betrachten
-- Preisentwicklungen, Importkosten und Lastverteilungen sichtbar machen
-- historische EVCC-Daten aus InfluxDB nach VictoriaMetrics übernehmen und dort weiterbetreiben
+- track PV production, self-consumption, and autarky
+- compare grid import and feed-in over time
+- analyze vehicles and charging points by energy, cost, and usage
+- inspect battery charge, discharge, and SOC behavior
+- visualize pricing trends, import cost, and load distribution
+- migrate historic EVCC data from InfluxDB to VictoriaMetrics and continue operating there
 
-## Einstieg
+## Getting started
 
-Für einen kompletten Neueinstieg oder Umstieg von EVCC + InfluxDB auf EVCC + VictoriaMetrics geht es hier weiter:
+For the full end-to-end path from EVCC + InfluxDB to EVCC + VictoriaMetrics + Grafana, continue here:
 
 - [docs/README.md](./docs/README.md)

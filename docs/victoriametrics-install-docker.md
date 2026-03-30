@@ -1,64 +1,62 @@
-# VictoriaMetrics mit Docker installieren
+# Install VictoriaMetrics with Docker
 
-Diese Anleitung beschreibt eine einfache Single-Node-Installation von VictoriaMetrics mit Docker.
+This guide covers a simple single-node VictoriaMetrics installation with Docker.
 
-Annahmen:
+Assumptions:
 
-- Docker ist bereits installiert
-- du willst eine einzelne VictoriaMetrics-Instanz betreiben
-- die Daten sollen persistent auf dem Host liegen
+- Docker is already installed
+- you want a single VictoriaMetrics instance
+- the data should be stored persistently on the host
 
-Nicht Bestandteil dieser Anleitung:
+Not covered here:
 
-- Installation von Docker selbst
-- Migration von InfluxDB nach VictoriaMetrics
-- Grafana- oder Dashboard-Deployment
+- installing Docker itself
+- migrating from InfluxDB to VictoriaMetrics
+- Grafana or dashboard deployment
 
-Dafür weiter mit:
+Continue with:
 
-- InfluxDB -> VictoriaMetrics Migration:
-  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
-- Grafana mit VictoriaMetrics und EVCC-Dashboards:
-  - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-## Verwendetes Image
+## Docker image
 
-Diese Anleitung nutzt:
+This guide uses:
 
 - `victoriametrics/victoria-metrics:v1.138.0`
 
-Wichtig:
+Important:
 
-- die Version ist bewusst gepinnt
-- prüfe bei Bedarf neuere Releases vor der Installation
+- the version is pinned on purpose
+- check for newer releases when needed
 
-Quellen:
+Sources:
 
 - [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/)
 - [VictoriaMetrics Releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases)
 
-## Ziel
+## Goal
 
-Am Ende läuft VictoriaMetrics:
+At the end, VictoriaMetrics runs:
 
-- auf Port `8428`
-- mit persistentem Datenverzeichnis auf dem Host
-- mit Browser-Zugriff auf `vmui`
+- on port `8428`
+- with persistent host storage
+- with browser access to `vmui`
 
-## Schritt 1: Verzeichnis anlegen
+## 1. Create the data directory
 
 ```bash
 mkdir -p /opt/victoriametrics/data
 cd /opt/victoriametrics
 ```
 
-## Schritt 2: Image laden
+## 2. Pull the image
 
 ```bash
 docker pull victoriametrics/victoria-metrics:v1.138.0
 ```
 
-## Schritt 3: Container starten
+## 3. Start the container
 
 ```bash
 docker run -d \
@@ -72,26 +70,26 @@ docker run -d \
   --selfScrapeInterval=10s
 ```
 
-## Bedeutung der wichtigsten Optionen
+## Important options
 
 - `-p 8428:8428`
-  - veröffentlicht VictoriaMetrics auf Port `8428`
+  - publishes VictoriaMetrics on port `8428`
 - `-v /opt/victoriametrics/data:/victoria-metrics-data`
-  - speichert Daten persistent auf dem Host
+  - stores data persistently on the host
 - `--retentionPeriod=10y`
-  - hält Daten für zehn Jahre
+  - keeps data for ten years
 - `--selfScrapeInterval=10s`
-  - sammelt die eigenen internen VM-Metriken alle 10 Sekunden ein
+  - collects VictoriaMetrics internal metrics every 10 seconds
 
-## Schritt 4: Funktion prüfen
+## 4. Verify the installation
 
-Containerstatus:
+Container status:
 
 ```bash
 docker ps | grep victoriametrics
 ```
 
-Health-Check:
+Health check:
 
 ```bash
 curl -fsSL http://127.0.0.1:8428/health
@@ -99,15 +97,15 @@ curl -fsSL http://127.0.0.1:8428/health
 
 Browser:
 
-- `http://<dein-host>:8428/vmui`
+- `http://<your-host>:8428/vmui`
 
-## Schritt 5: Logs prüfen
+## 5. Check logs
 
 ```bash
 docker logs --tail 100 victoriametrics
 ```
 
-## Schritt 6: Container später aktualisieren
+## 6. Update the container later
 
 ```bash
 docker pull victoriametrics/victoria-metrics:v1.138.0
@@ -115,25 +113,24 @@ docker stop victoriametrics
 docker rm victoriametrics
 ```
 
-Danach denselben `docker run`-Befehl erneut ausführen.
+Then run the same `docker run` command again.
 
-Wichtig:
+Important:
 
-- das Host-Verzeichnis `/opt/victoriametrics/data` bleibt dabei erhalten
-- die Daten bleiben deshalb bestehen
+- the host directory `/opt/victoriametrics/data` remains in place
+- the stored data remains available
 
-## Typische Stolperfallen
+## Common issues
 
-- Port `8428` ist schon belegt
-- das Host-Verzeichnis ist nicht beschreibbar
-- keine Persistenz, wenn das Volume vergessen wurde
-- Firewall blockiert Port `8428`
+- port `8428` is already in use
+- the host directory is not writable
+- no persistence because the volume was forgotten
+- the firewall blocks port `8428`
 
-## Nächster Schritt
+## Next step
 
-Wenn VictoriaMetrics läuft, weiter mit:
+Once VictoriaMetrics is running, continue with:
 
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
-- oder bei bestehender InfluxDB zuerst mit:
+- or, if you already have InfluxDB history, first:
   - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
-

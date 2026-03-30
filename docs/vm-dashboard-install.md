@@ -1,27 +1,27 @@
 # VM Dashboard Install
 
-For a simple end-user walkthrough, see:
+For a simpler first-time walkthrough, start here:
 
 - [deployment-readme.md](./deployment-readme.md)
 
-This is the end-user deploy path for the VM dashboards.
+This document describes the end-user deployment path for the VictoriaMetrics dashboards in more detail.
 
-Goal:
+## Goal
 
 - no Node.js required
-- simple first deploy defaults
+- simple first-deploy defaults
 - import both dashboards and Grafana library panels
 
 ## Recommended Grafana access
 
 Use a Grafana API token or service-account token with permissions to:
 
-- create/update folders
-- create/update dashboards
-- create/update library panels
-- delete dashboards/library panels when purge is enabled
+- create and update folders
+- create and update dashboards
+- create and update library panels
+- delete dashboards and library panels when `PURGE=true`
 
-This is simpler and safer than using username/password automation.
+This is simpler and safer than automating a username and password.
 
 ## Default behavior
 
@@ -35,22 +35,25 @@ The deployer defaults to the generated dashboard set:
 - datasource UID: `vm-evcc`
 - purge before import: `false`
 
-Default is `PURGE=false`, so existing dashboards are kept unless you explicitly opt into deleting them before import.
+Default is `PURGE=false`, so existing dashboards stay in place unless you explicitly choose to delete them first.
 
-When `PURGE=true`, the deployer deletes only the dashboards whose `uid` is present in the 6 VM dashboard JSON files and only the library panels whose `uid` is referenced under `__elements` in those same files.
+When `PURGE=true`, the deployer deletes only:
 
-For the first deploy, only these two values normally need to be changed:
+- the dashboards whose `uid` is present in the six VM dashboard JSON files
+- the library panels whose `uid` is referenced under `__elements` in those same files
+
+For most first deployments you only need to set:
 
 - `GRAFANA_URL`
 - `GRAFANA_API_TOKEN`
 
-It does **not** patch dashboard internals during deploy.
+The deployer does not patch dashboard internals during deployment.
 
 That means:
 
-- colors come from the checked-in dashboard JSONs
+- colors come from the checked-in dashboard JSON files
 - filter defaults come from the checked-in dashboard variables
-- user-specific tweaks should be made in Grafana after import, or by maintaining a local dashboard source
+- user-specific changes should be done in Grafana after import, or by deploying from a local dashboard directory
 
 ## Config file
 
@@ -67,7 +70,7 @@ and set at least:
 - `GRAFANA_URL`
 - `GRAFANA_API_TOKEN`
 
-Optional:
+Optional values:
 
 - `GRAFANA_DS_VM_EVCC_UID`
 - `GRAFANA_FOLDER_UID`
@@ -80,19 +83,19 @@ Optional:
 - `GITHUB_REF`
 - `PURGE`
 
-Runtime override parameters are also available:
+Runtime overrides are also available:
 
 - PowerShell: `-url`, `-token`, `-purge`
 - Python shell deployer: `--url`, `--token`, `--purge`
 - Bash-only deployer: `--url`, `--token`, `--purge`
 
-These override the config values for a single run.
+Those values override the config file for a single run.
 
 ## User customization
 
 The deployer is intentionally import-only.
 
-Recommended ways to customize:
+Recommended customization paths:
 
 - change dashboard variables in Grafana and save the dashboard
 - or deploy from a local dashboard directory via `DASHBOARD_SOURCE_MODE=local`
@@ -105,25 +108,25 @@ The deployer intentionally does not rewrite:
 
 ## Windows
 
-PowerShell only, no Node required:
+PowerShell only, no Node.js required:
 
 ```powershell
-.\scripts\deploy.ps1
+.\deploy.ps1
 ```
 
-With explicit config:
+With an explicit config file:
 
 ```powershell
 .\deploy.ps1 -config .\vm-dashboard-install.env
 ```
 
-Or directly with the important values:
+Or directly with the key values:
 
 ```powershell
 .\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
 ```
 
-## Linux / Raspberry Pi with Python shell deployer
+## Linux / Raspberry Pi with the Python shell deployer
 
 This variant uses `python3`, which is usually already present.
 
@@ -139,21 +142,21 @@ Run:
 sh ./deploy-python.sh
 ```
 
-With explicit config:
+With an explicit config file:
 
 ```bash
 sh ./deploy-python.sh --config ./vm-dashboard-install.env
 ```
 
-Or directly with the important values:
+Or directly with the key values:
 
 ```bash
 sh ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
-## Linux / Raspberry Pi with Bash-only deployer
+## Linux / Raspberry Pi with the Bash-only deployer
 
-This variant needs:
+This variant needs `jq`:
 
 ```bash
 sudo apt install jq
@@ -165,13 +168,13 @@ Run:
 sh ./deploy-bash.sh
 ```
 
-With explicit config:
+With an explicit config file:
 
 ```bash
 sh ./deploy-bash.sh --config ./vm-dashboard-install.env
 ```
 
-Or directly with the important values:
+Or directly with the key values:
 
 ```bash
 sh ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
@@ -187,4 +190,3 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the deploy scripts above.
-

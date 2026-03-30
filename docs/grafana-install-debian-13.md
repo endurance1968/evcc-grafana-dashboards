@@ -1,69 +1,64 @@
-# Grafana auf Debian 13 installieren
+# Install Grafana on Debian 13
 
-Diese Anleitung beschreibt die Installation von Grafana auf einer Debian-13-VM oder einem Debian-13-LXC.
+This guide covers a straightforward Grafana installation on a Debian 13 VM or Debian 13 LXC.
 
-Annahmen:
+Assumptions:
 
-- Debian 13 läuft bereits
-- du willst Grafana lokal per `systemd` betreiben
-- Grafana soll später mit VictoriaMetrics als Datasource genutzt werden
+- Debian 13 is already running
+- you want to run Grafana locally via `systemd`
+- Grafana will later use VictoriaMetrics as its datasource
 
-Nicht Bestandteil dieser Anleitung:
+Not covered here:
 
-- Installation von VictoriaMetrics selbst
-- Migration von InfluxDB nach VictoriaMetrics
-- Deployment der EVCC-Dashboards
+- installing VictoriaMetrics itself
+- migrating from InfluxDB to VictoriaMetrics
+- deploying the EVCC dashboards
 
-Dafür gibt es bereits eigene Anleitungen:
+For those topics, continue with:
 
-- VictoriaMetrics installieren:
-  - [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
-- InfluxDB -> VictoriaMetrics Migration:
-  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
-- Grafana mit VictoriaMetrics verbinden und EVCC-Dashboards deployen:
-  - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+- [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
+- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-## Empfohlener Installationsweg
+## Recommended installation path
 
-Für Debian 13 ist der empfohlene Weg laut offizieller Grafana-Doku:
+For Debian 13, the recommended path is the official Grafana APT repository.
 
-- Installation über das offizielle Grafana-APT-Repository
+Benefits:
 
-Vorteile:
+- easy updates through `apt`
+- no manual `.deb` handling
+- a clean `systemd` service
 
-- einfache Updates über `apt`
-- kein manuelles `.deb`-Handling
-- sauberer `systemd`-Service
+Official reference:
 
-Offizielle Quelle:
+- [Install Grafana on Debian or Ubuntu](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
 
-- [Grafana auf Debian oder Ubuntu installieren](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
+## Which edition?
 
-## Welche Edition?
+Grafana currently documents:
 
-Grafana dokumentiert aktuell:
+- `grafana-enterprise` as the default package
+- `grafana` as the OSS package
 
-- `grafana-enterprise` als empfohlene Standard-Edition
-- `grafana` als OSS-Paket
+Important:
 
-Wichtig:
+- `grafana-enterprise` can be used without a paid license
+- for normal EVCC setups this is usually fine
+- if you explicitly want OSS only, install `grafana` instead
 
-- `grafana-enterprise` ist ohne Lizenz kostenlos nutzbar
-- funktional ist das für normale Setups meist unkritisch
-- wenn du bewusst OSS-only willst, installiere stattdessen `grafana`
-
-Diese Anleitung nutzt standardmäßig:
+This guide uses:
 
 - `grafana-enterprise`
 
-## Schritt 1: Basis-Pakete installieren
+## 1. Install base packages
 
 ```bash
 sudo apt update
 sudo apt install -y apt-transport-https wget gnupg
 ```
 
-## Schritt 2: Grafana-APT-Key einrichten
+## 2. Add the Grafana APT key
 
 ```bash
 sudo mkdir -p /etc/apt/keyrings
@@ -71,144 +66,139 @@ sudo wget -O /etc/apt/keyrings/grafana.asc https://apt.grafana.com/gpg-full.key
 sudo chmod 644 /etc/apt/keyrings/grafana.asc
 ```
 
-## Schritt 3: Grafana-Repository einbinden
+## 3. Add the Grafana repository
 
-Für stabile Releases:
+For stable releases:
 
 ```bash
 echo "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
 ```
 
-Danach Paketliste aktualisieren:
+Then refresh the package index:
 
 ```bash
 sudo apt update
 ```
 
-## Schritt 4: Grafana installieren
+## 4. Install Grafana
 
-Empfohlene Standard-Edition:
+Recommended default edition:
 
 ```bash
 sudo apt install -y grafana-enterprise
 ```
 
-Falls du bewusst die OSS-Variante willst:
+If you explicitly want the OSS package:
 
 ```bash
 sudo apt install -y grafana
 ```
 
-## Schritt 5: Grafana starten und aktivieren
+## 5. Start and enable Grafana
 
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now grafana-server
 ```
 
-Status prüfen:
+Check status:
 
 ```bash
 sudo systemctl status grafana-server
 ```
 
-## Schritt 6: Funktion prüfen
+## 6. Verify the installation
 
-Lokal testen:
+Local check:
 
 ```bash
 curl -I http://127.0.0.1:3000
 ```
 
-Im Browser:
+Browser:
 
-- `http://<dein-host>:3000`
+- `http://<your-host>:3000`
 
-Standard-Login bei einer frischen Installation ist typischerweise:
+A fresh installation typically starts with:
 
-- Benutzer: `admin`
-- Passwort: `admin`
+- username: `admin`
+- password: `admin`
 
-Beim ersten Login verlangt Grafana normalerweise direkt ein neues Passwort.
+Grafana will normally force a password change on first login.
 
-## Schritt 7: Netzwerkzugriff prüfen
+## 7. Verify network access
 
-Wenn Grafana von einem anderen Host erreichbar sein soll:
+If Grafana should be reachable from another host:
 
-- Port `3000` muss erreichbar sein
+- port `3000` must be open
 
-Prüfen:
+Check:
 
 ```bash
 ss -ltnp | grep 3000
 ```
 
-Wenn eine Firewall aktiv ist, muss Port `3000` dort zusätzlich freigeschaltet werden.
+If you use a firewall, allow port `3000` there as well.
 
-## Schritt 8: Updates
+## 8. Updates
 
-Wenn Grafana über das APT-Repository installiert wurde, laufen Updates normal über `apt`:
+If Grafana was installed from the APT repository, updates work through `apt`:
 
 ```bash
 sudo apt update
 sudo apt upgrade
 ```
 
-Nur Grafana aktualisieren:
+To update Grafana only:
 
 ```bash
 sudo apt update
 sudo apt install grafana-enterprise
 ```
 
-oder bei OSS:
+or for OSS:
 
 ```bash
 sudo apt update
 sudo apt install grafana
 ```
 
-## Schritt 9: Für EVCC vorbereiten
+## 9. Prepare for EVCC
 
-Wenn Grafana läuft, ist der nächste Schritt normalerweise:
+Once Grafana is running, the next normal step is:
 
-1. VictoriaMetrics als Datasource anlegen
-2. Grafana Service-Account-Token erzeugen
-3. EVCC-Dashboards deployen
+1. create the VictoriaMetrics datasource
+2. create a Grafana service-account token
+3. deploy the EVCC dashboards
 
-Dafür weiter mit:
+Continue with:
 
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-## Hinweise für LXC
+## Notes for LXC
 
-Für einen normalen Debian-LXC gelten in der Regel dieselben Schritte wie für eine VM.
+For a normal Debian LXC, the same steps usually work unchanged.
 
-Wichtig ist vor allem:
+Main things to watch:
 
-- genügend RAM bereitstellen
-- Port `3000` vom Host bzw. Netzwerk erreichbar machen
-- Uhrzeit und Zeitzone im Container sauber halten
+- assign enough RAM
+- make port `3000` reachable from the host or network
+- keep time and timezone correct inside the container
 
-Grafana selbst braucht laut offizieller Doku mindestens ungefähr:
+Grafana itself typically needs at least about:
 
-- 512 MB RAM empfohlen
-- 1 CPU-Kern empfohlen
+- 512 MB RAM recommended
+- 1 CPU core recommended
 
-Quelle:
+## Common issues
 
-- [Grafana Installation](https://grafana.com/docs/grafana/latest/setup-grafana/installation/)
+- missing or incorrectly installed repository key
+- port `3000` open locally but blocked on the network
+- default password not changed yet
+- VictoriaMetrics datasource not created yet
+- later dashboard deploy fails because no service-account token exists
 
-## Typische Stolperfallen
+## Sources
 
-- Repository-Key fehlt oder ist falsch eingebunden
-- Port `3000` lokal offen, aber im Netzwerk blockiert
-- Standardpasswort wurde noch nicht geändert
-- VictoriaMetrics-Datasource ist noch nicht angelegt
-- späterer Dashboard-Deploy scheitert wegen fehlendem Service-Account-Token
-
-## Quellen
-
-- [Grafana auf Debian oder Ubuntu installieren](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
-- [Grafana Installation allgemein](https://grafana.com/docs/grafana/latest/setup-grafana/installation/)
-
+- [Install Grafana on Debian or Ubuntu](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
+- [Grafana installation overview](https://grafana.com/docs/grafana/latest/setup-grafana/installation/)

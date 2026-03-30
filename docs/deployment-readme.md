@@ -1,31 +1,31 @@
 # Deployment README
 
-Diese Anleitung ist fuer den ersten Dashboard-Deploy gedacht.
+This guide is intended for the first dashboard deployment.
 
-## Voraussetzungen
+## Prerequisites
 
-Benoetigt werden:
+You need:
 
-- eine laufende Grafana-Instanz
-- eine funktionierende VictoriaMetrics-Datasource in Grafana
-- ein Grafana Service-Account-Token
-- Internetzugriff auf GitHub
+- a running Grafana instance
+- a working VictoriaMetrics datasource in Grafana
+- a Grafana service-account token
+- internet access to GitHub
 
-Unter Linux oder auf dem Raspberry Pi werden je nach Deployer zusaetzlich benoetigt:
+On Linux or Raspberry Pi you additionally need:
 
-- fuer `deploy-python.sh`: `curl` und `python3`
-- fuer `deploy-bash.sh`: `bash`, `curl` und `jq`
+- for `deploy-python.sh`: `curl` and `python3`
+- for `deploy-bash.sh`: `bash`, `curl`, and `jq`
 
-Falls etwas fehlt:
+If something is missing:
 
 ```bash
 sudo apt update
-sudo apt install curl python3 jq
+sudo apt install -y curl python3 jq
 ```
 
-## 1. Deployer und Beispiel-Config holen
+## 1. Download the deployer and example config
 
-### Linux / Raspberry Pi mit Python-Deployer
+### Linux / Raspberry Pi with the Python deployer
 
 ```bash
 curl -fsSLo deploy-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-python.sh
@@ -33,7 +33,7 @@ curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/e
 chmod +x deploy-python.sh
 ```
 
-### Linux / Raspberry Pi mit Bash-Only-Deployer
+### Linux / Raspberry Pi with the Bash-only deployer
 
 ```bash
 curl -fsSLo deploy-bash.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-bash.sh
@@ -48,94 +48,92 @@ Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-d
 Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
 ```
 
-## 2. Datasource in Grafana pruefen
+## 2. Verify the datasource in Grafana
 
-In Grafana pruefen:
+In Grafana:
 
-1. `Connections` oder `Administration` oeffnen
-2. `Data sources` oeffnen
-3. pruefen, dass die VictoriaMetrics-Datasource existiert
-4. ihre UID notieren
+1. Open `Connections` or `Administration`
+2. Open `Data sources`
+3. Make sure the VictoriaMetrics datasource exists
+4. Note its UID
 
-Wenn du die Standard-UID verwendest, ist das meist einfach:
+If you use the default UID, it is usually:
 
 ```text
 vm-evcc
 ```
 
-## 3. Service-Account-Token in Grafana erzeugen
+## 3. Create a Grafana service-account token
 
 In Grafana:
 
-1. `Administration` oeffnen
-2. `Users and access` oeffnen
-3. `Service accounts` oeffnen
-4. `Add service account` klicken
-5. z. B. `evcc-dashboard-installer` anlegen
-6. den Service Account oeffnen
-7. `Add service account token` klicken
-8. einen Namen vergeben, z. B. `installer`
-9. `Generate token` klicken
-10. den Token sofort kopieren
+1. Open `Administration`
+2. Open `Users and access`
+3. Open `Service accounts`
+4. Click `Add service account`
+5. Create something like `evcc-dashboard-installer`
+6. Open the service account
+7. Click `Add service account token`
+8. Give it a name such as `installer`
+9. Click `Generate token`
+10. Copy the token immediately
 
-Fuer einfache lokale Installationen reicht in der Regel:
+For a simple local installation, `Admin` in the current organization is usually enough.
 
-- Rolle `Admin` in der Organisation
+## 4. Quick start
 
-## 4. Schnellstart
+For a first run, URL and token are normally enough. `purge` controls whether existing EVCC dashboards are deleted before import.
 
-Fuer den ersten Lauf reichen normalerweise nur URL und Token. Mit `purge` steuerst du, ob vorhandene EVCC-Dashboards vor dem Import geloescht werden sollen.
-
-### Linux / Raspberry Pi mit Python-Deployer
+### Linux / Raspberry Pi with the Python deployer
 
 ```bash
-./deploy-python.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
+./deploy-python.sh --url http://<your-grafana-ip>:3000 --token <your_token> --purge false
 ```
 
-### Linux / Raspberry Pi mit Bash-Only-Deployer
+### Linux / Raspberry Pi with the Bash-only deployer
 
 ```bash
-./deploy-bash.sh --url http://<deine-grafana-ip>:3000 --token <dein_token> --purge false
+./deploy-bash.sh --url http://<your-grafana-ip>:3000 --token <your_token> --purge false
 ```
 
 ### Windows
 
 ```powershell
-./deploy.ps1 -url http://<deine-grafana-ip>:3000 -token <dein_token> -purge false
+./deploy.ps1 -url http://<your-grafana-ip>:3000 -token <your_token> -purge false
 ```
 
-## 5. Optional: Config-Datei
+## 5. Optional: config file
 
-Wenn du nicht jedes Mal URL und Token angeben willst, kopiere:
+If you do not want to pass URL and token every time, copy:
 
 - `vm-dashboard-install.env.example`
 
-nach:
+to:
 
 - `vm-dashboard-install.env`
 
-Minimalinhalt:
+Minimal content:
 
 ```env
-GRAFANA_URL=http://<deine-grafana-ip>:3000
-GRAFANA_API_TOKEN=<dein_token>
+GRAFANA_URL=http://<your-grafana-ip>:3000
+GRAFANA_API_TOKEN=<your_token>
 ```
 
-Wenn du alte EVCC-Dashboards und Library Panels vor dem Import bewusst entfernen willst, setze in der Config oder beim Aufruf `purge=true`. In der Config sieht das so aus:
+If you want to delete old EVCC dashboards and library panels before import, set:
 
 ```env
 PURGE=true
 ```
 
-Danach reicht:
+Then you can simply run:
 
-### Linux / Raspberry Pi mit Python-Deployer
+### Linux / Raspberry Pi with the Python deployer
 
 ```bash
 ./deploy-python.sh
 ```
 
-### Linux / Raspberry Pi mit Bash-Only-Deployer
+### Linux / Raspberry Pi with the Bash-only deployer
 
 ```bash
 ./deploy-bash.sh
@@ -147,40 +145,39 @@ Danach reicht:
 .\deploy.ps1
 ```
 
-## 6. Ergebnis pruefen
+## 6. Verify the result
 
-Danach sollten im Grafana-Ordner `EVCC` diese Dashboards liegen:
+After the deploy, the Grafana folder `EVCC` should contain these dashboards:
 
 - `VM: EVCC: Today`
 - `VM: EVCC: Today - Details`
 - `VM: EVCC: Today - Mobile`
-- `VM: EVCC: Monat`
+- `VM: EVCC: Month`
 - `VM: EVCC: Year`
 - `VM: EVCC: All-time`
 
-## Typische Fehler
+## Common errors
 
 ### `Missing GRAFANA_API_TOKEN`
 
-Dann fehlt der Token:
+The token is missing:
 
 - in `vm-dashboard-install.env`
-- oder in den Uebergabeparametern
-- oder in der Umgebung
+- in the CLI parameters
+- or in the current environment
 
 ### 403 / Permission denied
 
-Dann hat der Token nicht genug Rechte.
+The token does not have enough rights.
 
-Pruefen:
+Check:
 
-- Service Account existiert noch
-- Token ist gueltig
-- Rechte reichen fuer Dashboards und Library Panels
+- the service account still exists
+- the token is still valid
+- the account can manage dashboards and library panels
 
-## Mehr Details
+## More details
 
-Die technische Doku liegt hier:
+The technical deployment guide is here:
 
 - [vm-dashboard-install.md](./vm-dashboard-install.md)
-

@@ -1,56 +1,56 @@
-# Migration von InfluxDB zu VictoriaMetrics
+# Migrate from InfluxDB to VictoriaMetrics
 
-Diese Anleitung beschreibt den kompletten Enduser-Weg von einer bestehenden EVCC-InfluxDB zu einem VictoriaMetrics-basierten Setup.
+This guide describes the full end-user path from an existing EVCC + InfluxDB setup to VictoriaMetrics.
 
-Annahmen:
+Assumptions:
 
-- VictoriaMetrics ist bereits installiert und erreichbar
-- EVCC schreibt bereits nach VictoriaMetrics oder soll danach dorthin schreiben
+- VictoriaMetrics is already installed and reachable
+- EVCC already writes to VictoriaMetrics, or will do so after the migration
 
-Nicht Bestandteil dieser Anleitung:
+Not covered here:
 
-- Installation von VictoriaMetrics selbst
-- Installation von Grafana selbst
-- Deployment der Grafana-Dashboards
+- installing VictoriaMetrics itself
+- installing Grafana itself
+- deploying the Grafana dashboards
 
-## Zielbild
+## Target state
 
-Nach der Migration gibt es zwei Datenebenen:
+After migration, there are two data layers:
 
-- Rohdaten in VictoriaMetrics
-  - Basis für `Today`, `Today - Mobile`, `Today - Details`
-- tägliche Rollups im Namespace `evcc_*`
-  - Basis für `Monat`, `Jahr`, `All-time`
+- raw data in VictoriaMetrics
+  - used by `Today`, `Today - Mobile`, and `Today - Details`
+- daily rollups in the `evcc_*` namespace
+  - used by `Month`, `Year`, and `All-time`
 
-Wichtig:
+Important:
 
-- Rohdaten werden nicht überschrieben
-- Rollups werden zusätzlich erzeugt
-- `Today*` bleibt auf Rohdaten
+- raw data is not overwritten
+- rollups are added on top
+- the `Today*` dashboards continue to use raw data
 
-## Was du brauchst
+## What you need
 
-- Python 3.11 oder neuer
-- HTTP-Zugriff auf InfluxDB v1 Query API
-- HTTP-Zugriff auf VictoriaMetrics
+- Python 3.11 or newer
+- HTTP access to the InfluxDB v1 query API
+- HTTP access to VictoriaMetrics
 
-Praktische Minimalvoraussetzungen auf Linux:
+Practical minimum on Linux:
 
 ```bash
 sudo apt update
 sudo apt install -y python3 curl
 ```
 
-## Benötigte Dateien herunterladen
+## Download the required files
 
-Arbeitsverzeichnis anlegen:
+Create a working directory:
 
 ```bash
 mkdir -p /opt/evcc-vm-migration
 cd /opt/evcc-vm-migration
 ```
 
-Benötigte Dateien herunterladen:
+Download the required files:
 
 ```bash
 curl -fsSLo reimport_influx_to_vm.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/reimport_influx_to_vm.py
@@ -58,49 +58,50 @@ curl -fsSLo evcc-vm-rollup.py https://raw.githubusercontent.com/endurance1968/ev
 curl -fsSLo evcc-vm-rollup-prod.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup-prod.conf.example
 ```
 
-Optional zusätzlich die allgemeine Beispiel-Config:
+Optional:
 
 ```bash
 curl -fsSLo evcc-vm-rollup.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup.conf.example
 ```
 
-## Verwendete Dateien
+## Files used in this migration
 
-- Rohdaten-Reimport:
+- raw-data import:
   - `reimport_influx_to_vm.py`
-- Rollup-Engine:
+- rollup engine:
   - `evcc-vm-rollup.py`
-- Rollup-Config:
+- production rollup config:
   - `evcc-vm-rollup-prod.conf.example`
 
-## Schritt 1: VictoriaMetrics und EVCC prüfen
+## 1. Check VictoriaMetrics and EVCC first
 
-Bevor du Daten umziehst, prüfe:
+Before moving data, verify:
 
-- VictoriaMetrics antwortet:
+- VictoriaMetrics responds:
 
 ```bash
 curl -fsSL http://<vm-host>:8428/health
 ```
 
-- die Ziel-Datasource in Grafana zeigt später auf VictoriaMetrics
-- EVCC soll am Ende ebenfalls nach VictoriaMetrics schreiben
+- Grafana will later point to VictoriaMetrics
+- EVCC should ultimately write to VictoriaMetrics as well
 
-Wenn EVCC noch parallel nach InfluxDB schreibt, ist das für die Übergangszeit ok.
+If EVCC still writes to InfluxDB in parallel during the transition, that is fine for a temporary migration window.
 
-## Schritt 2: Rohdaten einmalig von InfluxDB nach VictoriaMetrics übernehmen
+## 2. Import raw data from InfluxDB into VictoriaMetrics
 
-Der Helper importiert numerische Influx-Messungen direkt nach VictoriaMetrics.
+The helper imports numeric Influx measurements directly into VictoriaMetrics.
 
-Wichtig:
+Important:
 
-- der aktuelle Helper nutzt die InfluxDB-v1-Query-API
-- er erwartet direkten HTTP-Zugriff ohne Auth-Header-Handling im Script
-- falls deine InfluxDB Auth verlangt, brauchst du entweder einen lokalen Proxy/Tunnel oder du musst das Script dafür erweitern
+- the current helper uses the InfluxDB v1 query API
+- it expects direct HTTP access
+- it does not currently implement built-in auth-header handling
+- if your InfluxDB requires auth, use a local proxy/tunnel or extend the script
 
-### 2.1 Erst als Dry-Run testen
+### 2.1 Dry-run first
 
-Beispiel:
+Example:
 
 ```bash
 python3 reimport_influx_to_vm.py \
@@ -112,12 +113,12 @@ python3 reimport_influx_to_vm.py \
   --dry-run
 ```
 
-Der Dry-Run zeigt dir:
+The dry-run shows:
 
-- wie viele Measurements erkannt wurden
-- wie viele Serien und Punkte importiert würden
+- how many measurements were found
+- how many series and samples would be imported
 
-### 2.2 Danach echten Import starten
+### 2.2 Run the real import
 
 ```bash
 python3 reimport_influx_to_vm.py \
@@ -128,7 +129,7 @@ python3 reimport_influx_to_vm.py \
   --end 2026-03-30T00:00:00Z
 ```
 
-Optional für einzelne Measurements:
+Optional single-measurement import:
 
 ```bash
 python3 reimport_influx_to_vm.py \
@@ -140,9 +141,9 @@ python3 reimport_influx_to_vm.py \
   --end 2026-03-30T00:00:00Z
 ```
 
-### 2.3 Rohdaten verifizieren
+### 2.3 Verify the raw data
 
-Direkt in VictoriaMetrics prüfen:
+Query VictoriaMetrics directly:
 
 ```bash
 curl -fsG 'http://<vm-host>:8428/api/v1/series' \
@@ -151,33 +152,33 @@ curl -fsG 'http://<vm-host>:8428/api/v1/series' \
   --data-urlencode 'end=2026-03-02T00:00:00Z'
 ```
 
-Wenn hier Daten zurückkommen, ist die Rohdatenbasis ok.
+If this returns data, the raw-data layer is in place.
 
-## Schritt 3: Rollup-Konfiguration anlegen
+## 3. Create the rollup configuration
 
-Produktive Config aus dem Beispiel ableiten:
+Create the production config from the example:
 
 ```bash
 sudo cp evcc-vm-rollup-prod.conf.example /etc/evcc-vm-rollup.conf
 sudo editor /etc/evcc-vm-rollup.conf
 ```
 
-Wichtige Felder:
+Important fields:
 
 - `base_url`
-  - URL deiner VictoriaMetrics-Instanz
+  - URL of your VictoriaMetrics instance
 - `db_label`
-  - normalerweise `evcc`
+  - normally `evcc`
 - `timezone`
-  - z. B. `Europe/Berlin`
+  - for example `Europe/Berlin`
 - `metric_prefix`
-  - produktiv `evcc`
+  - production value `evcc`
 - `price_bucket_minutes`
-  - typischerweise `15` bei dynamischen Tarifen
+  - usually `15` for dynamic tariffs
 - `max_fetch_points_per_series`
-  - begrenzt, wie viele Rohdatenpunkte pro Zeitreihe in einem einzelnen Fetch geholt werden
+  - limits how many raw samples per series are fetched in a single request chunk
 
-Empfohlener produktiver Kern:
+Recommended production core:
 
 ```ini
 [victoriametrics]
@@ -192,95 +193,95 @@ price_bucket_minutes = 15
 max_fetch_points_per_series = 28000
 ```
 
-Wichtig:
+Important:
 
-- `metric_prefix = evcc` erzeugt produktive Rollups wie `evcc_pv_energy_daily_wh`
-- `host_label` leer lassen, solange du keinen sehr guten Grund hast
-- Rollups sollen auf Business-Labels beruhen, nicht auf Infra-Labels
+- `metric_prefix = evcc` creates production rollups such as `evcc_pv_energy_daily_wh`
+- keep `host_label` empty unless you have a very good reason not to
+- rollups should be based on business labels, not infrastructure labels
 
-### Hintergrund zu `max_fetch_points_per_series`
+### Background on `max_fetch_points_per_series`
 
-Dieser Wert ist die wichtigste Stellschraube für das Gleichgewicht zwischen:
+This is the main tuning knob for the balance between:
 
-- RAM-Bedarf
-- Anzahl der VM-Abfragen
-- Gesamtlaufzeit des Rollups
+- RAM usage
+- number of VictoriaMetrics requests
+- total rollup runtime
 
-Was er praktisch macht:
+What it does in practice:
 
-- der Rollup-Lauf holt Rohdaten nicht unendlich groß in einem Stück
-- stattdessen werden große Zeiträume in mehrere Fetch-Blöcke zerlegt
-- `max_fetch_points_per_series` setzt die Obergrenze pro Serie und pro Fetch
+- the rollup process does not fetch arbitrarily large time ranges in one request
+- instead, large periods are split into smaller fetch chunks
+- `max_fetch_points_per_series` defines the upper bound per series per fetch
 
-Wenn der Wert **größer** wird:
+If the value is **larger**:
 
-- es werden weniger einzelne HTTP-Abfragen an VictoriaMetrics nötig
-- der Lauf wird oft schneller
-- aber mehr Samples liegen gleichzeitig im Speicher
+- fewer HTTP requests are needed
+- the run is often faster
+- but more samples sit in memory at the same time
 
-Wenn der Wert **kleiner** wird:
+If the value is **smaller**:
 
-- es werden mehr einzelne Fetches nötig
-- der Lauf wird langsamer
-- aber der Speicherbedarf sinkt
+- more fetches are required
+- the run becomes slower
+- but memory usage drops
 
-Faustregel:
+Rule of thumb:
 
-- stärkere Hosts:
-  - Wert eher höher lassen
-- kleine Systeme wie Raspi:
-  - bei RAM-Problemen eher schrittweise reduzieren
+- stronger hosts:
+  - keep it higher
+- smaller systems such as a Raspberry Pi:
+  - reduce it gradually if you hit RAM limits
 
-Der Default `28000` ist ein pragmatischer Mittelwert:
+The default `28000` is a pragmatic compromise:
 
-- groß genug für gute Laufzeit
-- klein genug, damit der Rollup-Lauf nicht unnötig speicherhungrig wird
+- high enough for good runtime
+- low enough to avoid unnecessary memory pressure
 
-Nur anpassen, wenn es dafür einen echten Grund gibt:
+Only change it if you have a real reason:
 
-- OOM-/RAM-Probleme
-- ungewöhnlich langsame Backfills
-- sehr lange Rohdatenhistorie bei schwacher Hardware
+- OOM or RAM pressure
+- unusually slow backfills
+- very long raw-data history on weak hardware
 
-Wenn du testweise anpasst, dann in kleinen Schritten, zum Beispiel:
+If you experiment, do it in small steps, for example:
 
 - `28000`
 - `20000`
 - `15000`
 
-und danach Laufzeit und Peak-RAM erneut messen.
+Then measure runtime and peak RAM again.
 
-## Schritt 4: Rollup vor dem Schreiben prüfen
+## 4. Inspect the rollup before writing
 
-### 4.1 Dimensionen erkennen
+### 4.1 Detect dimensions
 
 ```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf detect
 ```
 
-### 4.2 Rollup-Plan ansehen
+### 4.2 Show the rollup plan
 
 ```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf plan
 ```
 
-### 4.3 Rohdaten-Benchmark laufen lassen
+### 4.3 Run the benchmark
 
 ```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf benchmark
 ```
 
-Das ist sinnvoll, weil du damit früh erkennst:
+This is useful because it tells you early:
 
-- ob die Rohdaten überhaupt lesbar sind
-- ob die Query-Laufzeiten vertretbar sind
-- ob `max_fetch_points_per_series` für deine Hardware passt
+- whether the raw data can be read at all
+- whether query runtimes are acceptable
+- whether `max_fetch_points_per_series` fits your hardware
 
-## Schritt 5: Einmaligen Initial-Backfill der Rollups ausführen
+## 5. Run the initial rollup backfill
 
-Jetzt werden die täglichen Rollups im Namespace `evcc_*` erzeugt.
+This creates the daily rollups in the `evcc_*` namespace.
 
-### 5.1 Erst Dry-Run
+### 5.1 Dry-run first
 
 ```bash
 python3 evcc-vm-rollup.py \
@@ -291,7 +292,7 @@ python3 evcc-vm-rollup.py \
   --progress
 ```
 
-### 5.2 Danach echter Write-Run
+### 5.2 Then run the real write
 
 ```bash
 python3 evcc-vm-rollup.py \
@@ -303,44 +304,44 @@ python3 evcc-vm-rollup.py \
   --write
 ```
 
-Hinweise:
+Notes:
 
-- der Backfill wird intern monatsweise verarbeitet und geschrieben
-- Januar wird also als eigener Block berechnet, dann Februar, dann März usw.
-- der Rollup-Lauf hält dadurch nicht den kompletten Gesamtzeitraum gleichzeitig im Speicher
-- das hält Speicherbedarf und Fortschritt überschaubar
-- der Lauf schreibt nur `evcc_*`
-- Rohdaten bleiben unangetastet
+- the backfill is processed and written month by month
+- January is handled as one block, then February, then March, and so on
+- the script does not keep the full historical range in memory at once
+- that keeps memory usage and progress visibility manageable
+- the run writes only `evcc_*`
+- raw data remains untouched
 
-## Schritt 6: Rollups verifizieren
+## 6. Verify the rollups
 
-Nach dem Initial-Backfill direkt prüfen:
+After the initial backfill, check directly:
 
 ```bash
 curl -fsG 'http://<vm-host>:8428/api/v1/query' \
   --data-urlencode 'query=sum(evcc_pv_energy_daily_wh{db="evcc"})'
 ```
 
-Zusätzlich sinnvoll:
+Also recommended:
 
-- Plausibilitätscheck gegen bekannte Zeiträume
-- bei Bedarf Vergleich mit bekannten Altwerten aus Influx
+- compare against a known time range
+- compare with previous Influx-based expectations if needed
 
-## Schritt 7: Laufenden Rollup-Betrieb einrichten
+## 7. Set up the ongoing rollup refresh
 
-Die Rollups sind tägliche Kennzahlen. Damit aktuelle Tage sauber nachlaufen, solltest du den aktuellen Tag regelmäßig neu berechnen.
+The rollups are daily metrics. To keep the current day up to date, you should recalculate the current day regularly.
 
-Empfehlung:
+Recommendation:
 
-- **stündlich** den Zeitraum `gestern + heute` neu rechnen
+- rerun **yesterday + today** every hour
 
-Warum nicht nur `heute`:
+Why not just `today`:
 
-- Messwerte können leicht verspätet eintreffen
-- Mitternacht und Zeitzone sind robuster
-- kleine Nachkorrekturen vom Vortag werden gleich mitgenommen
+- some raw samples arrive a little late
+- midnight and timezone transitions are more robust
+- small late corrections from the previous day are captured automatically
 
-### 8.1 Manueller stündlicher Refresh
+### 7.1 Manual hourly refresh
 
 ```bash
 python3 evcc-vm-rollup.py \
@@ -351,23 +352,9 @@ python3 evcc-vm-rollup.py \
   --write
 ```
 
-### 8.2 Empfohlene systemd-Variante
+### 7.2 Recommended `systemd` setup
 
-Service:
-
-```ini
-[Unit]
-Description=EVCC VictoriaMetrics hourly rollup refresh
-
-[Service]
-Type=oneshot
-WorkingDirectory=/opt/evcc-vm-migration
-ExecStart=/usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day %%YESTERDAY%% --end-day %%TODAY%% --write
-```
-
-Die Datumswerte müssen bei systemd über ein Wrapper-Skript gesetzt werden. Deshalb ist in der Praxis diese Variante einfacher:
-
-Wrapper `/usr/local/bin/evcc-vm-rollup-hourly.sh`:
+Wrapper script `/usr/local/bin/evcc-vm-rollup-hourly.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -375,18 +362,18 @@ set -euo pipefail
 /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
   backfill-test \
-  --start-day \"$(date -d 'yesterday' +%F)\" \
-  --end-day \"$(date +%F)\" \
+  --start-day "$(date -d 'yesterday' +%F)" \
+  --end-day "$(date +%F)" \
   --write
 ```
 
-Ausführbar machen:
+Make it executable:
 
 ```bash
 sudo chmod +x /usr/local/bin/evcc-vm-rollup-hourly.sh
 ```
 
-Service-Datei `/etc/systemd/system/evcc-vm-rollup-hourly.service`:
+Service file `/etc/systemd/system/evcc-vm-rollup-hourly.service`:
 
 ```ini
 [Unit]
@@ -397,7 +384,7 @@ Type=oneshot
 ExecStart=/usr/local/bin/evcc-vm-rollup-hourly.sh
 ```
 
-Timer-Datei `/etc/systemd/system/evcc-vm-rollup-hourly.timer`:
+Timer file `/etc/systemd/system/evcc-vm-rollup-hourly.timer`:
 
 ```ini
 [Unit]
@@ -411,7 +398,7 @@ Persistent=true
 WantedBy=timers.target
 ```
 
-Aktivieren:
+Enable it:
 
 ```bash
 sudo systemctl daemon-reload
@@ -419,72 +406,70 @@ sudo systemctl enable --now evcc-vm-rollup-hourly.timer
 systemctl list-timers | grep evcc-vm-rollup-hourly
 ```
 
-### 8.3 Einfache cron-Alternative
+### 7.3 Simple cron alternative
 
 ```cron
 7 * * * * /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day $(date -d 'yesterday' +\%F) --end-day $(date +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
-## Schritt 8: Nach der Migration InfluxDB aus dem Schreibpfad entfernen
+## 8. Remove InfluxDB from the active dashboard path
 
-Sobald du sicher bist, dass:
+Once you are sure that:
 
-- Rohdaten sauber in VictoriaMetrics ankommen
-- Rollups laufen
+- raw data arrives correctly in VictoriaMetrics
+- rollups are running correctly
 
-sollte EVCC nicht mehr parallel für den Dashboard-Betrieb an InfluxDB gebunden sein.
+EVCC no longer needs to depend on InfluxDB for dashboarding.
 
-Die alte InfluxDB kannst du dann:
+At that point you can:
 
-- nur noch als Backup/Referenz stehen lassen
-- oder später ganz abschalten
+- keep InfluxDB only as backup or reference
+- or later shut it down completely
 
-## Was man leicht vergisst
+## Easy things to forget
 
-- Grafana-Datasource muss auf VictoriaMetrics zeigen, nicht mehr auf Influx
-- `Today*` und Langfrist-Dashboards arbeiten auf unterschiedlichen Datenebenen
-- `metric_prefix` muss produktiv `evcc` sein, nicht `test_evcc`
-- der Reimport ersetzt keine laufenden Rollups
-- der Rollup-Lauf braucht einen Scheduler, sonst bleiben `Monat/Jahr/All-time` stehen
-- der aktuelle Reimport-Helper kann nicht von selbst mit Influx-Auth umgehen
-- bei Problemen zuerst Rohdaten prüfen, dann Rollups
+- Grafana must point to VictoriaMetrics, not InfluxDB
+- `Today*` and the long-range dashboards work on different data layers
+- `metric_prefix` must be `evcc`, not `test_evcc`
+- the raw-data reimport does not replace the ongoing rollup process
+- the rollup needs a scheduler, or `Month/Year/All-time` will stop updating
+- the current reimport helper does not handle Influx auth by itself
+- if something looks wrong, verify raw data first, then rollups
 
-## Reimport-Script vs. vmctl messen, ohne die produktive VM zu verändern
+## Measure `reimport_influx_to_vm.py` vs. `vmctl` safely
 
-Die kurze Einschätzung:
+Short version:
 
-- `vmctl` wird sehr wahrscheinlich **deutlich schneller** sein als `reimport_influx_to_vm.py`
-- Grund:
-  - `vmctl` ist genau für Massentransfers gebaut
-  - unterstützt Concurrency, Kompression und große Batches
-  - laut offizieller VictoriaMetrics-Doku ist die Geschwindigkeit vor allem durch InfluxDB-Leseleistung und die eingestellte Parallelität begrenzt
+- `vmctl` will very likely be faster than `reimport_influx_to_vm.py`
+- because `vmctl` is designed for bulk migrations
+- and it supports concurrency, compression, and large batches
 
-Wichtiger als die absolute Vermutung ist aber ein sauberer Testaufbau.
+But the right answer is a clean measurement, not a guess.
 
-### Sicherer Messaufbau
+### Safe benchmark setup
 
-Nicht gegen die produktive VictoriaMetrics-Instanz messen.
+Do **not** benchmark against your production VictoriaMetrics instance.
 
-Stattdessen:
+Instead:
 
-1. zweite temporäre VictoriaMetrics-Instanz starten
-2. beide Importe dorthin schreiben
-3. Laufzeit und Datenmenge vergleichen
+1. start a temporary second VictoriaMetrics instance
+2. write both imports there
+3. compare runtime and imported data volume
 
-Beispiel mit einer separaten Single-Node-Instanz:
+Example:
 
 ```bash
 mkdir -p /tmp/vm-bench-data
 victoria-metrics-prod -storageDataPath=/tmp/vm-bench-data -httpListenAddr=:18428
 ```
 
-Wichtig:
+Important:
 
-- anderer Port, z. B. `18428`
-- eigener leerer Datenpfad
-- keine Verbindung zur produktiven VM
+- use a different port, for example `18428`
+- use a separate empty data path
+- keep it isolated from production
 
-### Messung mit dem Python-Reimport-Script
+### Measure the Python reimport helper
 
 ```bash
 /usr/bin/time -v python3 reimport_influx_to_vm.py \
@@ -495,20 +480,16 @@ Wichtig:
   --end 2025-02-01T00:00:00Z
 ```
 
-Messen:
+Measure:
 
-- Wall clock time
+- wall clock time
 - CPU time
-- Max RSS
-- importierte Serien/Punkte aus der Script-Ausgabe
+- max RSS
+- imported series and samples from the script output
 
-### Messung mit vmctl
+### Measure `vmctl`
 
-Offiziell unterstützt laut VictoriaMetrics-Doku:
-
-- `vmctl influx --influx-addr ... --influx-database ... --vm-addr ...`
-
-Beispiel:
+According to the VictoriaMetrics docs, the InfluxDB path is:
 
 ```bash
 /usr/bin/time -v vmctl influx \
@@ -520,60 +501,59 @@ Beispiel:
   -s
 ```
 
-Offizielle Quelle:
+References:
 
 - [VictoriaMetrics vmctl](https://docs.victoriametrics.com/victoriametrics/vmctl/)
 - [VictoriaMetrics vmctl InfluxDB](https://docs.victoriametrics.com/victoriametrics/vmctl/influxdb/)
 
-### Fair vergleichen
+### Compare fairly
 
-Für einen fairen Vergleich:
+For a fair comparison:
 
-- denselben Zeitraum verwenden
-- dieselbe InfluxDB-Quelle verwenden
-- vor jedem Lauf die temporäre VM wieder leeren
-- zuerst klein anfangen:
-  - 1 Tag
-  - 7 Tage
-  - 30 Tage
-- erst danach einen großen Vergleich fahren
+- use the same time range
+- use the same InfluxDB source
+- reset the temporary VictoriaMetrics data between runs
+- start small:
+  - 1 day
+  - 7 days
+  - 30 days
+- only then run a larger benchmark
 
-Temporäre VM zwischen den Läufen zurücksetzen:
+Reset the temporary VictoriaMetrics data:
 
 ```bash
 rm -rf /tmp/vm-bench-data
 mkdir -p /tmp/vm-bench-data
 ```
 
-Danach VM neu starten.
+Then restart the temporary VictoriaMetrics process.
 
-### Was dabei herauskommt
+### What you get from this
 
-Danach hast du:
+Afterwards you will have:
 
-- echte Laufzeit pro Importweg
-- echten RAM-Bedarf
-- echte importierte Sample-/Serienmengen
-- keine Verfälschung deiner produktiven VictoriaMetrics-Instanz
+- real runtime for each import path
+- real RAM usage
+- real sample and series counts
+- no risk to your production VictoriaMetrics instance
 
-### Empfehlung
+### Recommendation
 
-Für den normalen Migrationsweg:
+For the normal migration path:
 
-- zuerst den vorhandenen Python-Reimport nutzen, weil er schon im Repo liegt
-- `vmctl` nur dann zusätzlich benchmarken, wenn:
-  - der Rohdatenimport sehr groß ist
-  - oder die Laufzeit des Python-Scripts unattraktiv wird
+- start with the existing Python helper, because it already lives in this repository
+- benchmark `vmctl` only if:
+  - the raw-data import is very large
+  - or the Python helper runtime becomes unattractive
 
-## Empfohlene Reihenfolge in kurz
+## Short version
 
-1. VictoriaMetrics prüfen
-2. Rohdaten aus Influx einmalig nach VictoriaMetrics importieren
-3. Rohdaten in VictoriaMetrics verifizieren
-4. Rollup-Config produktiv anlegen
-5. `detect`, `plan`, `benchmark`
-6. Initialen Rollup-Backfill mit `--write` fahren
-7. Rollups verifizieren
-8. stündlichen Rollup-Job einrichten
-9. Influx nur noch als Altbestand/Referenz behalten
-
+1. verify VictoriaMetrics
+2. import raw data from InfluxDB into VictoriaMetrics
+3. verify the raw data
+4. create the production rollup config
+5. run `detect`, `plan`, and `benchmark`
+6. run the initial rollup backfill with `--write`
+7. verify the rollups
+8. set up the hourly rollup job
+9. keep InfluxDB only as fallback or historical reference
