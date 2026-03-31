@@ -117,14 +117,10 @@ Provide a small Python CLI directly in `scripts/`.
 Why:
 
 - simple to install on any Linux host with Python
-- easier to reason about than a permanent `vmalert` service
 - easier to document
 - easier to run remotely if VictoriaMetrics is not on the same host
 - easier to backfill in visible monthly chunks with shell progress for long one-shot runs
 
-### Advanced path for power users
-
-Support generated `vmalert` rules for users who want native VM recording rules.
 
 ## Safety rules
 

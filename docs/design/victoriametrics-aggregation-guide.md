@@ -98,18 +98,18 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf bench
 ### Dry run
 
 ```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day 2026-02-20 --end-day 2026-03-22 --progress
+python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day 2026-02-20 --end-day 2026-03-22 --progress
 ```
 
 ### Actual write
 
 ```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day 2026-02-20 --end-day 2026-03-22 --progress --write
+python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day 2026-02-20 --end-day 2026-03-22 --progress --write
 ```
 
 ### Default long-range behavior
 
-`backfill-test` flushes by month by default.
+`backfill` flushes by month by default.
 
 That means:
 
@@ -125,7 +125,7 @@ The current implementation processes and flushes backfills month by month.
 Use the normal backfill command:
 
 ```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day 2025-01-01 --end-day 2026-03-21 --progress --write
+python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day 2025-01-01 --end-day 2026-03-21 --progress --write
 ```
 
 ### Safety rules
@@ -145,7 +145,7 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 Example cron:
 
 ```cron
-10 0 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day $(date -d 'yesterday' +\%F) --end-day $(date -d 'yesterday' +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
+10 0 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date -d 'yesterday' +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
 ## Validation

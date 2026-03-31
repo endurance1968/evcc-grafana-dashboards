@@ -156,32 +156,32 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "command",
-        choices=["detect", "plan", "render-vmalert-rules", "benchmark", "backfill-test"],
+        choices=["detect", "plan", "benchmark", "backfill"],
         help="Action to perform.",
     )
     parser.add_argument(
         "--start-day",
-        help="Local day in YYYY-MM-DD format for backfill-test.",
+        help="Local day in YYYY-MM-DD format for backfill.",
     )
     parser.add_argument(
         "--end-day",
-        help="Local day in YYYY-MM-DD format for backfill-test.",
+        help="Local day in YYYY-MM-DD format for backfill.",
     )
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Actually write the generated test rollups to VictoriaMetrics.",
+        help="Actually write the generated rollups to VictoriaMetrics.",
     )
     parser.add_argument(
         "--batch-size",
         type=int,
         default=200,
-        help="Number of time series per import batch during backfill-test.",
+        help="Number of time series per import batch during backfill.",
     )
     parser.add_argument(
         "--progress",
         action="store_true",
-        help="Print chunk progress to stderr while backfill-test is running.",
+        help="Print chunk progress to stderr while backfill is running.",
     )
     return parser.parse_args()
 
@@ -678,33 +678,6 @@ def print_plan(settings: Settings) -> int:
         ],
     }
     print(json.dumps(output, indent=2, ensure_ascii=True))
-    return 0
-
-
-def render_vmalert_rules(settings: Settings) -> int:
-    catalog = [
-        item
-        for item in build_catalog(settings)
-        if item.implemented and not item.expr.startswith("python:")
-    ]
-    lines = [
-        "groups:",
-        "  - name: evcc_vm_rollups_daily_test",
-        "    interval: 1d",
-        "    rules:",
-    ]
-    for item in catalog:
-        lines.extend(
-            [
-                f"      - record: {item.record}",
-                f"        expr: {item.expr}",
-                f"        labels:",
-                f'          db: "{settings.db_label}"',
-                f'          rollup_source: "raw"',
-                f'          rollup_phase: "{item.phase}"',
-            ]
-        )
-    sys.stdout.write("\n".join(lines) + "\n")
     return 0
 
 
@@ -1883,9 +1856,9 @@ def build_pv_health_rollups(
     return series_rows
 
 
-def backfill_test(settings: Settings, args: argparse.Namespace) -> int:
+def backfill(settings: Settings, args: argparse.Namespace) -> int:
     if not args.start_day or not args.end_day:
-        raise SystemExit("backfill-test requires --start-day and --end-day.")
+        raise SystemExit("backfill requires --start-day and --end-day.")
     if args.batch_size < 1:
         raise SystemExit("--batch-size must be at least 1.")
 
@@ -2290,12 +2263,10 @@ def main() -> int:
         return print_detect(settings)
     if args.command == "plan":
         return print_plan(settings)
-    if args.command == "render-vmalert-rules":
-        return render_vmalert_rules(settings)
     if args.command == "benchmark":
         return run_benchmark(settings)
-    if args.command == "backfill-test":
-        return backfill_test(settings, args)
+    if args.command == "backfill":
+        return backfill(settings, args)
 
     raise AssertionError(f"Unhandled command: {args.command}")
 

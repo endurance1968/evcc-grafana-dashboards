@@ -38,11 +38,6 @@ Show the rollup plan:
 python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example plan
 ```
 
-Render `vmalert` rules:
-
-```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example render-vmalert-rules
-```
 
 Benchmark representative raw-data queries:
 
@@ -53,13 +48,13 @@ python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.
 Dry-run backfill:
 
 ```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example backfill-test --start-day 2026-02-20 --end-day 2026-03-22 --progress
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example backfill --start-day 2026-02-20 --end-day 2026-03-22 --progress
 ```
 
 Write `evcc_*` rollups:
 
 ```bash
-python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill-test --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
 ```
 
 Rewrite host-tagged VM-only series:

@@ -286,7 +286,7 @@ This creates the daily rollups in the `evcc_*` namespace.
 ```bash
 python3 evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
-  backfill-test \
+  backfill \
   --start-day 2024-01-01 \
   --end-day 2026-03-30 \
   --progress
@@ -297,7 +297,7 @@ python3 evcc-vm-rollup.py \
 ```bash
 python3 evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
-  backfill-test \
+  backfill \
   --start-day 2024-01-01 \
   --end-day 2026-03-30 \
   --progress \
@@ -346,7 +346,7 @@ Why not just `today`:
 ```bash
 python3 evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
-  backfill-test \
+  backfill \
   --start-day $(date -d 'yesterday' +%F) \
   --end-day $(date +%F) \
   --write
@@ -361,7 +361,7 @@ Wrapper script `/usr/local/bin/evcc-vm-rollup-hourly.sh`:
 set -euo pipefail
 /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
-  backfill-test \
+  backfill \
   --start-day "$(date -d 'yesterday' +%F)" \
   --end-day "$(date +%F)" \
   --write
@@ -409,7 +409,7 @@ systemctl list-timers | grep evcc-vm-rollup-hourly
 ### 7.3 Simple cron alternative
 
 ```cron
-7 * * * * /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill-test --start-day $(date -d 'yesterday' +\%F) --end-day $(date +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
+7 * * * * /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
 ## 8. Remove InfluxDB from the active dashboard path
