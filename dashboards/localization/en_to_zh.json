@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "充电桩能源来源占比",
+  "Charging stations total": "充电桩总计",
+  "Consumers": "用电设备",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "所有可见充电点由光伏、电池放电和电网供能的估算占比。",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "热泵由光伏、电池放电和电网供能的估算占比。",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "基于每日来源归因汇总估算的热泵年度能耗。",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "能量计算的采样间隔。它应至少为 EVCC 轮询间隔的 2 倍。默认值：60s，因为 EVCC 的默认间隔为 60s。",
     "Total: Energy": "总计：能量",
     "URL used to open EVCC.": "用于打开 EVCC 的 URL。",
-    "URL used to open the inverter portal.": "用于打开逆变器门户的 URL。"
+    "URL used to open the inverter portal.": "用于打开逆变器门户的 URL。",
+    "Year": "年",
+    "All-time": "全时段",
+    "Previous month": "上个月",
+    "2 months ago": "两个月前",
+    "Previous year": "去年",
+    "2 years ago": "两年前"
   },
-  "contains": []
+  "Heat pump source mix": "热泵能源来源占比",
+  "Heat pump title match": "热泵标题匹配",
+  "Heat pump total": "热泵总计",
+  "Yearly charging energy across all visible loadpoints.": "所有可见充电点的年度充电能耗。"
 }

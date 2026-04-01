@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "Ladestationen Energiequellen",
+  "Charging stations total": "Ladestationen gesamt",
+  "Consumers": "Verbraucher",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für alle sichtbaren Ladepunkte.",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für die Wärmepumpe.",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "Geschätzte jährliche Wärmepumpenenergie auf Basis täglicher Quellenzuordnungs-Rollups.",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "Abtastintervall für die Energieberechnung. Sollte mindestens 2x dem EVCC-Abfrageintervall entsprechen. Standard: 60s, weil das EVCC-Standardintervall 60s beträgt.",
     "Total: Energy": "Gesamt: Energie",
     "URL used to open EVCC.": "URL, unter der EVCC geöffnet wird.",
-    "URL used to open the inverter portal.": "URL, unter der das Wechselrichterportal geöffnet wird."
+    "URL used to open the inverter portal.": "URL, unter der das Wechselrichterportal geöffnet wird.",
+    "Year": "Jahr",
+    "All-time": "Gesamtzeitraum",
+    "Previous month": "Vormonat",
+    "2 months ago": "Vor 2 Monaten",
+    "Previous year": "Vorjahr",
+    "2 years ago": "Vor 2 Jahren"
   },
-  "contains": []
+  "Heat pump source mix": "Wärmepumpe Energiequellen",
+  "Heat pump title match": "Wärmepumpen-Titelabgleich",
+  "Heat pump total": "Wärmepumpe gesamt",
+  "Yearly charging energy across all visible loadpoints.": "Jährliche Ladeenergie über alle sichtbaren Ladepunkte."
 }

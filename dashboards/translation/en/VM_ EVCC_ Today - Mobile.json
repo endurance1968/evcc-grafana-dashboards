@@ -1953,7 +1953,7 @@
       "title": "Today",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adtcx74?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
+      "url": "/d/adtcx74?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -1965,7 +1965,7 @@
       "title": "Yesterday",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adtcx74?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
+      "url": "/d/adtcx74?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -1977,7 +1977,7 @@
       "title": "Day before yesterday",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adtcx74?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
+      "url": "/d/adtcx74?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -1988,10 +1988,34 @@
         "EVCC"
       ],
       "targetBlank": false,
-      "title": "...",
+      "title": "Dashboards",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
     }
   ],
   "liveNow": true,
@@ -2677,4 +2701,3 @@
   "version": 13,
   "weekStart": ""
 }
-

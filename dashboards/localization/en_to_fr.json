@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "Répartition des sources des stations de charge",
+  "Charging stations total": "Stations de charge total",
+  "Consumers": "Consommateurs",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "Part estimée du PV, de la décharge batterie et du réseau pour tous les points de charge visibles.",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "Part estimée du PV, de la décharge batterie et du réseau pour la pompe à chaleur.",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "Énergie annuelle estimée de la pompe à chaleur basée sur des rollups quotidiens d'attribution des sources.",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "Intervalle d'échantillonnage pour les calculs d'énergie. Il doit être au moins égal à 2 fois l'intervalle d'interrogation EVCC. Par défaut : 60 s, car l'intervalle EVCC par défaut est de 60 s.",
     "Total: Energy": "Total : Énergie",
     "URL used to open EVCC.": "URL utilisée pour ouvrir EVCC.",
-    "URL used to open the inverter portal.": "URL utilisée pour ouvrir le portail de l'onduleur."
+    "URL used to open the inverter portal.": "URL utilisée pour ouvrir le portail de l'onduleur.",
+    "Year": "Année",
+    "All-time": "Toute la période",
+    "Previous month": "Mois précédent",
+    "2 months ago": "Il y a 2 mois",
+    "Previous year": "Année précédente",
+    "2 years ago": "Il y a 2 ans"
   },
-  "contains": []
+  "Heat pump source mix": "Répartition des sources de la pompe à chaleur",
+  "Heat pump title match": "Correspondance du titre de la pompe à chaleur",
+  "Heat pump total": "Pompe à chaleur total",
+  "Yearly charging energy across all visible loadpoints.": "Énergie de charge annuelle sur tous les points de charge visibles."
 }

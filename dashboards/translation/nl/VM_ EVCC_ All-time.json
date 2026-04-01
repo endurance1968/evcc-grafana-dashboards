@@ -7,6 +7,27 @@
       "type": "datasource",
       "pluginId": "victoriametrics-metrics-datasource",
       "pluginName": "VictoriaMetrics"
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "EVCC-URL",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "Naam omvormerportaal",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "URL omvormerportaal",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
     }
   ],
   "annotations": {
@@ -15,7 +36,70 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Jaar",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Maand",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [
+        "EVCC"
+      ],
+      "targetBlank": false,
+      "title": "Dashboards",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -91,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netafname"
+              "options": "Grid import"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Netafname"
+                "value": "Grid import"
               },
               {
                 "id": "color",
@@ -110,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Thuis"
+              "options": "Home"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Thuis"
+                "value": "Home"
               },
               {
                 "id": "color",
@@ -129,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Teruglevering"
+              "options": "Feed-in"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Teruglevering"
+                "value": "Feed-in"
               },
               {
                 "id": "color",
@@ -497,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -719,7 +803,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -740,14 +824,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Eigenverbruik"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -768,7 +852,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbruik"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -1101,7 +1185,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -1502,7 +1586,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -1717,7 +1801,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij laden"
+                "value": "Battery charge"
               },
               {
                 "id": "decimals",
@@ -1737,7 +1821,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij ontladen"
+                "value": "Battery discharge"
               },
               {
                 "id": "decimals",
@@ -1757,7 +1841,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij efficiëntie"
+                "value": "Battery efficiency"
               },
               {
                 "id": "decimals",
@@ -1784,7 +1868,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Gem. Max SOC"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -1804,7 +1888,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Gem. Min SOC"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -2130,7 +2214,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -2381,7 +2465,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV-energie"
+              "options": "PV energy"
             },
             "properties": [
               {
@@ -2501,7 +2585,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Teruglevering"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -2621,7 +2705,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Thuisverbruik"
+              "options": "Home consumption"
             },
             "properties": [
               {
@@ -2903,7 +2987,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -3170,7 +3254,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               }
             ]
           },
@@ -3384,7 +3468,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Elektriciteitsprijs: rekenkundig gemiddelde"
+                "value": "Electricity price: arithmetic mean"
               },
               {
                 "id": "color",
@@ -3407,7 +3491,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effectieve elektriciteitsprijs, dynamisch"
+                "value": "Effective electricity price, dynamic"
               },
               {
                 "id": "color",
@@ -3430,7 +3514,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde elektriciteitsprijs via dynamisch tarief"
+                "value": "Saved electricity price through dynamic tariff"
               },
               {
                 "id": "unit",
@@ -3446,19 +3530,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potentiële aankoop tegen rekenprijs"
+                "value": "Potential purchase at arithmetic price"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Ingekocht"
+              "options": "purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Aangekocht, dynamisch"
+                "value": "Purchased, dynamic"
               }
             ]
           },
@@ -3470,19 +3554,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Besparing via dynamisch tarief"
+                "value": "Savings through dynamic tariff"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkocht"
+              "options": "sold"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Verkocht (teruglevering)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "color",
@@ -3501,7 +3585,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balans"
+                "value": "Balance"
               }
             ]
           }
@@ -3678,7 +3762,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energiekosten tot nu toe zonder PV"
+                "value": "Energy costs so far without PV"
               },
               {
                 "id": "color",
@@ -3697,7 +3781,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kosten aangekochte energie tot nu toe"
+                "value": "Purchased energy costs so far"
               },
               {
                 "id": "color",
@@ -3716,7 +3800,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugleververgoeding tot nu toe"
+                "value": "Feed-in compensation so far"
               },
               {
                 "id": "color",
@@ -3735,7 +3819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energiekosten tot nu toe"
+                "value": "Energy costs so far"
               },
               {
                 "id": "thresholds",
@@ -3763,7 +3847,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kapitaalterugstroom tot nu toe"
+                "value": "Capital backflow so far"
               },
               {
                 "id": "color",
@@ -3782,7 +3866,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose gebaseerd op"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -3809,7 +3893,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse kapitaalterugstroom"
+                "value": "Yearly capital backflow"
               }
             ]
           },
@@ -3821,7 +3905,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugverdientijd"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -3837,7 +3921,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetalingsratio"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4044,7 +4128,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Geladen energie"
+                "value": "Charged energy"
               },
               {
                 "id": "unit",
@@ -4067,7 +4151,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ontladen energie"
+                "value": "Discharged energy"
               },
               {
                 "id": "unit",
@@ -4090,7 +4174,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Opslagverliezen"
+                "value": "Storage losses"
               },
               {
                 "id": "unit",
@@ -4113,7 +4197,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Volledige cycli"
+                "value": "Full cycles"
               },
               {
                 "id": "unit",
@@ -4133,7 +4217,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose gebaseerd op"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -4160,7 +4244,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetaling"
+                "value": "Yearly payback"
               }
             ]
           },
@@ -4172,7 +4256,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugverdientijd"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -4188,7 +4272,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetalingsratio"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4411,7 +4495,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Gereden kilometers"
+                "value": "Driven kilometers"
               },
               {
                 "id": "color",
@@ -4434,7 +4518,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Geschat verbruik"
+                "value": "Estimated consumption"
               },
               {
                 "id": "decimals",
@@ -4465,7 +4549,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Zonne-aandeel"
+                "value": "Solar share"
               },
               {
                 "id": "color",
@@ -4492,7 +4576,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effectieve laadprijs/kWh"
+                "value": "Effective charging price/kWh"
               },
               {
                 "id": "color",
@@ -4511,7 +4595,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten $vehicle zonder PV"
+                "value": "Driving costs $vehicle without PV"
               },
               {
                 "id": "color",
@@ -4530,7 +4614,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten $vehicle met PV"
+                "value": "Driving costs $vehicle with PV"
               },
               {
                 "id": "color",
@@ -4549,7 +4633,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde rijkosten dankzij PV"
+                "value": "Driving cost savings thanks to PV"
               },
               {
                 "id": "thresholds",
@@ -4577,7 +4661,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten verbrandingsmotor"
+                "value": "Combustion engine driving costs"
               }
             ]
           },
@@ -4589,7 +4673,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde rijkosten t.o.v. verbrandingsmotor"
+                "value": "Driving cost savings vs combustion engine"
               },
               {
                 "id": "thresholds",
@@ -4774,7 +4858,8 @@
             "value": "evcc",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "peakPowerLimit",
@@ -4791,7 +4876,8 @@
             "value": "30000",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "energySampleInterval",
@@ -4808,7 +4894,8 @@
             "value": "30s",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "tariffPriceInterval",
@@ -4825,7 +4912,8 @@
             "value": "15m",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "loadpointBlocklist",
@@ -4842,7 +4930,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "extBlocklist",
@@ -4859,7 +4948,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "auxBlocklist",
@@ -4876,7 +4966,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "current": {
@@ -4884,7 +4975,7 @@
           "text": "20",
           "value": "20"
         },
-        "hide": 0,
+        "hide": 2,
         "includeAll": false,
         "multi": false,
         "name": "installedWattPeak",
@@ -4922,7 +5013,7 @@
           "uid": "${DS_VM-EVCC}"
         },
         "definition": "label_values(sessionPricePerKWh_value{db=\"$dbLabel\",vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
-        "hide": 0,
+        "hide": 2,
         "includeAll": true,
         "label": "Voertuig",
         "multi": true,
@@ -4954,7 +5045,8 @@
           }
         ],
         "query": "6",
-        "type": "custom"
+        "type": "custom",
+        "hide": 2
       },
       {
         "current": {
@@ -4972,7 +5064,8 @@
           }
         ],
         "query": "1.75",
-        "type": "custom"
+        "type": "custom",
+        "hide": 2
       },
       {
         "current": {
@@ -4991,7 +5084,8 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "PV-systeem investeringskosten"
+        "description": "PV-systeem investeringskosten",
+        "hide": 2
       },
       {
         "current": {
@@ -5010,7 +5104,8 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "Batterij investeringskosten"
+        "description": "Batterij investeringskosten",
+        "hide": 2
       },
       {
         "current": {
@@ -5029,7 +5124,8 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "Jaarlijkse terugkerende systeemkosten"
+        "description": "Jaarlijkse terugkerende systeemkosten",
+        "hide": 2
       },
       {
         "current": {
@@ -5048,7 +5144,71 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "Bruikbare thuisbatterijcapaciteit in Wh"
+        "description": "Bruikbare thuisbatterijcapaciteit in Wh",
+        "hide": 2
+      },
+      {
+        "description": "URL die wordt gebruikt om EVCC te openen.",
+        "hide": 2,
+        "label": "EVCC-URL",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "Naam van het omvormerportaal voor de portaallink.",
+        "hide": 2,
+        "label": "Naam omvormerportaal",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "URL die wordt gebruikt om het omvormerportaal te openen.",
+        "hide": 2,
+        "label": "URL omvormerportaal",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -5063,4 +5223,3 @@
   "version": 6,
   "weekStart": ""
 }
-

@@ -16,6 +16,27 @@
       "pluginId": "__expr__"
     },
     {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "Inverter portal URL",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "Inverter portal name",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "EVCC URL",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Max power filter / W",
@@ -132,7 +153,7 @@
       "title": "Today",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -144,7 +165,7 @@
       "title": "Yesterday",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -156,7 +177,7 @@
       "title": "Day before yesterday",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -171,6 +192,30 @@
       "tooltip": "",
       "type": "dashboards",
       "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
     }
   ],
   "panels": [
@@ -4111,6 +4156,69 @@
             "selected": false
           }
         ]
+      },
+      {
+        "description": "URL used to open EVCC.",
+        "hide": 2,
+        "label": "EVCC URL",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "Name of the inverter portal for the portal link.",
+        "hide": 2,
+        "label": "Inverter portal name",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "URL used to open the inverter portal.",
+        "hide": 2,
+        "label": "Inverter portal URL",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -4125,4 +4233,3 @@
   "version": 48,
   "weekStart": ""
 }
-

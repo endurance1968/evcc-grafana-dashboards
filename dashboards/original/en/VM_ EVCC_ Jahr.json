@@ -7,6 +7,27 @@
       "type": "datasource",
       "pluginId": "victoriametrics-metrics-datasource",
       "pluginName": "VictoriaMetrics"
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "EVCC URL",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "Inverter portal name",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "Inverter portal URL",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
     }
   ],
   "annotations": {
@@ -15,7 +36,82 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Year",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Previous year",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now%2Fy&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "2 years ago",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-1y%2Fy&timezone=browser"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [
+        "EVCC"
+      ],
+      "targetBlank": false,
+      "title": "Dashboards",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -30,60 +126,6 @@
       "panels": [],
       "title": "PV",
       "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 27
-      },
-      "id": 68,
-      "panels": [],
-      "title": "Home",
-      "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 66
-      },
-      "id": 62,
-      "panels": [],
-      "title": "Battery",
-      "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 85
-      },
-      "id": 56,
-      "panels": [],
-      "title": "Vehicles",
-      "type": "row",
-      "options": {
-        "text": {
-          "titleSize": 12,
-          "valueSize": 20
-        }
-      },
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "^Consumption$",
-            "renamePattern": "Consumption: ${__field.labels.vehicle}"
-          }
-        }
-      ]
     },
     {
       "id": 41,
@@ -1382,6 +1424,19 @@
       ],
       "transformations": null,
       "maxDataPoints": 366
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 68,
+      "panels": [],
+      "title": "Home",
+      "type": "row"
     },
     {
       "id": 67,
@@ -2845,6 +2900,19 @@
       ]
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "id": 62,
+      "panels": [],
+      "title": "Battery",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -3127,7 +3195,7 @@
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-09
+          "le": 1E-09
         },
         "legend": {
           "show": false
@@ -3509,7 +3577,7 @@
           "color": "rgba(255,0,255,0.7)"
         },
         "filterValues": {
-          "le": 1e-09
+          "le": 1E-09
         },
         "legend": {
           "show": false
@@ -3794,6 +3862,507 @@
       ]
     },
     {
+      "id": 71,
+      "title": "Consumers",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      }
+    },
+    {
+      "id": 72,
+      "title": "Heat pump total",
+      "type": "stat",
+      "description": "Yearly heat pump energy across matching loadpoints.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 0,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpPvWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpBatteryWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpGridWh"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpPvWh + $hpBatteryWh + $hpGridWh) / 1000",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "title": "Heat pump source mix",
+      "type": "bargauge",
+      "description": "Estimated share of PV, battery discharge and grid supply for the heat pump loadpoint.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 4,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"PV\") or label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"Battery\") or label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"Grid\")",
+          "instant": true,
+          "legendFormat": "{{series}}",
+          "range": false,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "title": "Charging stations total",
+      "type": "stat",
+      "description": "Yearly charging energy across visible charging loadpoints, excluding the heat pump loadpoint.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 12,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpPvWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpBatteryWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpGridWh"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($lpPvWh + $lpBatteryWh + $lpGridWh) / 1000",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "title": "Charging stations source mix",
+      "type": "bargauge",
+      "description": "Estimated share of PV, battery discharge and grid supply for visible charging loadpoints, excluding the heat pump.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"PV\") or label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"Battery\") or label_set(((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) / clamp_min((sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))) + (sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))), 0.001)), \"series\", \"Grid\")",
+          "instant": true,
+          "legendFormat": "{{series}}",
+          "range": false,
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 96
+      },
+      "id": 56,
+      "panels": [],
+      "title": "Vehicles",
+      "type": "row",
+      "options": {
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        }
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^Consumption$",
+            "renamePattern": "Consumption: ${__field.labels.vehicle}"
+          }
+        }
+      ]
+    },
+    {
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -3913,7 +4482,7 @@
         "h": 24,
         "w": 5,
         "x": 0,
-        "y": 86
+        "y": 97
       },
       "id": 59,
       "options": {
@@ -4075,7 +4644,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 86
+        "y": 97
       },
       "id": 58,
       "options": {
@@ -4233,7 +4802,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 94
+        "y": 105
       },
       "id": 60,
       "options": {
@@ -4392,7 +4961,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 102
+        "y": 113
       },
       "id": 61,
       "options": {
@@ -4502,7 +5071,8 @@
             "value": "evcc",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "loadpointBlocklist",
@@ -4519,7 +5089,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "vehicleBlocklist",
@@ -4536,7 +5107,8 @@
             "value": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "extBlocklist",
@@ -4554,7 +5126,8 @@
             "text": "^none$",
             "value": "^none$"
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "auxBlocklist",
@@ -4571,7 +5144,19 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
+      },
+      {
+        "name": "heatPumpLoadpointRegex",
+        "label": "Heat pump loadpoint match",
+        "hide": 2,
+        "type": "constant",
+        "query": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
+        "current": {
+          "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
+          "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
+        }
       },
       {
         "name": "installedWattPeak",
@@ -4587,6 +5172,70 @@
             "text": "20",
             "value": "20",
             "selected": true
+          }
+        ],
+        "hide": 2
+      },
+      {
+        "description": "URL used to open EVCC.",
+        "hide": 2,
+        "label": "EVCC URL",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "Name of the inverter portal for the portal link.",
+        "hide": 2,
+        "label": "Inverter portal name",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "URL used to open the inverter portal.",
+        "hide": 2,
+        "label": "Inverter portal URL",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
           }
         ]
       }
@@ -4604,4 +5253,3 @@
   "weekStart": "",
   "__requires": []
 }
-

@@ -154,3 +154,17 @@ These items are intentionally deferred from the first safe rollout:
 
 - optional monthly rollup layer
 - any further measured performance tuning beyond the current chunked fetch path
+
+## Future extension: consumer source attribution
+
+For a later dashboard feature that should show yearly or monthly consumer energy split by:
+
+- `PV`
+- `Battery`
+- `Grid`
+
+there is now a dedicated design note:
+
+- [Consumer Energy Attribution Design](./consumer-energy-attribution-design.md)
+
+That extension is intentionally separate from the current baseline rollup scope because it adds modeled source attribution per consumer group.

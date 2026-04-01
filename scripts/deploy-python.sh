@@ -82,6 +82,9 @@ settings = {
     "DASHBOARD_FILTER_LOADPOINT_BLOCKLIST": "",
     "DASHBOARD_FILTER_EXT_BLOCKLIST": "",
     "DASHBOARD_FILTER_AUX_BLOCKLIST": "",
+    "DASHBOARD_EVCC_URL": "",
+    "DASHBOARD_PORTAL_TITLE": "",
+    "DASHBOARD_PORTAL_URL": "",
 }
 
 if config_path.exists():
@@ -175,7 +178,7 @@ def build_inputs(raw):
             out.append({"name": item["name"], "type": item["type"], "value": item.get("value", "")})
     return out
 
-def build_filter_overrides(settings):
+def build_dashboard_overrides(settings):
     return {
         "peakPowerLimit": settings.get("DASHBOARD_FILTER_PEAK_POWER_LIMIT", ""),
         "energySampleInterval": settings.get("DASHBOARD_ENERGY_SAMPLE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL", ""),
@@ -183,6 +186,9 @@ def build_filter_overrides(settings):
         "loadpointBlocklist": settings.get("DASHBOARD_FILTER_LOADPOINT_BLOCKLIST", ""),
         "extBlocklist": settings.get("DASHBOARD_FILTER_EXT_BLOCKLIST", ""),
         "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
+        "evccUrl": settings.get("DASHBOARD_EVCC_URL", ""),
+        "inverterPortalTitle": settings.get("DASHBOARD_PORTAL_TITLE", ""),
+        "inverterPortalUrl": settings.get("DASHBOARD_PORTAL_URL", ""),
     }
 
 def apply_dashboard_filter_overrides(raw, overrides):
@@ -227,13 +233,13 @@ def delete_and_report(kind, name, uid, path):
         print(f"Deleted {kind}: {name} [{uid}]")
     else:
         raise RuntimeError(f"Failed to delete {kind} {name} [{uid}]")
-filter_overrides = build_filter_overrides(settings)
+dashboard_overrides = build_dashboard_overrides(settings)
 
 dashboards = []
 library = {}
 for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
-    raw = apply_dashboard_filter_overrides(raw, filter_overrides)
+    raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
     dashboards.append({"raw": raw, "inputs": build_inputs(raw)})
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
@@ -250,11 +256,11 @@ else:
 print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
 print(f"Variant: {settings['DASHBOARD_VARIANT']}")
 print(f"Purge: {settings['PURGE']}")
-active_filter_overrides = {k: v for k, v in filter_overrides.items() if str(v).strip()}
-if active_filter_overrides:
+active_dashboard_overrides = {k: v for k, v in dashboard_overrides.items() if str(v).strip()}
+if active_dashboard_overrides:
     print()
-    print("Will apply dashboard filter overrides:")
-    for key, value in active_filter_overrides.items():
+    print("Will apply dashboard overrides:")
+    for key, value in active_dashboard_overrides.items():
         print(f"- {key} = {value}")
 print()
 print("Will import dashboards:")

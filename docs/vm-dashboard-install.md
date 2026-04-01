@@ -52,8 +52,8 @@ The deployer can optionally set the hidden dashboard filter variables during dep
 That means:
 
 - colors come from the checked-in dashboard JSON files
-- filter defaults can come either from the checked-in dashboard variables or from the optional deploy-time filter overrides
-- user-specific changes can be done in Grafana after import, by re-running the deployer with filter overrides, or by deploying from a local dashboard directory
+- dashboard variable defaults can come either from the checked-in dashboard JSON files or from optional deploy-time overrides
+- user-specific changes can be done in Grafana after import, by re-running the deployer with dashboard overrides, or by deploying from a local dashboard directory
 
 ## Config file
 
@@ -83,7 +83,7 @@ Optional values:
 - `GITHUB_REF`
 - `PURGE`
 
-Optional dashboard filter overrides:
+Optional dashboard variable overrides:
 
 - `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
 - `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
@@ -91,6 +91,9 @@ Optional dashboard filter overrides:
 - `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
 - `DASHBOARD_FILTER_EXT_BLOCKLIST`
 - `DASHBOARD_FILTER_AUX_BLOCKLIST`
+- `DASHBOARD_EVCC_URL`
+- `DASHBOARD_PORTAL_TITLE`
+- `DASHBOARD_PORTAL_URL`
 
 Example:
 
@@ -101,9 +104,12 @@ DASHBOARD_TARIFF_PRICE_INTERVAL=15m
 DASHBOARD_FILTER_EXT_BLOCKLIST=.*Car.*|.*Haupt.*
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_EVCC_URL=http://home:7070/#/
+DASHBOARD_PORTAL_TITLE=Solarman
+DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-All of these values are optional. They let you set the hidden dashboard constants during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
 
 Runtime overrides are also available:
 
@@ -111,7 +117,7 @@ Runtime overrides are also available:
 - Python shell deployer: `--url`, `--token`, `--purge`
 - Bash-only deployer: `--url`, `--token`, `--purge`
 
-Those values override the config file for a single run.
+Those values override the config file for a single run. The link/button values update the hidden dashboard variables used by the `EVCC` and portal buttons in the header.
 
 Backward compatibility: the old names `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL` and `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL` are still accepted as aliases.
 

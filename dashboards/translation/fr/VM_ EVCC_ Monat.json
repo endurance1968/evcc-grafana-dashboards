@@ -7,6 +7,27 @@
       "type": "datasource",
       "pluginId": "victoriametrics-metrics-datasource",
       "pluginName": "VictoriaMetrics"
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "URL EVCC",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "Nom du portail de l’onduleur",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "URL du portail de l’onduleur",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
     }
   ],
   "annotations": {
@@ -15,7 +36,82 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Mois",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Mois précédent",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now%2FM&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "Il y a 2 mois",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-1M%2FM&timezone=browser"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [
+        "EVCC"
+      ],
+      "targetBlank": false,
+      "title": "Tableaux de bord",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -89,7 +185,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Import réseau"
+                "value": "Grid import"
               }
             ]
           },
@@ -101,7 +197,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Maison"
+                "value": "Home"
               }
             ]
           },
@@ -113,7 +209,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Injection"
+                "value": "Feed-in"
               }
             ]
           },
@@ -147,7 +243,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -162,7 +258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -222,7 +318,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Injection"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -491,7 +587,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -506,7 +602,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -566,7 +662,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Injection"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -800,7 +896,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarcie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -821,14 +917,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarcie"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autoconsommation"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -849,7 +945,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autoconsommation"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -1104,7 +1200,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autonomie"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -1116,7 +1212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autonomie"
+                "value": "Self-sufficiency"
               }
             ]
           },
@@ -1213,7 +1309,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Other"
             },
             "properties": [
               {
@@ -1406,7 +1502,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Autre"
+                "value": "Other"
               },
               {
                 "id": "color",
@@ -1556,7 +1652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1571,7 +1667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterie"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -1741,7 +1837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1768,7 +1864,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Batterie"
+                "value": "Battery"
               }
             ]
           },
@@ -1927,7 +2023,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prix réseau : moyenne arithmétique"
+                "value": "Grid price: arithmetic mean"
               },
               {
                 "id": "unit",
@@ -1950,7 +2046,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prix effectif, dyn."
+                "value": "Effective price, dyn."
               },
               {
                 "id": "unit",
@@ -1973,7 +2069,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Économisé vs arith."
+                "value": "Saved vs arith."
               },
               {
                 "id": "unit",
@@ -1996,7 +2092,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potentiel au prix arith."
+                "value": "Potential at arith."
               },
               {
                 "id": "unit",
@@ -2019,7 +2115,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Acheté, dynamique"
+                "value": "Purchased, dynamic"
               },
               {
                 "id": "unit",
@@ -2042,7 +2138,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Économies dyn."
+                "value": "Savings dyn."
               },
               {
                 "id": "unit",
@@ -2065,7 +2161,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Vendu (injection)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "unit",
@@ -2088,7 +2184,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bilan"
+                "value": "Balance"
               },
               {
                 "id": "unit",
@@ -2423,7 +2519,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Moyenne"
+              "options": "Average"
             },
             "properties": [
               {
@@ -2438,7 +2534,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Prix effectif de l’électricité"
+              "options": "Effective electricity price"
             },
             "properties": [
               {
@@ -2596,12 +2692,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Acheté"
+              "options": "Purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Acheté"
+                "value": "Purchased"
               }
             ]
           },
@@ -2703,7 +2799,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Charge batterie"
+                "value": "Battery charge"
               },
               {
                 "id": "unit",
@@ -2723,7 +2819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Décharge batterie"
+                "value": "Battery discharge"
               },
               {
                 "id": "unit",
@@ -2743,7 +2839,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rendement batterie"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -2763,7 +2859,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC max moyen"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -2783,7 +2879,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC min moyen"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -3031,7 +3127,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Batterie max"
+                "value": "Battery max"
               }
             ]
           },
@@ -3050,7 +3146,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Batterie min"
+                "value": "Battery min"
               }
             ]
           },
@@ -3145,7 +3241,8 @@
             "value": "evcc",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "peakPowerLimit",
@@ -3162,7 +3259,8 @@
             "value": "30000",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "energySampleInterval",
@@ -3179,7 +3277,8 @@
             "value": "30s",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "tariffPriceInterval",
@@ -3196,7 +3295,8 @@
             "value": "15m",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "loadpointBlocklist",
@@ -3213,7 +3313,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "extBlocklist",
@@ -3231,7 +3332,8 @@
             "text": "^none$",
             "value": "^none$"
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "auxBlocklist",
@@ -3248,7 +3350,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "current": {
@@ -3256,7 +3359,7 @@
           "text": "20",
           "value": "20"
         },
-        "hide": 0,
+        "hide": 2,
         "includeAll": false,
         "multi": false,
         "name": "installedWattPeak",
@@ -3265,6 +3368,69 @@
         "skipUrlSync": false,
         "type": "constant",
         "label": "installedWattPeak"
+      },
+      {
+        "description": "URL utilisée pour ouvrir EVCC.",
+        "hide": 2,
+        "label": "URL EVCC",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "Nom du portail de l'onduleur pour le lien du portail.",
+        "hide": 2,
+        "label": "Nom du portail de l’onduleur",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "URL utilisée pour ouvrir le portail de l'onduleur.",
+        "hide": 2,
+        "label": "URL du portail de l’onduleur",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -3279,4 +3445,3 @@
   "version": 2,
   "weekStart": ""
 }
-

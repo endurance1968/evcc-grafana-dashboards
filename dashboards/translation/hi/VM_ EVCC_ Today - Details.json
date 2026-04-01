@@ -16,6 +16,27 @@
       "pluginId": "__expr__"
     },
     {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "इन्वर्टर पोर्टल URL",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "इन्वर्टर पोर्टल नाम",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "ईवीसीसी यूआरएल",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "अधिकतम पावर फ़िल्टर / W",
@@ -132,7 +153,7 @@
       "title": "आज",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -144,7 +165,7 @@
       "title": "कल",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -156,7 +177,7 @@
       "title": "परसों",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -171,6 +192,30 @@
       "tooltip": "",
       "type": "dashboards",
       "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "ईवीसीसी",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$इन्वर्टरपोर्टलटाइटल",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
     }
   ],
   "panels": [
@@ -239,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -282,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "ऊर्जा",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -423,7 +468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -533,7 +578,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -667,7 +712,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -767,7 +812,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पूर्वानुमान"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -782,7 +827,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "वास्तविक"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -826,7 +871,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "ऊर्जा",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -967,7 +1012,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "वास्तविक"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -982,7 +1027,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पूर्वानुमान"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -1095,7 +1140,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1282,7 +1327,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1413,7 +1458,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1600,7 +1645,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -1630,7 +1675,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1762,7 +1807,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1941,7 +1986,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2096,7 +2141,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "औसत"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2266,7 +2311,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2305,7 +2350,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "मूल्य"
+              "options": "Preis"
             },
             "properties": [
               {
@@ -2414,7 +2459,7 @@
               },
               {
                 "id": "displayName",
-                "value": "खरीदा गया"
+                "value": "Purchased"
               }
             ]
           },
@@ -2433,7 +2478,7 @@
               },
               {
                 "id": "displayName",
-                "value": "बेचा गया"
+                "value": "Sold"
               }
             ]
           },
@@ -2464,7 +2509,7 @@
               },
               {
                 "id": "displayName",
-                "value": "दिन का कुल"
+                "value": "Day total"
               }
             ]
           }
@@ -2607,7 +2652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "खरीदा गया"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2622,7 +2667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "बेचा गया"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2733,7 +2778,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "औसत"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2903,7 +2948,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2946,7 +2991,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "सीओ 2"
+              "options": "CO2"
             },
             "properties": [
               {
@@ -4111,6 +4156,69 @@
             "selected": false
           }
         ]
+      },
+      {
+        "description": "EVCC खोलने के लिए प्रयुक्त URL।",
+        "hide": 2,
+        "label": "ईवीसीसी यूआरएल",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "पोर्टल लिंक के लिए इन्वर्टर पोर्टल का नाम।",
+        "hide": 2,
+        "label": "इन्वर्टर पोर्टल नाम",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।",
+        "hide": 2,
+        "label": "इन्वर्टर पोर्टल URL",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -4125,4 +4233,3 @@
   "version": 48,
   "weekStart": ""
 }
-

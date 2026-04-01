@@ -7,6 +7,27 @@
       "type": "datasource",
       "pluginId": "victoriametrics-metrics-datasource",
       "pluginName": "VictoriaMetrics"
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "EVCC 网址",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "逆变器门户名称",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "逆变器门户网址",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
     }
   ],
   "annotations": {
@@ -15,7 +36,82 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "年",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "去年",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now%2Fy&timezone=browser"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": false,
+      "title": "两年前",
+      "tooltip": "",
+      "type": "link",
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-1y%2Fy&timezone=browser"
+    },
+    {
+      "asDropdown": true,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [
+        "EVCC"
+      ],
+      "targetBlank": false,
+      "title": "仪表板",
+      "tooltip": "",
+      "type": "dashboards",
+      "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "电动汽车控制中心",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
@@ -30,60 +126,6 @@
       "panels": [],
       "title": "光伏发电",
       "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 27
-      },
-      "id": 68,
-      "panels": [],
-      "title": "家庭",
-      "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 66
-      },
-      "id": 62,
-      "panels": [],
-      "title": "电池",
-      "type": "row"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 85
-      },
-      "id": 56,
-      "panels": [],
-      "title": "车辆",
-      "type": "row",
-      "options": {
-        "text": {
-          "titleSize": 12,
-          "valueSize": 20
-        }
-      },
-      "transformations": [
-        {
-          "id": "renameByRegex",
-          "options": {
-            "regex": "^Consumption$",
-            "renamePattern": "Consumption: ${__field.labels.vehicle}"
-          }
-        }
-      ]
     },
     {
       "id": 41,
@@ -126,12 +168,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "光伏发电"
+                "value": "PV"
               },
               {
                 "id": "color",
@@ -145,12 +187,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "电网输入"
+                "value": "Grid import"
               },
               {
                 "id": "color",
@@ -164,12 +206,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "家庭"
+                "value": "Home"
               },
               {
                 "id": "color",
@@ -183,12 +225,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "馈电"
+              "options": "Feed-in"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "馈电"
+                "value": "Feed-in"
               },
               {
                 "id": "color",
@@ -402,7 +444,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -413,7 +455,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -428,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -443,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -458,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "馈电"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -645,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自给率"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -666,14 +708,14 @@
               },
               {
                 "id": "displayName",
-                "value": "自给率"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "自耗"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -694,7 +736,7 @@
               },
               {
                 "id": "displayName",
-                "value": "自耗"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -881,14 +923,14 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "自给率"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -903,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自耗"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -1032,12 +1074,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏/日"
+              "options": "PV/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "光伏/日"
+                "value": "PV/day"
               },
               {
                 "id": "color",
@@ -1051,12 +1093,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "日消耗"
+              "options": "Consumption/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "日消耗"
+                "value": "Consumption/day"
               },
               {
                 "id": "color",
@@ -1070,12 +1112,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "每日电网输入"
+              "options": "Grid import/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "每日电网输入"
+                "value": "Grid import/day"
               },
               {
                 "id": "color",
@@ -1241,7 +1283,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -1253,14 +1295,14 @@
               },
               {
                 "id": "displayName",
-                "value": "光伏发电"
+                "value": "PV"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -1272,14 +1314,14 @@
               },
               {
                 "id": "displayName",
-                "value": "电网输入"
+                "value": "Grid import"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "日消耗"
+              "options": "Consumption/day"
             },
             "properties": [
               {
@@ -1291,7 +1333,7 @@
               },
               {
                 "id": "displayName",
-                "value": "消耗"
+                "value": "Consumption"
               }
             ]
           }
@@ -1384,6 +1426,19 @@
       "maxDataPoints": 366
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 27
+      },
+      "id": 68,
+      "panels": [],
+      "title": "家庭",
+      "type": "row"
+    },
+    {
       "id": 67,
       "title": "家庭：能源分配",
       "type": "piechart",
@@ -1409,7 +1464,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "其他"
+              "options": "Other"
             },
             "properties": [
               {
@@ -1424,7 +1479,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1618,7 +1673,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "其他"
+                "value": "Other"
               },
               {
                 "id": "color",
@@ -1744,7 +1799,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1759,7 +1814,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电池"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2014,7 +2069,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2041,14 +2096,14 @@
               },
               {
                 "id": "displayName",
-                "value": "电池"
+                "value": "Battery"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "其他"
+              "options": "Other"
             },
             "properties": [
               {
@@ -2196,7 +2251,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电价：算术平均值"
+                "value": "Electricity price: arithmetic mean"
               },
               {
                 "id": "color",
@@ -2219,7 +2274,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "实际电价（动态）"
+                "value": "Effective electricity price, dynamic"
               },
               {
                 "id": "color",
@@ -2242,7 +2297,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "通过动态电价节省的电价"
+                "value": "Saved electricity price through dynamic tariff"
               },
               {
                 "id": "unit",
@@ -2258,19 +2313,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "按算术价格的潜在购电"
+                "value": "Potential purchase at arithmetic price"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "购电"
+              "options": "purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "购入，动态"
+                "value": "Purchased, dynamic"
               }
             ]
           },
@@ -2282,19 +2337,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "动态电价节省"
+                "value": "Savings through dynamic tariff"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "售电"
+              "options": "sold"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "售出（馈电）"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "color",
@@ -2313,7 +2368,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平衡"
+                "value": "Balance"
               }
             ]
           }
@@ -2536,7 +2591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "平均值"
+              "options": "Average"
             },
             "properties": [
               {
@@ -2551,7 +2606,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "实际电价"
+              "options": "Effective electricity price"
             },
             "properties": [
               {
@@ -2721,14 +2776,14 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "购入"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2743,7 +2798,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "售电"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2845,6 +2900,19 @@
       ]
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 66
+      },
+      "id": 62,
+      "panels": [],
+      "title": "电池",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -2877,7 +2945,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池充电"
+                "value": "Battery charge"
               },
               {
                 "id": "unit",
@@ -2897,7 +2965,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池放电"
+                "value": "Battery discharge"
               },
               {
                 "id": "unit",
@@ -2917,7 +2985,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池效率"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -2944,7 +3012,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平均最高 SOC"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -2964,7 +3032,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平均最低 SOC"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -3325,7 +3393,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "充电"
+              "options": "Charge"
             },
             "properties": [
               {
@@ -3337,14 +3405,14 @@
               },
               {
                 "id": "displayName",
-                "value": "充电"
+                "value": "Charge"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "放电"
+              "options": "Discharge"
             },
             "properties": [
               {
@@ -3356,7 +3424,7 @@
               },
               {
                 "id": "displayName",
-                "value": "放电"
+                "value": "Discharge"
               }
             ]
           }
@@ -3694,7 +3762,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池效率"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -3789,6 +3857,814 @@
             "columnField": "series",
             "rowField": "month",
             "valueField": "value"
+          }
+        }
+      ]
+    },
+    {
+      "id": 71,
+      "title": "Consumers",
+      "type": "row",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 85
+      }
+    },
+    {
+      "id": 72,
+      "title": "Heat pump total",
+      "type": "stat",
+      "description": "Estimated yearly heat pump energy based on daily source attribution rollups.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 0,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_pv_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtPv"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_pv_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxPv"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_battery_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtBattery"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_battery_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxBattery"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_grid_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtGrid"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_grid_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxGrid"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtPv + $hpAuxPv) / 1000",
+          "hide": true,
+          "refId": "hpPvTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtBattery + $hpAuxBattery) / 1000",
+          "hide": true,
+          "refId": "hpBatteryTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtGrid + $hpAuxGrid) / 1000",
+          "hide": true,
+          "refId": "hpGridTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$hpPvTotal + $hpBatteryTotal + $hpGridTotal",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 73,
+      "title": "Heat pump source mix",
+      "type": "bargauge",
+      "description": "Estimated share of PV, battery discharge and grid supply for the heat pump.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 4,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_pv_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtPv"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_pv_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxPv"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_battery_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtBattery"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_battery_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxBattery"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_ext_energy_from_grid_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpExtGrid"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_aux_energy_from_grid_daily_wh{db=\"$dbLabel\",title=~\"$heatPumpTitleRegex\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "hpAuxGrid"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtPv + $hpAuxPv) / 1000",
+          "hide": true,
+          "refId": "hpPvTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtBattery + $hpAuxBattery) / 1000",
+          "hide": true,
+          "refId": "hpBatteryTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpExtGrid + $hpAuxGrid) / 1000",
+          "hide": true,
+          "refId": "hpGridTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "clamp_min($hpPvTotal + $hpBatteryTotal + $hpGridTotal, 0.001)",
+          "hide": true,
+          "refId": "hpTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $hpPvTotal / $hpTotal",
+          "legendFormat": "光伏发电",
+          "refId": "PV",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $hpBatteryTotal / $hpTotal",
+          "legendFormat": "电池",
+          "refId": "Battery",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $hpGridTotal / $hpTotal",
+          "legendFormat": "电网",
+          "refId": "Grid",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 74,
+      "title": "Charging stations total",
+      "type": "stat",
+      "description": "Yearly charging energy across all visible loadpoints.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 12,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpPvWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpBatteryWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpGridWh"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($lpPvWh + $lpBatteryWh + $lpGridWh) / 1000",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 75,
+      "title": "Charging stations source mix",
+      "type": "bargauge",
+      "description": "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 86
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpPvWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpBatteryWh"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
+          "hide": true,
+          "instant": true,
+          "range": false,
+          "refId": "lpGridWh"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpPvWh / 1000",
+          "hide": true,
+          "refId": "lpPvTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpBatteryWh / 1000",
+          "hide": true,
+          "refId": "lpBatteryTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpGridWh / 1000",
+          "hide": true,
+          "refId": "lpGridTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "clamp_min($lpPvTotal + $lpBatteryTotal + $lpGridTotal, 0.001)",
+          "hide": true,
+          "refId": "lpTotal",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $lpPvTotal / $lpTotal",
+          "legendFormat": "光伏发电",
+          "refId": "PV",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $lpBatteryTotal / $lpTotal",
+          "legendFormat": "电池",
+          "refId": "Battery",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "100 * $lpGridTotal / $lpTotal",
+          "legendFormat": "电网",
+          "refId": "Grid",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 96
+      },
+      "id": 56,
+      "panels": [],
+      "title": "车辆",
+      "type": "row",
+      "options": {
+        "text": {
+          "titleSize": 12,
+          "valueSize": 20
+        }
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^Consumption$",
+            "renamePattern": "Consumption: ${__field.labels.vehicle}"
           }
         }
       ]
@@ -3913,7 +4789,7 @@
         "h": 24,
         "w": 5,
         "x": 0,
-        "y": 86
+        "y": 97
       },
       "id": 59,
       "options": {
@@ -4065,7 +4941,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               }
             ]
           }
@@ -4075,7 +4951,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 86
+        "y": 97
       },
       "id": 58,
       "options": {
@@ -4223,7 +5099,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               }
             ]
           }
@@ -4233,7 +5109,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 94
+        "y": 105
       },
       "id": 60,
       "options": {
@@ -4382,7 +5258,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Month"
               }
             ]
           }
@@ -4392,7 +5268,7 @@
         "h": 8,
         "w": 19,
         "x": 5,
-        "y": 102
+        "y": 113
       },
       "id": 61,
       "options": {
@@ -4502,7 +5378,8 @@
             "value": "evcc",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "loadpointBlocklist",
@@ -4519,7 +5396,8 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "vehicleBlocklist",
@@ -4536,7 +5414,8 @@
             "value": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "extBlocklist",
@@ -4554,7 +5433,8 @@
             "text": "^none$",
             "value": "^none$"
           }
-        ]
+        ],
+        "hide": 2
       },
       {
         "name": "auxBlocklist",
@@ -4571,7 +5451,19 @@
             "value": "^none$",
             "selected": true
           }
-        ]
+        ],
+        "hide": 2
+      },
+      {
+        "name": "heatPumpTitleRegex",
+        "label": "Heat pump title match",
+        "hide": 2,
+        "type": "constant",
+        "query": "(?i).*(wp|warmepumpe|wärmepumpe|heat pump|altherma).*",
+        "current": {
+          "text": "(?i).*(wp|warmepumpe|wärmepumpe|heat pump|altherma).*",
+          "value": "(?i).*(wp|warmepumpe|wärmepumpe|heat pump|altherma).*"
+        }
       },
       {
         "name": "installedWattPeak",
@@ -4587,6 +5479,70 @@
             "text": "20",
             "value": "20",
             "selected": true
+          }
+        ],
+        "hide": 2
+      },
+      {
+        "description": "用于打开 EVCC 的 URL。",
+        "hide": 2,
+        "label": "EVCC 网址",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "门户链接使用的逆变器门户名称。",
+        "hide": 2,
+        "label": "逆变器门户名称",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "用于打开逆变器门户的 URL。",
+        "hide": 2,
+        "label": "逆变器门户网址",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
           }
         ]
       }
@@ -4604,4 +5560,3 @@
   "weekStart": "",
   "__requires": []
 }
-

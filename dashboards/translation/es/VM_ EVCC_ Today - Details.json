@@ -16,6 +16,27 @@
       "pluginId": "__expr__"
     },
     {
+      "name": "VAR_INVERTERPORTALURL",
+      "type": "constant",
+      "label": "URL del portal del inversor",
+      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "description": ""
+    },
+    {
+      "name": "VAR_INVERTERPORTALTITLE",
+      "type": "constant",
+      "label": "Nombre del portal del inversor",
+      "value": "Solarman",
+      "description": ""
+    },
+    {
+      "name": "VAR_EVCCURL",
+      "type": "constant",
+      "label": "URL de EVCC",
+      "value": "http://home:7070/#/",
+      "description": ""
+    },
+    {
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Filtro de potencia máxima / W",
@@ -132,7 +153,7 @@
       "title": "Hoy",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -144,7 +165,7 @@
       "title": "Ayer",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -156,7 +177,7 @@
       "title": "Anteayer",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -171,6 +192,30 @@
       "tooltip": "",
       "type": "dashboards",
       "url": ""
+    },
+    {
+      "asDropdown": false,
+      "icon": "bolt",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "EVCC",
+      "tooltip": "",
+      "type": "link",
+      "url": "$evccUrl"
+    },
+    {
+      "asDropdown": false,
+      "icon": "cloud",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "$inverterPortalTitle",
+      "tooltip": "",
+      "type": "link",
+      "url": "$inverterPortalUrl"
     }
   ],
   "panels": [
@@ -282,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energía",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -767,7 +812,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Pronóstico"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -782,7 +827,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Real"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -826,7 +871,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energía",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -967,7 +1012,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Real"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -982,7 +1027,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Pronóstico"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -1095,7 +1140,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Otros"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1282,7 +1327,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Otros"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1413,7 +1458,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Otros"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1630,7 +1675,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Otros"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1762,7 +1807,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Casa"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1941,7 +1986,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Casa"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2096,7 +2141,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Promedio"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2266,7 +2311,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Importación de red"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2305,7 +2350,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Precio"
+              "options": "Preis"
             },
             "properties": [
               {
@@ -2414,7 +2459,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Comprado"
+                "value": "Purchased"
               }
             ]
           },
@@ -2433,7 +2478,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Vendido"
+                "value": "Sold"
               }
             ]
           },
@@ -2464,7 +2509,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Total del día"
+                "value": "Day total"
               }
             ]
           }
@@ -2607,7 +2652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Comprado"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2622,7 +2667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendido"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2733,7 +2778,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Promedio"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2903,7 +2948,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Importación de red"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -4111,6 +4156,69 @@
             "selected": false
           }
         ]
+      },
+      {
+        "description": "URL utilizada para abrir EVCC.",
+        "hide": 2,
+        "label": "URL de EVCC",
+        "name": "evccUrl",
+        "query": "${VAR_EVCCURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_EVCCURL}",
+          "text": "${VAR_EVCCURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_EVCCURL}",
+            "text": "${VAR_EVCCURL}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "Nombre del portal del inversor para el enlace al portal.",
+        "hide": 2,
+        "label": "Nombre del portal del inversor",
+        "name": "inverterPortalTitle",
+        "query": "${VAR_INVERTERPORTALTITLE}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALTITLE}",
+          "text": "${VAR_INVERTERPORTALTITLE}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALTITLE}",
+            "text": "${VAR_INVERTERPORTALTITLE}",
+            "selected": false
+          }
+        ]
+      },
+      {
+        "description": "URL utilizada para abrir el portal del inversor.",
+        "hide": 2,
+        "label": "URL del portal del inversor",
+        "name": "inverterPortalUrl",
+        "query": "${VAR_INVERTERPORTALURL}",
+        "skipUrlSync": true,
+        "type": "constant",
+        "current": {
+          "value": "${VAR_INVERTERPORTALURL}",
+          "text": "${VAR_INVERTERPORTALURL}",
+          "selected": false
+        },
+        "options": [
+          {
+            "value": "${VAR_INVERTERPORTALURL}",
+            "text": "${VAR_INVERTERPORTALURL}",
+            "selected": false
+          }
+        ]
       }
     ]
   },
@@ -4125,4 +4233,3 @@
   "version": 48,
   "weekStart": ""
 }
-

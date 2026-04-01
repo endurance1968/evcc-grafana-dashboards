@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "Verdeling energiebronnen laadstations",
+  "Charging stations total": "Laadstations totaal",
+  "Consumers": "Verbruikers",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "Geschat aandeel PV, batterij-ontlading en net voor alle zichtbare laadpunten.",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "Geschat aandeel PV, batterij-ontlading en net voor de warmtepomp.",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "Geschatte jaarlijkse warmtepompenergie op basis van dagelijkse bron-toewijzingsrollups.",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "Bemonsteringsinterval voor energieberekeningen. Dit moet minimaal 2x het EVCC-pollinginterval zijn. Standaard: 60s, omdat het standaard EVCC-interval 60s is.",
     "Total: Energy": "Totaal: energie",
     "URL used to open EVCC.": "URL die wordt gebruikt om EVCC te openen.",
-    "URL used to open the inverter portal.": "URL die wordt gebruikt om het omvormerportaal te openen."
+    "URL used to open the inverter portal.": "URL die wordt gebruikt om het omvormerportaal te openen.",
+    "Year": "Jaar",
+    "All-time": "Gehele periode",
+    "Previous month": "Vorige maand",
+    "2 months ago": "2 maanden geleden",
+    "Previous year": "Vorig jaar",
+    "2 years ago": "2 jaar geleden"
   },
-  "contains": []
+  "Heat pump source mix": "Verdeling energiebronnen warmtepomp",
+  "Heat pump title match": "Warmtepomp titelmatch",
+  "Heat pump total": "Warmtepomp totaal",
+  "Yearly charging energy across all visible loadpoints.": "Jaarlijkse laadenergie over alle zichtbare laadpunten."
 }

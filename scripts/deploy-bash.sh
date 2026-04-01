@@ -73,6 +73,9 @@ DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL=""
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=""
 DASHBOARD_FILTER_EXT_BLOCKLIST=""
 DASHBOARD_FILTER_AUX_BLOCKLIST=""
+DASHBOARD_EVCC_URL=""
+DASHBOARD_PORTAL_TITLE=""
+DASHBOARD_PORTAL_URL=""
 
 if [[ -f "$CONFIG_PATH" ]]; then
   set -a
@@ -166,7 +169,7 @@ apply_dashboard_override() {
   mv "$tmp_file" "$file"
 }
 
-print_filter_overrides() {
+print_dashboard_overrides() {
   local printed=0
   for entry in \
     "peakPowerLimit:$DASHBOARD_FILTER_PEAK_POWER_LIMIT" \
@@ -174,13 +177,16 @@ print_filter_overrides() {
     "tariffPriceInterval:${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}" \
     "loadpointBlocklist:$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST" \
     "extBlocklist:$DASHBOARD_FILTER_EXT_BLOCKLIST" \
-    "auxBlocklist:$DASHBOARD_FILTER_AUX_BLOCKLIST"; do
+    "auxBlocklist:$DASHBOARD_FILTER_AUX_BLOCKLIST" \
+    "evccUrl:$DASHBOARD_EVCC_URL" \
+    "inverterPortalTitle:$DASHBOARD_PORTAL_TITLE" \
+    "inverterPortalUrl:$DASHBOARD_PORTAL_URL"; do
     key=${entry%%:*}
     value=${entry#*:}
     if [[ -n "$value" ]]; then
       if [[ "$printed" -eq 0 ]]; then
         echo
-        echo "Will apply dashboard filter overrides:"
+        echo "Will apply dashboard overrides:"
         printed=1
       fi
       echo "- $key = $value"
@@ -214,6 +220,9 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "loadpointBlocklist" "$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "extBlocklist" "$DASHBOARD_FILTER_EXT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "auxBlocklist" "$DASHBOARD_FILTER_AUX_BLOCKLIST"
+  apply_dashboard_override "$raw_file" "evccUrl" "$DASHBOARD_EVCC_URL"
+  apply_dashboard_override "$raw_file" "inverterPortalTitle" "$DASHBOARD_PORTAL_TITLE"
+  apply_dashboard_override "$raw_file" "inverterPortalUrl" "$DASHBOARD_PORTAL_URL"
 
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
     [.__inputs[]? | select(.name and .type) |
@@ -256,7 +265,7 @@ fi
 echo "Language: $DASHBOARD_LANGUAGE"
 echo "Variant: $DASHBOARD_VARIANT"
 echo "Purge: $PURGE"
-print_filter_overrides
+print_dashboard_overrides
 echo
 echo "Will import dashboards:"
 for file_name in "${DASHBOARD_FILES[@]}"; do

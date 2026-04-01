@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "चार्जिंग स्टेशन ऊर्जा स्रोत मिश्रण",
+  "Charging stations total": "चार्जिंग स्टेशन कुल",
+  "Consumers": "उपभोक्ता",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "सभी दृश्य लोडपॉइंट्स के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "हीट पंप के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "दैनिक स्रोत-अनुपात रोलअप पर आधारित अनुमानित वार्षिक हीट पंप ऊर्जा।",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "ऊर्जा गणनाओं के लिए नमूना अंतराल। यह EVCC पोलिंग अंतराल का कम से कम 2 गुना होना चाहिए। डिफ़ॉल्ट: 60s, क्योंकि EVCC का डिफ़ॉल्ट अंतराल 60s है।",
     "Total: Energy": "कुल: ऊर्जा",
     "URL used to open EVCC.": "EVCC खोलने के लिए प्रयुक्त URL।",
-    "URL used to open the inverter portal.": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।"
+    "URL used to open the inverter portal.": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।",
+    "Year": "वर्ष",
+    "All-time": "संपूर्ण अवधि",
+    "Previous month": "पिछला माह",
+    "2 months ago": "2 महीने पहले",
+    "Previous year": "पिछला वर्ष",
+    "2 years ago": "2 साल पहले"
   },
-  "contains": []
+  "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
+  "Heat pump title match": "हीट पंप शीर्षक मिलान",
+  "Heat pump total": "हीट पंप कुल",
+  "Yearly charging energy across all visible loadpoints.": "सभी दृश्य लोडपॉइंट्स की वार्षिक चार्जिंग ऊर्जा।"
 }

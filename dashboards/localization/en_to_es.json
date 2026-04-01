@@ -1,4 +1,11 @@
 {
+  "Charging stations source mix": "Mezcla de fuentes de las estaciones de carga",
+  "Charging stations total": "Estaciones de carga total",
+  "Consumers": "Consumidores",
+  "contains": [],
+  "Estimated share of PV, battery discharge and grid supply for all visible loadpoints.": "Proporción estimada de FV, descarga de batería y red para todos los puntos de carga visibles.",
+  "Estimated share of PV, battery discharge and grid supply for the heat pump.": "Proporción estimada de FV, descarga de batería y red para la bomba de calor.",
+  "Estimated yearly heat pump energy based on daily source attribution rollups.": "Energía anual estimada de la bomba de calor basada en rollups diarios de atribución de origen.",
   "exact": {
     "__auto": "__auto",
     "{{loadpoint}}": "{{loadpoint}}",
@@ -283,7 +290,16 @@
     "Sampling interval for energy calculations. It should be at least 2x the EVCC polling interval. Default: 60s, because the default EVCC interval is 60s.": "Intervalo de muestreo para los cálculos de energía. Debe ser al menos 2 veces el intervalo de sondeo de EVCC. Predeterminado: 60s, porque el intervalo predeterminado de EVCC es 60s.",
     "Total: Energy": "Total: energía",
     "URL used to open EVCC.": "URL utilizada para abrir EVCC.",
-    "URL used to open the inverter portal.": "URL utilizada para abrir el portal del inversor."
+    "URL used to open the inverter portal.": "URL utilizada para abrir el portal del inversor.",
+    "Year": "Año",
+    "All-time": "Todo el período",
+    "Previous month": "Mes anterior",
+    "2 months ago": "Hace 2 meses",
+    "Previous year": "Año anterior",
+    "2 years ago": "Hace 2 años"
   },
-  "contains": []
+  "Heat pump source mix": "Mezcla de fuentes de la bomba de calor",
+  "Heat pump title match": "Coincidencia de título de bomba de calor",
+  "Heat pump total": "Bomba de calor total",
+  "Yearly charging energy across all visible loadpoints.": "Energía anual de carga en todos los puntos de carga visibles."
 }

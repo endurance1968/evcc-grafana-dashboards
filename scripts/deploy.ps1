@@ -125,7 +125,7 @@ function Build-Inputs($Raw) {
   return $inputs
 }
 
-function Get-FilterOverrides() {
+function Get-DashboardOverrides() {
   return @{
     peakPowerLimit = $settings.DASHBOARD_FILTER_PEAK_POWER_LIMIT
     energySampleInterval = $(if ($settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL) { $settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL } else { $settings.DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL })
@@ -133,6 +133,9 @@ function Get-FilterOverrides() {
     loadpointBlocklist = $settings.DASHBOARD_FILTER_LOADPOINT_BLOCKLIST
     extBlocklist = $settings.DASHBOARD_FILTER_EXT_BLOCKLIST
     auxBlocklist = $settings.DASHBOARD_FILTER_AUX_BLOCKLIST
+    evccUrl = $settings.DASHBOARD_EVCC_URL
+    inverterPortalTitle = $settings.DASHBOARD_PORTAL_TITLE
+    inverterPortalUrl = $settings.DASHBOARD_PORTAL_URL
   }
 }
 
@@ -212,11 +215,14 @@ $settings = @{
   DASHBOARD_FILTER_LOADPOINT_BLOCKLIST = ''
   DASHBOARD_FILTER_EXT_BLOCKLIST = ''
   DASHBOARD_FILTER_AUX_BLOCKLIST = ''
+  DASHBOARD_EVCC_URL = ''
+  DASHBOARD_PORTAL_TITLE = ''
+  DASHBOARD_PORTAL_URL = ''
 }
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_API_TOKEN','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_API_TOKEN','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -234,7 +240,7 @@ Merge-Setting $settings 'GRAFANA_FOLDER_UID' $folderuid
 Merge-Setting $settings 'GRAFANA_FOLDER_TITLE' $foldertitle
 if ($settings.ContainsKey('DEPLOY_PURGE') -and -not $settings.ContainsKey('PURGE')) { $settings['PURGE'] = $settings['DEPLOY_PURGE'] }
 if (-not [string]::IsNullOrWhiteSpace($purge)) { $settings['PURGE'] = if ($purge -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
-$filterOverrides = Get-FilterOverrides
+$dashboardOverrides = Get-DashboardOverrides
 
 if (-not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or -token.' }
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
@@ -252,7 +258,7 @@ $dashboards = @()
 $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
   $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json
-  $raw = Apply-DashboardFilterOverrides $raw $filterOverrides
+  $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
   $dashboards += @{ fileName = $fileName; raw = $raw; inputs = (Build-Inputs $raw) }
   if ($null -ne $raw.PSObject.Properties['__elements']) {
     foreach ($prop in $raw.__elements.PSObject.Properties) { $libraryElements[$prop.Name] = $prop.Value }
@@ -268,11 +274,11 @@ if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') { Write-Host "Source: local / $
 Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
 Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
 Write-Host "Purge: $($settings.PURGE)"
-$activeFilterOverrides = @($filterOverrides.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) })
-if ($activeFilterOverrides.Count -gt 0) {
+$activeDashboardOverrides = @($dashboardOverrides.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) })
+if ($activeDashboardOverrides.Count -gt 0) {
   Write-Host ''
-  Write-Host 'Will apply dashboard filter overrides:'
-  foreach ($entry in $activeFilterOverrides) {
+  Write-Host 'Will apply dashboard overrides:'
+  foreach ($entry in $activeDashboardOverrides | Sort-Object Name) {
     Write-Host "- $($entry.Key) = $($entry.Value)"
   }
 }

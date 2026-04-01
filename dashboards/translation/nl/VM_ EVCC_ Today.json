@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Thuis"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Net"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -248,7 +248,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "PV-voorspelling"
+                "options": "PV forecast"
               },
               "properties": [
                 {
@@ -469,7 +469,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -647,7 +647,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -668,14 +668,14 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Autarkie"
+                  "value": "Autarky"
                 }
               ]
             },
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbruik"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -696,7 +696,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Eigenverbruik"
+                  "value": "Self-consumption"
                 }
               ]
             }
@@ -891,7 +891,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarkie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -910,7 +910,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Eigenverbruik"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -1117,7 +1117,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netafname"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1132,7 +1132,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Teruglevering"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1147,7 +1147,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Thuis"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1177,7 +1177,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij laden"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1192,7 +1192,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij ontladen"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1286,7 +1286,7 @@
             "mode": "single",
             "sort": "none"
           },
-          "xField": "Energie",
+          "xField": "Energy",
           "xTickLabelRotation": 0,
           "xTickLabelSpacing": 0
         },
@@ -1409,7 +1409,7 @@
             "refId": "workaround"
           }
         ],
-        "title": "Vermogen (kWh)",
+        "title": "Energie (kWh)",
         "transformations": [
           {
             "id": "reduce",
@@ -1551,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Thuis"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1566,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Netafname"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1596,7 +1596,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij ontladen"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1626,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Teruglevering"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1641,7 +1641,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterij laden"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1828,7 +1828,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Aangekocht"
+                "options": "Purchased"
               },
               "properties": [
                 {
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Verkocht"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -1882,7 +1882,7 @@
                 },
                 {
                   "id": "displayName",
-                  "value": "Dagtotaal"
+                  "value": "Day total"
                 }
               ]
             }
@@ -2012,7 +2012,7 @@
       "title": "Vandaag",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&refresh=10s"
+      "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -2024,7 +2024,7 @@
       "title": "Gisteren",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd"
+      "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -2036,7 +2036,7 @@
       "title": "Eergisteren",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd"
+      "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Net"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2211,7 +2211,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterij"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2247,7 +2247,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Thuis"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2735,4 +2735,3 @@
   "version": 68,
   "weekStart": ""
 }
-

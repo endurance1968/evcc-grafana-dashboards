@@ -119,7 +119,7 @@ GRAFANA_URL=http://<your-grafana-ip>:3000
 GRAFANA_API_TOKEN=<your_token>
 ```
 
-Optional dashboard filter overrides in `vm-dashboard-install.env`:
+Optional dashboard variable overrides in `vm-dashboard-install.env`:
 
 ```env
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
@@ -128,9 +128,12 @@ DASHBOARD_TARIFF_PRICE_INTERVAL=15m
 DASHBOARD_FILTER_EXT_BLOCKLIST=.*Car.*|.*Haupt.*
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_EVCC_URL=http://home:7070/#/
+DASHBOARD_PORTAL_TITLE=Solarman
+DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-All of these values are optional. They are applied when you run the deployer again later, so you can change the hidden dashboard filter defaults without editing the JSON files by hand. The behavior is the same in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+All of these values are optional. They are applied when you run the deployer again later, so you can change hidden dashboard variables and the header buttons without editing the JSON files by hand. The behavior is the same in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
 
 If you want to delete old EVCC dashboards and library panels before import, set:
 
