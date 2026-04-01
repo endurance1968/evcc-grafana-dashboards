@@ -82,6 +82,9 @@ Optional values:
 - `GITHUB_REPO`
 - `GITHUB_REF`
 - `PURGE`
+
+Optional dashboard filter overrides:
+
 - `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
 - `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
 - `DASHBOARD_TARIFF_PRICE_INTERVAL`
@@ -89,7 +92,18 @@ Optional values:
 - `DASHBOARD_FILTER_EXT_BLOCKLIST`
 - `DASHBOARD_FILTER_AUX_BLOCKLIST`
 
-These filter values let you set the hidden dashboard constants during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+Example:
+
+```env
+DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
+DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
+DASHBOARD_TARIFF_PRICE_INTERVAL=15m
+DASHBOARD_FILTER_EXT_BLOCKLIST=.*Car.*|.*Haupt.*
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
+DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+```
+
+All of these values are optional. They let you set the hidden dashboard constants during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
 
 Runtime overrides are also available:
 
@@ -201,6 +215,7 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the deploy scripts above.
+
 
 
 
