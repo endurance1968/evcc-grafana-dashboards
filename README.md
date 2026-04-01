@@ -8,6 +8,11 @@ It builds on the earlier InfluxDB-based EVCC dashboard work by Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
 Many thanks to Carsten for the excellent groundwork. This repository extends that foundation with a production-ready VictoriaMetrics path, migration guidance, rollups, localized dashboard variants, and simple Grafana deploy scripts.
 
+Example dashboard:
+
+![EVCC dashboard example](./images/dashboard-example-today.png)
+
+
 ## What this repository adds
 
 - a complete VictoriaMetrics-based EVCC dashboard set
