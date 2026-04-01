@@ -19,7 +19,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "最大功率过滤 / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "最大功率过滤 / W",
         "name": "peakPowerLimit",
-        "query": "25000",
+        "query": "30000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "不应显示的 EXT 设备列表。该表达式是一个正则表达式。它不能为空；如果不需要过滤任何内容，请使用一个与所有条目都不匹配的正则表达式。\n\n示例：\n无条目：/^none$/\n过滤掉“底层”：/^底层$/\n过滤掉“底层”和“一层”：/^底层$|^一层$/\n过滤掉所有以“配电”开头的内容：/^配电.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4125,3 +4125,4 @@
   "version": 48,
   "weekStart": ""
 }
+

@@ -3150,16 +3150,16 @@
       {
         "name": "peakPowerLimit",
         "type": "constant",
-        "query": "25000",
+        "query": "30000",
         "label": "峰值功率限制",
         "current": {
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
-            "text": "25000",
-            "value": "25000",
+            "text": "30000",
+            "value": "30000",
             "selected": true
           }
         ]
@@ -3218,12 +3218,12 @@
       {
         "name": "extBlocklist",
         "type": "constant",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "label": "EXT 屏蔽列表",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -3279,3 +3279,4 @@
   "version": 2,
   "weekStart": ""
 }
+

@@ -74,6 +74,14 @@ settings = {
     "DASHBOARD_VARIANT": "gen",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
+    "DASHBOARD_FILTER_PEAK_POWER_LIMIT": "",
+    "DASHBOARD_ENERGY_SAMPLE_INTERVAL": "",
+    "DASHBOARD_TARIFF_PRICE_INTERVAL": "",
+    "DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL": "",
+    "DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL": "",
+    "DASHBOARD_FILTER_LOADPOINT_BLOCKLIST": "",
+    "DASHBOARD_FILTER_EXT_BLOCKLIST": "",
+    "DASHBOARD_FILTER_AUX_BLOCKLIST": "",
 }
 
 if config_path.exists():
@@ -103,6 +111,7 @@ if not settings["GRAFANA_API_TOKEN"]:
     raise SystemExit("Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or --token.")
 if settings["DASHBOARD_SOURCE_MODE"] == "local" and not settings["DASHBOARD_LOCAL_DIR"]:
     raise SystemExit("DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.")
+
 
 DASHBOARD_FILES = [
     "VM_ EVCC_ All-time.json",
@@ -166,6 +175,35 @@ def build_inputs(raw):
             out.append({"name": item["name"], "type": item["type"], "value": item.get("value", "")})
     return out
 
+def build_filter_overrides(settings):
+    return {
+        "peakPowerLimit": settings.get("DASHBOARD_FILTER_PEAK_POWER_LIMIT", ""),
+        "energySampleInterval": settings.get("DASHBOARD_ENERGY_SAMPLE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL", ""),
+        "tariffPriceInterval": settings.get("DASHBOARD_TARIFF_PRICE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL", ""),
+        "loadpointBlocklist": settings.get("DASHBOARD_FILTER_LOADPOINT_BLOCKLIST", ""),
+        "extBlocklist": settings.get("DASHBOARD_FILTER_EXT_BLOCKLIST", ""),
+        "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
+    }
+
+def apply_dashboard_filter_overrides(raw, overrides):
+    if not overrides:
+        return raw
+    templating = raw.get("templating") or {}
+    variables = templating.get("list") or []
+    for variable in variables:
+        name = variable.get("name")
+        value = str(overrides.get(name, "") or "").strip()
+        if not value:
+            continue
+        variable["query"] = value
+        current = dict(variable.get("current") or {})
+        current["text"] = value
+        current["value"] = value
+        variable["current"] = current
+        if "options" in variable:
+            variable["options"] = [{"selected": True, "text": value, "value": value}]
+    return raw
+
 def confirm_apply():
     if settings.get("CLI_YES", "").lower() == "true":
         return True
@@ -189,10 +227,13 @@ def delete_and_report(kind, name, uid, path):
         print(f"Deleted {kind}: {name} [{uid}]")
     else:
         raise RuntimeError(f"Failed to delete {kind} {name} [{uid}]")
+filter_overrides = build_filter_overrides(settings)
+
 dashboards = []
 library = {}
 for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
+    raw = apply_dashboard_filter_overrides(raw, filter_overrides)
     dashboards.append({"raw": raw, "inputs": build_inputs(raw)})
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
@@ -209,6 +250,12 @@ else:
 print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
 print(f"Variant: {settings['DASHBOARD_VARIANT']}")
 print(f"Purge: {settings['PURGE']}")
+active_filter_overrides = {k: v for k, v in filter_overrides.items() if str(v).strip()}
+if active_filter_overrides:
+    print()
+    print("Will apply dashboard filter overrides:")
+    for key, value in active_filter_overrides.items():
+        print(f"- {key} = {value}")
 print()
 print("Will import dashboards:")
 for dashboard in dashboards:
@@ -291,4 +338,5 @@ print()
 print("Install finished.")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 PY
+
 

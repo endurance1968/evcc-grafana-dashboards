@@ -19,7 +19,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Max power filter / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "Max power filter / W",
         "name": "peakPowerLimit",
-        "query": "25000",
+        "query": "30000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "List of EXT devices that should NOT be shown. The expression is a regular expression. It must not be empty, so if nothing should be filtered, use a regular expression that matches none of the entries.\n\nExamples:\nNo entries: /^none$/\nFilter out 'Ground floor': /^Ground floor$/\nFilter out 'Ground floor' and 'First floor': /^Ground floor$|^First floor$/\nFilter out everything starting with 'Distribution': /^Distribution.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4125,3 +4125,4 @@
   "version": 48,
   "weekStart": ""
 }
+

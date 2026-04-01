@@ -12,7 +12,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Filtro de potencia máxima / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -2735,3 +2735,4 @@
   "version": 68,
   "weekStart": ""
 }
+

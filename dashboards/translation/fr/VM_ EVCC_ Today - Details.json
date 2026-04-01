@@ -19,7 +19,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Filtre de puissance max / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "Filtre de puissance max / W",
         "name": "peakPowerLimit",
-        "query": "25000",
+        "query": "30000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "Liste des appareils EXT à NE PAS afficher. L'expression est une expression régulière. Elle ne doit pas être vide ; si rien ne doit être filtré, utilisez une expression régulière qui ne correspond à aucune entrée.\n\nExemples :\nAucune entrée : /^none$/\nFiltrer 'Rez-de-chaussée' : /^Rez-de-chaussée$/\nFiltrer 'Rez-de-chaussée' et 'Premier étage' : /^Rez-de-chaussée$|^Premier étage$/\nFiltrer tout ce qui commence par 'Distribution' : /^Distribution.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4125,3 +4125,4 @@
   "version": 48,
   "weekStart": ""
 }
+

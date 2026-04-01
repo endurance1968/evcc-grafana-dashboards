@@ -65,6 +65,14 @@ DASHBOARD_LANGUAGE="en"
 DASHBOARD_VARIANT="gen"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
+DASHBOARD_FILTER_PEAK_POWER_LIMIT=""
+DASHBOARD_ENERGY_SAMPLE_INTERVAL=""
+DASHBOARD_TARIFF_PRICE_INTERVAL=""
+DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL=""
+DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL=""
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=""
+DASHBOARD_FILTER_EXT_BLOCKLIST=""
+DASHBOARD_FILTER_AUX_BLOCKLIST=""
 
 if [[ -f "$CONFIG_PATH" ]]; then
   set -a
@@ -138,6 +146,48 @@ fetch_source() {
   curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_REF/$subdir/$(urlencode "$filename")" -o "$out_file"
 }
 
+apply_dashboard_override() {
+  local file="$1"
+  local variable_name="$2"
+  local value="$3"
+  [[ -n "$value" ]] || return 0
+  local tmp_file="${file}.tmp"
+  jq --arg name "$variable_name" --arg value "$value" '
+    if .templating and .templating.list then
+      .templating.list |= map(
+        if .name == $name then
+          .query = $value
+          | .current = ((.current // {}) + {text:$value, value:$value})
+          | .options = [{selected:true, text:$value, value:$value}]
+        else . end
+      )
+    else . end
+  ' "$file" > "$tmp_file"
+  mv "$tmp_file" "$file"
+}
+
+print_filter_overrides() {
+  local printed=0
+  for entry in \
+    "peakPowerLimit:$DASHBOARD_FILTER_PEAK_POWER_LIMIT" \
+    "energySampleInterval:${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}" \
+    "tariffPriceInterval:${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}" \
+    "loadpointBlocklist:$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST" \
+    "extBlocklist:$DASHBOARD_FILTER_EXT_BLOCKLIST" \
+    "auxBlocklist:$DASHBOARD_FILTER_AUX_BLOCKLIST"; do
+    key=${entry%%:*}
+    value=${entry#*:}
+    if [[ -n "$value" ]]; then
+      if [[ "$printed" -eq 0 ]]; then
+        echo
+        echo "Will apply dashboard filter overrides:"
+        printed=1
+      fi
+      echo "- $key = $value"
+    fi
+  done
+}
+
 replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds else . end)'
 
 DASHBOARD_FILES=(
@@ -158,6 +208,12 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
   inputs_file="$TMP_DIR/$file_name.inputs.json"
   fetch_source "$file_name" "$raw_file"
+  apply_dashboard_override "$raw_file" "peakPowerLimit" "$DASHBOARD_FILTER_PEAK_POWER_LIMIT"
+  apply_dashboard_override "$raw_file" "energySampleInterval" "${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}"
+  apply_dashboard_override "$raw_file" "tariffPriceInterval" "${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}"
+  apply_dashboard_override "$raw_file" "loadpointBlocklist" "$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST"
+  apply_dashboard_override "$raw_file" "extBlocklist" "$DASHBOARD_FILTER_EXT_BLOCKLIST"
+  apply_dashboard_override "$raw_file" "auxBlocklist" "$DASHBOARD_FILTER_AUX_BLOCKLIST"
 
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
     [.__inputs[]? | select(.name and .type) |
@@ -200,6 +256,7 @@ fi
 echo "Language: $DASHBOARD_LANGUAGE"
 echo "Variant: $DASHBOARD_VARIANT"
 echo "Purge: $PURGE"
+print_filter_overrides
 echo
 echo "Will import dashboards:"
 for file_name in "${DASHBOARD_FILES[@]}"; do
@@ -385,5 +442,6 @@ if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
 else
   echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
 fi
+
 
 

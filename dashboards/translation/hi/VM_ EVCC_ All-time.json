@@ -4779,16 +4779,16 @@
       {
         "name": "peakPowerLimit",
         "type": "constant",
-        "query": "25000",
+        "query": "30000",
         "label": "अधिकतम शक्ति सीमा",
         "current": {
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
-            "text": "25000",
-            "value": "25000",
+            "text": "30000",
+            "value": "30000",
             "selected": true
           }
         ]
@@ -5063,3 +5063,4 @@
   "version": 6,
   "weekStart": ""
 }
+

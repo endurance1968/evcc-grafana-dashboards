@@ -19,7 +19,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Filtro potenza massima / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "Filtro potenza massima / W",
         "name": "peakPowerLimit",
-        "query": "25000",
+        "query": "30000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "Elenco dei dispositivi EXT che NON devono essere mostrati. L'espressione è una espressione regolare. Non deve essere vuota; se non deve essere filtrato nulla, usa un'espressione regolare che non corrisponda a nessuna voce.\n\nEsempi:\nNessuna voce: /^none$/\nEscludi 'Piano terra': /^Piano terra$/\nEscludi 'Piano terra' e 'Primo piano': /^Piano terra$|^Primo piano$/\nEscludi tutto ciò che inizia con 'Distribuzione': /^Distribuzione.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4125,3 +4125,4 @@
   "version": 48,
   "weekStart": ""
 }
+

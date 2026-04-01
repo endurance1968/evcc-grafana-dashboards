@@ -4541,12 +4541,12 @@
       {
         "name": "extBlocklist",
         "type": "constant",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "label": "EXT Blocklist",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4604,3 +4604,4 @@
   "weekStart": "",
   "__requires": []
 }
+

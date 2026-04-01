@@ -47,13 +47,13 @@ For most first deployments you only need to set:
 - `GRAFANA_URL`
 - `GRAFANA_API_TOKEN`
 
-The deployer does not patch dashboard internals during deployment.
+The deployer can optionally set the hidden dashboard filter variables during deployment.
 
 That means:
 
 - colors come from the checked-in dashboard JSON files
-- filter defaults come from the checked-in dashboard variables
-- user-specific changes should be done in Grafana after import, or by deploying from a local dashboard directory
+- filter defaults can come either from the checked-in dashboard variables or from the optional deploy-time filter overrides
+- user-specific changes can be done in Grafana after import, by re-running the deployer with filter overrides, or by deploying from a local dashboard directory
 
 ## Config file
 
@@ -82,6 +82,14 @@ Optional values:
 - `GITHUB_REPO`
 - `GITHUB_REF`
 - `PURGE`
+- `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
+- `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
+- `DASHBOARD_TARIFF_PRICE_INTERVAL`
+- `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
+- `DASHBOARD_FILTER_EXT_BLOCKLIST`
+- `DASHBOARD_FILTER_AUX_BLOCKLIST`
+
+These filter values let you set the hidden dashboard constants during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
 
 Runtime overrides are also available:
 
@@ -90,6 +98,8 @@ Runtime overrides are also available:
 - Bash-only deployer: `--url`, `--token`, `--purge`
 
 Those values override the config file for a single run.
+
+Backward compatibility: the old names `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL` and `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL` are still accepted as aliases.
 
 ## User customization
 
@@ -103,8 +113,9 @@ Recommended customization paths:
 The deployer intentionally does not rewrite:
 
 - colors
-- blocklist defaults
 - panel settings
+
+The only supported deploy-time customization is the set of hidden dashboard filter variables listed above.
 
 ## Windows
 
@@ -190,3 +201,9 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the deploy scripts above.
+
+
+
+
+
+

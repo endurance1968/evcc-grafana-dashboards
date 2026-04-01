@@ -19,7 +19,7 @@
       "name": "VAR_PEAKPOWERLIMIT",
       "type": "constant",
       "label": "Max vermogensfilter / W",
-      "value": "25000",
+      "value": "30000",
       "description": ""
     },
     {
@@ -3971,13 +3971,13 @@
         "hide": 2,
         "label": "Max vermogensfilter / W",
         "name": "peakPowerLimit",
-        "query": "25000",
+        "query": "30000",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": "25000",
-          "value": "25000"
+          "text": "30000",
+          "value": "30000"
         },
         "options": [
           {
@@ -4012,13 +4012,13 @@
         "description": "Lijst met EXT-apparaten die NIET moeten worden weergegeven. De expressie is een reguliere expressie. Deze mag niet leeg zijn; als niets gefilterd moet worden, gebruik dan een reguliere expressie die met geen van de items overeenkomt.\n\nVoorbeelden:\nGeen items: /^none$/\nFilter 'Begane grond' uit: /^Begane grond$/\nFilter 'Begane grond' en 'Eerste verdieping' uit: /^Begane grond$|^Eerste verdieping$/\nFilter alles uit dat begint met 'Verdeling': /^Verdeling.*$/",
         "hide": 2,
         "name": "extBlocklist",
-        "query": ".*Car.*|.*Haupt.*",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
           "selected": true,
-          "text": ".*Car.*|.*Haupt.*",
-          "value": ".*Car.*|.*Haupt.*"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
@@ -4125,3 +4125,4 @@
   "version": 48,
   "weekStart": ""
 }
+
