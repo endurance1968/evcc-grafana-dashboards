@@ -395,7 +395,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -643,7 +643,7 @@
         }
       ],
       "title": "电池电量",
-      "transparent": true,
+      "transparent": false,
       "type": "bargauge"
     },
     {
@@ -939,7 +939,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -1257,7 +1257,7 @@
         }
       ],
       "title": "家庭：当前功率",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1575,7 +1575,7 @@
         }
       ],
       "title": "家庭：能源分配",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1916,7 +1916,7 @@
         }
       ],
       "title": "总计：能源分配",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -2241,7 +2241,7 @@
         }
       ],
       "title": "电价",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2582,7 +2582,7 @@
         }
       ],
       "title": "成本",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2878,7 +2878,7 @@
         }
       ],
       "title": "二氧化碳",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3163,7 +3163,7 @@
         }
       ],
       "title": "电流/相",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3389,7 +3389,7 @@
         }
       ],
       "title": "功率/相位",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3629,7 +3629,7 @@
         }
       ],
       "title": "每相充电电流: $loadpoint",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {

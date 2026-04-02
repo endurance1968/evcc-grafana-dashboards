@@ -125,7 +125,7 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 4,
+        "w": 5,
         "x": 0,
         "y": 1
       },
@@ -146,7 +146,7 @@
               }
             ]
           },
-          "unit": "locale",
+          "unit": "kWh",
           "min": 0,
           "custom": {
             "barRadius": 0.18
@@ -361,7 +361,7 @@
         }
       ],
       "description": "",
-      "transparent": true
+      "transparent": false
     },
     {
       "id": 19,
@@ -373,8 +373,8 @@
       },
       "gridPos": {
         "h": 12,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 5,
         "y": 1
       },
       "pluginVersion": "12.3.3",
@@ -773,13 +773,13 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 12,
-        "w": 4,
+        "h": 6,
+        "w": 5,
         "x": 0,
         "y": 13
       },
       "pluginVersion": "12.3.3",
-      "transparent": true,
+      "transparent": false,
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -978,8 +978,8 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 5,
         "y": 13
       },
       "pluginVersion": "12.3.3",
@@ -1380,8 +1380,8 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 5,
         "y": 19
       },
       "pluginVersion": "12.3.3",
@@ -1906,10 +1906,10 @@
         ]
       },
       "gridPos": {
-        "h": 6,
-        "w": 4,
+        "h": 12,
+        "w": 5,
         "x": 0,
-        "y": 25
+        "y": 19
       },
       "id": 16,
       "options": {
@@ -2009,8 +2009,8 @@
       "description": "",
       "gridPos": {
         "h": 6,
-        "w": 4,
-        "x": 4,
+        "w": 3,
+        "x": 5,
         "y": 25
       },
       "pluginVersion": "12.3.3",
@@ -2408,7 +2408,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "transparent": true,
+      "transparent": false,
       "gridPos": {
         "h": 11,
         "w": 8,
@@ -2529,7 +2529,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "transparent": true,
+      "transparent": false,
       "gridPos": {
         "h": 11,
         "w": 8,
@@ -2650,7 +2650,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "transparent": true,
+      "transparent": false,
       "gridPos": {
         "h": 11,
         "w": 8,
@@ -3443,7 +3443,7 @@
         "x": 0,
         "y": 82
       },
-      "transparent": true,
+      "transparent": false,
       "pluginVersion": "12.3.3",
       "fieldConfig": {
         "defaults": {
@@ -3741,7 +3741,7 @@
         "x": 8,
         "y": 82
       },
-      "transparent": true,
+      "transparent": false,
       "pluginVersion": "12.3.3",
       "fieldConfig": {
         "defaults": {
@@ -4107,7 +4107,7 @@
         "x": 16,
         "y": 82
       },
-      "transparent": true,
+      "transparent": false,
       "pluginVersion": "12.3.3",
       "fieldConfig": {
         "defaults": {

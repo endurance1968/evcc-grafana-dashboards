@@ -609,7 +609,7 @@
             }
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -818,7 +818,7 @@
           }
         ],
         "title": "Kengetallen",
-        "transparent": true,
+        "transparent": false,
         "type": "gauge"
       }
     },
@@ -1059,7 +1059,7 @@
             "type": "math"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -1455,7 +1455,7 @@
             }
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "barchart"
       }
     },
@@ -1782,7 +1782,7 @@
             "refId": "homePower"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -1951,7 +1951,7 @@
             "type": "math"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "stat"
       }
     }
@@ -2451,7 +2451,7 @@
         }
       ],
       "title": "Vermogen",
-      "transparent": true,
+      "transparent": false,
       "type": "gauge"
     },
     {

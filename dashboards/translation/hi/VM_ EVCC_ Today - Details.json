@@ -395,7 +395,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -643,7 +643,7 @@
         }
       ],
       "title": "बैटरी स्तर",
-      "transparent": true,
+      "transparent": false,
       "type": "bargauge"
     },
     {
@@ -939,7 +939,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -1257,7 +1257,7 @@
         }
       ],
       "title": "घर: वर्तमान शक्ति",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1575,7 +1575,7 @@
         }
       ],
       "title": "घर: ऊर्जा वितरण",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1916,7 +1916,7 @@
         }
       ],
       "title": "कुल: ऊर्जा वितरण",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -2241,7 +2241,7 @@
         }
       ],
       "title": "बिजली की कीमत",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2582,7 +2582,7 @@
         }
       ],
       "title": "लागत",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2878,7 +2878,7 @@
         }
       ],
       "title": "सीओ 2",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3163,7 +3163,7 @@
         }
       ],
       "title": "धाराएँ/चरण",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3389,7 +3389,7 @@
         }
       ],
       "title": "शक्ति/फेज",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3629,7 +3629,7 @@
         }
       ],
       "title": "चार्ज धारा/फेज: $loadpoint",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {

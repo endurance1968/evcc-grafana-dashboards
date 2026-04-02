@@ -395,7 +395,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -643,7 +643,7 @@
         }
       ],
       "title": "Niveau batterie",
-      "transparent": true,
+      "transparent": false,
       "type": "bargauge"
     },
     {
@@ -939,7 +939,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -1257,7 +1257,7 @@
         }
       ],
       "title": "Maison : Puissance actuelle",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1575,7 +1575,7 @@
         }
       ],
       "title": "Maison : répartition d’énergie",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1916,7 +1916,7 @@
         }
       ],
       "title": "Total : répartition d’énergie",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -2241,7 +2241,7 @@
         }
       ],
       "title": "Prix de l'électricité",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2582,7 +2582,7 @@
         }
       ],
       "title": "Coûts",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2878,7 +2878,7 @@
         }
       ],
       "title": "CO2",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3163,7 +3163,7 @@
         }
       ],
       "title": "Courants/phase",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3389,7 +3389,7 @@
         }
       ],
       "title": "Puissance/phase",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3629,7 +3629,7 @@
         }
       ],
       "title": "Courants de charge/phase: $loadpoint",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {

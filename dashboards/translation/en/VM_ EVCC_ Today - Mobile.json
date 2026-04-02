@@ -659,7 +659,7 @@
             "refId": "homePower"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -877,7 +877,7 @@
             }
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -1046,7 +1046,7 @@
             "type": "math"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "stat"
       }
     },
@@ -1255,7 +1255,7 @@
           }
         ],
         "title": "Metrics",
-        "transparent": true,
+        "transparent": false,
         "type": "gauge"
       }
     },
@@ -1496,7 +1496,7 @@
             "type": "math"
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "timeseries"
       }
     },
@@ -1892,7 +1892,7 @@
             }
           }
         ],
-        "transparent": true,
+        "transparent": false,
         "type": "barchart"
       }
     }
@@ -2404,7 +2404,7 @@
         }
       ],
       "title": "Power",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2691,7 +2691,7 @@
     ]
   },
   "time": {
-    "from": "2026-01-30T23:00:00.000Z",
+    "from": "2026-01-30T23:00:00Z",
     "to": "2026-01-31T22:59:59.999Z"
   },
   "timepicker": {},

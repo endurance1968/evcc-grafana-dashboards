@@ -395,7 +395,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -643,7 +643,7 @@
         }
       ],
       "title": "Batterijniveau",
-      "transparent": true,
+      "transparent": false,
       "type": "bargauge"
     },
     {
@@ -939,7 +939,7 @@
           }
         }
       ],
-      "transparent": true,
+      "transparent": false,
       "type": "barchart"
     },
     {
@@ -1257,7 +1257,7 @@
         }
       ],
       "title": "Huis: huidig vermogen",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1575,7 +1575,7 @@
         }
       ],
       "title": "Thuis: energieverdeling",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -1916,7 +1916,7 @@
         }
       ],
       "title": "Totaal: energieverdeling",
-      "transparent": true,
+      "transparent": false,
       "type": "piechart"
     },
     {
@@ -2241,7 +2241,7 @@
         }
       ],
       "title": "elektriciteitstarief",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2582,7 +2582,7 @@
         }
       ],
       "title": "Kosten",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -2878,7 +2878,7 @@
         }
       ],
       "title": "CO2",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3163,7 +3163,7 @@
         }
       ],
       "title": "Stromen/fase",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3389,7 +3389,7 @@
         }
       ],
       "title": "Vermogen/fase",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
@@ -3629,7 +3629,7 @@
         }
       ],
       "title": "Laadstromen/fase: $loadpoint",
-      "transparent": true,
+      "transparent": false,
       "type": "stat"
     },
     {
