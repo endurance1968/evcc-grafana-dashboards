@@ -173,7 +173,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "पीवी"
+                "value": "PV"
               }
             ]
           },
@@ -185,7 +185,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "ग्रिड आयात"
+                "value": "Grid import"
               }
             ]
           },
@@ -197,7 +197,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "घर"
+                "value": "Home"
               }
             ]
           },
@@ -209,7 +209,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "ग्रिड में आपूर्ति"
+                "value": "Feed-in"
               }
             ]
           },
@@ -228,7 +228,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पीवी"
+              "options": "PV"
             },
             "properties": [
               {
@@ -243,7 +243,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -258,7 +258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -318,7 +318,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड में आपूर्ति"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -572,7 +572,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पीवी"
+              "options": "PV"
             },
             "properties": [
               {
@@ -587,7 +587,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -602,7 +602,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -662,7 +662,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड में आपूर्ति"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -896,7 +896,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "आत्मनिर्भरता"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -917,14 +917,14 @@
               },
               {
                 "id": "displayName",
-                "value": "आत्मनिर्भरता"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "स्व-उपभोग"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
               },
               {
                 "id": "displayName",
-                "value": "स्व-उपभोग"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -1200,7 +1200,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "आत्मनिर्भरता"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -1212,7 +1212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "आत्मनिर्भरता"
+                "value": "Self-sufficiency"
               }
             ]
           },
@@ -1309,7 +1309,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Other"
             },
             "properties": [
               {
@@ -1502,7 +1502,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अन्य"
+                "value": "Other"
               },
               {
                 "id": "color",
@@ -1652,7 +1652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1667,7 +1667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "बैटरी"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -1837,7 +1837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1864,7 +1864,7 @@
               },
               {
                 "id": "displayName",
-                "value": "बैटरी"
+                "value": "Battery"
               }
             ]
           },
@@ -1988,7 +1988,7 @@
         "h": 18,
         "w": 5,
         "x": 0,
-        "y": 43
+        "y": 54
       },
       "pluginVersion": "12.3.3",
       "transparent": false,
@@ -2023,7 +2023,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "ग्रिड कीमत: अंकगणितीय औसत"
+                "value": "Grid price: arithmetic mean"
               },
               {
                 "id": "unit",
@@ -2046,7 +2046,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "प्रभावी मूल्य, गतिशील"
+                "value": "Effective price, dyn."
               },
               {
                 "id": "unit",
@@ -2069,7 +2069,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अंकगणितीय की तुलना में बचत"
+                "value": "Saved vs arith."
               },
               {
                 "id": "unit",
@@ -2092,7 +2092,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अंकगणितीय पर संभावित"
+                "value": "Potential at arith."
               },
               {
                 "id": "unit",
@@ -2115,7 +2115,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "खरीदा गया, गतिशील"
+                "value": "Purchased, dynamic"
               },
               {
                 "id": "unit",
@@ -2138,7 +2138,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "गतिशील बचत"
+                "value": "Savings dyn."
               },
               {
                 "id": "unit",
@@ -2161,7 +2161,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बेचा गया (आपूर्ति)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "unit",
@@ -2184,7 +2184,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "संतुलन"
+                "value": "Balance"
               },
               {
                 "id": "unit",
@@ -2446,7 +2446,7 @@
         "h": 11,
         "w": 19,
         "x": 5,
-        "y": 43
+        "y": 54
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2519,7 +2519,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "औसत"
+              "options": "Average"
             },
             "properties": [
               {
@@ -2534,7 +2534,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "प्रभावी बिजली कीमत"
+              "options": "Effective electricity price"
             },
             "properties": [
               {
@@ -2641,7 +2641,7 @@
         "h": 7,
         "w": 19,
         "x": 5,
-        "y": 54
+        "y": 65
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -2692,12 +2692,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "खरीदा गया"
+              "options": "Purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "खरीदा गया"
+                "value": "Purchased"
               }
             ]
           },
@@ -2763,7 +2763,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 61
+        "y": 72
       },
       "panels": []
     },
@@ -2799,7 +2799,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी चार्ज"
+                "value": "Battery charge"
               },
               {
                 "id": "unit",
@@ -2819,7 +2819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी डिस्चार्ज"
+                "value": "Battery discharge"
               },
               {
                 "id": "unit",
@@ -2839,7 +2839,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी दक्षता"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -2859,7 +2859,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "औसत अधिकतम SOC"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -2879,7 +2879,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "औसत न्यूनतम SOC"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -2897,7 +2897,7 @@
         "h": 7,
         "w": 5,
         "x": 0,
-        "y": 62
+        "y": 73
       },
       "id": 16,
       "options": {
@@ -3066,7 +3066,7 @@
         "h": 7,
         "w": 19,
         "x": 5,
-        "y": 62
+        "y": 73
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -3115,7 +3115,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC अधिकतम"
+              "options": "SOC max"
             },
             "properties": [
               {
@@ -3127,14 +3127,14 @@
               },
               {
                 "id": "displayName",
-                "value": "बैटरी अधिकतम"
+                "value": "Battery max"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC न्यूनतम"
+              "options": "SOC min"
             },
             "properties": [
               {
@@ -3146,7 +3146,7 @@
               },
               {
                 "id": "displayName",
-                "value": "बैटरी न्यूनतम"
+                "value": "Battery min"
               }
             ]
           },
@@ -3215,6 +3215,609 @@
           "refId": "socMin",
           "hide": false,
           "interval": "1d"
+        }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 43
+      },
+      "id": 38,
+      "panels": [],
+      "title": "उपभोक्ता",
+      "type": "row"
+    },
+    {
+      "id": 39,
+      "title": "हीट पंप कुल",
+      "type": "stat",
+      "description": "मेल खाते लोडपॉइंट्स पर वार्षिक हीट पंप ऊर्जा।",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 0,
+        "y": 44
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "hpPvWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "hpBatteryWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "hpGridWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($hpPvWh + $hpBatteryWh + $hpGridWh) / 1000",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 40,
+      "title": "हीट पंप स्रोत मिश्रण",
+      "type": "bargauge",
+      "description": "हीट पंप लोडपॉइंट के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 4,
+        "y": 44
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "hpPvKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "hpBatteryKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "hpGridKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$hpPvKwh + $hpBatteryKwh + $hpGridKwh",
+          "refId": "hpTotalKwh",
+          "type": "math",
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$hpPvKwh / $hpTotalKwh",
+          "refId": "PV",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$hpBatteryKwh / $hpTotalKwh",
+          "refId": "Battery",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$hpGridKwh / $hpTotalKwh",
+          "refId": "Grid",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "title": "चार्जिंग स्टेशनों का कुल",
+      "type": "stat",
+      "description": "हीट पंप लोडपॉइंट को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स की वार्षिक चार्जिंग ऊर्जा।",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 4,
+        "x": 12,
+        "y": 44
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kWh"
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "lpPvWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "lpBatteryWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "hide": true,
+          "refId": "lpGridWh",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($lpPvWh + $lpBatteryWh + $lpGridWh) / 1000",
+          "refId": "A",
+          "type": "math"
+        }
+      ]
+    },
+    {
+      "id": 42,
+      "title": "चार्जिंग स्टेशनों का स्रोत मिश्रण",
+      "type": "bargauge",
+      "description": "हीट पंप को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 8,
+        "x": 16,
+        "y": 44
+      },
+      "pluginVersion": "12.3.3",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "PV"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#447EBC"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Grid"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#E24D42"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 60,
+        "minVizWidth": 120,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "manual",
+        "text": {
+          "titleSize": 12,
+          "valueSize": 18
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "lpPvKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "lpBatteryKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "refId": "lpGridKwh",
+          "hide": true,
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpPvKwh + $lpBatteryKwh + $lpGridKwh",
+          "refId": "lpTotalKwh",
+          "type": "math",
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpPvKwh / $lpTotalKwh",
+          "refId": "PV",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpBatteryKwh / $lpTotalKwh",
+          "refId": "Battery",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$lpGridKwh / $lpTotalKwh",
+          "refId": "Grid",
+          "type": "math"
         }
       ]
     }
@@ -3315,6 +3918,17 @@
           }
         ],
         "hide": 2
+      },
+      {
+        "name": "heatPumpLoadpointRegex",
+        "label": "हीट पंप लोडपॉइंट मिलान",
+        "hide": 2,
+        "type": "constant",
+        "query": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
+        "current": {
+          "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
+          "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
+        }
       },
       {
         "name": "extBlocklist",

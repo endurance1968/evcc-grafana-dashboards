@@ -47,7 +47,7 @@
       "title": "Année",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
+      "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now%2Fy&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -59,7 +59,7 @@
       "title": "Année précédente",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now%2Fy&timezone=browser"
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now-1y%2Fy&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -71,7 +71,7 @@
       "title": "Il y a 2 ans",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-1y%2Fy&timezone=browser"
+      "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-2y%2Fy&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -187,12 +187,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Import réseau"
+                "value": "Grid import"
               },
               {
                 "id": "color",
@@ -206,12 +206,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Maison"
+                "value": "Home"
               },
               {
                 "id": "color",
@@ -225,12 +225,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Injection"
+              "options": "Feed-in"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Injection"
+                "value": "Feed-in"
               },
               {
                 "id": "color",
@@ -444,7 +444,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Injection"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -594,7 +594,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) /1000, \"series\", \"PV\") or label_set((sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) /1000, \"series\", \"Grid import\") or label_set(((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) * -1) /1000, \"series\", \"Home\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[400d:1d])) by (local_month, loadpoint)) * -1) /1000, \"loadpoint\", \"series\") or label_set(((sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) * -1) /1000, \"series\", \"Feed-in\")"
+          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"PV\") or label_set((sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"Grid import\") or label_set(((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) * -1) /1000, \"series\", \"Home\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) * -1) /1000, \"loadpoint\", \"series\") or label_set(((sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) * -1) /1000, \"series\", \"Feed-in\")"
         }
       ],
       "transformations": [
@@ -687,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarcie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -708,14 +708,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarcie"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autoconsommation"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -736,7 +736,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autoconsommation"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -923,14 +923,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarcie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autoconsommation"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -994,7 +994,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set(1 - (sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) / ((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) + (sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month))), \"series\", \"Autarky\") or label_set(((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month))) / (sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)), \"series\", \"Self-consumption\")"
+          "expr": "label_set(1 - (sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / ((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) + (sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))), \"series\", \"Autarky\") or label_set(((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / (sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Self-consumption\")"
         }
       ],
       "transformations": [
@@ -1074,12 +1074,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/jour"
+              "options": "PV/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV/jour"
+                "value": "PV/day"
               },
               {
                 "id": "color",
@@ -1093,12 +1093,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consommation/jour"
+              "options": "Consumption/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Consommation/jour"
+                "value": "Consumption/day"
               },
               {
                 "id": "color",
@@ -1112,12 +1112,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau/jour"
+              "options": "Grid import/day"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Import réseau/jour"
+                "value": "Grid import/day"
               },
               {
                 "id": "color",
@@ -1302,7 +1302,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -1314,14 +1314,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Import réseau"
+                "value": "Grid import"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Consommation/jour"
+              "options": "Consumption/day"
             },
             "properties": [
               {
@@ -1333,7 +1333,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consommation"
+                "value": "Consumption"
               }
             ]
           }
@@ -1468,7 +1468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Other"
             },
             "properties": [
               {
@@ -1483,7 +1483,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1682,7 +1682,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Autre"
+                "value": "Other"
               },
               {
                 "id": "color",
@@ -1729,7 +1729,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month) - sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) / 1000, \"series\", \"Other\") or label_copy(((sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$extBlocklist\"}[1d]))[400d:1d])) by (local_month, title)) /1000), \"title\", \"series\") or label_copy(((sum(sum_over_time((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$auxBlocklist\"}[1d]))[400d:1d])) by (local_month, title)) /1000), \"title\", \"series\")"
+          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) - sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Other\") or label_copy(((sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$extBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) /1000), \"title\", \"series\") or label_copy(((sum(sum_over_time((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$auxBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) /1000), \"title\", \"series\")"
         }
       ],
       "transformations": [
@@ -1808,7 +1808,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1823,7 +1823,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterie"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2082,7 +2082,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2109,14 +2109,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Batterie"
+                "value": "Battery"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Other"
             },
             "properties": [
               {
@@ -2164,7 +2164,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set(((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month) ) - (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month))) / 1000, \"series\", \"Battery\") or label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)) /1000, \"series\", \"Home\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[400d:1d])) by (local_month, loadpoint)) /1000), \"loadpoint\", \"series\")"
+          "expr": "label_set(((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) ) - (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000, \"series\", \"Battery\") or label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"Home\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) /1000), \"loadpoint\", \"series\")"
         }
       ],
       "transformations": [
@@ -2264,7 +2264,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prix de l’électricité : moyenne arithmétique"
+                "value": "Electricity price: arithmetic mean"
               },
               {
                 "id": "color",
@@ -2287,7 +2287,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prix effectif de l’électricité, dynamique"
+                "value": "Effective electricity price, dynamic"
               },
               {
                 "id": "color",
@@ -2310,7 +2310,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prix économisé grâce au tarif dynamique"
+                "value": "Saved electricity price through dynamic tariff"
               },
               {
                 "id": "unit",
@@ -2326,19 +2326,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Achat potentiel au prix arithmétique"
+                "value": "Potential purchase at arithmetic price"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Acheté"
+              "options": "purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Acheté, dynamique"
+                "value": "Purchased, dynamic"
               }
             ]
           },
@@ -2350,19 +2350,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Économies grâce au tarif dynamique"
+                "value": "Savings through dynamic tariff"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendu"
+              "options": "sold"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Vendu (injection)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "color",
@@ -2381,7 +2381,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bilan"
+                "value": "Balance"
               }
             ]
           }
@@ -2416,7 +2416,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d]))",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
           "hide": true,
           "instant": true,
           "range": false
@@ -2428,7 +2428,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) / sum(count_over_time((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d]))",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / sum(count_over_time((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
           "legendFormat": "averagePrice",
           "instant": true,
           "range": false
@@ -2440,7 +2440,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) * -1",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) * -1",
           "legendFormat": "Acheté",
           "instant": true,
           "range": false
@@ -2500,7 +2500,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d]))",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
           "legendFormat": "Vendu",
           "instant": true,
           "range": false
@@ -2604,7 +2604,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Moyenne"
+              "options": "Average"
             },
             "properties": [
               {
@@ -2619,7 +2619,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Prix effectif de l’électricité"
+              "options": "Effective electricity price"
             },
             "properties": [
               {
@@ -2789,14 +2789,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Acheté"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2811,7 +2811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendu"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2859,7 +2859,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)), \"series\", \"Purchased\") or (label_set((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) by (local_month)), \"series\", \"Sold\") and on() (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[400d:1d])) > 0))"
+          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Purchased\") or (label_set((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Sold\") and on() (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) > 0))"
         }
       ],
       "transformations": [
@@ -2958,7 +2958,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Charge batterie"
+                "value": "Battery charge"
               },
               {
                 "id": "unit",
@@ -2978,7 +2978,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Décharge batterie"
+                "value": "Battery discharge"
               },
               {
                 "id": "unit",
@@ -2998,7 +2998,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rendement batterie"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -3025,7 +3025,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC max moyen"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -3045,7 +3045,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC min moyen"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -3426,7 +3426,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Décharge"
+              "options": "Discharge"
             },
             "properties": [
               {
@@ -3438,7 +3438,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Décharge"
+                "value": "Discharge"
               }
             ]
           }
@@ -3777,7 +3777,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rendement batterie"
+                "value": "Battery efficiency"
               },
               {
                 "id": "unit",
@@ -4048,12 +4048,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterie"
+              "options": "Battery"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterie"
+                "value": "Battery"
               },
               {
                 "id": "color",
@@ -4067,12 +4067,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réseau"
+              "options": "Grid"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Réseau"
+                "value": "Grid"
               },
               {
                 "id": "color",
@@ -4343,12 +4343,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterie"
+              "options": "Battery"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterie"
+                "value": "Battery"
               },
               {
                 "id": "color",
@@ -4362,12 +4362,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réseau"
+              "options": "Grid"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Réseau"
+                "value": "Grid"
               },
               {
                 "id": "color",
@@ -4779,7 +4779,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               }
             ]
           }
@@ -4937,7 +4937,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               }
             ]
           }
@@ -5096,7 +5096,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mois"
+                "value": "Month"
               }
             ]
           }
