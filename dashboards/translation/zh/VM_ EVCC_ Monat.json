@@ -173,7 +173,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "光伏发电"
               }
             ]
           },
@@ -185,7 +185,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "电网输入"
               }
             ]
           },
@@ -197,7 +197,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "家庭"
               }
             ]
           },
@@ -209,7 +209,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "馈电"
               }
             ]
           },
@@ -228,7 +228,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -243,7 +243,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -258,7 +258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -318,7 +318,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -572,7 +572,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -587,7 +587,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -602,7 +602,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -662,7 +662,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -896,7 +896,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -917,14 +917,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "自给率"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "自耗"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "自耗"
               }
             ]
           }
@@ -1200,7 +1200,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -1212,7 +1212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-sufficiency"
+                "value": "自给自足"
               }
             ]
           },
@@ -1309,7 +1309,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1502,7 +1502,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "其他"
               },
               {
                 "id": "color",
@@ -1652,7 +1652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -1667,7 +1667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "电池"
             },
             "properties": [
               {
@@ -1837,7 +1837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -1864,7 +1864,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "电池"
               }
             ]
           },
@@ -2023,7 +2023,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid price: arithmetic mean"
+                "value": "电网电价：算术平均值"
               },
               {
                 "id": "unit",
@@ -2046,7 +2046,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective price, dyn."
+                "value": "实际价格，动态"
               },
               {
                 "id": "unit",
@@ -2069,7 +2069,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved vs arith."
+                "value": "相对算术价节省"
               },
               {
                 "id": "unit",
@@ -2092,7 +2092,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential at arith."
+                "value": "按算术价的潜力"
               },
               {
                 "id": "unit",
@@ -2115,7 +2115,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "购入，动态"
               },
               {
                 "id": "unit",
@@ -2138,7 +2138,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings dyn."
+                "value": "动态节省"
               },
               {
                 "id": "unit",
@@ -2161,7 +2161,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "售出（馈电）"
               },
               {
                 "id": "unit",
@@ -2184,7 +2184,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "平衡"
               },
               {
                 "id": "unit",
@@ -2519,7 +2519,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2534,7 +2534,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "实际电价"
             },
             "properties": [
               {
@@ -2692,12 +2692,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "购入"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased"
+                "value": "购入"
               }
             ]
           },
@@ -2799,7 +2799,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "电池充电"
               },
               {
                 "id": "unit",
@@ -2819,7 +2819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "电池放电"
               },
               {
                 "id": "unit",
@@ -2839,7 +2839,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "电池效率"
               },
               {
                 "id": "unit",
@@ -2859,7 +2859,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "平均最高 SOC"
               },
               {
                 "id": "unit",
@@ -2879,7 +2879,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "平均最低 SOC"
               },
               {
                 "id": "unit",
@@ -3115,7 +3115,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC max"
+              "options": "SOC 最高"
             },
             "properties": [
               {
@@ -3127,14 +3127,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery max"
+                "value": "电池最大值"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC min"
+              "options": "SOC 最低"
             },
             "properties": [
               {
@@ -3146,7 +3146,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery min"
+                "value": "电池最小值"
               }
             ]
           },

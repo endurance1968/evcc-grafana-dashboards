@@ -187,12 +187,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netzbezug"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Netzbezug"
               },
               {
                 "id": "color",
@@ -206,12 +206,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "Haus"
               },
               {
                 "id": "color",
@@ -225,12 +225,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "Einspeisung"
               },
               {
                 "id": "color",
@@ -444,7 +444,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netzbezug"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
@@ -687,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -708,14 +708,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "Autarkie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Eigenverbrauch"
             },
             "properties": [
               {
@@ -736,7 +736,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "Eigenverbrauch"
               }
             ]
           }
@@ -923,14 +923,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Eigenverbrauch"
             },
             "properties": [
               {
@@ -1074,12 +1074,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/day"
+              "options": "PV/Tag"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV/day"
+                "value": "PV/Tag"
               },
               {
                 "id": "color",
@@ -1093,12 +1093,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Verbrauch/Tag"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Consumption/day"
+                "value": "Verbrauch/Tag"
               },
               {
                 "id": "color",
@@ -1112,12 +1112,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import/day"
+              "options": "Netzbezug/Tag"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import/day"
+                "value": "Netzbezug/Tag"
               },
               {
                 "id": "color",
@@ -1302,7 +1302,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netzbezug"
             },
             "properties": [
               {
@@ -1314,14 +1314,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Netzbezug"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Verbrauch/Tag"
             },
             "properties": [
               {
@@ -1333,7 +1333,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consumption"
+                "value": "Verbrauch"
               }
             ]
           }
@@ -1468,7 +1468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Sonstiges"
             },
             "properties": [
               {
@@ -1483,7 +1483,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
@@ -1682,7 +1682,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "Sonstiges"
               },
               {
                 "id": "color",
@@ -1808,7 +1808,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
@@ -1823,7 +1823,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Speicher"
             },
             "properties": [
               {
@@ -2082,7 +2082,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
@@ -2109,14 +2109,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Speicher"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Sonstiges"
             },
             "properties": [
               {
@@ -2264,7 +2264,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "Strompreis: Arithmetisches Mittel"
               },
               {
                 "id": "color",
@@ -2287,7 +2287,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "Effektiver Strompreis, dynamisch"
               },
               {
                 "id": "color",
@@ -2310,7 +2310,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "Eingesparter Strompreis durch dynamischen Tarif"
               },
               {
                 "id": "unit",
@@ -2326,19 +2326,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "Potentieller Einkauf nach arithmetischem Preis"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Einkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "Einkauf, dynamisch"
               }
             ]
           },
@@ -2350,19 +2350,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "Einsparung durch dynamischen Tarif"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Verkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "Verkauf (Einspeisung)"
               },
               {
                 "id": "color",
@@ -2381,7 +2381,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "Bilanz"
               }
             ]
           }
@@ -2604,7 +2604,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2619,7 +2619,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Effektiver Strompreis"
             },
             "properties": [
               {
@@ -2789,14 +2789,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Einkauf"
             },
             "properties": [
               {
@@ -2811,7 +2811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Verkauf"
             },
             "properties": [
               {
@@ -2958,7 +2958,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "Speicher laden"
               },
               {
                 "id": "unit",
@@ -2978,7 +2978,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "Speicher entladen"
               },
               {
                 "id": "unit",
@@ -2998,7 +2998,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Speicher Effizienz"
               },
               {
                 "id": "unit",
@@ -3025,7 +3025,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "Durchschnitt Max SOC"
               },
               {
                 "id": "unit",
@@ -3045,7 +3045,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "Durchschnitt Min SOC"
               },
               {
                 "id": "unit",
@@ -3407,7 +3407,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Charge"
+              "options": "Laden"
             },
             "properties": [
               {
@@ -3419,14 +3419,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Charge"
+                "value": "Laden"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Discharge"
+              "options": "Entladen"
             },
             "properties": [
               {
@@ -3438,7 +3438,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Discharge"
+                "value": "Entladen"
               }
             ]
           }
@@ -3777,7 +3777,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Speicher Effizienz"
               },
               {
                 "id": "unit",
@@ -3878,7 +3878,7 @@
     },
     {
       "id": 71,
-      "title": "Consumers",
+      "title": "Verbraucher",
       "type": "row",
       "collapsed": false,
       "panels": [],
@@ -3891,9 +3891,9 @@
     },
     {
       "id": 72,
-      "title": "Heat pump total",
+      "title": "Wärmepumpe gesamt",
       "type": "stat",
-      "description": "Yearly heat pump energy across matching loadpoints.",
+      "description": "Jährliche Wärmepumpenenergie über passende Loadpoints.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -3991,9 +3991,9 @@
     },
     {
       "id": 73,
-      "title": "Heat pump source mix",
+      "title": "Versorgungsmix Wärmepumpe",
       "type": "bargauge",
-      "description": "Estimated share of PV, battery discharge and grid supply for the heat pump loadpoint.",
+      "description": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für den Wärmepumpen-Loadpoint.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4048,12 +4048,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Speicher"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Speicher"
               },
               {
                 "id": "color",
@@ -4067,12 +4067,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Netz"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "Netz"
               },
               {
                 "id": "color",
@@ -4186,9 +4186,9 @@
     },
     {
       "id": 74,
-      "title": "Charging stations total",
+      "title": "Ladestationen gesamt",
       "type": "stat",
-      "description": "Yearly charging energy across visible charging loadpoints, excluding the heat pump loadpoint.",
+      "description": "Jährliche Ladeenergie über sichtbare Lade-Loadpoints ohne den Wärmepumpen-Loadpoint.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4286,9 +4286,9 @@
     },
     {
       "id": 75,
-      "title": "Charging stations source mix",
+      "title": "Versorgungsmix Ladestationen",
       "type": "bargauge",
-      "description": "Estimated share of PV, battery discharge and grid supply for visible charging loadpoints, excluding the heat pump.",
+      "description": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für sichtbare Lade-Loadpoints ohne Wärmepumpe.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4343,12 +4343,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Speicher"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Speicher"
               },
               {
                 "id": "color",
@@ -4362,12 +4362,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Netz"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "Netz"
               },
               {
                 "id": "color",
@@ -4779,7 +4779,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           }
@@ -4937,7 +4937,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           }
@@ -5096,7 +5096,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           }
@@ -5294,7 +5294,7 @@
       },
       {
         "name": "heatPumpLoadpointRegex",
-        "label": "Heat pump loadpoint match",
+        "label": "Wärmepumpen-Loadpoint-Muster",
         "hide": 2,
         "type": "constant",
         "query": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",

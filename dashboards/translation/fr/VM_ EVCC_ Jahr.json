@@ -187,12 +187,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Import réseau"
               },
               {
                 "id": "color",
@@ -206,12 +206,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "Maison"
               },
               {
                 "id": "color",
@@ -225,12 +225,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Injection"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "Injection"
               },
               {
                 "id": "color",
@@ -444,7 +444,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               },
               {
                 "id": "decimals",
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Injection"
             },
             "properties": [
               {
@@ -687,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarcie"
             },
             "properties": [
               {
@@ -708,14 +708,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "Autarcie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsommation"
             },
             "properties": [
               {
@@ -736,7 +736,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "Autoconsommation"
               }
             ]
           }
@@ -923,14 +923,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarcie"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsommation"
             },
             "properties": [
               {
@@ -1074,12 +1074,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/day"
+              "options": "PV/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV/day"
+                "value": "PV/jour"
               },
               {
                 "id": "color",
@@ -1093,12 +1093,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consommation/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Consumption/day"
+                "value": "Consommation/jour"
               },
               {
                 "id": "color",
@@ -1112,12 +1112,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import/day"
+              "options": "Import réseau/jour"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import/day"
+                "value": "Import réseau/jour"
               },
               {
                 "id": "color",
@@ -1302,7 +1302,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
@@ -1314,14 +1314,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Import réseau"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consommation/jour"
             },
             "properties": [
               {
@@ -1333,7 +1333,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consumption"
+                "value": "Consommation"
               }
             ]
           }
@@ -1468,7 +1468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Autre"
             },
             "properties": [
               {
@@ -1483,7 +1483,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -1682,7 +1682,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "Autre"
               },
               {
                 "id": "color",
@@ -1808,7 +1808,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -1823,7 +1823,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batterie"
             },
             "properties": [
               {
@@ -2082,7 +2082,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -2109,14 +2109,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Batterie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Autre"
             },
             "properties": [
               {
@@ -2264,7 +2264,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "Prix de l’électricité : moyenne arithmétique"
               },
               {
                 "id": "color",
@@ -2287,7 +2287,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "Prix effectif de l’électricité, dynamique"
               },
               {
                 "id": "color",
@@ -2310,7 +2310,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "Prix économisé grâce au tarif dynamique"
               },
               {
                 "id": "unit",
@@ -2326,19 +2326,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "Achat potentiel au prix arithmétique"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Acheté"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "Acheté, dynamique"
               }
             ]
           },
@@ -2350,19 +2350,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "Économies grâce au tarif dynamique"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Vendu"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "Vendu (injection)"
               },
               {
                 "id": "color",
@@ -2381,7 +2381,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "Bilan"
               }
             ]
           }
@@ -2604,7 +2604,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Moyenne"
             },
             "properties": [
               {
@@ -2619,7 +2619,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Prix effectif de l’électricité"
             },
             "properties": [
               {
@@ -2789,14 +2789,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acheté"
             },
             "properties": [
               {
@@ -2811,7 +2811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Vendu"
             },
             "properties": [
               {
@@ -2958,7 +2958,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "Charge batterie"
               },
               {
                 "id": "unit",
@@ -2978,7 +2978,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "Décharge batterie"
               },
               {
                 "id": "unit",
@@ -2998,7 +2998,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Rendement batterie"
               },
               {
                 "id": "unit",
@@ -3025,7 +3025,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "SOC max moyen"
               },
               {
                 "id": "unit",
@@ -3045,7 +3045,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "SOC min moyen"
               },
               {
                 "id": "unit",
@@ -3426,7 +3426,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Discharge"
+              "options": "Décharge"
             },
             "properties": [
               {
@@ -3438,7 +3438,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Discharge"
+                "value": "Décharge"
               }
             ]
           }
@@ -3777,7 +3777,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Rendement batterie"
               },
               {
                 "id": "unit",
@@ -3878,7 +3878,7 @@
     },
     {
       "id": 71,
-      "title": "Consumers",
+      "title": "Consommateurs",
       "type": "row",
       "collapsed": false,
       "panels": [],
@@ -3891,9 +3891,9 @@
     },
     {
       "id": 72,
-      "title": "Heat pump total",
+      "title": "Total pompe à chaleur",
       "type": "stat",
-      "description": "Yearly heat pump energy across matching loadpoints.",
+      "description": "Énergie annuelle de la pompe à chaleur sur les points de charge correspondants.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -3991,9 +3991,9 @@
     },
     {
       "id": 73,
-      "title": "Heat pump source mix",
+      "title": "Répartition des sources de la pompe à chaleur",
       "type": "bargauge",
-      "description": "Estimated share of PV, battery discharge and grid supply for the heat pump loadpoint.",
+      "description": "Part estimée du PV, de la décharge batterie et du réseau pour le point de charge de la pompe à chaleur.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4048,12 +4048,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batterie"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Batterie"
               },
               {
                 "id": "color",
@@ -4067,12 +4067,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Réseau"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "Réseau"
               },
               {
                 "id": "color",
@@ -4186,9 +4186,9 @@
     },
     {
       "id": 74,
-      "title": "Charging stations total",
+      "title": "Total bornes de recharge",
       "type": "stat",
-      "description": "Yearly charging energy across visible charging loadpoints, excluding the heat pump loadpoint.",
+      "description": "Énergie de charge annuelle sur les points de charge visibles, hors point de charge de la pompe à chaleur.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4286,9 +4286,9 @@
     },
     {
       "id": 75,
-      "title": "Charging stations source mix",
+      "title": "Répartition des sources des bornes de recharge",
       "type": "bargauge",
-      "description": "Estimated share of PV, battery discharge and grid supply for visible charging loadpoints, excluding the heat pump.",
+      "description": "Part estimée du PV, de la décharge batterie et du réseau pour les points de charge visibles, hors pompe à chaleur.",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -4343,12 +4343,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batterie"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "Batterie"
               },
               {
                 "id": "color",
@@ -4362,12 +4362,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Réseau"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "Réseau"
               },
               {
                 "id": "color",
@@ -4779,7 +4779,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -4937,7 +4937,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -5096,7 +5096,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Mois"
               }
             ]
           }
@@ -5294,7 +5294,7 @@
       },
       {
         "name": "heatPumpLoadpointRegex",
-        "label": "Heat pump loadpoint match",
+        "label": "Correspondance du point de charge de la pompe à chaleur",
         "hide": 2,
         "type": "constant",
         "query": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",

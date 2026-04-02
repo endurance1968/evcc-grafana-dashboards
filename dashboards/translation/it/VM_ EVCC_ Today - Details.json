@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "Energia",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -468,7 +468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -578,7 +578,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -712,7 +712,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -812,7 +812,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Previsione"
             },
             "properties": [
               {
@@ -827,7 +827,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Reale"
             },
             "properties": [
               {
@@ -871,7 +871,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "Energia",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1012,7 +1012,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Reale"
             },
             "properties": [
               {
@@ -1027,7 +1027,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Previsione"
             },
             "properties": [
               {
@@ -1140,7 +1140,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1327,7 +1327,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1458,7 +1458,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1645,7 +1645,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totale"
             },
             "properties": [
               {
@@ -1675,7 +1675,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1807,7 +1807,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1986,7 +1986,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -2141,7 +2141,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2311,7 +2311,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -2350,7 +2350,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "Prezzo"
             },
             "properties": [
               {
@@ -2459,7 +2459,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Purchased"
+                "value": "Acquistato"
               }
             ]
           },
@@ -2478,7 +2478,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Sold"
+                "value": "Venduto"
               }
             ]
           },
@@ -2509,7 +2509,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Day total"
+                "value": "Totale giornaliero"
               }
             ]
           }
@@ -2652,7 +2652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
@@ -2667,7 +2667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Venduto"
             },
             "properties": [
               {
@@ -2778,7 +2778,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2948,7 +2948,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
