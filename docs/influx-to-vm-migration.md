@@ -279,7 +279,7 @@ Recommended production core:
 
 ```ini
 [victoriametrics]
-base_url = http://<vm-host>:8428
+base_url = http://localhost:8428
 db_label = evcc
 host_label =
 timezone = Europe/Berlin
