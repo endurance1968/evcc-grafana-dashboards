@@ -67,7 +67,13 @@ def parse_args() -> argparse.Namespace:
         "--import-batch-size",
         type=int,
         default=1,
-        help="Number of series per VM import batch during write mode.",
+        help="Number of series chunks per VM import batch during write mode.",
+    )
+    parser.add_argument(
+        "--max-import-line-bytes",
+        type=int,
+        default=8_000_000,
+        help="Maximum size per vmimport JSONL line before a series is split into multiple chunks (default: 8000000).",
     )
     parser.add_argument(
         "--progress-every",
@@ -207,6 +213,63 @@ def serialize_jsonl(items: list[dict]) -> bytes:
     return ("\n".join(chunks) + "\n").encode("utf-8")
 
 
+def estimate_series_line_bytes(item: dict) -> int:
+    return len(json.dumps(item, separators=(",", ":"), ensure_ascii=True).encode("utf-8")) + 1
+
+
+def split_series_for_import(item: dict, max_line_bytes: int) -> list[dict]:
+    if max_line_bytes <= 0:
+        raise ValueError("max_line_bytes must be greater than 0")
+
+    timestamps = [int(ts) for ts in item.get("timestamps", [])]
+    values = [float(value) for value in item.get("values", [])]
+    if len(timestamps) != len(values):
+        raise ValueError("timestamps and values length mismatch")
+
+    if not timestamps:
+        return [item]
+
+    metric = item["metric"]
+    chunks: list[dict] = []
+    start = 0
+    total = len(timestamps)
+
+    while start < total:
+        low = start + 1
+        high = total
+        best_end: int | None = None
+        while low <= high:
+            mid = (low + high) // 2
+            candidate = {
+                "metric": metric,
+                "timestamps": timestamps[start:mid],
+                "values": values[start:mid],
+            }
+            size = estimate_series_line_bytes(candidate)
+            if size <= max_line_bytes:
+                best_end = mid
+                low = mid + 1
+            else:
+                high = mid - 1
+
+        if best_end is None:
+            raise SystemExit(
+                f"Single sample for metric {metric} exceeds --max-import-line-bytes={max_line_bytes}. "
+                "Increase the limit and retry."
+            )
+
+        chunks.append(
+            {
+                "metric": metric,
+                "timestamps": timestamps[start:best_end],
+                "values": values[start:best_end],
+            }
+        )
+        start = best_end
+
+    return chunks
+
+
 def verify_matcher_count(base_url: str, matcher: str) -> int:
     url = f"{base_url.rstrip('/')}/prometheus/api/v1/series?" + urllib.parse.urlencode([("match[]", matcher)])
     with urllib.request.urlopen(url, timeout=120) as response:
@@ -214,17 +277,8 @@ def verify_matcher_count(base_url: str, matcher: str) -> int:
     return len(payload.get("data", []))
 
 
-def delete_target_matchers(base_url: str, rewritten: list[dict], dropped_label: str) -> int:
-    deleted = 0
-    seen: set[str] = set()
-    for item in rewritten:
-        matcher = target_matcher(item["metric"], dropped_label)
-        if matcher in seen:
-            continue
-        http_post_form(base_url, "/api/v1/admin/tsdb/delete_series", [("match[]", matcher)])
-        seen.add(matcher)
-        deleted += 1
-    return deleted
+def delete_target_matcher(base_url: str, matcher: str) -> None:
+    http_post_form(base_url, "/api/v1/admin/tsdb/delete_series", [("match[]", matcher)])
 
 
 def iter_jsonl(path: Path) -> Iterator[dict]:
@@ -235,15 +289,15 @@ def iter_jsonl(path: Path) -> Iterator[dict]:
             yield json.loads(raw)
 
 
-def batched_from_file(path: Path, batch_size: int) -> Iterator[list[dict]]:
-    batch: list[dict] = []
-    for item in iter_jsonl(path):
-        batch.append(item)
-        if len(batch) >= max(batch_size, 1):
-            yield batch
-            batch = []
-    if batch:
-        yield batch
+def flush_import_batch(base_url: str, batch: list[dict], imported_batches: int, imported_chunks: int, progress_cb: Callable[[str], None] | None) -> int:
+    if not batch:
+        return imported_batches
+    http_post_bytes(base_url, "/api/v1/import", serialize_jsonl(batch))
+    imported_batches += 1
+    if progress_cb is not None:
+        progress_cb(f"Import progress: batches={imported_batches}, chunk_series={imported_chunks}")
+    batch.clear()
+    return imported_batches
 
 
 def import_rewritten_file(
@@ -251,21 +305,40 @@ def import_rewritten_file(
     rewritten_path: Path,
     dropped_label: str,
     batch_size: int,
+    max_line_bytes: int,
     delete_targets_first: bool,
     progress_cb: Callable[[str], None] | None = None,
-) -> tuple[int, int]:
+) -> tuple[int, int, int, int]:
     deleted_targets = 0
     imported_batches = 0
-    imported_series = 0
-    for batch in batched_from_file(rewritten_path, batch_size):
-        if delete_targets_first:
-            deleted_targets += delete_target_matchers(base_url, batch, dropped_label)
-        http_post_bytes(base_url, "/api/v1/import", serialize_jsonl(batch))
-        imported_batches += 1
-        imported_series += len(batch)
-        if progress_cb is not None:
-            progress_cb(f"Import progress: batches={imported_batches}, rewritten_series={imported_series}")
-    return deleted_targets, imported_batches
+    imported_source_series = 0
+    imported_chunk_series = 0
+    batch: list[dict] = []
+    deleted_matchers: set[str] = set()
+
+    for item in iter_jsonl(rewritten_path):
+        imported_source_series += 1
+        matcher = target_matcher(item["metric"], dropped_label)
+        if delete_targets_first and matcher not in deleted_matchers:
+            delete_target_matcher(base_url, matcher)
+            deleted_matchers.add(matcher)
+            deleted_targets += 1
+
+        chunks = split_series_for_import(item, max_line_bytes)
+        for chunk in chunks:
+            batch.append(chunk)
+            imported_chunk_series += 1
+            if len(batch) >= max(batch_size, 1):
+                imported_batches = flush_import_batch(base_url, batch, imported_batches, imported_chunk_series, progress_cb)
+
+        if progress_cb is not None and len(chunks) > 1:
+            progress_cb(
+                f"Chunked metric {transformed_matcher(item['metric'])} into {len(chunks)} import lines "
+                f"(source_series={imported_source_series}, chunk_series={imported_chunk_series})"
+            )
+
+    imported_batches = flush_import_batch(base_url, batch, imported_batches, imported_chunk_series, progress_cb)
+    return deleted_targets, imported_batches, imported_source_series, imported_chunk_series
 
 
 def describe_url_error(base_url: str, exc: urllib.error.URLError) -> str:
@@ -279,6 +352,11 @@ def describe_url_error(base_url: str, exc: urllib.error.URLError) -> str:
         return (
             f"VictoriaMetrics is not reachable at {base_url!r}. "
             "Check the port and whether the service is running."
+        )
+    if isinstance(reason, ConnectionResetError):
+        return (
+            f"VictoriaMetrics reset the connection at {base_url!r}. "
+            "Check service logs; oversized vmimport lines are a common cause during writes."
         )
     return (
         f"Could not reach VictoriaMetrics at {base_url!r}: {reason}. "
@@ -379,6 +457,7 @@ def main() -> int:
             "overlap_examples": overlap_examples,
             "output_points": output_points,
             "streaming": True,
+            "max_import_line_bytes": args.max_import_line_bytes,
         }
 
         if overlap_timestamps and not (args.allow_overlap or args.merge_target):
@@ -404,12 +483,15 @@ def main() -> int:
         if rewritten_path is None:
             raise RuntimeError("Internal error: no rewritten JSONL path available for write mode")
 
-        progress(f"Starting import phase from {rewritten_path} with batch_size={args.import_batch_size}")
-        deleted_targets, imported_batches = import_rewritten_file(
+        progress(
+            f"Starting import phase from {rewritten_path} with batch_size={args.import_batch_size} and max_line_bytes={args.max_import_line_bytes}"
+        )
+        deleted_targets, imported_batches, imported_source_series, imported_chunk_series = import_rewritten_file(
             args.base_url,
             rewritten_path,
             args.drop_label,
             args.import_batch_size,
+            args.max_import_line_bytes,
             delete_targets_first=args.merge_target,
             progress_cb=progress,
         )
@@ -421,11 +503,15 @@ def main() -> int:
         summary["deleted_target_series"] = deleted_targets
         summary["import_batches"] = imported_batches
         summary["import_batch_size"] = args.import_batch_size
+        summary["imported_source_series"] = imported_source_series
+        summary["imported_chunk_series"] = imported_chunk_series
         summary["source_series_after_delete"] = source_count
         if temp_rewritten:
             summary["rewritten_jsonl_note"] = "temporary rewritten file was created automatically for write mode"
         progress(
-            f"Write complete: batches={imported_batches}, deleted_target_series={deleted_targets}, source_series_after_delete={source_count}"
+            "Write complete: "
+            f"batches={imported_batches}, source_series={imported_source_series}, chunk_series={imported_chunk_series}, "
+            f"deleted_target_series={deleted_targets}, source_series_after_delete={source_count}"
         )
         print(json.dumps(summary, indent=2))
         return 0
@@ -436,4 +522,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

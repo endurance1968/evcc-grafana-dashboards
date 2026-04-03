@@ -66,12 +66,6 @@ curl -fsSLo check_data.py https://raw.githubusercontent.com/endurance1968/evcc-g
 curl -fsSLo vm-rewrite-drop-label.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/vm-rewrite-drop-label.py
 ```
 
-Optional analysis helper:
-
-```bash
-curl -fsSLo compare_labelsets.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/compare_labelsets.py
-```
-
 ## Files used in this migration
 
 - raw-data import:
@@ -257,25 +251,6 @@ Important:
 - keep the backup JSONL
 - only use `--allow-value-conflicts` if you have reviewed the differences and want source values to win explicitly
 
-### 3.4 What to analyze later
-
-After `host` is removed, the remaining candidates for later analysis are labelset subsets, for example:
-
-- `{db,id}` vs. `{db,id,title}`
-- `{db,loadpoint}` vs. `{db,loadpoint,vehicle}`
-
-Do not delete those automatically. Compare them first.
-
-Optional helper:
-
-```bash
-python3 compare_labelsets.py \
-  --left-json /tmp/before-cleanup/target-stats.json \
-  --left-name before \
-  --right-json /tmp/after-cleanup/target-stats.json \
-  --right-name after
-```
-
 ## 4. Create the rollup configuration
 
 Create the production config from the example:
@@ -402,7 +377,9 @@ python3 check_data.py \
 
 ## 8. Set up the hourly rollup refresh
 
-### 8.1 Example wrapper script
+Use a simple cron job that runs every hour.
+
+### 8.1 Create the wrapper script
 
 Create `/usr/local/bin/evcc-vm-rollup-hourly.sh`:
 
@@ -424,45 +401,24 @@ Then:
 sudo chmod +x /usr/local/bin/evcc-vm-rollup-hourly.sh
 ```
 
-### 8.2 systemd timer example
+### 8.2 Create the cron job
 
-Service file `/etc/systemd/system/evcc-vm-rollup-hourly.service`:
-
-```ini
-[Unit]
-Description=EVCC VictoriaMetrics hourly rollup refresh
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/evcc-vm-rollup-hourly.sh
-```
-
-Timer file `/etc/systemd/system/evcc-vm-rollup-hourly.timer`:
-
-```ini
-[Unit]
-Description=Run EVCC VictoriaMetrics rollup refresh hourly
-
-[Timer]
-OnCalendar=hourly
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-```
-
-Enable it:
+Open root crontab:
 
 ```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now evcc-vm-rollup-hourly.timer
-systemctl list-timers | grep evcc-vm-rollup-hourly
+sudo crontab -e
 ```
 
-### 8.3 Simple cron alternative
+Add this entry:
 
 ```cron
-7 * * * * /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
+7 * * * * /usr/local/bin/evcc-vm-rollup-hourly.sh >> /var/log/evcc-vm-rollup.log 2>&1
+```
+
+Optional check:
+
+```bash
+sudo crontab -l
 ```
 
 ## 9. Remove InfluxDB from the active dashboard path
@@ -497,7 +453,6 @@ Current recommendation:
 - use `vmctl influx` for the raw-data import
 - remove `host` as the first cleanup step only when `host`-tagged series are actually present
 - keep business labels such as `loadpoint`, `vehicle`, `id`, and `title`
-- only deduplicate subset labelsets later after explicit comparison
 - use `check_data.py` after import and after the initial rollup backfill
 
 ## Short version
