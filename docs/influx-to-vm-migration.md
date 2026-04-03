@@ -63,6 +63,7 @@ curl -fsSLo evcc-vm-rollup.py https://raw.githubusercontent.com/endurance1968/ev
 curl -fsSLo evcc-vm-rollup-prod.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup-prod.conf.example
 curl -fsSLo evcc-vm-rollup.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup.conf.example
 curl -fsSLo check_data.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/check_data.py
+curl -fsSLo compare_import_coverage.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/compare_import_coverage.py
 curl -fsSLo vm-rewrite-drop-label.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/vm-rewrite-drop-label.py
 ```
 
@@ -72,6 +73,8 @@ curl -fsSLo vm-rewrite-drop-label.py https://raw.githubusercontent.com/endurance
   - `vmctl`
 - health and presence checks:
   - `check_data.py`
+- source-versus-import coverage check:
+  - `compare_import_coverage.py`
 - safe first cleanup step:
   - `vm-rewrite-drop-label.py`
 - rollup engine:
@@ -177,6 +180,25 @@ python3 check_data.py \
   --db evcc \
   --end-time 2026-03-30T23:59:59Z
 ```
+
+### 2.4 Compare import coverage against Influx before cleanup
+
+Run this directly after `vmctl` and before any `host` rewrite. The default run checks the full Influx measurement set, but splits the result into `repo-relevant` and `additional` groups so the conclusion clearly shows whether the active dashboard schema is blocked or only extra EVCC metadata families are affected.
+
+If this check reports problems, stop here and explicitly re-import the affected measurements before cleanup or rollups.
+
+```bash
+python3 compare_import_coverage.py \
+  --influx-url http://<influx-host>:8086 \
+  --influx-db evcc \
+  --vm-base-url http://<vm-host>:8428 \
+  --vm-db-label evcc \
+  --start 2026-03-21T00:00:00Z \
+  --end 2026-04-03T23:59:59Z \
+  --only-problems
+```
+
+Use `--measurement-regex '^batterySoc$'` if you want to inspect only one suspicious measurement. Use `--repo-relevant-only` only when you explicitly want to limit the check to the active dashboard schema. Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap.
 
 ## 3. First cleanup step: remove `host` only if needed
 
@@ -462,13 +484,13 @@ Current recommendation:
 - use `vmctl influx` for the raw-data import
 - remove `host` as the first cleanup step only when `host`-tagged series are actually present
 - keep business labels such as `loadpoint`, `vehicle`, `id`, and `title`
-- use `check_data.py` after import and after the initial rollup backfill
+- use `compare_import_coverage.py` and `check_data.py` after the raw import, then run `check_data.py` again after the initial rollup backfill
 
 ## Short version
 
 1. verify VictoriaMetrics
 2. import raw data with `vmctl influx`
-3. verify raw data and run `check_data.py`
+3. verify raw data with `compare_import_coverage.py` and `check_data.py`
 4. if needed, remove `host` with `vm-rewrite-drop-label.py`
 5. create the production rollup config
 6. run `detect`, `plan`, and `benchmark`
@@ -476,6 +498,7 @@ Current recommendation:
 8. verify the rollups
 9. set up the hourly rollup job
 10. keep InfluxDB only as fallback or historical reference
+
 
 
 

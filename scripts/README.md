@@ -16,6 +16,7 @@ Current rollup files:
 - `rollup/evcc-vm-rollup.conf.example`
 - `rollup/evcc-vm-rollup-prod.conf.example`
 - `helper/check_data.py`
+- `helper/compare_import_coverage.py`
 - `helper/compare_labelsets.py`
 - `helper/vm-rewrite-drop-label.py`
 
@@ -71,7 +72,16 @@ python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc 
 python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc --phase raw --end-time 2026-03-31T23:59:59Z
 ```
 
-Only if the check reports host-tagged series, rewrite host-tagged VM-only series:
+Compare Influx source coverage against the imported VM raw metrics right after `vmctl`. The default run now checks the full Influx measurement set, but splits the result into `repo-relevant` and `additional` groups so the conclusion clearly shows whether the active dashboard schema is blocked or only extra EVCC metadata families are affected:
+
+```bash
+python3 scripts/helper/compare_import_coverage.py --influx-url http://127.0.0.1:8086 --influx-db evcc --vm-base-url http://127.0.0.1:8428 --vm-db-label evcc --start 2026-03-21T00:00:00Z --end 2026-04-03T23:59:59Z --only-problems
+
+# optional: limit the check to repo-relevant measurements only
+python3 scripts/helper/compare_import_coverage.py --influx-url http://127.0.0.1:8086 --influx-db evcc --vm-base-url http://127.0.0.1:8428 --vm-db-label evcc --start 2026-03-21T00:00:00Z --end 2026-04-03T23:59:59Z --only-problems --repo-relevant-only
+```
+
+Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap.`n`nOnly if the coverage check and the data check look good, rewrite host-tagged VM-only series:
 
 ```bash
 python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
@@ -141,7 +151,5 @@ For end users, prefer:
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
 - `docs/vm-dashboard-install.md`
-
-
 
 
