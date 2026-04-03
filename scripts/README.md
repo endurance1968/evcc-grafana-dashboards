@@ -59,18 +59,6 @@ python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-
 
 ## VM cleanup and validation helpers
 
-Rewrite host-tagged VM-only series:
-
-```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
-```
-
-Recommended write mode after a successful dry-run:
-
-```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --merge-target --reset-cache --write
-```
-
 Check whether raw EVCC metrics and expected daily rollups exist after import/backfill. In the default `auto` phase the script checks raw data first, then automatically includes rollups once they exist. It also reports whether `host` cleanup is recommended:
 
 ```bash
@@ -80,10 +68,19 @@ python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc
 python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc --phase raw
 
 # historical import or benchmark VM
-python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc
-
-# explicit raw-import phase
 python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc --phase raw --end-time 2026-03-31T23:59:59Z
+```
+
+Only if the check reports host-tagged series, rewrite host-tagged VM-only series:
+
+```bash
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
+```
+
+Recommended write mode after a successful dry-run:
+
+```bash
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --merge-target --reset-cache --write
 ```
 
 Compare labelsets between two import states or benchmark exports:
@@ -144,5 +141,7 @@ For end users, prefer:
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
 - `docs/vm-dashboard-install.md`
+
+
 
 

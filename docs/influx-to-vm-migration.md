@@ -184,9 +184,9 @@ python3 check_data.py \
   --end-time 2026-03-30T23:59:59Z
 ```
 
-## 3. First cleanup step: remove `host`
+## 3. First cleanup step: remove `host` only if needed
 
-The first cleanup step should focus on `host` only.
+Do this step only if the data check or a direct series query shows host-tagged raw series.
 
 Why `host` is the safest first target:
 
@@ -203,7 +203,22 @@ Do **not** blindly drop these labels:
 
 Those labels carry the EVCC semantics that we want to preserve.
 
-### 3.1 Dry-run the rewrite first
+### 3.1 Check first whether `host` is present
+
+The default `check_data.py` output already reports this in the `Cleanup checks` section.
+
+You can also query it directly:
+
+```bash
+curl -fsG 'http://<vm-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]={db="evcc",host!=""}' \
+  --data-urlencode 'start=2024-01-01T00:00:00Z' \
+  --data-urlencode 'end=2026-03-30T23:59:59Z'
+```
+
+If this returns no series, skip the `host` cleanup step.
+
+### 3.2 Dry-run the rewrite first
 
 ```bash
 python3 vm-rewrite-drop-label.py \
@@ -220,7 +235,7 @@ The dry-run exports the host-tagged source series, removes `host` in memory, and
 - whether transformed timestamps overlap existing hostless target series
 - whether there are value conflicts
 
-### 3.2 Recommended write mode
+### 3.3 Recommended write mode
 
 If the dry-run looks clean, use merge mode so existing hostless targets are preserved and merged safely:
 
@@ -242,7 +257,7 @@ Important:
 - keep the backup JSONL
 - only use `--allow-value-conflicts` if you have reviewed the differences and want source values to win explicitly
 
-### 3.3 What to analyze later
+### 3.4 What to analyze later
 
 After `host` is removed, the remaining candidates for later analysis are labelset subsets, for example:
 
@@ -480,7 +495,7 @@ At that point you can:
 Current recommendation:
 
 - use `vmctl influx` for the raw-data import
-- remove `host` as the first cleanup step
+- remove `host` as the first cleanup step only when `host`-tagged series are actually present
 - keep business labels such as `loadpoint`, `vehicle`, `id`, and `title`
 - only deduplicate subset labelsets later after explicit comparison
 - use `check_data.py` after import and after the initial rollup backfill
@@ -490,12 +505,13 @@ Current recommendation:
 1. verify VictoriaMetrics
 2. import raw data with `vmctl influx`
 3. verify raw data and run `check_data.py`
-4. remove `host` with `vm-rewrite-drop-label.py`
+4. if needed, remove `host` with `vm-rewrite-drop-label.py`
 5. create the production rollup config
 6. run `detect`, `plan`, and `benchmark`
 7. run the initial rollup backfill with `--write`
 8. verify the rollups
 9. set up the hourly rollup job
 10. keep InfluxDB only as fallback or historical reference
+
 
 
