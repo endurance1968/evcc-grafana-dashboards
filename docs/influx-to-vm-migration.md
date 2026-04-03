@@ -164,12 +164,15 @@ curl -fsG 'http://<vm-host>:8428/api/v1/series' \
 
 ### 2.3 Run the repository data check
 
-Use the VM-only checker after the import.
+Use the VM-only checker after the import. In the default `auto` phase it validates raw data first and only checks rollups once they exist. It also reports whether `host`-tagged series are present and should be normalized away.
 
 For a current production VM:
 
 ```bash
 python3 check_data.py --base-url http://<vm-host>:8428 --db evcc
+
+# explicit raw-import phase
+python3 check_data.py --base-url http://<vm-host>:8428 --db evcc --phase raw
 ```
 
 For a historical benchmark or migration VM, anchor the logical check point to the imported range:
@@ -494,4 +497,5 @@ Current recommendation:
 8. verify the rollups
 9. set up the hourly rollup job
 10. keep InfluxDB only as fallback or historical reference
+
 

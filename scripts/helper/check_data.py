@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 """Check whether expected EVCC raw metrics and VM rollups exist in VictoriaMetrics.
 
-This script is intended to run after the Influx -> VM import and after the initial
-rollup backfill. It does not compare values point-by-point. Instead it answers the
-operator question:
+The checker supports different phases of the migration flow:
 
-    "Do we have the raw and daily metrics that the dashboards and rollups expect?"
+- raw import only
+- rollup validation only
+- full validation
+- auto mode that checks raw data first and only evaluates rollups once they exist
 
-It distinguishes between:
-- core metrics that every EVCC VM dashboard installation should have
-- conditional metrics that depend on detected features such as battery, loadpoints,
-  tariffs, EXT or AUX consumers
+It also reports whether host-tagged raw series are present and therefore a first
+cleanup step with vm-rewrite-drop-label.py is recommended.
 """
 
 from __future__ import annotations
@@ -60,9 +59,7 @@ FEATURES: Dict[str, Dict[str, object]] = {
     },
     "loadpoints": {
         "detect": ["chargePower_value"],
-        "raw": [
-            MetricCheck("chargePower_value", "critical", "Loadpoint dashboards need charge power."),
-        ],
+        "raw": [MetricCheck("chargePower_value", "critical", "Loadpoint dashboards need charge power.")],
         "rollups": [
             MetricCheck("evcc_loadpoint_energy_daily_wh", "critical", "Month/Year/All-time need loadpoint daily energy."),
             MetricCheck("evcc_loadpoint_energy_from_pv_daily_wh", "critical", "Consumer mix panels need PV attribution."),
@@ -147,13 +144,22 @@ def http_json(url: str) -> dict:
         return json.loads(response.read().decode("utf-8"))
 
 
-def build_series_url(base_url: str, metric: str, db_label: str, start: str, end: str) -> str:
-    params = urllib.parse.urlencode({"match[]": f'{metric}{{db="{db_label}"}}', "start": start, "end": end})
+def build_matcher_url(base_url: str, matcher: str, start: str, end: str) -> str:
+    params = urllib.parse.urlencode({"match[]": matcher, "start": start, "end": end})
     return f"{base_url.rstrip('/')}/api/v1/series?{params}"
+
+
+def build_series_url(base_url: str, metric: str, db_label: str, start: str, end: str) -> str:
+    return build_matcher_url(base_url, f'{metric}{{db="{db_label}"}}', start, end)
 
 
 def series_count(base_url: str, metric: str, db_label: str, start: str, end: str) -> int:
     payload = http_json(build_series_url(base_url, metric, db_label, start, end))
+    return len(payload.get("data") or [])
+
+
+def matcher_count(base_url: str, matcher: str, start: str, end: str) -> int:
+    payload = http_json(build_matcher_url(base_url, matcher, start, end))
     return len(payload.get("data") or [])
 
 
@@ -171,14 +177,25 @@ def worst_level(levels: Sequence[str]) -> str:
     return "OK"
 
 
-def render_section(title: str, checks: List[dict]) -> None:
+def render_section(title: str, checks: List[dict], skipped_reason: str | None = None) -> None:
     print(f"\n{title}")
     print("-" * len(title))
+    if skipped_reason:
+        print(f"SKIP     {skipped_reason}")
+        return
     if not checks:
         print("SKIP")
         return
     for item in checks:
         print(f"{item['level']:<8} {item['metric']:<48} series={item['series']:<5} {item['reason']}")
+
+
+def run_metric_checks(base_url: str, db_label: str, items: Sequence[MetricCheck], start: str, end: str) -> List[dict]:
+    results: List[dict] = []
+    for item in items:
+        count = series_count(base_url, item.metric, db_label, start, end)
+        results.append({"metric": item.metric, "level": classify_level(count, item.severity), "series": count, "reason": item.reason})
+    return results
 
 
 def main() -> int:
@@ -189,6 +206,12 @@ def main() -> int:
     parser.add_argument("--rollup-days", type=int, default=90, help="recent window for daily rollup checks")
     parser.add_argument("--feature-lookback-days", type=int, default=3650, help="lookback window to detect optional features")
     parser.add_argument("--end-time", help="override logical end time in RFC3339 (default: now)")
+    parser.add_argument(
+        "--phase",
+        choices=["auto", "raw", "rollup", "full"],
+        default="auto",
+        help="validation phase: raw import only, rollup only, full, or auto (default)",
+    )
     parser.add_argument("--json", action="store_true", help="emit machine-readable JSON only")
     args = parser.parse_args()
 
@@ -201,6 +224,7 @@ def main() -> int:
             now = now.astimezone(UTC)
     else:
         now = utc_now()
+
     raw_start = iso_z(now - dt.timedelta(hours=args.raw_hours))
     rollup_start = iso_z(now - dt.timedelta(days=args.rollup_days))
     feature_start = iso_z(now - dt.timedelta(days=args.feature_lookback_days))
@@ -211,64 +235,79 @@ def main() -> int:
         detectors: Sequence[str] = config["detect"]  # type: ignore[assignment]
         feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, feature_start, end) > 0 for metric in detectors)
 
+    detected_rollup_presence = any(series_count(args.base_url, item.metric, args.db, rollup_start, end) > 0 for item in CORE_ROLLUPS)
+    host_matcher = f'{{db="{args.db}",host!=""}}'
+    host_series_count = matcher_count(args.base_url, host_matcher, feature_start, end)
+
+    effective_phase = args.phase
+    if args.phase == "auto":
+        effective_phase = "full" if detected_rollup_presence else "raw"
+
     sections: List[dict] = []
 
-    def run_checks(title: str, items: Sequence[MetricCheck], start: str, end_time: str) -> None:
-        results: List[dict] = []
-        for item in items:
-            count = series_count(args.base_url, item.metric, args.db, start, end_time)
-            results.append({"metric": item.metric, "level": classify_level(count, item.severity), "series": count, "reason": item.reason})
-        sections.append({"title": title, "items": results})
+    if effective_phase in {"raw", "full"}:
+        sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, args.db, CORE_RAW, raw_start, end)})
+        for feature_name, enabled in feature_flags.items():
+            if not enabled:
+                sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": [], "skipped_reason": "feature not detected"})
+                continue
+            items: Sequence[MetricCheck] = FEATURES[feature_name]["raw"]  # type: ignore[index]
+            sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, raw_start, end)})
+    else:
+        sections.append({"title": "Core raw metrics", "items": [], "skipped_reason": f"phase={effective_phase}"})
 
-    run_checks("Core raw metrics", CORE_RAW, raw_start, end)
+    if effective_phase in {"rollup", "full"}:
+        sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, args.db, CORE_ROLLUPS, rollup_start, end)})
+        for feature_name, enabled in feature_flags.items():
+            if not enabled:
+                sections.append({"title": f"Conditional rollups ({feature_name})", "items": [], "skipped_reason": "feature not detected"})
+                continue
+            items: Sequence[MetricCheck] = FEATURES[feature_name]["rollups"]  # type: ignore[index]
+            sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, rollup_start, end)})
+    else:
+        sections.append({
+            "title": "Core rollup metrics",
+            "items": [],
+            "skipped_reason": "rollup phase not active yet" if args.phase == "auto" and not detected_rollup_presence else f"phase={effective_phase}",
+        })
 
-    conditional_raw: List[dict] = []
-    for feature_name, enabled in feature_flags.items():
-        if not enabled:
-            conditional_raw.append({"title": f"Conditional raw metrics ({feature_name})", "items": []})
-            continue
-        items: Sequence[MetricCheck] = FEATURES[feature_name]["raw"]  # type: ignore[index]
-        results = []
-        for item in items:
-            count = series_count(args.base_url, item.metric, args.db, raw_start, end)
-            results.append({"metric": item.metric, "level": classify_level(count, item.severity), "series": count, "reason": item.reason})
-        conditional_raw.append({"title": f"Conditional raw metrics ({feature_name})", "items": results})
+    cleanup_items = [{
+        "metric": host_matcher,
+        "level": "WARNING" if host_series_count > 0 else "OK",
+        "series": host_series_count,
+        "reason": "Host-tagged raw series detected. Run vm-rewrite-drop-label.py if you want to normalize away infrastructure labels.",
+    }]
+    sections.append({"title": "Cleanup checks", "items": cleanup_items})
 
-    run_checks("Core rollup metrics", CORE_ROLLUPS, rollup_start, end)
-
-    conditional_rollups: List[dict] = []
-    for feature_name, enabled in feature_flags.items():
-        if not enabled:
-            conditional_rollups.append({"title": f"Conditional rollups ({feature_name})", "items": []})
-            continue
-        items = FEATURES[feature_name]["rollups"]  # type: ignore[index]
-        results = []
-        for item in items:
-            count = series_count(args.base_url, item.metric, args.db, rollup_start, end)
-            results.append({"metric": item.metric, "level": classify_level(count, item.severity), "series": count, "reason": item.reason})
-        conditional_rollups.append({"title": f"Conditional rollups ({feature_name})", "items": results})
-
-    all_sections = sections + conditional_raw + conditional_rollups
-    levels = [item["level"] for section in all_sections for item in section["items"]]
+    levels = [item["level"] for section in sections for item in section["items"]]
     overall = worst_level(levels)
+    code = 2 if overall == "CRITICAL" else 1 if overall == "WARNING" else 0
 
     payload = {
         "base_url": args.base_url,
         "db": args.db,
+        "requested_phase": args.phase,
+        "effective_phase": effective_phase,
+        "detected_rollup_presence": detected_rollup_presence,
+        "host_series_count": host_series_count,
         "windows": {"raw_start": raw_start, "rollup_start": rollup_start, "feature_start": feature_start, "end": end},
         "detected_features": feature_flags,
         "overall": overall,
-        "sections": all_sections,
+        "sections": sections,
     }
 
     if args.json:
         print(json.dumps(payload, indent=2, sort_keys=True))
-        return 2 if overall == "CRITICAL" else 1 if overall == "WARNING" else 0
+        return code
 
     print("EVCC VM data check")
     print("==================")
     print(f"Base URL:           {args.base_url}")
     print(f"db label:           {args.db}")
+    print(f"Requested phase:    {args.phase}")
+    print(f"Effective phase:    {effective_phase}")
+    print(f"Rollups detected:   {'yes' if detected_rollup_presence else 'no'}")
+    print(f"Host-tagged series: {host_series_count}")
     print(f"Raw window:         {raw_start} -> {end}")
     print(f"Rollup window:      {rollup_start} -> {end}")
     print(f"Feature lookback:   {feature_start} -> {end}")
@@ -278,17 +317,13 @@ def main() -> int:
         print(f"{name:<10} {'yes' if feature_flags[name] else 'no'}")
 
     for section in sections:
-        render_section(section["title"], section["items"])
-    for section in conditional_raw:
-        render_section(section["title"], section["items"])
-    for section in conditional_rollups:
-        render_section(section["title"], section["items"])
+        render_section(section["title"], section["items"], section.get("skipped_reason"))
 
     print("\nOverall")
     print("-------")
     print(overall)
     print("\nExit codes: OK=0, WARNING=1, CRITICAL=2")
-    return 2 if overall == "CRITICAL" else 1 if overall == "WARNING" else 0
+    return code
 
 
 if __name__ == "__main__":
