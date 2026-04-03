@@ -173,7 +173,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "पीवी"
               }
             ]
           },
@@ -185,7 +185,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "ग्रिड आयात"
               }
             ]
           },
@@ -197,7 +197,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "घर"
               }
             ]
           },
@@ -209,7 +209,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "ग्रिड में आपूर्ति"
               }
             ]
           },
@@ -228,7 +228,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -243,7 +243,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -258,7 +258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -318,7 +318,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -572,7 +572,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -587,7 +587,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -602,7 +602,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -662,7 +662,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -896,7 +896,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -917,14 +917,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "आत्मनिर्भरता"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "स्व-उपभोग"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "स्व-उपभोग"
               }
             ]
           }
@@ -1200,7 +1200,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -1212,7 +1212,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-sufficiency"
+                "value": "आत्मनिर्भरता"
               }
             ]
           },
@@ -1309,7 +1309,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1502,7 +1502,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Other"
+                "value": "अन्य"
               },
               {
                 "id": "color",
@@ -1652,7 +1652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1667,7 +1667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "बैटरी"
             },
             "properties": [
               {
@@ -1837,7 +1837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1864,7 +1864,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "बैटरी"
               }
             ]
           },
@@ -2023,7 +2023,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid price: arithmetic mean"
+                "value": "ग्रिड कीमत: अंकगणितीय औसत"
               },
               {
                 "id": "unit",
@@ -2046,7 +2046,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective price, dyn."
+                "value": "प्रभावी मूल्य, गतिशील"
               },
               {
                 "id": "unit",
@@ -2069,7 +2069,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved vs arith."
+                "value": "अंकगणितीय की तुलना में बचत"
               },
               {
                 "id": "unit",
@@ -2092,7 +2092,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential at arith."
+                "value": "अंकगणितीय पर संभावित"
               },
               {
                 "id": "unit",
@@ -2115,7 +2115,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "खरीदा गया, गतिशील"
               },
               {
                 "id": "unit",
@@ -2138,7 +2138,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings dyn."
+                "value": "गतिशील बचत"
               },
               {
                 "id": "unit",
@@ -2161,7 +2161,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "बेचा गया (आपूर्ति)"
               },
               {
                 "id": "unit",
@@ -2184,7 +2184,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "संतुलन"
               },
               {
                 "id": "unit",
@@ -2519,7 +2519,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2534,7 +2534,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "प्रभावी बिजली कीमत"
             },
             "properties": [
               {
@@ -2692,12 +2692,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased"
+                "value": "खरीदा गया"
               }
             ]
           },
@@ -2799,7 +2799,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "बैटरी चार्ज"
               },
               {
                 "id": "unit",
@@ -2819,7 +2819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "बैटरी डिस्चार्ज"
               },
               {
                 "id": "unit",
@@ -2839,7 +2839,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "बैटरी दक्षता"
               },
               {
                 "id": "unit",
@@ -2859,7 +2859,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "औसत अधिकतम SOC"
               },
               {
                 "id": "unit",
@@ -2879,7 +2879,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "औसत न्यूनतम SOC"
               },
               {
                 "id": "unit",
@@ -3115,7 +3115,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC max"
+              "options": "SOC अधिकतम"
             },
             "properties": [
               {
@@ -3127,14 +3127,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery max"
+                "value": "बैटरी अधिकतम"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "SOC min"
+              "options": "SOC न्यूनतम"
             },
             "properties": [
               {
@@ -3146,7 +3146,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Battery min"
+                "value": "बैटरी न्यूनतम"
               }
             ]
           },
@@ -3371,12 +3371,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "पीवी"
               },
               {
                 "id": "color",
@@ -3390,12 +3390,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "बैटरी"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "बैटरी"
               },
               {
                 "id": "color",
@@ -3409,12 +3409,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "ग्रिड"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "ग्रिड"
               },
               {
                 "id": "color",
@@ -3666,12 +3666,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "पीवी"
               },
               {
                 "id": "color",
@@ -3685,12 +3685,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "बैटरी"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery"
+                "value": "बैटरी"
               },
               {
                 "id": "color",
@@ -3704,12 +3704,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "ग्रिड"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid"
+                "value": "ग्रिड"
               },
               {
                 "id": "color",

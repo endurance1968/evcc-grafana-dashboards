@@ -156,12 +156,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV"
+                "value": "光伏发电"
               },
               {
                 "id": "color",
@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "电网输入"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "家庭"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "馈电"
               },
               {
                 "id": "color",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               },
               {
                 "id": "decimals",
@@ -804,7 +804,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -825,14 +825,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "自给率"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "自耗"
             },
             "properties": [
               {
@@ -853,7 +853,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "自耗"
               }
             ]
           }
@@ -1186,7 +1186,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               },
               {
                 "id": "decimals",
@@ -1588,7 +1588,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               },
               {
                 "id": "decimals",
@@ -1804,7 +1804,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "电池充电"
               },
               {
                 "id": "decimals",
@@ -1824,7 +1824,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "电池放电"
               },
               {
                 "id": "decimals",
@@ -1844,7 +1844,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "电池效率"
               },
               {
                 "id": "decimals",
@@ -1871,7 +1871,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "平均最高 SOC"
               },
               {
                 "id": "unit",
@@ -1891,7 +1891,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "平均最低 SOC"
               },
               {
                 "id": "unit",
@@ -2217,7 +2217,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               },
               {
                 "id": "decimals",
@@ -2469,7 +2469,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "光伏能量"
             },
             "properties": [
               {
@@ -2590,7 +2590,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -2711,7 +2711,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "家庭消耗"
             },
             "properties": [
               {
@@ -2994,7 +2994,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               },
               {
                 "id": "decimals",
@@ -3262,7 +3262,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "月份"
               }
             ]
           },
@@ -3476,7 +3476,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "电价：算术平均值"
               },
               {
                 "id": "color",
@@ -3499,7 +3499,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "实际电价（动态）"
               },
               {
                 "id": "color",
@@ -3522,7 +3522,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "通过动态电价节省的电价"
               },
               {
                 "id": "unit",
@@ -3538,19 +3538,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "按算术价格的潜在购电"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "购电"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "购入，动态"
               }
             ]
           },
@@ -3562,19 +3562,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "动态电价节省"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "售电"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "售出（馈电）"
               },
               {
                 "id": "color",
@@ -3593,7 +3593,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "平衡"
               }
             ]
           }
@@ -3770,7 +3770,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far without PV"
+                "value": "截至目前无光伏能源成本"
               },
               {
                 "id": "color",
@@ -3789,7 +3789,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased energy costs so far"
+                "value": "截至目前购入能源成本"
               },
               {
                 "id": "color",
@@ -3808,7 +3808,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in compensation so far"
+                "value": "截至目前馈电补偿"
               },
               {
                 "id": "color",
@@ -3827,7 +3827,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far"
+                "value": "截至目前能源成本"
               },
               {
                 "id": "thresholds",
@@ -3855,7 +3855,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Capital backflow so far"
+                "value": "截至目前资本回流"
               },
               {
                 "id": "color",
@@ -3874,7 +3874,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "预测基于"
               },
               {
                 "id": "unit",
@@ -3901,7 +3901,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly capital backflow"
+                "value": "年度资本回流"
               }
             ]
           },
@@ -3913,7 +3913,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "回收期"
               },
               {
                 "id": "unit",
@@ -3929,7 +3929,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "年度回收率"
               },
               {
                 "id": "unit",
@@ -4136,7 +4136,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Charged energy"
+                "value": "充电能量"
               },
               {
                 "id": "unit",
@@ -4159,7 +4159,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Discharged energy"
+                "value": "放电能量"
               },
               {
                 "id": "unit",
@@ -4182,7 +4182,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Storage losses"
+                "value": "储能损耗"
               },
               {
                 "id": "unit",
@@ -4205,7 +4205,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Full cycles"
+                "value": "完整循环"
               },
               {
                 "id": "unit",
@@ -4225,7 +4225,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "预测基于"
               },
               {
                 "id": "unit",
@@ -4252,7 +4252,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback"
+                "value": "年度回收"
               }
             ]
           },
@@ -4264,7 +4264,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "回收期"
               },
               {
                 "id": "unit",
@@ -4280,7 +4280,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "年度回收率"
               },
               {
                 "id": "unit",
@@ -4503,7 +4503,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Driven kilometers"
+                "value": "行驶公里数"
               },
               {
                 "id": "color",
@@ -4526,7 +4526,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Estimated consumption"
+                "value": "估算消耗"
               },
               {
                 "id": "decimals",
@@ -4557,7 +4557,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Solar share"
+                "value": "太阳能占比"
               },
               {
                 "id": "color",
@@ -4584,7 +4584,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effective charging price/kWh"
+                "value": "实际充电价格/kWh"
               },
               {
                 "id": "color",
@@ -4603,7 +4603,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle without PV"
+                "value": "$vehicle 不含光伏行驶成本"
               },
               {
                 "id": "color",
@@ -4622,7 +4622,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle with PV"
+                "value": "$vehicle 含光伏行驶成本"
               },
               {
                 "id": "color",
@@ -4641,7 +4641,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings thanks to PV"
+                "value": "光伏带来的行驶成本节省"
               },
               {
                 "id": "thresholds",
@@ -4669,7 +4669,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Combustion engine driving costs"
+                "value": "燃油车行驶成本"
               }
             ]
           },
@@ -4681,7 +4681,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings vs combustion engine"
+                "value": "相对燃油车节省的行驶成本"
               },
               {
                 "id": "thresholds",

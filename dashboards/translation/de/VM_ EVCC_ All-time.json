@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netzbezug"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Grid import"
+                "value": "Netzbezug"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Home"
+                "value": "Haus"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in"
+                "value": "Einspeisung"
               },
               {
                 "id": "color",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -804,7 +804,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -825,14 +825,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarky"
+                "value": "Autarkie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Eigenverbrauch"
             },
             "properties": [
               {
@@ -853,7 +853,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Self-consumption"
+                "value": "Eigenverbrauch"
               }
             ]
           }
@@ -1186,7 +1186,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -1588,7 +1588,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -1804,7 +1804,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery charge"
+                "value": "Speicher laden"
               },
               {
                 "id": "decimals",
@@ -1824,7 +1824,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery discharge"
+                "value": "Speicher entladen"
               },
               {
                 "id": "decimals",
@@ -1844,7 +1844,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Battery efficiency"
+                "value": "Speicher Effizienz"
               },
               {
                 "id": "decimals",
@@ -1871,7 +1871,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Max SOC"
+                "value": "Durchschnitt Max SOC"
               },
               {
                 "id": "unit",
@@ -1891,7 +1891,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Avg Min SOC"
+                "value": "Durchschnitt Min SOC"
               },
               {
                 "id": "unit",
@@ -2217,7 +2217,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -2469,7 +2469,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV Energie"
             },
             "properties": [
               {
@@ -2590,7 +2590,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
@@ -2711,7 +2711,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "Hausverbrauch"
             },
             "properties": [
               {
@@ -2994,7 +2994,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -3262,7 +3262,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Month"
+                "value": "Monat"
               }
             ]
           },
@@ -3476,7 +3476,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Electricity price: arithmetic mean"
+                "value": "Strompreis: Arithmetisches Mittel"
               },
               {
                 "id": "color",
@@ -3499,7 +3499,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effective electricity price, dynamic"
+                "value": "Effektiver Strompreis, dynamisch"
               },
               {
                 "id": "color",
@@ -3522,7 +3522,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Saved electricity price through dynamic tariff"
+                "value": "Eingesparter Strompreis durch dynamischen Tarif"
               },
               {
                 "id": "unit",
@@ -3538,19 +3538,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potential purchase at arithmetic price"
+                "value": "Potentieller Einkauf nach arithmetischem Preis"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Einkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased, dynamic"
+                "value": "Einkauf, dynamisch"
               }
             ]
           },
@@ -3562,19 +3562,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Savings through dynamic tariff"
+                "value": "Einsparung durch dynamischen Tarif"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Verkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Sold (feed-in)"
+                "value": "Verkauf (Einspeisung)"
               },
               {
                 "id": "color",
@@ -3593,7 +3593,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balance"
+                "value": "Bilanz"
               }
             ]
           }
@@ -3770,7 +3770,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far without PV"
+                "value": "Bisherige Energiekosten ohne PV"
               },
               {
                 "id": "color",
@@ -3789,7 +3789,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Purchased energy costs so far"
+                "value": "Bisher zugekaufte Energiekosten"
               },
               {
                 "id": "color",
@@ -3808,7 +3808,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Feed-in compensation so far"
+                "value": "Bisher erzielte Vergütung"
               },
               {
                 "id": "color",
@@ -3827,7 +3827,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energy costs so far"
+                "value": "Bisherige Energiekosten"
               },
               {
                 "id": "thresholds",
@@ -3855,7 +3855,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Capital backflow so far"
+                "value": "Bisheriger Kapitalrückfluss"
               },
               {
                 "id": "color",
@@ -3874,7 +3874,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "Prognose basiert auf"
               },
               {
                 "id": "unit",
@@ -3901,7 +3901,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly capital backflow"
+                "value": "Jährliche Kapitalrückflüsse"
               }
             ]
           },
@@ -3913,7 +3913,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "Amortisationsdauer"
               },
               {
                 "id": "unit",
@@ -3929,7 +3929,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "Jährliche Amortisationsrate"
               },
               {
                 "id": "unit",
@@ -4136,7 +4136,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Charged energy"
+                "value": "Ladeenergie"
               },
               {
                 "id": "unit",
@@ -4159,7 +4159,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Discharged energy"
+                "value": "Entladeenergie"
               },
               {
                 "id": "unit",
@@ -4182,7 +4182,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Storage losses"
+                "value": "Speicherverluste"
               },
               {
                 "id": "unit",
@@ -4205,7 +4205,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Full cycles"
+                "value": "Vollzyklen"
               },
               {
                 "id": "unit",
@@ -4225,7 +4225,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Forecast based on"
+                "value": "Prognose basiert auf"
               },
               {
                 "id": "unit",
@@ -4252,7 +4252,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback"
+                "value": "Jährliche Amortisation"
               }
             ]
           },
@@ -4264,7 +4264,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Payback period"
+                "value": "Amortisationsdauer"
               },
               {
                 "id": "unit",
@@ -4280,7 +4280,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Yearly payback rate"
+                "value": "Jährliche Amortisationsrate"
               },
               {
                 "id": "unit",
@@ -4503,7 +4503,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Driven kilometers"
+                "value": "Gefahrene Kilometer"
               },
               {
                 "id": "color",
@@ -4526,7 +4526,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Estimated consumption"
+                "value": "Geschätzter Verbrauch"
               },
               {
                 "id": "decimals",
@@ -4557,7 +4557,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Solar share"
+                "value": "Solaranteil"
               },
               {
                 "id": "color",
@@ -4584,7 +4584,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effective charging price/kWh"
+                "value": "Effektiver Ladepreis/kWh"
               },
               {
                 "id": "color",
@@ -4603,7 +4603,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle without PV"
+                "value": "Fahrtkosten $vehicle ohne PV"
               },
               {
                 "id": "color",
@@ -4622,7 +4622,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving costs $vehicle with PV"
+                "value": "Fahrtkosten $vehicle mit PV"
               },
               {
                 "id": "color",
@@ -4641,7 +4641,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings thanks to PV"
+                "value": "Eingesparte Fahrtkosten dank PV"
               },
               {
                 "id": "thresholds",
@@ -4669,7 +4669,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Combustion engine driving costs"
+                "value": "Fahrtkosten Verbrenner"
               }
             ]
           },
@@ -4681,7 +4681,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Driving cost savings vs combustion engine"
+                "value": "Eingesparte Fahrtkosten ggü Verbrenner"
               },
               {
                 "id": "thresholds",
