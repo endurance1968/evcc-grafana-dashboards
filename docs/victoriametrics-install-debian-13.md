@@ -2,6 +2,16 @@
 
 This guide covers the installation of a current single-node VictoriaMetrics instance on a Debian 13 VM or Debian 13 LXC.
 
+## Validation status
+
+This guide was manually executed and validated on a Debian 13 VM/LXC as part of the first end-user release preparation.
+
+Current status:
+
+- VictoriaMetrics installation: tested
+- service start via `systemd`: tested
+- VictoriaMetrics running after installation: confirmed
+
 Assumptions:
 
 - Debian 13 is already running
@@ -19,6 +29,7 @@ Not covered here:
 At the end, VictoriaMetrics runs as a `systemd` service:
 
 - binary: `victoria-metrics-prod`
+- migration utility: `vmctl`
 - HTTP port: `8428`
 - data path: `/var/lib/victoria-metrics`
 - service name: `victoriametrics`
@@ -27,7 +38,7 @@ At the end, VictoriaMetrics runs as a `systemd` service:
 
 As of now, the current community release is:
 
-- `v1.138.0`
+- `v1.139.0`
 
 Sources:
 
@@ -43,7 +54,7 @@ Important:
 
 ```bash
 sudo apt update
-sudo apt install -y curl tar ca-certificates
+sudo apt install -y curl wget tar ca-certificates
 ```
 
 ## 2. Download the correct release
@@ -52,12 +63,12 @@ For Debian 13 on `amd64`:
 
 ```bash
 cd /tmp
-curl -fL -o victoria-metrics-linux-amd64-v1.138.0.tar.gz https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.138.0/victoria-metrics-linux-amd64-v1.138.0.tar.gz
+curl -fL -o victoria-metrics-linux-amd64-v1.139.0.tar.gz https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.139.0/victoria-metrics-linux-amd64-v1.139.0.tar.gz
 ```
 
 For `arm64`, use:
 
-- `victoria-metrics-linux-arm64-v1.138.0.tar.gz`
+- `victoria-metrics-linux-arm64-v1.139.0.tar.gz`
 
 To check your system architecture:
 
@@ -73,7 +84,7 @@ Typical values:
 ## 3. Install the binary
 
 ```bash
-sudo tar -xvf /tmp/victoria-metrics-linux-amd64-v1.138.0.tar.gz -C /usr/local/bin
+sudo tar -xvf /tmp/victoria-metrics-linux-amd64-v1.139.0.tar.gz -C /usr/local/bin
 ```
 
 Then verify:
@@ -82,7 +93,30 @@ Then verify:
 /usr/local/bin/victoria-metrics-prod --version
 ```
 
-## 4. Create the system user and data directory
+## 4. Install vmutils (`vmctl`)
+
+`vmctl` is useful for migrations and benchmarks. For the standard non-Docker setup, install it together with VictoriaMetrics.
+
+For Debian 13 on `amd64`:
+
+```bash
+cd /tmp
+wget https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/v1.139.0/vmutils-linux-amd64-v1.139.0.tar.gz
+tar xzf vmutils-linux-amd64-v1.139.0.tar.gz
+sudo install -m 0755 vmctl-prod /usr/local/bin/vmctl
+```
+
+For `arm64`, use the matching archive:
+
+- `vmutils-linux-arm64-v1.139.0.tar.gz`
+
+Then verify:
+
+```bash
+/usr/local/bin/vmctl --version
+```
+
+## 5. Create the system user and data directory
 
 ```bash
 sudo useradd -r -s /usr/sbin/nologin victoriametrics
@@ -90,7 +124,7 @@ sudo mkdir -p /var/lib/victoria-metrics
 sudo chown -R victoriametrics:victoriametrics /var/lib/victoria-metrics
 ```
 
-## 5. Create the systemd service
+## 6. Create the systemd service
 
 Create the service file:
 
@@ -133,7 +167,7 @@ Notes:
 
 That is useful if you want to inspect VictoriaMetrics internals quickly in `vmui`. If you do not need those internal metrics, you can omit the flag.
 
-## 6. Start and enable the service
+## 7. Start and enable the service
 
 ```bash
 sudo systemctl daemon-reload
@@ -146,7 +180,7 @@ Check status:
 sudo systemctl status victoriametrics.service
 ```
 
-## 7. Verify the installation
+## 8. Verify the installation
 
 Health check:
 
@@ -164,7 +198,7 @@ VMUI in the browser:
 
 - `http://<your-host>:8428/vmui`
 
-## 8. Optionally expose the port to the network
+## 9. Optionally expose the port to the network
 
 If Grafana or EVCC should access VictoriaMetrics from another host, port `8428` must be reachable.
 
@@ -176,19 +210,22 @@ ss -ltnp | grep 8428
 
 If you use a firewall, open the port there as well.
 
-## 9. Upgrade later
+## 10. Upgrade later
 
 Upgrade flow:
 
 1. download the new release
-2. extract the binary into `/usr/local/bin`
-3. restart the service
+2. extract the `victoria-metrics-prod` binary into `/usr/local/bin`
+3. extract the matching `vmctl` binary into `/usr/local/bin`
+4. restart the service
 
 Example:
 
 ```bash
 sudo systemctl stop victoriametrics
 sudo tar -xvf /tmp/victoria-metrics-linux-amd64-vX.Y.Z.tar.gz -C /usr/local/bin
+sudo tar -xvf /tmp/vmutils-linux-amd64-vX.Y.Z.tar.gz -C /tmp
+sudo install -m 0755 /tmp/vmctl-prod /usr/local/bin/vmctl
 sudo systemctl start victoriametrics
 ```
 
@@ -196,14 +233,16 @@ Then verify again:
 
 ```bash
 /usr/local/bin/victoria-metrics-prod --version
+/usr/local/bin/vmctl --version
 sudo systemctl status victoriametrics
 ```
 
-## 10. Prepare for EVCC
+## 11. Prepare for EVCC
 
 For EVCC and the dashboard set, you normally need:
 
 - VictoriaMetrics reachable at `http://<host>:8428`
+- `vmctl` available locally for optional import benchmarks and migrations
 - a Grafana datasource pointing to that URL
 - EVCC or migration and rollup scripts reading from or writing to that URL
 

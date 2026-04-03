@@ -64,6 +64,11 @@ That guide covers:
 - technical deploy details:
   - [vm-dashboard-install.md](./vm-dashboard-install.md)
 
+## Release preparation
+
+- first end-user release checklist:
+  - [first-release-checklist.md](./first-release-checklist.md)
+
 ## Short version
 
 For a typical migration from EVCC + InfluxDB to EVCC + VictoriaMetrics, there are really only three major blocks:

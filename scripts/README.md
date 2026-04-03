@@ -16,6 +16,7 @@ Current rollup files:
 - `rollup/evcc-vm-rollup.conf.example`
 - `rollup/evcc-vm-rollup-prod.conf.example`
 - `helper/reimport_influx_to_vm.py`
+- `helper/benchmark-influx-imports.sh`
 - `helper/vm-rewrite-drop-label.py`
 
 The tool keeps the raw EVCC metrics untouched:
@@ -63,6 +64,16 @@ Rewrite host-tagged VM-only series:
 python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl
 ```
 
+
+Benchmark Python importer vs. `vmctl` on a fresh local VictoriaMetrics storage:
+
+```bash
+bash scripts/helper/benchmark-influx-imports.sh \
+  --influx-base http://192.168.1.183:8086 \
+  --start 2024-01-01T00:00:00Z \
+  --end 2026-03-30T00:00:00Z \
+  --allow-destructive-reset
+```
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.
@@ -112,3 +123,4 @@ For end users, prefer:
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
 - `docs/vm-dashboard-install.md`
+
