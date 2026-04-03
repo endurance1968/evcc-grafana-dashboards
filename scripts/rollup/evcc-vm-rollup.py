@@ -919,6 +919,13 @@ def run_benchmark(settings: Settings, as_json: bool = False) -> int:
     print("-------------------")
     for item in python_results:
         print(f"- {item['record']}")
+
+    print("\nResult")
+    print("------")
+    if failed_promql:
+        print("NOT OK: one or more direct source checks failed. Review the failed checks before running backfill.")
+    else:
+        print("OK: direct source checks passed. The setup is ready for a dry-run backfill.")
     return 0
 
 
