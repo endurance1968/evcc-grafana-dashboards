@@ -183,6 +183,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Print chunk progress to stderr while backfill is running.",
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON for detect/plan/benchmark/backfill output.",
+    )
     return parser.parse_args()
 
 
@@ -195,6 +200,20 @@ def load_settings(path: str) -> Settings:
     if max_fetch_points_per_series < 1000:
         raise SystemExit("max_fetch_points_per_series must be at least 1000")
 
+    benchmark_defaults = {
+        "start": (datetime.now(timezone.utc) - timedelta(days=30)).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "end": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "step": "1d",
+    }
+    if parser.has_section("benchmark"):
+        benchmark_start = parser.get("benchmark", "start", fallback=benchmark_defaults["start"])
+        benchmark_end = parser.get("benchmark", "end", fallback=benchmark_defaults["end"])
+        benchmark_step = parser.get("benchmark", "step", fallback=benchmark_defaults["step"])
+    else:
+        benchmark_start = benchmark_defaults["start"]
+        benchmark_end = benchmark_defaults["end"]
+        benchmark_step = benchmark_defaults["step"]
+
     return Settings(
         base_url=parser.get("victoriametrics", "base_url").rstrip("/"),
         db_label=parser.get("victoriametrics", "db_label"),
@@ -205,9 +224,9 @@ def load_settings(path: str) -> Settings:
         energy_rollup_step=parser.get("victoriametrics", "energy_rollup_step", fallback="60s"),
         price_bucket_minutes=parser.getint("victoriametrics", "price_bucket_minutes", fallback=15),
         max_fetch_points_per_series=max_fetch_points_per_series,
-        benchmark_start=parser.get("benchmark", "start"),
-        benchmark_end=parser.get("benchmark", "end"),
-        benchmark_step=parser.get("benchmark", "step"),
+        benchmark_start=benchmark_start,
+        benchmark_end=benchmark_end,
+        benchmark_step=benchmark_step,
     )
 
 
@@ -649,15 +668,6 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             implemented=True,
             group_labels=(),
         ),
-        RollupMetric(
-            key="pricing_rollups",
-            record=record_name(settings, "energy_purchased_daily_eur"),
-            expr="deferred",
-            description="Deferred: tariff and finance rollups belong to phase 2.",
-            phase="phase-2",
-            implemented=False,
-            group_labels=(),
-        ),
     ]
 
 
@@ -724,41 +734,102 @@ def build_window_chunks(windows: list[DayWindow]) -> list[tuple[str, list[DayWin
     return chunks
 
 
-def print_detect(settings: Settings) -> int:
+def print_list_section(title: str, values: list[str], empty_text: str = "none detected") -> None:
+    print(f"\n{title}")
+    print("-" * len(title))
+    if not values:
+        print(empty_text)
+        return
+    for value in values:
+        print(f"- {value}")
+
+
+def print_detect(settings: Settings, as_json: bool = False) -> int:
     detection = detect_dimensions(settings)
-    print(json.dumps(detection, indent=2, ensure_ascii=True))
+    if as_json:
+        print(json.dumps(detection, indent=2, ensure_ascii=True))
+        return 0
+
+    print("EVCC rollup dimension detection")
+    print("============================")
+    print(f"Namespace:  {settings.metric_prefix}")
+    print(f"Timezone:   {settings.timezone}")
+    print(f"VM base:    {settings.base_url}")
+    print(f"db label:   {settings.db_label}")
+    print(f"Range:      {settings.benchmark_start} -> {settings.benchmark_end}")
+    print_list_section("Loadpoints", detection["loadpoints"])
+    print_list_section("Vehicles", detection["vehicles"])
+    print_list_section("EXT titles", detection["ext_titles"])
+    print_list_section("AUX titles", detection["aux_titles"])
     return 0
 
 
-def print_plan(settings: Settings) -> int:
+def print_plan(settings: Settings, as_json: bool = False) -> int:
     detection = detect_dimensions(settings)
-    catalog = build_catalog(settings)
-    output = {
-        "namespace": settings.metric_prefix,
-        "timezone": settings.timezone,
-        "detection": detection,
-        "implemented": [
-            {
-                "key": item.key,
-                "record": item.record,
-                "description": item.description,
-                "expr": item.expr,
-                "group_labels": list(item.group_labels),
-            }
-            for item in catalog
-            if item.implemented
-        ],
-        "deferred": [
-            {
-                "key": item.key,
-                "record": item.record,
-                "description": item.description,
-            }
-            for item in catalog
-            if not item.implemented
-        ],
+    catalog = [item for item in build_catalog(settings) if item.implemented]
+    if as_json:
+        output = {
+            "namespace": settings.metric_prefix,
+            "timezone": settings.timezone,
+            "detection": detection,
+            "implemented": [
+                {
+                    "key": item.key,
+                    "record": item.record,
+                    "description": item.description,
+                    "expr": item.expr,
+                    "group_labels": list(item.group_labels),
+                    "phase": item.phase,
+                }
+                for item in catalog
+            ],
+        }
+        print(json.dumps(output, indent=2, ensure_ascii=True))
+        return 0
+
+    print("EVCC rollup plan")
+    print("================")
+    print(f"Namespace:   {settings.metric_prefix}")
+    print(f"Timezone:    {settings.timezone}")
+    print(f"VM base:     {settings.base_url}")
+    print(f"db label:    {settings.db_label}")
+    print(f"Raw step:    {settings.raw_sample_step}")
+    print(f"Energy step: {settings.energy_rollup_step}")
+    print(f"Price bucket minutes: {settings.price_bucket_minutes}")
+    print(f"Implemented rollups: {len(catalog)}")
+
+    print_list_section("Loadpoints", detection["loadpoints"])
+    print_list_section("Vehicles", detection["vehicles"])
+    print_list_section("EXT titles", detection["ext_titles"])
+    print_list_section("AUX titles", detection["aux_titles"])
+
+    phase_groups: dict[str, list[RollupMetric]] = {}
+    for item in catalog:
+        phase_groups.setdefault(item.phase, []).append(item)
+
+    phase_titles = {
+        "phase-1": "Phase 1: core energy and distance rollups",
+        "phase-2": "Phase 2: battery, grid, and pricing rollups",
+        "phase-3": "Phase 3: source attribution rollups",
     }
-    print(json.dumps(output, indent=2, ensure_ascii=True))
+    for phase in ("phase-1", "phase-2", "phase-3"):
+        items = phase_groups.get(phase, [])
+        title = phase_titles[phase]
+        print(f"\n{title}")
+        print("-" * len(title))
+        if not items:
+            print("none")
+            continue
+        for item in items:
+            scope = ", ".join(item.group_labels) if item.group_labels else "global"
+            print(f"- {item.record} [{scope}]")
+            print(f"  {item.description}")
+
+    print("\nPlan notes")
+    print("----------")
+    print("- This plan only lists implemented rollups.")
+    print("- detect/plan do not write data.")
+    print("- backfill --write creates the daily evcc_* metrics.")
     return 0
 
 
@@ -791,23 +862,63 @@ def benchmark_query(settings: Settings, item: RollupMetric) -> dict:
     }
 
 
-def run_benchmark(settings: Settings) -> int:
+def run_benchmark(settings: Settings, as_json: bool = False) -> int:
     catalog = [item for item in build_catalog(settings) if item.implemented]
     results = [benchmark_query(settings, item) for item in catalog]
-    print(
-        json.dumps(
-            {
-                "range": {
-                    "start": settings.benchmark_start,
-                    "end": settings.benchmark_end,
-                    "step": settings.benchmark_step,
-                },
-                "results": results,
-            },
-            indent=2,
-            ensure_ascii=True,
-        )
-    )
+    payload = {
+        "range": {
+            "start": settings.benchmark_start,
+            "end": settings.benchmark_end,
+            "step": settings.benchmark_step,
+        },
+        "results": results,
+    }
+    if as_json:
+        print(json.dumps(payload, indent=2, ensure_ascii=True))
+        return 0
+
+    promql_results = [item for item in results if item["elapsed_ms"] is not None]
+    python_results = [item for item in results if item["elapsed_ms"] is None]
+    successful_promql = [item for item in promql_results if item["status"] == "success"]
+    failed_promql = [item for item in promql_results if item["status"] != "success"]
+    slowest = sorted(successful_promql, key=lambda item: float(item["elapsed_ms"]), reverse=True)[:5]
+
+    print("EVCC rollup benchmark")
+    print("====================")
+    print(f"Range: {settings.benchmark_start} -> {settings.benchmark_end}")
+    print(f"Step:  {settings.benchmark_step}")
+
+    print("\nSummary")
+    print("-------")
+    print(f"- Implemented rollups: {len(results)}")
+    print(f"- Direct PromQL checks: {len(promql_results)}")
+    print(f"- Python-only rollups: {len(python_results)}")
+    print(f"- Successful PromQL checks: {len(successful_promql)}")
+    print(f"- Failed PromQL checks: {len(failed_promql)}")
+
+    print("\nInterpretation")
+    print("--------------")
+    print("- PromQL checks validate that the required raw source metrics can be queried from VictoriaMetrics.")
+    print("- Python-only rollups are computed during backfill; they do not have a single PromQL query to benchmark here.")
+    print("- If PromQL checks are fast and successful, the setup is usually ready for a dry-run backfill.")
+
+    if slowest:
+        print("\nSlowest direct checks")
+        print("--------------------")
+        for item in slowest:
+            print(f"- {item['record']}: {item['elapsed_ms']} ms, series={item['series']}")
+
+    if failed_promql:
+        print("\nFailed direct checks")
+        print("--------------------")
+        for item in failed_promql:
+            series_text = "n/a" if item["series"] is None else str(item["series"])
+            print(f"- {item['record']}: status={item['status']}, series={series_text}")
+
+    print("\nPython-only rollups")
+    print("-------------------")
+    for item in python_results:
+        print(f"- {item['record']}")
     return 0
 
 
@@ -2569,11 +2680,11 @@ def main() -> int:
     settings = load_settings(args.config)
 
     if args.command == "detect":
-        return print_detect(settings)
+        return print_detect(settings, as_json=args.json)
     if args.command == "plan":
-        return print_plan(settings)
+        return print_plan(settings, as_json=args.json)
     if args.command == "benchmark":
-        return run_benchmark(settings)
+        return run_benchmark(settings, as_json=args.json)
     if args.command == "backfill":
         return backfill(settings, args)
 

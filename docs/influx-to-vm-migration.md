@@ -295,8 +295,16 @@ Important:
 - `metric_prefix = evcc` creates production rollups such as `evcc_pv_energy_daily_wh`
 - keep `host_label` empty unless you have a very good reason not to
 - rollups should be based on business labels, not infrastructure labels
+- the `[benchmark]` section is optional; if omitted, the script uses the last 30 days with `step = 1d`
 
 ## 5. Inspect the rollup before writing
+
+Use these two commands before the first backfill:
+
+- `detect`
+  - shows which business dimensions were found in the raw data, for example loadpoints, vehicles, `EXT` titles, and `AUX` titles
+- `plan`
+  - shows which rollups will be created from the detected raw model and helps verify that the config matches your installation
 
 ### 5.1 Detect dimensions
 
@@ -318,8 +326,9 @@ python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf benchmark
 
 This is useful because it tells you early:
 
-- whether the raw data can be read at all
-- whether query runtimes are acceptable
+- whether the required raw source metrics can be queried from VictoriaMetrics
+- whether the direct source queries are fast enough
+- which rollups are Python-only and will only be computed during backfill
 - whether `max_fetch_points_per_series` fits your hardware
 
 ## 6. Run the initial rollup backfill

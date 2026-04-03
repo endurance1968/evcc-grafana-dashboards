@@ -229,11 +229,20 @@ def main() -> int:
     rollup_start = iso_z(now - dt.timedelta(days=args.rollup_days))
     feature_start = iso_z(now - dt.timedelta(days=args.feature_lookback_days))
     end = iso_z(now)
+    live_now = utc_now()
+    live_raw_start = iso_z(live_now - dt.timedelta(hours=args.raw_hours))
+    live_end = iso_z(live_now)
 
     feature_flags: Dict[str, bool] = {}
+    raw_feature_flags: Dict[str, bool] = {}
+    live_raw_feature_flags: Dict[str, bool] = {}
+    rollup_feature_flags: Dict[str, bool] = {}
     for feature_name, config in FEATURES.items():
         detectors: Sequence[str] = config["detect"]  # type: ignore[assignment]
         feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, feature_start, end) > 0 for metric in detectors)
+        raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, raw_start, end) > 0 for metric in detectors)
+        live_raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, live_raw_start, live_end) > 0 for metric in detectors)
+        rollup_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, rollup_start, end) > 0 for metric in detectors)
 
     detected_rollup_presence = any(series_count(args.base_url, item.metric, args.db, rollup_start, end) > 0 for item in CORE_ROLLUPS)
     host_matcher = f'{{db="{args.db}",host!=""}}'
@@ -247,9 +256,14 @@ def main() -> int:
 
     if effective_phase in {"raw", "full"}:
         sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, args.db, CORE_RAW, raw_start, end)})
-        for feature_name, enabled in feature_flags.items():
+        for feature_name, enabled in raw_feature_flags.items():
             if not enabled:
-                sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": [], "skipped_reason": "feature not detected"})
+                skipped_reason = (
+                    "feature detected historically, but not active in raw window"
+                    if feature_flags[feature_name]
+                    else "feature not detected"
+                )
+                sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["raw"]  # type: ignore[index]
             sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, raw_start, end)})
@@ -258,9 +272,14 @@ def main() -> int:
 
     if effective_phase in {"rollup", "full"}:
         sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, args.db, CORE_ROLLUPS, rollup_start, end)})
-        for feature_name, enabled in feature_flags.items():
+        for feature_name, enabled in rollup_feature_flags.items():
             if not enabled:
-                sections.append({"title": f"Conditional rollups ({feature_name})", "items": [], "skipped_reason": "feature not detected"})
+                skipped_reason = (
+                    "feature detected historically, but not active in rollup window"
+                    if feature_flags[feature_name]
+                    else "feature not detected"
+                )
+                sections.append({"title": f"Conditional rollups ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["rollups"]  # type: ignore[index]
             sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, rollup_start, end)})
@@ -290,8 +309,18 @@ def main() -> int:
         "effective_phase": effective_phase,
         "detected_rollup_presence": detected_rollup_presence,
         "host_series_count": host_series_count,
-        "windows": {"raw_start": raw_start, "rollup_start": rollup_start, "feature_start": feature_start, "end": end},
+        "windows": {
+            "raw_start": raw_start,
+            "rollup_start": rollup_start,
+            "feature_start": feature_start,
+            "end": end,
+            "live_raw_start": live_raw_start,
+            "live_end": live_end,
+        },
         "detected_features": feature_flags,
+        "raw_window_features": raw_feature_flags,
+        "live_raw_window_features": live_raw_feature_flags,
+        "rollup_window_features": rollup_feature_flags,
         "overall": overall,
         "sections": sections,
     }
@@ -309,6 +338,7 @@ def main() -> int:
     print(f"Rollups detected:   {'yes' if detected_rollup_presence else 'no'}")
     print(f"Host-tagged series: {host_series_count}")
     print(f"Raw window:         {raw_start} -> {end}")
+    print(f"Live raw window:    {live_raw_start} -> {live_end}")
     print(f"Rollup window:      {rollup_start} -> {end}")
     print(f"Feature lookback:   {feature_start} -> {end}")
     print("\nDetected features")
