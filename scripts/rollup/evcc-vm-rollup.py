@@ -2295,6 +2295,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     import_results = []
     chunk_summaries = []
     skipped = 0
+    skip_reasons: dict[str, int] = {}
     emitted_samples = 0
     total_batches = 0
     processed_days = 0
@@ -2351,6 +2352,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         series_map: dict[tuple[tuple[str, str], ...], dict] = {}
         chunk_start_samples = emitted_samples
         chunk_start_skipped = skipped
+        chunk_start_skip_reasons = dict(skip_reasons)
         fetch_blocks, fetch_block_by_day = build_fetch_blocks(
             chunk_name,
             chunk_windows,
@@ -2385,10 +2387,12 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         value = sample_value(result_item)
                         if value is None:
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "no_data")
                             continue
                         vehicle = str(result_item.get("metric", {}).get("vehicle", "")).strip()
                         if not vehicle:
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "missing_label")
                             continue
                         previous_value = previous_vehicle_odometer.get(vehicle)
                         previous_vehicle_odometer[vehicle] = value
@@ -2397,6 +2401,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         delta = value - previous_value
                         if not math.isfinite(delta) or delta < 0:
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "invalid_value")
                             continue
                         labels = base_daily_labels(settings, item.record, window)
                         labels["vehicle"] = vehicle
@@ -2415,6 +2420,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     selected_value = day_min if item.key == "battery_soc_daily_min" else day_max
                     if selected_value is None:
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data")
                         continue
                     append_series_sample(
                         series_map,
@@ -2433,6 +2439,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     for labels, value in summarize_positive_energy_rollups_from_matrix(settings, item, window, positive_energy_cache[cache_key]):
                         if not math.isfinite(value):
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "invalid_value")
                             continue
                         append_series_sample(
                             series_map,
@@ -2467,6 +2474,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     selected_value = price_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
                         continue
                     append_series_sample(
                         series_map,
@@ -2485,6 +2493,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     for labels, value in fetch_vehicle_price_rollups(settings, item, window, shared_price_context):
                         if not math.isfinite(value):
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "invalid_value")
                             continue
                         append_series_sample(
                             series_map,
@@ -2504,6 +2513,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     selected_value = aggregate_price_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
                         continue
                     append_series_sample(
                         series_map,
@@ -2524,6 +2534,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     selected_value = grid_energy_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
                         continue
                     append_series_sample(
                         series_map,
@@ -2544,6 +2555,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     selected_value = battery_energy_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
                         continue
                     append_series_sample(
                         series_map,
@@ -2565,6 +2577,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     for labels, value in attribution_rollups.get(item.key, []):
                         if not math.isfinite(value):
                             skipped += 1
+                            bump_skip_reason(skip_reasons, "invalid_value")
                             continue
                         append_series_sample(
                             series_map,
@@ -2580,6 +2593,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     value = sample_value(result_item)
                     if value is None:
                         skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data")
                         continue
                     labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
                     append_series_sample(series_map, labels, window.sample_timestamp_ms, value)
@@ -2614,6 +2628,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             "samples": emitted_samples - chunk_start_samples,
             "series": len(series_rows),
             "skipped": skipped - chunk_start_skipped,
+            "skip_reasons": diff_skip_reasons(skip_reasons, chunk_start_skip_reasons),
             "batches": len(batches),
             "duration_s": round(time.perf_counter() - chunk_started_at, 6),
         }
@@ -2672,14 +2687,108 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "samples": emitted_samples,
         "series": len(seen_series_keys),
         "skipped": skipped,
+        "skip_reasons": dict(sorted(skip_reasons.items())),
         "chunks": chunk_summaries,
         "batches": total_batches,
         "batch_size": args.batch_size,
         "import_results": import_results,
         "profile": {key: round(float(value), 6) for key, value in ACTIVE_PROFILE.items()},
     }
-    print(json.dumps(summary, indent=2, ensure_ascii=True))
+    if args.json:
+        print(json.dumps(summary, indent=2, ensure_ascii=True))
+    else:
+        print_backfill_summary(summary, args)
     return 0
+
+
+def bump_skip_reason(skip_reasons: dict[str, int], reason: str) -> None:
+    skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
+
+
+def diff_skip_reasons(current: dict[str, int], snapshot: dict[str, int]) -> dict[str, int]:
+    keys = set(current) | set(snapshot)
+    return {key: current.get(key, 0) - snapshot.get(key, 0) for key in sorted(keys) if current.get(key, 0) - snapshot.get(key, 0) > 0}
+
+
+def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
+    profile = summary.get("profile", {})
+    total_s = float(profile.get("total_s", 0.0) or 0.0)
+    peak_memory = profile.get("memory_peak_mb")
+    chunks = summary.get("chunks", [])
+    slowest_chunks = sorted(chunks, key=lambda item: float(item.get("duration_s", 0.0)), reverse=True)[:5]
+
+    print(f"EVCC rollup {'write' if args.write else 'dry-run'}")
+    print("===========================")
+    print(f"Range:        {summary['range']['start_day']} -> {summary['range']['end_day']}")
+    print(f"Days:         {summary['range']['days']}")
+    print(f"Timezone:     {summary['timezone']}")
+    print(f"Raw step:     {summary['raw_sample_step']}")
+    print(f"Energy step:  {summary['energy_rollup_step']}")
+    print(f"Batch size:   {summary['batch_size']}")
+
+    print("\nSummary")
+    print("-------")
+    print(f"- Rollup metrics: {len(summary['metrics'])}")
+    print(f"- Output series: {summary['series']}")
+    print(f"- Output samples: {summary['samples']}")
+    print(f"- Skipped items: {summary['skipped']}")
+    print(f"- Month chunks: {len(chunks)}")
+    skip_reasons = summary.get("skip_reasons", {})
+    print(f"- Import batches: {summary['batches']}")
+    print(f"- Total runtime: {round(total_s, 2)} s")
+    if peak_memory is not None:
+        print(f"- Peak RAM: {round(float(peak_memory), 2)} MB")
+
+    if skip_reasons:
+        print("\nSkip reasons")
+        print("------------")
+        labels = {
+            "no_data": "No usable source data for that rollup/day",
+            "invalid_value": "Computed or fetched value was invalid",
+            "missing_label": "Required business label was missing",
+        }
+        for key, count in skip_reasons.items():
+            print(f"- {labels.get(key, key)}: {count}")
+
+    if slowest_chunks:
+        print("\nSlowest chunks")
+        print("-------------")
+        for item in slowest_chunks:
+            skip_reason_text = ""
+            if item.get("skip_reasons"):
+                top_reason = max(item["skip_reasons"].items(), key=lambda pair: pair[1])
+                skip_reason_text = f", top-skip={top_reason[0]}:{top_reason[1]}"
+            print(
+                f"- {item['chunk']}: {item['duration_s']} s, samples={item['samples']}, "
+                f"series={item['series']}, skipped={item['skipped']}{skip_reason_text}"
+            )
+
+    print("\nInterpretation")
+    print("--------------")
+    print("- 'Skipped items' are grouped below so you can see whether they mostly come from missing source data, invalid values, or missing labels.")
+    if args.write:
+        print("- Write mode calculated the rollups and imported the resulting evcc_* metrics into VictoriaMetrics.")
+    else:
+        print("- Dry-run mode calculates the rollups but does not write any evcc_* metrics.")
+        print("- If this dry-run looks plausible, the next step is the same command with --write.")
+
+    print("\nResult")
+    print("------")
+    if summary['samples'] <= 0 or summary['series'] <= 0:
+        print("NO-GO: the dry-run produced no rollup output. Review detect/plan and the raw data first.")
+        return
+
+    if peak_memory is not None and float(peak_memory) >= 3072.0:
+        if args.write:
+            print("OK WITH CAUTION: write completed, but peak memory was high. Check system headroom before repeating the run.")
+        else:
+            print("GO WITH CAUTION: dry-run succeeded, but peak memory was high. Consider a smaller range or batch size before --write.")
+        return
+
+    if args.write:
+        print("OK: write completed successfully.")
+    else:
+        print("GO: dry-run completed successfully. The setup is ready for the real write run.")
 
 
 def main() -> int:
