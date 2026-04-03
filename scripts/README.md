@@ -15,14 +15,14 @@ Current rollup files:
 - `rollup/evcc-vm-rollup.py`
 - `rollup/evcc-vm-rollup.conf.example`
 - `rollup/evcc-vm-rollup-prod.conf.example`
-- `helper/reimport_influx_to_vm.py`
-- `helper/benchmark-influx-imports.sh`
+- `helper/check_data.py`
+- `helper/compare_labelsets.py`
 - `helper/vm-rewrite-drop-label.py`
 
 The tool keeps the raw EVCC metrics untouched:
 
 - no writes unless `--write` is passed explicitly
-- no raw metric changes
+- no raw metric changes from the rollup engine
 - no dashboard rewiring
 
 ## Main commands
@@ -38,7 +38,6 @@ Show the rollup plan:
 ```bash
 python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example plan
 ```
-
 
 Benchmark representative raw-data queries:
 
@@ -58,22 +57,38 @@ Write `evcc_*` rollups:
 python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
 ```
 
+## VM cleanup and validation helpers
+
 Rewrite host-tagged VM-only series:
 
 ```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
 
-
-Benchmark Python importer vs. `vmctl` on a fresh local VictoriaMetrics storage:
+Recommended write mode after a successful dry-run:
 
 ```bash
-bash scripts/helper/benchmark-influx-imports.sh \
-  --influx-base http://192.168.1.183:8086 \
-  --start 2024-01-01T00:00:00Z \
-  --end 2026-03-30T00:00:00Z \
-  --allow-destructive-reset
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{db="evcc",host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --merge-target --reset-cache --write
 ```
+
+Check whether raw EVCC metrics and expected daily rollups exist after import/backfill:
+
+```bash
+python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc
+
+# historical import or benchmark VM
+python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --db evcc --end-time 2026-03-31T23:59:59Z
+```
+
+Compare labelsets between two import states or benchmark exports:
+
+```bash
+python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/target-stats.json --left-name before --right-json /tmp/after-cleanup/target-stats.json --right-name after
+
+# only one metric
+python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/target-stats.json --left-name before --right-json /tmp/after-cleanup/target-stats.json --right-name after --metric-regex '^pvPower_value$'
+```
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.
