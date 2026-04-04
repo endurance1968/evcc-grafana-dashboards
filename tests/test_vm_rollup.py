@@ -1,8 +1,10 @@
+import contextlib
 import importlib.util
+import io
 import pathlib
 import sys
 import unittest
-
+from types import SimpleNamespace
 
 MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "rollup" / "evcc-vm-rollup.py"
 SPEC = importlib.util.spec_from_file_location("evcc_vm_rollup", MODULE_PATH)
@@ -51,7 +53,7 @@ class VmRollupTests(unittest.TestCase):
         self.assertNotIn("grid_import_daily_energy", deferred)
         self.assertNotIn("battery_charge_daily_energy", deferred)
         self.assertNotIn("grid_export_credit_daily", deferred)
-        self.assertIn("pricing_rollups", deferred)
+        self.assertEqual(deferred, set())
 
     def test_vehicle_distance_rollup_collapses_to_vehicle_dimension(self):
         item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "vehicle_daily_distance")
@@ -186,6 +188,66 @@ class VmRollupTests(unittest.TestCase):
             'sum by (vehicle) (chargePower_value{db="evcc"})',
         )
 
+    def test_positive_energy_rollups_use_direct_integrate_queries(self):
+        catalog = MODULE.build_catalog(self.settings)
+        pv_item = next(metric for metric in catalog if metric.key == "pv_daily_energy")
+        home_item = next(metric for metric in catalog if metric.key == "home_daily_energy")
+        loadpoint_item = next(metric for metric in catalog if metric.key == "loadpoint_daily_energy")
+        self.assertEqual(
+            pv_item.expr,
+            'sum(integrate(pvPower_value{db="evcc",id=""}[1d])) / 3600',
+        )
+        self.assertEqual(
+            home_item.expr,
+            'sum(integrate(homePower_value{db="evcc"}[1d])) / 3600',
+        )
+        self.assertEqual(
+            loadpoint_item.expr,
+            'sum(integrate(chargePower_value{db="evcc"}[1d])) by (loadpoint) / 3600',
+        )
+
+    def test_backfill_positive_energy_uses_direct_rollup_query_path(self):
+        pv_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")
+        args = SimpleNamespace(start_day="2026-03-02", end_day="2026-03-02", batch_size=200, progress=False, write=False, json=True)
+        captured = {}
+
+        def fake_build_catalog(settings):
+            return [pv_item]
+
+        def fake_fetch_rollup_vector(settings, item, window):
+            captured["query"] = item.expr
+            return [{"metric": {"db": "evcc"}, "value": [window.sample_timestamp_ms / 1000, "4200"]}]
+
+        def fail_positive_matrix(*_args, **_kwargs):
+            raise AssertionError("legacy positive-energy matrix path should not be used")
+
+        def fake_build_health(*_args, **_kwargs):
+            return []
+
+        original_build_catalog = MODULE.build_catalog
+        original_fetch_rollup_vector = MODULE.fetch_rollup_vector
+        original_positive_matrix = MODULE.fetch_chunk_positive_energy_matrix
+        original_build_health = MODULE.build_pv_health_rollups
+        MODULE.build_catalog = fake_build_catalog
+        MODULE.fetch_rollup_vector = fake_fetch_rollup_vector
+        MODULE.fetch_chunk_positive_energy_matrix = fail_positive_matrix
+        MODULE.build_pv_health_rollups = fake_build_health
+        try:
+            stdout = io.StringIO()
+            with contextlib.redirect_stdout(stdout):
+                result = MODULE.backfill(self.settings, args)
+        finally:
+            MODULE.build_catalog = original_build_catalog
+            MODULE.fetch_rollup_vector = original_fetch_rollup_vector
+            MODULE.fetch_chunk_positive_energy_matrix = original_positive_matrix
+            MODULE.build_pv_health_rollups = original_build_health
+
+        summary = MODULE.json.loads(stdout.getvalue())
+        self.assertEqual(result, 0)
+        self.assertEqual(captured["query"], 'sum(integrate(pvPower_value{db="evcc",id=""}[1d])) / 3600')
+        self.assertEqual(summary["samples"], 1)
+        self.assertEqual(summary["series"], 1)
+        self.assertEqual(summary["skipped"], 0)
     def test_serialize_import_jsonl_creates_one_json_line_per_series(self):
         payload = MODULE.serialize_import_jsonl(
             [
@@ -219,21 +281,20 @@ class VmRollupTests(unittest.TestCase):
             MODULE.parse_local_day("2026-01-30", "--start-day"),
             MODULE.parse_local_day("2026-02-02", "--end-day"),
         )
-        chunks = MODULE.build_window_chunks(windows, "month")
+        chunks = MODULE.build_window_chunks(windows)
         self.assertEqual([label for label, _ in chunks], ["2026-01", "2026-02"])
         self.assertEqual([len(items) for _, items in chunks], [2, 2])
 
-    def test_build_window_chunks_all_keeps_single_chunk(self):
+    def test_build_window_chunks_keeps_single_chunk_for_single_month(self):
         windows = MODULE.build_day_windows(
             self.settings,
             MODULE.parse_local_day("2026-01-30", "--start-day"),
-            MODULE.parse_local_day("2026-02-02", "--end-day"),
+            MODULE.parse_local_day("2026-01-31", "--end-day"),
         )
-        chunks = MODULE.build_window_chunks(windows, "all")
+        chunks = MODULE.build_window_chunks(windows)
         self.assertEqual(len(chunks), 1)
-        self.assertEqual(chunks[0][0], "all")
-        self.assertEqual(len(chunks[0][1]), 4)
-
+        self.assertEqual(chunks[0][0], "2026-01")
+        self.assertEqual(len(chunks[0][1]), 2)
 
     def test_build_fetch_blocks_splits_large_month_into_multiple_blocks(self):
         windows = MODULE.build_day_windows(
@@ -493,6 +554,7 @@ class VmRollupTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
 

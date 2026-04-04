@@ -370,8 +370,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="pv_daily_energy",
             record=record_name(settings, "pv_energy_daily_wh"),
-            expr="python: positive-only daily PV energy on 60s buckets",
-            description="PV daily energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(pvPower_value{{{root_no_id}}}[1d])) / 3600",
+            description="PV daily energy from raw power values.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -379,8 +379,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="home_daily_energy",
             record=record_name(settings, "home_energy_daily_wh"),
-            expr="python: positive-only daily home energy on 60s buckets",
-            description="Home daily energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(homePower_value{{{root}}}[1d])) / 3600",
+            description="Home daily energy from raw power values.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -388,8 +388,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="loadpoint_daily_energy",
             record=record_name(settings, "loadpoint_energy_daily_wh"),
-            expr="python: positive-only per-loadpoint daily energy on 60s buckets",
-            description="Per-loadpoint daily charging energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (loadpoint) / 3600",
+            description="Per-loadpoint daily charging energy.",
             phase="phase-1",
             implemented=True,
             group_labels=("loadpoint",),
@@ -397,8 +397,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="vehicle_daily_energy",
             record=record_name(settings, "vehicle_energy_daily_wh"),
-            expr="python: positive-only per-vehicle daily energy on 60s buckets",
-            description="Per-vehicle daily charging energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (vehicle) / 3600",
+            description="Per-vehicle daily charging energy.",
             phase="phase-1",
             implemented=True,
             group_labels=("vehicle",),
@@ -472,8 +472,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
-            expr="python: positive-only per-ext-title daily energy on 60s buckets",
-            description="Per-ext-title daily energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(extPower_value{{{root}}}[1d])) by (title) / 3600",
+            description="Per-ext-title daily energy.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -481,8 +481,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="aux_daily_energy",
             record=record_name(settings, "aux_energy_daily_wh"),
-            expr="python: positive-only per-aux-title daily energy on 60s buckets",
-            description="Per-aux-title daily energy from positive 60-second power buckets.",
+            expr=f"sum(integrate(auxPower_value{{{root}}}[1d])) by (title) / 3600",
+            description="Per-aux-title daily energy.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -2368,7 +2368,6 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             parse_step_seconds(settings.raw_sample_step),
             settings.max_fetch_points_per_series,
         )
-        positive_energy_cache: dict[tuple[str, str], list[dict]] = {}
         shared_price_contexts: dict[str, dict[str, object]] = {}
         attribution_contexts: dict[str, dict[str, object]] = {}
 
@@ -2443,15 +2442,21 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     continue
                 if item.key in positive_energy_metric_keys:
                     started_at = time.perf_counter()
-                    cache_key = (fetch_block.name, item.key)
-                    if cache_key not in positive_energy_cache:
-                        positive_energy_cache[cache_key] = fetch_chunk_positive_energy_matrix(settings, item, fetch_block)
-                    for labels, value in summarize_positive_energy_rollups_from_matrix(settings, item, window, positive_energy_cache[cache_key]):
-                        if not math.isfinite(value):
+                    result_items = fetch_rollup_vector(settings, item, window)
+                    if not result_items:
+                        skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data")
+                        add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
+                        continue
+                    for result_item in result_items:
+                        value = sample_value(result_item)
+                        if value is None or not math.isfinite(value):
                             skipped += 1
-                            bump_skip_reason(skip_reasons, "invalid_value")
-                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
+                            bump_skip_reason(skip_reasons, "invalid_value" if value is not None else "no_data")
+                            if value is not None:
+                                record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                             continue
+                        labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
                         append_series_sample(
                             series_map,
                             labels,
@@ -2860,6 +2865,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
