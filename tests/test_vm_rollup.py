@@ -177,8 +177,13 @@ class VmRollupTests(unittest.TestCase):
 
     def test_positive_energy_query_uses_expected_grouping(self):
         catalog = MODULE.build_catalog(self.settings)
+        pv_item = next(metric for metric in catalog if metric.key == "pv_daily_energy")
         loadpoint_item = next(metric for metric in catalog if metric.key == "loadpoint_daily_energy")
         vehicle_item = next(metric for metric in catalog if metric.key == "vehicle_daily_energy")
+        self.assertEqual(
+            MODULE.positive_energy_query(self.settings, pv_item),
+            'sum without(host, id, title) (pvPower_value{db="evcc",id!=""}) or sum without(host) (pvPower_value{db="evcc",id=""})',
+        )
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, loadpoint_item),
             'sum by (loadpoint) (chargePower_value{db="evcc"})',

@@ -1375,7 +1375,7 @@ def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     root = base_matchers(settings)
     root_no_id = root + ',id=""'
     if item.key == "pv_daily_energy":
-        return f'sum without(host) (pvPower_value{{{root_no_id}}})'
+        return f'sum without(host, id, title) (pvPower_value{{{root},id!=""}}) or sum without(host) (pvPower_value{{{root_no_id}}})'
     if item.key == "home_daily_energy":
         return f'sum without(host) (homePower_value{{{root}}})'
     if item.key == "loadpoint_daily_energy":
