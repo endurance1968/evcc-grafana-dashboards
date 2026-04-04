@@ -370,8 +370,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="pv_daily_energy",
             record=record_name(settings, "pv_energy_daily_wh"),
-            expr=f"sum(integrate(pvPower_value{{{root_no_id}}}[1d])) / 3600",
-            description="PV daily energy from raw power values.",
+            expr="python: legacy-style daily PV energy from positive max buckets",
+            description="PV daily energy from positive raw power buckets using the legacy max-per-step integration semantics.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -379,8 +379,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="home_daily_energy",
             record=record_name(settings, "home_energy_daily_wh"),
-            expr=f"sum(integrate(homePower_value{{{root}}}[1d])) / 3600",
-            description="Home daily energy from raw power values.",
+            expr="python: legacy-style daily home energy from positive max buckets",
+            description="Home daily energy from positive raw power buckets using the legacy max-per-step integration semantics.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -1303,6 +1303,73 @@ def summarize_positive_bucket_energy_samples(
         total_wh += (sum(values) / len(values)) * bucket_seconds / 3600.0
     return total_wh
 
+
+def reduce_bucket_values(values: list[float], reducer: str) -> float:
+    if reducer == "max":
+        return max(values)
+    if reducer == "mean":
+        return sum(values) / len(values)
+    raise ValueError(f"Unsupported bucket reducer: {reducer}")
+
+
+def summarize_legacy_bucket_energy_samples(
+    samples: list[tuple[int, float]],
+    start_ts: int,
+    end_ts: int,
+    bucket_seconds: int,
+    reducer: str,
+    peak_power_limit: float = 40000.0,
+) -> float:
+    bucket_map: dict[int, list[float]] = {}
+    for timestamp, value in samples:
+        if timestamp < start_ts or timestamp >= end_ts:
+            continue
+        if not math.isfinite(value) or value < 0 or value >= peak_power_limit:
+            continue
+        bucket_start = start_ts + (((timestamp - start_ts) // bucket_seconds) * bucket_seconds)
+        bucket_map.setdefault(bucket_start, []).append(value)
+    total_wh = 0.0
+    for bucket_start in range(start_ts, end_ts, bucket_seconds):
+        values = bucket_map.get(bucket_start)
+        if not values:
+            continue
+        total_wh += reduce_bucket_values(values, reducer) * bucket_seconds / 3600.0
+    return total_wh
+
+
+def legacy_bucket_reducer_for_item(item: RollupMetric) -> str | None:
+    if item.key in {"pv_daily_energy", "home_daily_energy"}:
+        return "max"
+    return None
+
+
+def summarize_legacy_positive_energy_rollups_from_matrix(
+    settings: Settings,
+    item: RollupMetric,
+    window: DayWindow,
+    matrix: list[dict],
+) -> list[tuple[dict[str, str], float]]:
+    reducer = legacy_bucket_reducer_for_item(item)
+    if reducer is None:
+        raise ValueError(f"Unsupported legacy positive energy key: {item.key}")
+    bucket_seconds = parse_step_seconds(settings.energy_rollup_step)
+    start_ts = iso_to_timestamp(window.start_iso)
+    end_ts = iso_to_timestamp(window.end_iso)
+    out: list[tuple[dict[str, str], float]] = []
+    for result_item in matrix:
+        samples = slice_samples(result_item["samples"], start_ts, end_ts)
+        if not samples:
+            continue
+        value = summarize_legacy_bucket_energy_samples(
+            samples,
+            start_ts,
+            end_ts,
+            bucket_seconds,
+            reducer,
+        )
+        labels = normalize_rollup_labels(settings, item, result_item.get("metric", {}), window)
+        out.append((labels, value))
+    return out
 
 def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     root = base_matchers(settings)
@@ -2310,9 +2377,11 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     processed_days = 0
     pv_daily_values_by_year: dict[str, dict[str, object]] = {}
     pv_daily_values_by_year_month: dict[tuple[str, str], dict[str, object]] = {}
-    positive_energy_metric_keys = {
+    legacy_positive_energy_metric_keys = {
         "pv_daily_energy",
         "home_daily_energy",
+    }
+    direct_positive_energy_metric_keys = {
         "loadpoint_daily_energy",
         "vehicle_daily_energy",
         "ext_daily_energy",
@@ -2370,6 +2439,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         )
         shared_price_contexts: dict[str, dict[str, object]] = {}
         attribution_contexts: dict[str, dict[str, object]] = {}
+        positive_energy_contexts: dict[tuple[str, str], list[dict]] = {}
 
         update_peak_memory()
         if args.progress:
@@ -2440,7 +2510,44 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     emitted_samples += 1
                     add_duration(ACTIVE_PROFILE, "battery_soc_s", started_at)
                     continue
-                if item.key in positive_energy_metric_keys:
+                if item.key in legacy_positive_energy_metric_keys:
+                    started_at = time.perf_counter()
+                    matrix_cache_key = (fetch_block.name, item.key)
+                    matrix = positive_energy_contexts.get(matrix_cache_key)
+                    if matrix is None:
+                        matrix = fetch_chunk_positive_energy_matrix(settings, item, fetch_block)
+                        positive_energy_contexts[matrix_cache_key] = matrix
+                    result_items = summarize_legacy_positive_energy_rollups_from_matrix(settings, item, window, matrix)
+                    if not result_items:
+                        skipped += 1
+                        bump_skip_reason(skip_reasons, "no_data")
+                        add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
+                        continue
+                    for labels, value in result_items:
+                        append_series_sample(
+                            series_map,
+                            labels,
+                            window.sample_timestamp_ms,
+                            value,
+                        )
+                        if item.key == "pv_daily_energy":
+                            year_bucket = pv_daily_values_by_year.setdefault(
+                                window.local_year,
+                                {"values": [], "timestamp_ms": 0},
+                            )
+                            year_bucket["values"].append(value)
+                            year_bucket["timestamp_ms"] = max(int(year_bucket["timestamp_ms"]), window.sample_timestamp_ms)
+                            month_key = (window.local_year, window.local_month)
+                            month_bucket = pv_daily_values_by_year_month.setdefault(
+                                month_key,
+                                {"values": [], "timestamp_ms": 0},
+                            )
+                            month_bucket["values"].append(value)
+                            month_bucket["timestamp_ms"] = max(int(month_bucket["timestamp_ms"]), window.sample_timestamp_ms)
+                        emitted_samples += 1
+                    add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
+                    continue
+                if item.key in direct_positive_energy_metric_keys:
                     started_at = time.perf_counter()
                     result_items = fetch_rollup_vector(settings, item, window)
                     if not result_items:
@@ -2463,20 +2570,6 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                             window.sample_timestamp_ms,
                             value,
                         )
-                        if item.key == "pv_daily_energy":
-                            year_bucket = pv_daily_values_by_year.setdefault(
-                                window.local_year,
-                                {"values": [], "timestamp_ms": 0},
-                            )
-                            year_bucket["values"].append(value)
-                            year_bucket["timestamp_ms"] = max(int(year_bucket["timestamp_ms"]), window.sample_timestamp_ms)
-                            month_key = (window.local_year, window.local_month)
-                            month_bucket = pv_daily_values_by_year_month.setdefault(
-                                month_key,
-                                {"values": [], "timestamp_ms": 0},
-                            )
-                            month_bucket["values"].append(value)
-                            month_bucket["timestamp_ms"] = max(int(month_bucket["timestamp_ms"]), window.sample_timestamp_ms)
                         emitted_samples += 1
                     add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
                     continue
@@ -2865,6 +2958,8 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 
 
 

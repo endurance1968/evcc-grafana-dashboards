@@ -188,38 +188,81 @@ class VmRollupTests(unittest.TestCase):
             'sum by (vehicle) (chargePower_value{db="evcc"})',
         )
 
-    def test_positive_energy_rollups_use_direct_integrate_queries(self):
+    def test_base_energy_rollups_keep_pv_and_home_on_legacy_python_path(self):
         catalog = MODULE.build_catalog(self.settings)
         pv_item = next(metric for metric in catalog if metric.key == "pv_daily_energy")
         home_item = next(metric for metric in catalog if metric.key == "home_daily_energy")
         loadpoint_item = next(metric for metric in catalog if metric.key == "loadpoint_daily_energy")
         self.assertEqual(
             pv_item.expr,
-            'sum(integrate(pvPower_value{db="evcc",id=""}[1d])) / 3600',
+            'python: legacy-style daily PV energy from positive max buckets',
         )
         self.assertEqual(
             home_item.expr,
-            'sum(integrate(homePower_value{db="evcc"}[1d])) / 3600',
+            'python: legacy-style daily home energy from positive max buckets',
         )
         self.assertEqual(
             loadpoint_item.expr,
             'sum(integrate(chargePower_value{db="evcc"}[1d])) by (loadpoint) / 3600',
         )
 
-    def test_backfill_positive_energy_uses_direct_rollup_query_path(self):
+    def test_summarize_legacy_bucket_energy_samples_uses_bucket_max(self):
+        value = MODULE.summarize_legacy_bucket_energy_samples(
+            [
+                (0, 600.0),
+                (10, 1200.0),
+                (60, 300.0),
+                (70, -5.0),
+                (80, 50000.0),
+            ],
+            start_ts=0,
+            end_ts=120,
+            bucket_seconds=60,
+            reducer="max",
+        )
+        self.assertAlmostEqual(value, 25.0, places=6)
+
+    def test_summarize_legacy_positive_energy_rollups_from_matrix_uses_bucket_max(self):
         pv_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")
-        args = SimpleNamespace(start_day="2026-03-02", end_day="2026-03-02", batch_size=200, progress=False, write=False, json=True)
-        captured = {}
+        window = MODULE.DayWindow(
+            day="2026-03-02",
+            start_iso="1970-01-01T00:00:00Z",
+            end_iso="1970-01-01T00:02:00Z",
+            sample_timestamp_ms=0,
+            local_year="1970",
+            local_month="01",
+            local_day="01",
+            local_date="1970-01-01",
+        )
+        result = MODULE.summarize_legacy_positive_energy_rollups_from_matrix(
+            self.settings,
+            pv_item,
+            window,
+            [
+                {
+                    "metric": {"db": "evcc"},
+                    "samples": [(0, 600.0), (10, 1200.0), (60, 300.0), (70, -5.0)],
+                }
+            ],
+        )
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0]["__name__"], "evcc_pv_energy_daily_wh")
+        self.assertAlmostEqual(result[0][1], 25.0, places=6)
+
+    def test_backfill_pv_daily_energy_uses_legacy_matrix_path(self):
+        pv_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")
+        args = SimpleNamespace(start_day="1970-01-01", end_day="1970-01-01", batch_size=200, progress=False, write=False, json=True)
+        captured = {"matrix_calls": 0}
 
         def fake_build_catalog(settings):
             return [pv_item]
 
-        def fake_fetch_rollup_vector(settings, item, window):
-            captured["query"] = item.expr
-            return [{"metric": {"db": "evcc"}, "value": [window.sample_timestamp_ms / 1000, "4200"]}]
+        def fail_fetch_rollup_vector(*_args, **_kwargs):
+            raise AssertionError("legacy PV daily energy should not use the direct rollup query path")
 
-        def fail_positive_matrix(*_args, **_kwargs):
-            raise AssertionError("legacy positive-energy matrix path should not be used")
+        def fake_fetch_chunk_positive_energy_matrix(settings, item, chunk):
+            captured["matrix_calls"] += 1
+            return [{"metric": {"db": "evcc"}, "samples": [(0, 600.0), (10, 1200.0), (60, 300.0)]}]
 
         def fake_build_health(*_args, **_kwargs):
             return []
@@ -229,8 +272,8 @@ class VmRollupTests(unittest.TestCase):
         original_positive_matrix = MODULE.fetch_chunk_positive_energy_matrix
         original_build_health = MODULE.build_pv_health_rollups
         MODULE.build_catalog = fake_build_catalog
-        MODULE.fetch_rollup_vector = fake_fetch_rollup_vector
-        MODULE.fetch_chunk_positive_energy_matrix = fail_positive_matrix
+        MODULE.fetch_rollup_vector = fail_fetch_rollup_vector
+        MODULE.fetch_chunk_positive_energy_matrix = fake_fetch_chunk_positive_energy_matrix
         MODULE.build_pv_health_rollups = fake_build_health
         try:
             stdout = io.StringIO()
@@ -244,7 +287,7 @@ class VmRollupTests(unittest.TestCase):
 
         summary = MODULE.json.loads(stdout.getvalue())
         self.assertEqual(result, 0)
-        self.assertEqual(captured["query"], 'sum(integrate(pvPower_value{db="evcc",id=""}[1d])) / 3600')
+        self.assertEqual(captured["matrix_calls"], 1)
         self.assertEqual(summary["samples"], 1)
         self.assertEqual(summary["series"], 1)
         self.assertEqual(summary["skipped"], 0)
@@ -554,6 +597,8 @@ class VmRollupTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
 
 
 
