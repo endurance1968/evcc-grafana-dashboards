@@ -2659,8 +2659,12 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
 
         update_peak_memory()
         if args.progress:
+            skip_reason_text = ""
+            if chunk_summary["skipped"] > 0 and chunk_summary.get("skip_reasons"):
+                top_reason = max(chunk_summary["skip_reasons"].items(), key=lambda pair: pair[1])
+                skip_reason_text = f" top-skip={top_reason[0]}:{top_reason[1]}"
             print(
-                f"[chunk {chunk_index}/{len(chunks)}] done {chunk_name} days={processed_days}/{len(windows)} samples={chunk_summary['samples']} series={chunk_summary['series']} skipped={chunk_summary['skipped']} batches={chunk_summary['batches']}",
+                f"[chunk {chunk_index}/{len(chunks)}] done {chunk_name} days={processed_days}/{len(windows)} samples={chunk_summary['samples']} series={chunk_summary['series']} skipped={chunk_summary['skipped']} batches={chunk_summary['batches']}{skip_reason_text}",
                 file=sys.stderr,
                 flush=True,
             )
@@ -2748,12 +2752,21 @@ def diff_skip_reasons(current: dict[str, int], snapshot: dict[str, int]) -> dict
     return {key: current.get(key, 0) - snapshot.get(key, 0) for key in sorted(keys) if current.get(key, 0) - snapshot.get(key, 0) > 0}
 
 
+def top_skip_reason_text(skip_reasons: dict[str, int]) -> str:
+    if not skip_reasons:
+        return ""
+    top_reason = max(skip_reasons.items(), key=lambda pair: pair[1])
+    return f"{top_reason[0]}:{top_reason[1]}"
+
+
 def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     profile = summary.get("profile", {})
     total_s = float(profile.get("total_s", 0.0) or 0.0)
     peak_memory = profile.get("memory_peak_mb")
     chunks = summary.get("chunks", [])
     slowest_chunks = sorted(chunks, key=lambda item: float(item.get("duration_s", 0.0)), reverse=True)[:5]
+    skipped_chunks = [item for item in chunks if int(item.get("skipped", 0)) > 0]
+    most_skipped_chunks = sorted(skipped_chunks, key=lambda item: int(item.get("skipped", 0)), reverse=True)[:5]
 
     print(f"EVCC rollup {'write' if args.write else 'dry-run'}")
     print("===========================")
