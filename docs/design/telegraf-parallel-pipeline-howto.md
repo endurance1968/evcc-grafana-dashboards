@@ -31,49 +31,68 @@ Because of that, EVCC should target a Telegraf `[[inputs.influxdb_v2_listener]]`
 
 ## Recommended listener layout
 
-Keep v1 and v2 separated by port.
+Current setup uses the Influx v2 listener on the standard EVCC write port and keeps the v1 listener disabled.
 
 Example:
 
 ```toml
-[[inputs.influxdb_listener]]
+[agent]
+  interval = "10s"
+  round_interval = true
+  metric_batch_size = 1000
+  metric_buffer_limit = 10000
+  flush_interval = "10s"
+  flush_jitter = "1s"
+  precision = "1s"
+  omit_hostname = true
+  debug = true
+
+#[[inputs.influxdb_listener]]
+#  service_address = ":8086"
+#  read_timeout = "30s"
+#  write_timeout = "30s"
+#  basic_username = "<listener-user>"
+#  basic_password = "<listener-password>"
+
+[[inputs.influxdb_v2_listener]]
   service_address = ":8086"
   read_timeout = "30s"
   write_timeout = "30s"
-  basic_username = "..."
-  basic_password = "..."
-
-[[inputs.influxdb_v2_listener]]
-  service_address = ":8186"
-  read_timeout = "30s"
-  write_timeout = "30s"
-  token = "..."
+  token = "<listener-token>"
 ```
 
 Practical meaning:
 
-- `:8086` stays available for manual Influx-v1 style tests.
-- `:8186` is the EVCC write target when EVCC uses the v2 write API.
+- `:8086` is the active EVCC write target via the Influx v2 API.
+- the v1 listener stays commented out unless you explicitly need `/write` compatibility for manual tests.
+- `omit_hostname = true` avoids adding an infrastructure-only `host` label from Telegraf.
 
 ## Example output fan-out
 
 ```toml
 [[outputs.influxdb]]
-  urls = ["http://192.168.1.183:8086"]
-  database = "evcc"
-  username = "..."
-  password = "..."
-  timeout = "10s"
-
-[[outputs.influxdb]]
-  urls = ["http://192.168.1.160:8428"]
+  alias = "victoriametrics"
+  urls = ["http://<victoriametrics-host>:8428"]
   database = "evcc"
   timeout = "10s"
 
 [[outputs.postgresql]]
-  connection = "host=192.168.1.164 user=... password=... dbname=telemetry sslmode=disable"
+  connection = "host=<postgres-host> user=<postgres-user> password=<postgres-password> dbname=telemetry sslmode=disable"
   tags_as_foreign_keys = false
+
+[[outputs.influxdb]]
+  alias = "influx"
+  urls = ["http://<influxdb-host>:8086"]
+  database = "evcc"
+  username = "<influxdb-user>"
+  password = "<influxdb-password>"
+  timeout = "10s"
 ```
+
+Practical meaning:
+
+- `alias` makes Telegraf logs easier to read when two outputs use the same plugin type.
+- VictoriaMetrics still uses the `outputs.influxdb` plugin because it accepts Influx line protocol on port `8428`.
 
 ## Operational checks after changes
 

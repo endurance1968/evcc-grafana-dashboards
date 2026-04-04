@@ -486,6 +486,19 @@ Current recommendation:
 - keep business labels such as `loadpoint`, `vehicle`, `id`, and `title`
 - use `compare_import_coverage.py` and `check_data.py` after the raw import, then run `check_data.py` again after the initial rollup backfill
 
+## Next steps
+
+- review whether the five basic daily rollups should move closer to the maintainer's PromQL-based logic:
+  - PV energy
+  - home energy
+  - grid import energy
+  - grid export energy
+  - loadpoint energy
+- keep the broader Python backfill logic mainly for rollups that are harder to express cleanly in PromQL:
+  - tariff and cost rollups
+  - PV/battery/grid attribution
+  - more complex vehicle and battery calculations
+
 ## Short version
 
 1. verify VictoriaMetrics

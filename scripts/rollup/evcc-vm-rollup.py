@@ -193,8 +193,16 @@ def parse_args() -> argparse.Namespace:
 
 def load_settings(path: str) -> Settings:
     parser = configparser.ConfigParser()
-    with open(path, "r", encoding="utf-8") as handle:
-        parser.read_file(handle)
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            parser.read_file(handle)
+    except FileNotFoundError as exc:
+        raise SystemExit(
+            "Configuration file not found: "
+            f"{path}\n"
+            "Create the rollup config first or pass the correct path with --config."
+        ) from exc
+
 
     max_fetch_points_per_series = parser.getint("victoriametrics", "max_fetch_points_per_series", fallback=28000)
     if max_fetch_points_per_series < 1000:
@@ -2296,6 +2304,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     chunk_summaries = []
     skipped = 0
     skip_reasons: dict[str, int] = {}
+    invalid_examples: list[dict[str, str]] = []
     emitted_samples = 0
     total_batches = 0
     processed_days = 0
@@ -2402,6 +2411,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         if not math.isfinite(delta) or delta < 0:
                             skipped += 1
                             bump_skip_reason(skip_reasons, "invalid_value")
+                            record_invalid_example(invalid_examples, item.record, window.day, "negative_or_non_finite_delta", vehicle)
                             continue
                         labels = base_daily_labels(settings, item.record, window)
                         labels["vehicle"] = vehicle
@@ -2440,6 +2450,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         if not math.isfinite(value):
                             skipped += 1
                             bump_skip_reason(skip_reasons, "invalid_value")
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                             continue
                         append_series_sample(
                             series_map,
@@ -2475,6 +2486,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
+                        if selected_value is not None:
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                         continue
                     append_series_sample(
                         series_map,
@@ -2494,6 +2507,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         if not math.isfinite(value):
                             skipped += 1
                             bump_skip_reason(skip_reasons, "invalid_value")
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                             continue
                         append_series_sample(
                             series_map,
@@ -2514,6 +2528,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
+                        if selected_value is not None:
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                         continue
                     append_series_sample(
                         series_map,
@@ -2535,6 +2551,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
+                        if selected_value is not None:
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                         continue
                     append_series_sample(
                         series_map,
@@ -2556,6 +2574,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
                         bump_skip_reason(skip_reasons, "no_data" if selected_value is None else "invalid_value")
+                        if selected_value is not None:
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                         continue
                     append_series_sample(
                         series_map,
@@ -2578,6 +2598,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         if not math.isfinite(value):
                             skipped += 1
                             bump_skip_reason(skip_reasons, "invalid_value")
+                            record_invalid_example(invalid_examples, item.record, window.day, "non_finite_result")
                             continue
                         append_series_sample(
                             series_map,
@@ -2688,6 +2709,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "series": len(seen_series_keys),
         "skipped": skipped,
         "skip_reasons": dict(sorted(skip_reasons.items())),
+        "invalid_examples": invalid_examples,
         "chunks": chunk_summaries,
         "batches": total_batches,
         "batch_size": args.batch_size,
@@ -2703,6 +2725,22 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
 
 def bump_skip_reason(skip_reasons: dict[str, int], reason: str) -> None:
     skip_reasons[reason] = skip_reasons.get(reason, 0) + 1
+
+
+def record_invalid_example(
+    invalid_examples: list[dict[str, str]],
+    metric: str,
+    day: str,
+    reason: str,
+    detail: str = "",
+    limit: int = 5,
+) -> None:
+    if len(invalid_examples) >= limit:
+        return
+    entry = {"metric": metric, "day": day, "reason": reason}
+    if detail:
+        entry["detail"] = detail
+    invalid_examples.append(entry)
 
 
 def diff_skip_reasons(current: dict[str, int], snapshot: dict[str, int]) -> dict[str, int]:
@@ -2809,5 +2847,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
