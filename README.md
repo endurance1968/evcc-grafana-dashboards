@@ -1,6 +1,8 @@
 # EVCC Grafana Dashboards
 
 > **Preview status:** This repository is still in preview. A first release is planned for the next few weeks.
+> **Known issue:** Long-range PV rollups can still be wrong on some migrated datasets until the raw `pvPower` family has been repaired and re-imported. See [docs/influx-to-vm-migration.md](./docs/influx-to-vm-migration.md).
+
 
 This repository provides a VictoriaMetrics-based dashboard set for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
 

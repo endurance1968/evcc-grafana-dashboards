@@ -10,8 +10,14 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 from typing import Callable, Iterator
+
+
+SCRIPT_NAME = "vm-rewrite-drop-label.py"
+SCRIPT_VERSION = "2026.04.04.1"
+SCRIPT_CREATED = "2026-03-29"
 
 
 def parse_args() -> argparse.Namespace:
@@ -86,6 +92,19 @@ def parse_args() -> argparse.Namespace:
 
 def progress(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
+
+
+def local_timestamp() -> str:
+    return datetime.now().astimezone().replace(microsecond=0).isoformat()
+
+
+def script_metadata(generated_at: str | None = None) -> dict[str, str]:
+    return {
+        "name": SCRIPT_NAME,
+        "version": SCRIPT_VERSION,
+        "created": SCRIPT_CREATED,
+        "generated_at": generated_at or local_timestamp(),
+    }
 
 
 def export_url(base_url: str, matcher: str, start_ms: int | None = None, end_ms: int | None = None) -> str:
@@ -382,6 +401,10 @@ def main() -> int:
         ensure_parent(rewritten_path)
 
     try:
+        metadata = script_metadata()
+        progress(
+            f"{metadata['name']} v{metadata['version']} (created {metadata['created']}, run {metadata['generated_at']})"
+        )
         progress(
             f"Starting vm label rewrite in {'write' if args.write else 'dry-run'} mode for matcher {args.matcher} at {args.base_url}"
         )
@@ -443,6 +466,7 @@ def main() -> int:
         )
 
         summary = {
+            "script": metadata,
             "mode": "write" if args.write else "dry-run",
             "matcher": args.matcher,
             "drop_label": args.drop_label,

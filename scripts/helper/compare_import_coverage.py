@@ -16,8 +16,12 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from typing import Iterable, Iterator, List, Sequence
+from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
+SCRIPT_NAME = "compare_import_coverage.py"
+SCRIPT_VERSION = "2026.04.04.2"
+SCRIPT_CREATED = "2026-04-03"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
     "auxPower",
@@ -62,6 +66,18 @@ class MetricCoverage:
     hint: str | None
 
 
+@dataclass(frozen=True)
+class EnergyCoverage:
+    name: str
+    group: str
+    status: str
+    checked_windows: int
+    problem_windows: int
+    reasons: Sequence[str]
+    examples: Sequence[str]
+    hint: str | None
+
+
 def iso_z(value: dt.datetime | None) -> str:
     if value is None:
         return "-"
@@ -70,6 +86,33 @@ def iso_z(value: dt.datetime | None) -> str:
 
 def parse_iso(value: str) -> dt.datetime:
     return dt.datetime.fromisoformat(value.replace("Z", "+00:00")).astimezone(UTC)
+
+
+def local_now() -> dt.datetime:
+    return dt.datetime.now().astimezone()
+
+
+def local_timestamp() -> str:
+    return local_now().replace(microsecond=0).isoformat()
+
+
+def script_metadata(generated_at: str | None = None) -> dict[str, str]:
+    return {
+        "name": SCRIPT_NAME,
+        "version": SCRIPT_VERSION,
+        "created": SCRIPT_CREATED,
+        "generated_at": generated_at or local_timestamp(),
+    }
+
+
+def print_report_header(title: str, underline: str, generated_at: str | None = None) -> None:
+    metadata = script_metadata(generated_at)
+    print(title)
+    print(underline)
+    print(f"Script:       {metadata['name']}")
+    print(f"Version:      {metadata['version']}")
+    print(f"Created:      {metadata['created']}")
+    print(f"Run at:       {metadata['generated_at']}")
 
 
 def http_json(url: str) -> dict:
@@ -223,6 +266,21 @@ def export_lines(base_url: str, metric: str, db_label: str, start: str, end: str
                 yield line
 
 
+def export_lines_for_matcher(base_url: str, matcher: str, start: str, end: str) -> Iterable[str]:
+    params = [
+        ("match[]", matcher),
+        ("start", start),
+        ("end", end),
+    ]
+    query = urllib.parse.urlencode(params)
+    url = f"{base_url.rstrip('/')}/api/v1/export?{query}"
+    with urllib.request.urlopen(url, timeout=300) as response:
+        for raw_line in response:
+            line = raw_line.decode("utf-8").strip()
+            if line:
+                yield line
+
+
 def vm_stats(base_url: str, metric: str, db_label: str, start: str, end: str) -> SpanStats:
     total_points = 0
     total_series = 0
@@ -327,6 +385,191 @@ def compare_measurement(
     )
 
 
+def iter_month_windows(start: str, end: str, timezone_name: str) -> List[tuple[str, str, str]]:
+    start_utc = parse_iso(start)
+    end_utc = parse_iso(end)
+    timezone = ZoneInfo(timezone_name)
+    start_local = start_utc.astimezone(timezone)
+    end_local = end_utc.astimezone(timezone)
+    cursor = dt.datetime(start_local.year, start_local.month, 1, tzinfo=timezone)
+    end_month = dt.datetime(end_local.year, end_local.month, 1, tzinfo=timezone)
+    windows: List[tuple[str, str, str]] = []
+    while cursor <= end_month:
+        if cursor.month == 12:
+            next_month = dt.datetime(cursor.year + 1, 1, 1, tzinfo=timezone)
+        else:
+            next_month = dt.datetime(cursor.year, cursor.month + 1, 1, tzinfo=timezone)
+        window_start = max(start_utc, cursor.astimezone(UTC))
+        window_end = min(end_utc, next_month.astimezone(UTC) - dt.timedelta(seconds=1))
+        if window_start <= window_end:
+            windows.append((f"{cursor.year:04d}-{cursor.month:02d}", iso_z(window_start), iso_z(window_end)))
+        cursor = next_month
+    return windows
+
+
+def first_numeric_value(payload: dict) -> float | None:
+    for series in iter_influx_series(payload):
+        for row in series.get("values", []) or []:
+            if isinstance(row, list) and len(row) >= 2 and row[1] is not None:
+                return float(row[1])
+    return None
+
+
+def influx_legacy_pv_total_kwh(
+    base_url: str,
+    db: str,
+    start: str,
+    end: str,
+    username: str | None,
+    password: str | None,
+    timezone_name: str,
+    bucket_seconds: int,
+    peak_power_limit: float,
+) -> float:
+    query = (
+        'SELECT sum("integral") FROM ('
+        'SELECT integral("subquery") / 3600000 AS "integral" FROM '
+        '(SELECT max("value") AS "subquery" FROM "pvPower" '
+        f"WHERE time >= '{start}' AND time <= '{end}' and value >=0 AND value < {peak_power_limit} "
+        "AND (\"id\"::tag = '') "
+        f"GROUP BY time({bucket_seconds}s) fill(0) tz('{timezone_name}')) "
+        f"GROUP BY time(1d) fill(0) tz('{timezone_name}'))"
+    )
+    payload = influx_query(base_url, db, query, username, password)
+    value = first_numeric_value(payload)
+    return float(value) if value is not None else 0.0
+
+
+def vm_legacy_bucket_energy_kwh(
+    base_url: str,
+    db_label: str,
+    start: str,
+    end: str,
+    bucket_seconds: int,
+    peak_power_limit: float,
+) -> float:
+    matcher = f'pvPower_value{{db="{db_label}",id=""}}'
+    start_ms = int(parse_iso(start).timestamp() * 1000)
+    end_ms = int(parse_iso(end).timestamp() * 1000) + 1000
+    bucket_ms = bucket_seconds * 1000
+    bucket_map: dict[int, list[float]] = {}
+    try:
+        lines = export_lines_for_matcher(base_url, matcher, start, end)
+    except urllib.error.HTTPError:
+        return 0.0
+    for line in lines:
+        payload = json.loads(line)
+        timestamps = payload.get("timestamps", [])
+        values = payload.get("values", [])
+        for timestamp, value in zip(timestamps, values):
+            ts = int(timestamp)
+            val = float(value)
+            if ts < start_ms or ts >= end_ms:
+                continue
+            if val < 0 or val >= peak_power_limit:
+                continue
+            bucket_start = start_ms + (((ts - start_ms) // bucket_ms) * bucket_ms)
+            bucket_map.setdefault(bucket_start, []).append(val)
+    total_wh = 0.0
+    for bucket_start in range(start_ms, end_ms, bucket_ms):
+        values = bucket_map.get(bucket_start)
+        if not values:
+            continue
+        total_wh += max(values) * bucket_ms / 3600000.0
+    return total_wh / 1000.0
+
+
+def build_critical_energy_checks(
+    influx_base_url: str,
+    influx_db: str,
+    vm_base_url: str,
+    vm_db_label: str,
+    start: str,
+    end: str,
+    username: str | None,
+    password: str | None,
+    timezone_name: str,
+    bucket_seconds: int,
+    peak_power_limit: float,
+    tolerance_ratio: float,
+) -> List[EnergyCoverage]:
+    checked_windows = 0
+    problem_windows = 0
+    examples: List[str] = []
+    for label, window_start, window_end in iter_month_windows(start, end, timezone_name):
+        influx_kwh = influx_legacy_pv_total_kwh(
+            influx_base_url,
+            influx_db,
+            window_start,
+            window_end,
+            username,
+            password,
+            timezone_name,
+            bucket_seconds,
+            peak_power_limit,
+        )
+        if influx_kwh <= 0:
+            continue
+        checked_windows += 1
+        vm_kwh = vm_legacy_bucket_energy_kwh(
+            vm_base_url,
+            vm_db_label,
+            window_start,
+            window_end,
+            bucket_seconds,
+            peak_power_limit,
+        )
+        lower_bound = influx_kwh * (1.0 - tolerance_ratio)
+        upper_bound = influx_kwh * (1.0 + tolerance_ratio)
+        if vm_kwh < lower_bound or vm_kwh > upper_bound:
+            problem_windows += 1
+            if len(examples) < 6:
+                examples.append(f"{label}: Influx={influx_kwh:.1f} kWh, VM={vm_kwh:.1f} kWh")
+
+    if checked_windows == 0:
+        return [
+            EnergyCoverage(
+                name='pvPower{id=""} monthly legacy energy parity',
+                group='critical-energy',
+                status='SKIP',
+                checked_windows=0,
+                problem_windows=0,
+                reasons=['no positive Influx pvPower total-series energy in the selected range'],
+                examples=[],
+                hint=None,
+            )
+        ]
+
+    if problem_windows > 0:
+        return [
+            EnergyCoverage(
+                name='pvPower{id=""} monthly legacy energy parity',
+                group='critical-energy',
+                status='TRUNCATED',
+                checked_windows=checked_windows,
+                problem_windows=problem_windows,
+                reasons=[
+                    f'VM legacy PV total-series energy drifted outside the allowed monthly tolerance in {problem_windows} of {checked_windows} checked month(s)'
+                ],
+                examples=examples,
+                hint='raw pvPower total-series data in VictoriaMetrics is incomplete or materially different; re-import pvPower before rebuilding rollups',
+            )
+        ]
+
+    return [
+        EnergyCoverage(
+            name='pvPower{id=""} monthly legacy energy parity',
+            group='critical-energy',
+            status='OK',
+            checked_windows=checked_windows,
+            problem_windows=0,
+            reasons=['monthly PV total-series energy stayed within the allowed tolerance across the checked range'],
+            examples=[],
+            hint=None,
+        )
+    ]
+
+
 def render_group(label: str, items: Sequence[MetricCoverage], only_problems: bool) -> None:
     relevant = [item for item in items if item.status != "SKIP"]
     shown = [item for item in relevant if not only_problems or item.status != "OK"]
@@ -356,15 +599,48 @@ def render_group(label: str, items: Sequence[MetricCoverage], only_problems: boo
                 print(f"  Hint:   {item.hint}")
 
 
-def render_report(results: Sequence[MetricCoverage], start: str, end: str, only_problems: bool) -> int:
+def render_energy_checks(label: str, items: Sequence[EnergyCoverage], only_problems: bool) -> None:
+    relevant = [item for item in items if item.status != "SKIP"]
+    shown = [item for item in relevant if not only_problems or item.status != "OK"]
+    problems = [item for item in relevant if item.status in {"MISSING", "TRUNCATED"}]
+
+    print(label)
+    print("-" * len(label))
+    print(f"- Checked: {len(relevant)}")
+    print(f"- OK: {sum(1 for item in relevant if item.status == 'OK')}")
+    print(f"- Problems: {len(problems)}")
+
+    if shown:
+        print()
+        for item in shown:
+            print(f"- {item.name}: {item.status}")
+            print(f"  Windows checked: {item.checked_windows}")
+            print(f"  Problem windows: {item.problem_windows}")
+            for reason in item.reasons:
+                print(f"  Reason: {reason}")
+            for example in item.examples:
+                print(f"  Example: {example}")
+            if item.hint:
+                print(f"  Hint:   {item.hint}")
+
+
+def render_report(
+    results: Sequence[MetricCoverage],
+    critical_checks: Sequence[EnergyCoverage],
+    start: str,
+    end: str,
+    only_problems: bool,
+    metadata: dict[str, str],
+) -> int:
     filtered = [item for item in results if item.status != "SKIP"]
     repo_items = [item for item in filtered if item.group == "repo-relevant"]
     extra_items = [item for item in filtered if item.group == "additional"]
+    energy_items = [item for item in critical_checks if item.status != "SKIP"]
     repo_problems = [item for item in repo_items if item.status in {"MISSING", "TRUNCATED"}]
     extra_problems = [item for item in extra_items if item.status in {"MISSING", "TRUNCATED"}]
+    energy_problems = [item for item in energy_items if item.status in {"MISSING", "TRUNCATED"}]
 
-    print("EVCC import coverage check")
-    print("==========================")
+    print_report_header("EVCC import coverage check", "==========================", metadata.get("generated_at"))
     print(f"Range: {start} -> {end}")
     print()
     print("Summary")
@@ -372,10 +648,15 @@ def render_report(results: Sequence[MetricCoverage], start: str, end: str, only_
     print(f"- Measurements checked: {len(filtered)}")
     print(f"- Repo-relevant checked: {len(repo_items)}")
     print(f"- Repo-relevant problems: {len(repo_problems)}")
+    print(f"- Critical energy checks: {len(energy_items)}")
+    print(f"- Critical energy problems: {len(energy_problems)}")
     print(f"- Additional checked: {len(extra_items)}")
     print(f"- Additional problems: {len(extra_problems)}")
     print()
     render_group("Repo-relevant measurements", repo_items, only_problems)
+    if energy_items:
+        print()
+        render_energy_checks("Critical energy checks", energy_items, only_problems)
     if extra_items:
         print()
         render_group("Additional measurements", extra_items, only_problems)
@@ -383,15 +664,15 @@ def render_report(results: Sequence[MetricCoverage], start: str, end: str, only_
     print()
     print("Result")
     print("------")
-    if repo_problems:
-        print("NOT OK: at least one repo-relevant raw measurement is missing or truncated in VictoriaMetrics.")
-        print("Stop before cleanup or rollups for those metrics, or explicitly re-import the affected measurements.")
+    if repo_problems or energy_problems:
+        print("NOT OK: at least one repo-relevant raw measurement or critical PV energy check failed in VictoriaMetrics.")
+        print("Stop before cleanup or rollups for those metrics, or explicitly re-import the affected raw measurement family.")
         return 2
     if extra_problems:
-        print("OK FOR REPO: the repo-relevant raw measurements look complete enough for cleanup and rollups.")
+        print("OK FOR REPO: the repo-relevant raw measurements and critical PV energy checks look complete enough for cleanup and rollups.")
         print("REVIEW ADDITIONAL MEASUREMENTS: extra EVCC measurements are missing or truncated, but they are outside the active dashboard schema.")
         return 1
-    print("OK: the checked raw measurements look complete enough for the next migration step.")
+    print("OK: the checked raw measurements and critical PV energy checks look complete enough for the next migration step.")
     return 0
 
 
@@ -410,6 +691,10 @@ def main() -> int:
     ap.add_argument("--all-measurements", action="store_true", help="deprecated compatibility flag; full measurement coverage is now the default")
     ap.add_argument("--only-problems", action="store_true", help="show only non-OK measurements in the details section")
     ap.add_argument("--tolerance-seconds", type=int, default=3600, help="allowed clock/span drift before a metric is flagged as truncated")
+    ap.add_argument("--timezone", default="Europe/Berlin", help="local timezone for the critical PV monthly energy parity check")
+    ap.add_argument("--energy-sample-interval-seconds", type=int, default=60, help="bucket size in seconds for the critical PV monthly energy parity check")
+    ap.add_argument("--peak-power-limit", type=float, default=40000.0, help="upper limit for valid PV power samples in watts during the critical PV monthly energy parity check")
+    ap.add_argument("--pv-energy-tolerance-ratio", type=float, default=0.15, help="allowed relative monthly drift for the critical PV total-series parity check")
     ap.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     args = ap.parse_args()
 
@@ -436,10 +721,38 @@ def main() -> int:
         )
         for measurement in measurements
     ]
+    critical_checks = build_critical_energy_checks(
+        args.influx_url,
+        args.influx_db,
+        args.vm_base_url,
+        args.vm_db_label,
+        args.start,
+        args.end,
+        args.influx_user,
+        args.influx_password,
+        args.timezone,
+        args.energy_sample_interval_seconds,
+        args.peak_power_limit,
+        args.pv_energy_tolerance_ratio,
+    )
 
     if args.json:
         payload = {
+            "script": script_metadata(),
             "range": {"start": args.start, "end": args.end},
+            "critical_checks": [
+                {
+                    "name": item.name,
+                    "group": item.group,
+                    "status": item.status,
+                    "checked_windows": item.checked_windows,
+                    "problem_windows": item.problem_windows,
+                    "reasons": list(item.reasons),
+                    "examples": list(item.examples),
+                    "hint": item.hint,
+                }
+                for item in critical_checks
+            ],
             "results": [
                 {
                     "measurement": item.measurement,
@@ -466,14 +779,15 @@ def main() -> int:
         }
         print(json.dumps(payload, indent=2, sort_keys=True))
         repo_problems = any(item.group == "repo-relevant" and item.status in {"MISSING", "TRUNCATED"} for item in results if item.status != "SKIP")
+        energy_problems = any(item.status in {"MISSING", "TRUNCATED"} for item in critical_checks if item.status != "SKIP")
         extra_problems = any(item.group == "additional" and item.status in {"MISSING", "TRUNCATED"} for item in results if item.status != "SKIP")
-        if repo_problems:
+        if repo_problems or energy_problems:
             return 2
         if extra_problems:
             return 1
         return 0
 
-    return render_report(results, args.start, args.end, args.only_problems)
+    return render_report(results, critical_checks, args.start, args.end, args.only_problems, script_metadata())
 
 
 if __name__ == "__main__":

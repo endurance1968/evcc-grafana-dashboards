@@ -24,6 +24,9 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence
 
 UTC = dt.timezone.utc
+SCRIPT_NAME = "check_data.py"
+SCRIPT_VERSION = "2026.04.04.1"
+SCRIPT_CREATED = "2026-04-03"
 
 
 def iso_z(value: dt.datetime) -> str:
@@ -32,6 +35,33 @@ def iso_z(value: dt.datetime) -> str:
 
 def utc_now() -> dt.datetime:
     return dt.datetime.now(tz=UTC)
+
+
+def local_now() -> dt.datetime:
+    return dt.datetime.now().astimezone()
+
+
+def local_timestamp() -> str:
+    return local_now().replace(microsecond=0).isoformat()
+
+
+def script_metadata(generated_at: str | None = None) -> Dict[str, str]:
+    return {
+        "name": SCRIPT_NAME,
+        "version": SCRIPT_VERSION,
+        "created": SCRIPT_CREATED,
+        "generated_at": generated_at or local_timestamp(),
+    }
+
+
+def print_report_header(title: str, underline: str, generated_at: str | None = None) -> None:
+    metadata = script_metadata(generated_at)
+    print(title)
+    print(underline)
+    print(f"Script:              {metadata['name']}")
+    print(f"Version:             {metadata['version']}")
+    print(f"Created:             {metadata['created']}")
+    print(f"Run at:              {metadata['generated_at']}")
 
 
 @dataclass(frozen=True)
@@ -303,6 +333,7 @@ def main() -> int:
     code = 2 if overall == "CRITICAL" else 1 if overall == "WARNING" else 0
 
     payload = {
+        "script": script_metadata(),
         "base_url": args.base_url,
         "db": args.db,
         "requested_phase": args.phase,
@@ -329,8 +360,7 @@ def main() -> int:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return code
 
-    print("EVCC VM data check")
-    print("==================")
+    print_report_header("EVCC VM data check", "==================", str(payload.get("script", {}).get("generated_at", "")) or None)
     print(f"Base URL:           {args.base_url}")
     print(f"db label:           {args.db}")
     print(f"Requested phase:    {args.phase}")

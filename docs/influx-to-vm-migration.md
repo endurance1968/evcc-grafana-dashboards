@@ -198,7 +198,43 @@ python3 compare_import_coverage.py \
   --only-problems
 ```
 
-Use `--measurement-regex '^batterySoc$'` if you want to inspect only one suspicious measurement. Use `--repo-relevant-only` only when you explicitly want to limit the check to the active dashboard schema. Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap.
+Use `--measurement-regex '^batterySoc$'` if you want to inspect only one suspicious measurement. Use `--repo-relevant-only` only when you explicitly want to limit the check to the active dashboard schema. Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap. The helper now also runs a critical monthly PV total-series parity check against the original Influx legacy semantics for `pvPower{id=""}` so it can catch cases where the measurement exists in VM but the imported raw values are still materially too low.
+
+If that critical PV check fails, the safest repair path is:
+
+1. delete the affected raw `pvPower_value` family in VictoriaMetrics
+2. re-import only `pvPower` via `vmctl influx --influx-filter-series`
+3. rerun `compare_import_coverage.py` for `pvPower`
+4. rebuild the `evcc_*` rollups after the raw PV data is healthy again
+
+Example repair run for `pvPower` only:
+
+```bash
+curl -fsS -X POST 'http://<vm-host>:8428/api/v1/admin/tsdb/delete_series' \
+  --data-urlencode 'match[]=pvPower_value{db="evcc"}'
+
+yes | vmctl influx \
+  --influx-addr='http://<influx-host>:8086' \
+  --influx-user='<user>' \
+  --influx-password='<password>' \
+  --influx-database='evcc' \
+  --influx-filter-series "on evcc from pvPower" \
+  --influx-filter-time-start='2025-01-01T00:00:00Z' \
+  --influx-filter-time-end='2026-03-31T23:59:59Z' \
+  --vm-addr='http://<vm-host>:8428'
+
+python3 compare_import_coverage.py \
+  --influx-url http://<influx-host>:8086 \
+  --influx-db evcc \
+  --vm-base-url http://<vm-host>:8428 \
+  --vm-db-label evcc \
+  --start 2025-01-01T00:00:00Z \
+  --end 2026-03-31T23:59:59Z \
+  --measurement-regex '^pvPower$' \
+  --only-problems
+```
+
+The `--influx-filter-series` flag is documented in the official vmctl InfluxDB docs: [Filtering](https://docs.victoriametrics.com/victoriametrics/vmctl/influxdb/).
 
 ## 3. First cleanup step: remove `host` only if needed
 

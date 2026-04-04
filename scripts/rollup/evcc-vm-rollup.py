@@ -17,6 +17,38 @@ from datetime import date, datetime, time as dt_time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 
+SCRIPT_NAME = "evcc-vm-rollup.py"
+SCRIPT_VERSION = "2026.04.04.1"
+SCRIPT_CREATED = "2026-03-29"
+
+
+def current_local_timestamp() -> datetime:
+    return datetime.now().astimezone()
+
+
+def format_local_timestamp(value: datetime) -> str:
+    return value.astimezone().replace(microsecond=0).isoformat()
+
+
+def script_metadata(generated_at: str | None = None) -> dict[str, str]:
+    return {
+        "name": SCRIPT_NAME,
+        "version": SCRIPT_VERSION,
+        "created": SCRIPT_CREATED,
+        "generated_at": generated_at or format_local_timestamp(current_local_timestamp()),
+    }
+
+
+def print_report_header(title: str, underline: str, generated_at: str | None = None) -> None:
+    metadata = script_metadata(generated_at)
+    print(title)
+    print(underline)
+    print(f"Script:       {metadata['name']}")
+    print(f"Version:      {metadata['version']}")
+    print(f"Created:      {metadata['created']}")
+    print(f"Run at:       {metadata['generated_at']}")
+
+
 @dataclass(frozen=True)
 class Settings:
     base_url: str
@@ -755,11 +787,12 @@ def print_list_section(title: str, values: list[str], empty_text: str = "none de
 def print_detect(settings: Settings, as_json: bool = False) -> int:
     detection = detect_dimensions(settings)
     if as_json:
-        print(json.dumps(detection, indent=2, ensure_ascii=True))
+        output = dict(detection)
+        output["script"] = script_metadata()
+        print(json.dumps(output, indent=2, ensure_ascii=True))
         return 0
 
-    print("EVCC rollup dimension detection")
-    print("============================")
+    print_report_header("EVCC rollup dimension detection", "============================")
     print(f"Namespace:  {settings.metric_prefix}")
     print(f"Timezone:   {settings.timezone}")
     print(f"VM base:    {settings.base_url}")
@@ -777,6 +810,7 @@ def print_plan(settings: Settings, as_json: bool = False) -> int:
     catalog = [item for item in build_catalog(settings) if item.implemented]
     if as_json:
         output = {
+            "script": script_metadata(),
             "namespace": settings.metric_prefix,
             "timezone": settings.timezone,
             "detection": detection,
@@ -795,8 +829,7 @@ def print_plan(settings: Settings, as_json: bool = False) -> int:
         print(json.dumps(output, indent=2, ensure_ascii=True))
         return 0
 
-    print("EVCC rollup plan")
-    print("================")
+    print_report_header("EVCC rollup plan", "================")
     print(f"Namespace:   {settings.metric_prefix}")
     print(f"Timezone:    {settings.timezone}")
     print(f"VM base:     {settings.base_url}")
@@ -874,6 +907,7 @@ def run_benchmark(settings: Settings, as_json: bool = False) -> int:
     catalog = [item for item in build_catalog(settings) if item.implemented]
     results = [benchmark_query(settings, item) for item in catalog]
     payload = {
+        "script": script_metadata(),
         "range": {
             "start": settings.benchmark_start,
             "end": settings.benchmark_end,
@@ -891,8 +925,7 @@ def run_benchmark(settings: Settings, as_json: bool = False) -> int:
     failed_promql = [item for item in promql_results if item["status"] != "success"]
     slowest = sorted(successful_promql, key=lambda item: float(item["elapsed_ms"]), reverse=True)[:5]
 
-    print("EVCC rollup benchmark")
-    print("====================")
+    print_report_header("EVCC rollup benchmark", "====================")
     print(f"Range: {settings.benchmark_start} -> {settings.benchmark_end}")
     print(f"Step:  {settings.benchmark_step}")
 
@@ -2792,6 +2825,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     ACTIVE_PROFILE["total_s"] = time.perf_counter() - total_started_at
 
     summary = {
+        "script": script_metadata(),
         "mode": "write" if args.write else "dry-run",
         "timezone": settings.timezone,
         "raw_sample_step": settings.raw_sample_step,
@@ -2866,8 +2900,11 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     skipped_chunks = [item for item in chunks if int(item.get("skipped", 0)) > 0]
     most_skipped_chunks = sorted(skipped_chunks, key=lambda item: int(item.get("skipped", 0)), reverse=True)[:5]
 
-    print(f"EVCC rollup {'write' if args.write else 'dry-run'}")
-    print("===========================")
+    print_report_header(
+        f"EVCC rollup {'write' if args.write else 'dry-run'}",
+        "===========================",
+        str(summary.get("script", {}).get("generated_at", "")) or None,
+    )
     print(f"Range:        {summary['range']['start_day']} -> {summary['range']['end_day']}")
     print(f"Days:         {summary['range']['days']}")
     print(f"Timezone:     {summary['timezone']}")
