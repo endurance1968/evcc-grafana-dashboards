@@ -19,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.20"
+SCRIPT_VERSION = "2026.04.05.21"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -598,6 +598,8 @@ def main() -> int:
         output_points = 0
         delete_only_series = 0
         delete_only_points = 0
+        grouped_unresolved_value_conflicts = 0
+        grouped_source_value_conflicts = 0
 
         group_files: dict[str, Path] = {}
         temp_group_dir_obj: tempfile.TemporaryDirectory[str] | None = None
@@ -930,6 +932,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
