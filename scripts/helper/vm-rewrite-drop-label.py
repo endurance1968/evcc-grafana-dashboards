@@ -498,6 +498,7 @@ def main() -> int:
         overlap_examples: list[dict] = []
         output_points = 0
 
+        analyze_started_at = perf_counter()
         with backup_path.open("w", encoding="utf-8", newline="\n") as backup_handle:
             rewritten_handle = None
             try:
