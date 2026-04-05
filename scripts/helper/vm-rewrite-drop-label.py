@@ -7,6 +7,7 @@ import argparse
 import json
 import socket
 import sys
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -18,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.16"
+SCRIPT_VERSION = "2026.04.05.17"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -864,6 +865,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
