@@ -18,8 +18,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.04.1"
-SCRIPT_CREATED = "2026-03-29"
+SCRIPT_VERSION = "2026.04.05.1"
+SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
 def current_local_timestamp() -> datetime:
@@ -34,7 +34,7 @@ def script_metadata(generated_at: str | None = None) -> dict[str, str]:
     return {
         "name": SCRIPT_NAME,
         "version": SCRIPT_VERSION,
-        "created": SCRIPT_CREATED,
+        "last_modified": SCRIPT_LAST_MODIFIED,
         "generated_at": generated_at or format_local_timestamp(current_local_timestamp()),
     }
 
@@ -45,7 +45,7 @@ def print_report_header(title: str, underline: str, generated_at: str | None = N
     print(underline)
     print(f"Script:       {metadata['name']}")
     print(f"Version:      {metadata['version']}")
-    print(f"Created:      {metadata['created']}")
+    print(f"Last modified:{metadata['last_modified']:>12}")
     print(f"Run at:       {metadata['generated_at']}")
 
 

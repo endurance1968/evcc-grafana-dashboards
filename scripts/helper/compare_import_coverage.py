@@ -21,8 +21,8 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.05.2"
-SCRIPT_CREATED = "2026-04-03"
+SCRIPT_VERSION = "2026.04.05.3"
+SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
     "auxPower",
@@ -101,7 +101,7 @@ def script_metadata(generated_at: str | None = None) -> dict[str, str]:
     return {
         "name": SCRIPT_NAME,
         "version": SCRIPT_VERSION,
-        "created": SCRIPT_CREATED,
+        "last_modified": SCRIPT_LAST_MODIFIED,
         "generated_at": generated_at or local_timestamp(),
     }
 
@@ -112,7 +112,7 @@ def print_report_header(title: str, underline: str, generated_at: str | None = N
     print(underline)
     print(f"Script:       {metadata['name']}")
     print(f"Version:      {metadata['version']}")
-    print(f"Created:      {metadata['created']}")
+    print(f"Last modified:{metadata['last_modified']:>12}")
     print(f"Run at:       {metadata['generated_at']}")
 
 

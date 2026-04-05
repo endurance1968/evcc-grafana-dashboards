@@ -18,8 +18,8 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.4"
-SCRIPT_CREATED = "2026-03-29"
+SCRIPT_VERSION = "2026.04.05.5"
+SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
 @dataclass(frozen=True)
@@ -123,7 +123,7 @@ def script_metadata(generated_at: str | None = None) -> dict[str, str]:
     return {
         "name": SCRIPT_NAME,
         "version": SCRIPT_VERSION,
-        "created": SCRIPT_CREATED,
+        "last_modified": SCRIPT_LAST_MODIFIED,
         "generated_at": generated_at or local_timestamp(),
     }
 
@@ -485,7 +485,7 @@ def main() -> int:
         metadata = script_metadata()
         total_started_at = perf_counter()
         progress(
-            f"{metadata['name']} v{metadata['version']} (created {metadata['created']}, run {metadata['generated_at']})"
+            f"{metadata['name']} v{metadata['version']} (last modified {metadata['last_modified']}, run {metadata['generated_at']})"
         )
         progress(
             f"Starting vm label rewrite in {'write' if args.write else 'dry-run'} mode for matcher {args.matcher} at {args.base_url}"
