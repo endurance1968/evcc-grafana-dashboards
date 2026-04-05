@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.11"
+SCRIPT_VERSION = "2026.04.05.12"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -77,6 +77,11 @@ def parse_args() -> argparse.Namespace:
         "--keep-target-values-on-conflict",
         action="store_true",
         help="Allow merge when identical timestamps have different values; keep existing target values and import only missing timestamps.",
+    )
+    parser.add_argument(
+        "--delete-source-when-fully-shadowed",
+        action="store_true",
+        help="If every source timestamp already exists in the hostless target with a conflicting value, skip re-import and just delete the source series.",
     )
     parser.add_argument(
         "--reset-cache",
@@ -244,6 +249,20 @@ def analyze_target_overlap(item: dict, existing: list[dict]) -> tuple[int, int]:
         if float(existing_val) != float(val):
             current_conflicts += 1
     return current_overlap, current_conflicts
+
+
+def should_delete_source_only(
+    item: dict,
+    overlap_timestamps: int,
+    value_conflicts: int,
+    delete_source_when_fully_shadowed: bool,
+) -> bool:
+    if not delete_source_when_fully_shadowed:
+        return False
+    point_count = len(item.get("timestamps", []))
+    if point_count <= 0:
+        return False
+    return overlap_timestamps == point_count and value_conflicts == point_count
 
 
 def merge_with_targets(
@@ -528,6 +547,8 @@ def main() -> int:
         value_conflicts = 0
         overlap_examples: list[dict] = []
         output_points = 0
+        delete_only_series = 0
+        delete_only_points = 0
 
         analyze_started_at = perf_counter()
         with backup_path.open("w", encoding="utf-8", newline="\n") as backup_handle:
@@ -557,6 +578,26 @@ def main() -> int:
                             }
                         )
 
+                    if should_delete_source_only(
+                        rewritten,
+                        current_overlap,
+                        current_conflicts,
+                        args.delete_source_when_fully_shadowed,
+                    ):
+                        delete_only_series += 1
+                        delete_only_points += len(rewritten.get("timestamps", []))
+                        if len(overlap_examples) < 10:
+                            overlap_examples.append(
+                                {
+                                    "metric": rewritten["metric"],
+                                    "delete_source_only": True,
+                                    "overlap_timestamps": current_overlap,
+                                    "value_conflicts": current_conflicts,
+                                    "host_points": len(rewritten["timestamps"]),
+                                }
+                            )
+                        continue
+
                     final_item = rewritten
                     if args.merge_target:
                         final_item = merge_with_targets(
@@ -583,7 +624,7 @@ def main() -> int:
         analyze_seconds = elapsed_seconds(analyze_started_at, analyze_finished_at)
         progress(
             "Analyze phase complete: "
-            f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}, seconds={analyze_seconds}"
+            f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}, delete_only_series={delete_only_series}, seconds={analyze_seconds}"
         )
 
         summary = {
@@ -601,6 +642,8 @@ def main() -> int:
             "value_conflicts": value_conflicts,
             "overlap_examples": overlap_examples,
             "output_points": output_points,
+            "delete_only_series": delete_only_series,
+            "delete_only_points": delete_only_points,
             "streaming": True,
             "max_import_line_bytes": args.max_import_line_bytes,
             "performance": {
@@ -763,6 +806,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
 
 
 
