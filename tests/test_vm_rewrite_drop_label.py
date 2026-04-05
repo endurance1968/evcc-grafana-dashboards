@@ -134,6 +134,21 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         self.assertEqual(merged["timestamps"], [1000, 2000, 3000])
         self.assertEqual(merged["values"], [1.0, 20.0, 30.0])
 
+    def test_count_internal_value_conflicts_counts_duplicate_timestamps_with_different_values(self):
+        items = [
+            {
+                "metric": {"__name__": "batteryCapacity_value", "db": "evcc"},
+                "timestamps": [1000, 2000],
+                "values": [0.0, 1.0],
+            },
+            {
+                "metric": {"__name__": "batteryCapacity_value", "db": "evcc"},
+                "timestamps": [1000, 3000],
+                "values": [1.0, 2.0],
+            },
+        ]
+
+        self.assertEqual(MODULE.count_internal_value_conflicts(items), 1)
     def test_should_delete_source_only_when_every_point_is_fully_shadowed(self):
         item = {
             "metric": {"__name__": "pvPower_value", "db": "evcc"},
@@ -153,3 +168,4 @@ class VmRewriteDropLabelTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

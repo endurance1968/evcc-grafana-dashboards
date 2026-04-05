@@ -19,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.19"
+SCRIPT_VERSION = "2026.04.05.20"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -252,6 +252,19 @@ def analyze_target_overlap(item: dict, existing: list[dict]) -> tuple[int, int]:
     return current_overlap, current_conflicts
 
 
+
+def count_internal_value_conflicts(items: list[dict]) -> int:
+    merged_points: dict[int, float] = {}
+    conflicts = 0
+    for item in items:
+        for ts, val in zip(item.get("timestamps", []), item.get("values", [])):
+            ts = int(ts)
+            val = float(val)
+            existing_val = merged_points.get(ts)
+            if existing_val is not None and existing_val != val:
+                conflicts += 1
+            merged_points[ts] = val
+    return conflicts
 def should_delete_source_only(
     item: dict,
     overlap_timestamps: int,
@@ -635,16 +648,15 @@ def main() -> int:
             if rewritten_path is not None:
                 with rewritten_path.open("w", encoding="utf-8", newline="\n") as rewritten_handle:
                     for grouped_index, matcher in enumerate(sorted(group_files), start=1):
-                        combined_source = combine_rewritten_series(
-                            list(iter_jsonl(group_files[matcher])),
-                            args.allow_value_conflicts,
-                        )
+                        grouped_items = list(iter_jsonl(group_files[matcher]))
+                        grouped_source_conflicts = count_internal_value_conflicts(grouped_items)
+                        combined_source = combine_rewritten_series(grouped_items, allow_value_conflicts=True)
                         target_existing = fetch_target_series(args.base_url, combined_source["metric"], args.drop_label)
-                        grouped_overlap, grouped_conflicts = analyze_target_overlap(combined_source, target_existing)
+                        grouped_overlap, grouped_target_conflicts = analyze_target_overlap(combined_source, target_existing)
                         if should_delete_source_only(
                             combined_source,
                             grouped_overlap,
-                            grouped_conflicts,
+                            grouped_target_conflicts,
                             args.delete_source_when_fully_shadowed,
                         ):
                             delete_only_series += 1
@@ -655,33 +667,52 @@ def main() -> int:
                                         "metric": combined_source["metric"],
                                         "delete_source_only": True,
                                         "overlap_timestamps": grouped_overlap,
-                                        "value_conflicts": grouped_conflicts,
+                                        "value_conflicts": grouped_target_conflicts,
                                         "host_points": len(combined_source["timestamps"]),
                                     }
                                 )
                             if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                                 progress(
                                     "Rewrite aggregation progress: "
-                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}"
+                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}, grouped_source_conflicts={grouped_source_value_conflicts}"
                                 )
                             continue
 
-                        if grouped_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
-                            grouped_unresolved_value_conflicts += grouped_conflicts
+                        if grouped_source_conflicts and not args.allow_value_conflicts:
+                            grouped_source_value_conflicts += grouped_source_conflicts
+                            if len(overlap_examples) < 10:
+                                overlap_examples.append(
+                                    {
+                                        "metric": combined_source["metric"],
+                                        "grouped_source_conflicts": True,
+                                        "overlap_timestamps": grouped_overlap,
+                                        "value_conflicts": grouped_source_conflicts,
+                                        "host_points": len(combined_source["timestamps"]),
+                                    }
+                                )
+                            if args.progress_every > 0 and grouped_index % args.progress_every == 0:
+                                progress(
+                                    "Rewrite aggregation progress: "
+                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}, grouped_source_conflicts={grouped_source_value_conflicts}"
+                                )
+                            continue
+
+                        if grouped_target_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
+                            grouped_unresolved_value_conflicts += grouped_target_conflicts
                             if len(overlap_examples) < 10:
                                 overlap_examples.append(
                                     {
                                         "metric": combined_source["metric"],
                                         "grouped_unresolved_conflicts": True,
                                         "overlap_timestamps": grouped_overlap,
-                                        "value_conflicts": grouped_conflicts,
+                                        "value_conflicts": grouped_target_conflicts,
                                         "host_points": len(combined_source["timestamps"]),
                                     }
                                 )
                             if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                                 progress(
                                     "Rewrite aggregation progress: "
-                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}"
+                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}, grouped_source_conflicts={grouped_source_value_conflicts}"
                                 )
                             continue
 
@@ -698,7 +729,7 @@ def main() -> int:
                         if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                             progress(
                                 "Rewrite aggregation progress: "
-                                f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}"
+                                f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}, grouped_source_conflicts={grouped_source_value_conflicts}"
                             )
         finally:
             if temp_group_dir_obj is not None:
@@ -729,6 +760,7 @@ def main() -> int:
             "delete_only_series": delete_only_series,
             "delete_only_points": delete_only_points,
             "grouped_unresolved_value_conflicts": grouped_unresolved_value_conflicts,
+            "grouped_source_value_conflicts": grouped_source_value_conflicts,
             "streaming": True,
             "max_import_line_bytes": args.max_import_line_bytes,
             "performance": {
@@ -747,7 +779,11 @@ def main() -> int:
             )
             return 2
 
-        unresolved_value_conflicts = max(remaining_value_conflicts(value_conflicts, delete_only_points), grouped_unresolved_value_conflicts)
+        unresolved_value_conflicts = max(
+            remaining_value_conflicts(value_conflicts, delete_only_points),
+            grouped_unresolved_value_conflicts,
+            grouped_source_value_conflicts,
+        )
         summary["unresolved_value_conflicts"] = unresolved_value_conflicts
 
         if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
@@ -894,6 +930,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
 
 
 
