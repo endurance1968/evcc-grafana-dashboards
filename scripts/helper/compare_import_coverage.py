@@ -14,13 +14,14 @@ import json
 import re
 import urllib.parse
 import urllib.request
+import sys
 from dataclasses import dataclass
 from typing import Iterable, Iterator, List, Sequence
 from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.05.1"
+SCRIPT_VERSION = "2026.04.05.2"
 SCRIPT_CREATED = "2026-04-03"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
@@ -113,6 +114,11 @@ def print_report_header(title: str, underline: str, generated_at: str | None = N
     print(f"Version:      {metadata['version']}")
     print(f"Created:      {metadata['created']}")
     print(f"Run at:       {metadata['generated_at']}")
+
+
+def progress(message: str, enabled: bool) -> None:
+    if enabled:
+        print(message, file=sys.stderr, flush=True)
 
 
 def http_json(url: str) -> dict:
@@ -519,11 +525,15 @@ def build_critical_energy_checks(
     bucket_seconds: int,
     peak_power_limit: float,
     tolerance_ratio: float,
+    show_progress: bool = False,
 ) -> List[EnergyCoverage]:
     checked_windows = 0
     problem_windows = 0
     examples: List[str] = []
-    for label, window_start, window_end in iter_month_windows(start, end, timezone_name):
+    windows = iter_month_windows(start, end, timezone_name)
+    total_windows = len(windows)
+    for index, (label, window_start, window_end) in enumerate(windows, start=1):
+        progress(f"Critical energy progress: month={index}/{total_windows} window={label}", show_progress)
         influx_kwh = influx_legacy_pv_total_kwh(
             influx_base_url,
             influx_db,
@@ -725,6 +735,7 @@ def main() -> int:
     ap.add_argument("--peak-power-limit", type=float, default=40000.0, help="upper limit for valid PV power samples in watts during the critical PV monthly energy parity check")
     ap.add_argument("--pv-energy-tolerance-ratio", type=float, default=0.15, help="allowed relative monthly drift for the critical PV total-series parity check")
     ap.add_argument("--json", action="store_true", help="emit machine-readable JSON")
+    ap.add_argument("--progress", action="store_true", help="print progress updates to stderr while measurements are being checked")
     args = ap.parse_args()
 
     measurements = influx_measurements(
@@ -735,21 +746,24 @@ def main() -> int:
         args.measurement_regex,
         args.repo_relevant_only,
     )
-    results = [
-        compare_measurement(
-            args.influx_url,
-            args.influx_db,
-            args.vm_base_url,
-            args.vm_db_label,
-            measurement,
-            args.start,
-            args.end,
-            args.influx_user,
-            args.influx_password,
-            args.tolerance_seconds,
+    results: List[MetricCoverage] = []
+    total_measurements = len(measurements)
+    for index, measurement in enumerate(measurements, start=1):
+        progress(f"Measurement progress: {index}/{total_measurements} measurement={measurement}", args.progress)
+        results.append(
+            compare_measurement(
+                args.influx_url,
+                args.influx_db,
+                args.vm_base_url,
+                args.vm_db_label,
+                measurement,
+                args.start,
+                args.end,
+                args.influx_user,
+                args.influx_password,
+                args.tolerance_seconds,
+            )
         )
-        for measurement in measurements
-    ]
     critical_checks = build_critical_energy_checks(
         args.influx_url,
         args.influx_db,
