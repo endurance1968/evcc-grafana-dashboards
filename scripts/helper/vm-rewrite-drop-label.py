@@ -11,14 +11,14 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime
-from time import perf_counter
+from time import perf_counter, sleep
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.3"
+SCRIPT_VERSION = "2026.04.05.4"
 SCRIPT_CREATED = "2026-03-29"
 
 
@@ -95,6 +95,18 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=10,
         help="Emit progress after this many processed source series (default: 10).",
+    )
+    parser.add_argument(
+        "--verify-retries",
+        type=int,
+        default=3,
+        help="Number of verification attempts after import before refusing source deletion (default: 3).",
+    )
+    parser.add_argument(
+        "--verify-retry-delay",
+        type=float,
+        default=2.0,
+        help="Seconds to wait between failed verification attempts (default: 2.0).",
     )
     return parser.parse_args()
 
@@ -608,12 +620,24 @@ def main() -> int:
             f"source_series={imported_source_series}, chunk_series={imported_chunk_series}, batches={imported_batches}, seconds={import_seconds}"
         )
         verify_started_at = perf_counter()
-        verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
+        verification_failures: list[str] = []
+        verification_attempts = max(args.verify_retries, 1)
+        verification_attempt = 0
+        for verification_attempt in range(1, verification_attempts + 1):
+            verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
+            if not verification_failures:
+                break
+            if verification_attempt < verification_attempts:
+                progress(
+                    "Verification retry scheduled: "
+                    f"attempt={verification_attempt}/{verification_attempts}, failures={len(verification_failures)}, delay={args.verify_retry_delay}s"
+                )
+                sleep(max(args.verify_retry_delay, 0.0))
         verify_finished_at = perf_counter()
         verify_seconds = elapsed_seconds(verify_started_at, verify_finished_at)
         progress(
             "Verification stats: "
-            f"targets={len(expected_targets)}, seconds={verify_seconds}"
+            f"targets={len(expected_targets)}, attempts={verification_attempt}, seconds={verify_seconds}"
         )
         summary["performance"].update({
             "import_seconds": import_seconds,
@@ -621,6 +645,7 @@ def main() -> int:
             "import_chunk_series_per_second": rate_per_second(imported_chunk_series, import_seconds),
             "import_batches_per_second": rate_per_second(imported_batches, import_seconds),
             "verification_seconds": verify_seconds,
+            "verification_attempts": verification_attempt,
             "verification_targets_per_second": rate_per_second(len(expected_targets), verify_seconds),
         })
         if verification_failures:
