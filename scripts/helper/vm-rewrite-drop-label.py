@@ -19,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.18"
+SCRIPT_VERSION = "2026.04.05.19"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -666,6 +666,25 @@ def main() -> int:
                                 )
                             continue
 
+                        if grouped_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
+                            grouped_unresolved_value_conflicts += grouped_conflicts
+                            if len(overlap_examples) < 10:
+                                overlap_examples.append(
+                                    {
+                                        "metric": combined_source["metric"],
+                                        "grouped_unresolved_conflicts": True,
+                                        "overlap_timestamps": grouped_overlap,
+                                        "value_conflicts": grouped_conflicts,
+                                        "host_points": len(combined_source["timestamps"]),
+                                    }
+                                )
+                            if args.progress_every > 0 and grouped_index % args.progress_every == 0:
+                                progress(
+                                    "Rewrite aggregation progress: "
+                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}"
+                                )
+                            continue
+
                         final_item = combined_source
                         if args.merge_target:
                             final_item = merge_with_targets(
@@ -679,7 +698,7 @@ def main() -> int:
                         if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                             progress(
                                 "Rewrite aggregation progress: "
-                                f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}"
+                                f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}"
                             )
         finally:
             if temp_group_dir_obj is not None:
@@ -709,6 +728,7 @@ def main() -> int:
             "output_points": output_points,
             "delete_only_series": delete_only_series,
             "delete_only_points": delete_only_points,
+            "grouped_unresolved_value_conflicts": grouped_unresolved_value_conflicts,
             "streaming": True,
             "max_import_line_bytes": args.max_import_line_bytes,
             "performance": {
@@ -727,7 +747,7 @@ def main() -> int:
             )
             return 2
 
-        unresolved_value_conflicts = remaining_value_conflicts(value_conflicts, delete_only_points)
+        unresolved_value_conflicts = max(remaining_value_conflicts(value_conflicts, delete_only_points), grouped_unresolved_value_conflicts)
         summary["unresolved_value_conflicts"] = unresolved_value_conflicts
 
         if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
@@ -874,6 +894,8 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 
 
 
