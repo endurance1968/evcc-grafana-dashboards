@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.6"
+SCRIPT_VERSION = "2026.04.05.7"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -107,6 +107,11 @@ def parse_args() -> argparse.Namespace:
         type=float,
         default=2.0,
         help="Seconds to wait between failed verification attempts (default: 2.0).",
+    )
+    parser.add_argument(
+        "--skip-import-verification",
+        action="store_true",
+        help="Skip the built-in target verification after import and rely on external checks instead.",
     )
     return parser.parse_args()
 
@@ -622,26 +627,34 @@ def main() -> int:
             "Import stats: "
             f"source_series={imported_source_series}, chunk_series={imported_chunk_series}, batches={imported_batches}, seconds={import_seconds}"
         )
-        verify_started_at = perf_counter()
         verification_failures: list[str] = []
-        verification_attempts = max(args.verify_retries, 1)
+        verification_attempts = 0
         verification_attempt = 0
-        for verification_attempt in range(1, verification_attempts + 1):
-            verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
-            if not verification_failures:
-                break
-            if verification_attempt < verification_attempts:
-                progress(
-                    "Verification retry scheduled: "
-                    f"attempt={verification_attempt}/{verification_attempts}, failures={len(verification_failures)}, delay={args.verify_retry_delay}s"
-                )
-                sleep(max(args.verify_retry_delay, 0.0))
-        verify_finished_at = perf_counter()
-        verify_seconds = elapsed_seconds(verify_started_at, verify_finished_at)
-        progress(
-            "Verification stats: "
-            f"targets={len(expected_targets)}, attempts={verification_attempt}, seconds={verify_seconds}"
-        )
+        verify_seconds = 0.0
+        if args.skip_import_verification:
+            progress(
+                "Skipping built-in import verification because --skip-import-verification was requested. "
+                "Run compare_import_coverage.py afterwards before continuing."
+            )
+        else:
+            verify_started_at = perf_counter()
+            verification_attempts = max(args.verify_retries, 1)
+            for verification_attempt in range(1, verification_attempts + 1):
+                verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
+                if not verification_failures:
+                    break
+                if verification_attempt < verification_attempts:
+                    progress(
+                        "Verification retry scheduled: "
+                        f"attempt={verification_attempt}/{verification_attempts}, failures={len(verification_failures)}, delay={args.verify_retry_delay}s"
+                    )
+                    sleep(max(args.verify_retry_delay, 0.0))
+            verify_finished_at = perf_counter()
+            verify_seconds = elapsed_seconds(verify_started_at, verify_finished_at)
+            progress(
+                "Verification stats: "
+                f"targets={len(expected_targets)}, attempts={verification_attempt}, seconds={verify_seconds}"
+            )
         summary["performance"].update({
             "import_seconds": import_seconds,
             "import_source_series_per_second": rate_per_second(imported_source_series, import_seconds),
@@ -656,6 +669,7 @@ def main() -> int:
             summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
             summary["import_verification"] = {
                 "ok": False,
+                "skipped": False,
                 "checked_targets": len(expected_targets),
                 "failures": verification_failures,
             }
@@ -686,7 +700,16 @@ def main() -> int:
         summary["imported_source_series"] = imported_source_series
         summary["imported_chunk_series"] = imported_chunk_series
         summary["source_series_after_delete"] = source_count
-        summary["import_verification"] = {"ok": True, "checked_targets": len(expected_targets), "failures": []}
+        if args.skip_import_verification:
+            summary["import_verification"] = {
+                "ok": None,
+                "skipped": True,
+                "checked_targets": len(expected_targets),
+                "failures": [],
+                "note": "Built-in import verification was skipped. Run compare_import_coverage.py before continuing.",
+            }
+        else:
+            summary["import_verification"] = {"ok": True, "skipped": False, "checked_targets": len(expected_targets), "failures": []}
         summary["performance"].update({
             "delete_source_seconds": delete_source_seconds,
             "reset_cache_seconds": reset_cache_seconds,
@@ -708,6 +731,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
 
