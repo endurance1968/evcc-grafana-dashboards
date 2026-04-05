@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.13"
+SCRIPT_VERSION = "2026.04.05.14"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -269,33 +269,64 @@ def remaining_value_conflicts(total_value_conflicts: int, delete_only_points: in
     return max(total_value_conflicts - delete_only_points, 0)
 
 
+def merge_points(
+    metric: dict[str, str],
+    items: list[dict],
+    allow_value_conflicts: bool,
+    keep_existing_values_on_conflict: bool,
+    conflict_error: str,
+) -> dict:
+    merged_points: dict[int, float] = {}
+    for item in items:
+        for ts, val in zip(item.get("timestamps", []), item.get("values", [])):
+            ts = int(ts)
+            val = float(val)
+            if ts in merged_points and merged_points[ts] != val:
+                if keep_existing_values_on_conflict:
+                    continue
+                if not allow_value_conflicts:
+                    raise SystemExit(conflict_error.format(metric=metric, ts=ts, existing=merged_points[ts], source=val))
+            merged_points[ts] = val
+    merged_ts = sorted(merged_points)
+    return {
+        "metric": metric,
+        "timestamps": merged_ts,
+        "values": [merged_points[ts] for ts in merged_ts],
+    }
+
+
+def combine_rewritten_series(items: list[dict], allow_value_conflicts: bool) -> dict:
+    if not items:
+        raise ValueError('items must not be empty')
+    metric = items[0]["metric"]
+    return merge_points(
+        metric,
+        items,
+        allow_value_conflicts=allow_value_conflicts,
+        keep_existing_values_on_conflict=False,
+        conflict_error=(
+            "Value conflict after dropping labels for {metric} at timestamp {ts}: existing={existing} source={source}. "
+            "Use --allow-value-conflicts to prefer later source values."
+        ),
+    )
+
+
 def merge_with_targets(
     item: dict,
     existing: list[dict],
     allow_value_conflicts: bool,
     keep_target_values_on_conflict: bool,
 ) -> dict:
-    merged_points: dict[int, float] = {}
-    for candidate in existing:
-        merged_points.update({int(ts): float(val) for ts, val in zip(candidate.get("timestamps", []), candidate.get("values", []))})
-    for ts, val in zip(item["timestamps"], item["values"]):
-        ts = int(ts)
-        val = float(val)
-        if ts in merged_points and merged_points[ts] != val:
-            if keep_target_values_on_conflict:
-                continue
-            if not allow_value_conflicts:
-                raise SystemExit(
-                    f"Value conflict for {item['metric']} at timestamp {ts}: existing={merged_points[ts]} source={val}. "
-                    "Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values."
-                )
-        merged_points[ts] = val
-    merged_ts = sorted(merged_points)
-    return {
-        "metric": item["metric"],
-        "timestamps": merged_ts,
-        "values": [merged_points[ts] for ts in merged_ts],
-    }
+    return merge_points(
+        item["metric"],
+        [*existing, item],
+        allow_value_conflicts=allow_value_conflicts,
+        keep_existing_values_on_conflict=keep_target_values_on_conflict,
+        conflict_error=(
+            "Value conflict for {metric} at timestamp {ts}: existing={existing} source={source}. "
+            "Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values."
+        ),
+    )
 
 
 def http_post_form(base_url: str, path: str, form: list[tuple[str, str]]) -> str:
@@ -554,75 +585,85 @@ def main() -> int:
         delete_only_series = 0
         delete_only_points = 0
 
+        grouped_rewrites: dict[str, list[dict]] = {}
+        existing_by_matcher: dict[str, list[dict]] = {}
+
         analyze_started_at = perf_counter()
         with backup_path.open("w", encoding="utf-8", newline="\n") as backup_handle:
-            rewritten_handle = None
-            try:
-                if rewritten_path is not None:
-                    rewritten_handle = rewritten_path.open("w", encoding="utf-8", newline="\n")
+            for exported in iter_export_lines(args.base_url, args.matcher):
+                exported_series += 1
+                exported_points += len(exported.get("timestamps", []))
+                append_jsonl_line(backup_handle, exported)
 
-                for exported in iter_export_lines(args.base_url, args.matcher):
-                    exported_series += 1
-                    exported_points += len(exported.get("timestamps", []))
-                    append_jsonl_line(backup_handle, exported)
-
-                    rewritten = transform_series(exported, args.drop_label)
+                rewritten = transform_series(exported, args.drop_label)
+                matcher = target_matcher(rewritten["metric"], args.drop_label)
+                existing = existing_by_matcher.get(matcher)
+                if existing is None:
                     existing = fetch_target_series(args.base_url, rewritten["metric"], args.drop_label)
+                    existing_by_matcher[matcher] = existing
                     checked_series += 1
-                    current_overlap, current_conflicts = analyze_target_overlap(rewritten, existing)
-                    overlap_timestamps += current_overlap
-                    value_conflicts += current_conflicts
-                    if (current_overlap or current_conflicts) and len(overlap_examples) < 10:
+                current_overlap, current_conflicts = analyze_target_overlap(rewritten, existing)
+                overlap_timestamps += current_overlap
+                value_conflicts += current_conflicts
+                if (current_overlap or current_conflicts) and len(overlap_examples) < 10:
+                    overlap_examples.append(
+                        {
+                            "metric": rewritten["metric"],
+                            "overlap_timestamps": current_overlap,
+                            "value_conflicts": current_conflicts,
+                            "host_points": len(rewritten["timestamps"]),
+                        }
+                    )
+
+                if should_delete_source_only(
+                    rewritten,
+                    current_overlap,
+                    current_conflicts,
+                    args.delete_source_when_fully_shadowed,
+                ):
+                    delete_only_series += 1
+                    delete_only_points += len(rewritten.get("timestamps", []))
+                    if len(overlap_examples) < 10:
                         overlap_examples.append(
                             {
                                 "metric": rewritten["metric"],
+                                "delete_source_only": True,
                                 "overlap_timestamps": current_overlap,
                                 "value_conflicts": current_conflicts,
                                 "host_points": len(rewritten["timestamps"]),
                             }
                         )
+                else:
+                    grouped_rewrites.setdefault(matcher, []).append(rewritten)
 
-                    if should_delete_source_only(
-                        rewritten,
-                        current_overlap,
-                        current_conflicts,
-                        args.delete_source_when_fully_shadowed,
-                    ):
-                        delete_only_series += 1
-                        delete_only_points += len(rewritten.get("timestamps", []))
-                        if len(overlap_examples) < 10:
-                            overlap_examples.append(
-                                {
-                                    "metric": rewritten["metric"],
-                                    "delete_source_only": True,
-                                    "overlap_timestamps": current_overlap,
-                                    "value_conflicts": current_conflicts,
-                                    "host_points": len(rewritten["timestamps"]),
-                                }
-                            )
-                        continue
+                if args.progress_every > 0 and exported_series % args.progress_every == 0:
+                    progress(
+                        "Analyze progress: "
+                        f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}"
+                    )
 
-                    final_item = rewritten
+        if rewritten_path is not None:
+            with rewritten_path.open("w", encoding="utf-8", newline="\n") as rewritten_handle:
+                for grouped_index, matcher in enumerate(sorted(grouped_rewrites), start=1):
+                    combined_source = combine_rewritten_series(
+                        grouped_rewrites[matcher],
+                        args.allow_value_conflicts,
+                    )
+                    final_item = combined_source
                     if args.merge_target:
                         final_item = merge_with_targets(
-                            rewritten,
-                            existing,
+                            combined_source,
+                            existing_by_matcher.get(matcher, []),
                             args.allow_value_conflicts,
                             args.keep_target_values_on_conflict,
                         )
-
                     output_points += len(final_item.get("timestamps", []))
-                    if rewritten_handle is not None:
-                        append_jsonl_line(rewritten_handle, final_item)
-
-                    if args.progress_every > 0 and exported_series % args.progress_every == 0:
+                    append_jsonl_line(rewritten_handle, final_item)
+                    if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                         progress(
-                            "Analyze progress: "
-                            f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}"
+                            "Rewrite aggregation progress: "
+                            f"targets={grouped_index}, output_points={output_points}"
                         )
-            finally:
-                if rewritten_handle is not None:
-                    rewritten_handle.close()
 
         analyze_finished_at = perf_counter()
         analyze_seconds = elapsed_seconds(analyze_started_at, analyze_finished_at)
@@ -813,6 +854,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 

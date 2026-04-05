@@ -40,6 +40,25 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             '{__name__="pvPower_value",db="evcc"}',
         )
 
+    def test_combine_rewritten_series_merges_multiple_sources_for_same_target(self):
+        items = [
+            {
+                "metric": {"__name__": "batterySoc_value", "db": "evcc", "id": "1"},
+                "timestamps": [1000, 2000],
+                "values": [10.0, 20.0],
+            },
+            {
+                "metric": {"__name__": "batterySoc_value", "db": "evcc", "id": "1"},
+                "timestamps": [3000, 4000],
+                "values": [30.0, 40.0],
+            },
+        ]
+
+        combined = MODULE.combine_rewritten_series(items, allow_value_conflicts=False)
+
+        self.assertEqual(combined["timestamps"], [1000, 2000, 3000, 4000])
+        self.assertEqual(combined["values"], [10.0, 20.0, 30.0, 40.0])
+
     def test_import_rewritten_file_accumulates_expected_stats_per_target_matcher(self):
         rows = [
             {
