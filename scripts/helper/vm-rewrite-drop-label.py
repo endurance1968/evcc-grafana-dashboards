@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.10"
+SCRIPT_VERSION = "2026.04.05.11"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -72,6 +72,11 @@ def parse_args() -> argparse.Namespace:
         "--allow-value-conflicts",
         action="store_true",
         help="Allow merge when identical timestamps have different values; source values win.",
+    )
+    parser.add_argument(
+        "--keep-target-values-on-conflict",
+        action="store_true",
+        help="Allow merge when identical timestamps have different values; keep existing target values and import only missing timestamps.",
     )
     parser.add_argument(
         "--reset-cache",
@@ -241,18 +246,26 @@ def analyze_target_overlap(item: dict, existing: list[dict]) -> tuple[int, int]:
     return current_overlap, current_conflicts
 
 
-def merge_with_targets(item: dict, existing: list[dict], allow_value_conflicts: bool) -> dict:
+def merge_with_targets(
+    item: dict,
+    existing: list[dict],
+    allow_value_conflicts: bool,
+    keep_target_values_on_conflict: bool,
+) -> dict:
     merged_points: dict[int, float] = {}
     for candidate in existing:
         merged_points.update({int(ts): float(val) for ts, val in zip(candidate.get("timestamps", []), candidate.get("values", []))})
     for ts, val in zip(item["timestamps"], item["values"]):
         ts = int(ts)
         val = float(val)
-        if ts in merged_points and merged_points[ts] != val and not allow_value_conflicts:
-            raise SystemExit(
-                f"Value conflict for {item['metric']} at timestamp {ts}: existing={merged_points[ts]} source={val}. "
-                "Use --allow-value-conflicts to prefer source values."
-            )
+        if ts in merged_points and merged_points[ts] != val:
+            if keep_target_values_on_conflict:
+                continue
+            if not allow_value_conflicts:
+                raise SystemExit(
+                    f"Value conflict for {item['metric']} at timestamp {ts}: existing={merged_points[ts]} source={val}. "
+                    "Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values."
+                )
         merged_points[ts] = val
     merged_ts = sorted(merged_points)
     return {
@@ -546,7 +559,12 @@ def main() -> int:
 
                     final_item = rewritten
                     if args.merge_target:
-                        final_item = merge_with_targets(rewritten, existing, args.allow_value_conflicts)
+                        final_item = merge_with_targets(
+                            rewritten,
+                            existing,
+                            args.allow_value_conflicts,
+                            args.keep_target_values_on_conflict,
+                        )
 
                     output_points += len(final_item.get("timestamps", []))
                     if rewritten_handle is not None:
@@ -601,10 +619,10 @@ def main() -> int:
             )
             return 2
 
-        if value_conflicts and not args.allow_value_conflicts:
+        if value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
             print(json.dumps(summary, indent=2))
             print(
-                "Refusing to rewrite because transformed timestamps conflict with existing target values. Use --allow-value-conflicts to prefer source values.",
+                "Refusing to rewrite because transformed timestamps conflict with existing target values. Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values.",
                 file=sys.stderr,
             )
             return 3
@@ -745,6 +763,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
 
 
 

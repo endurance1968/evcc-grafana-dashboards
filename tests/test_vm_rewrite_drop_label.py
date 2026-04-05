@@ -91,7 +91,30 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         self.assertEqual(list(expected_targets), [matcher])
         self.assertEqual(expected_targets[matcher], MODULE.SeriesStats(points=3, first=1000, last=3000))
 
+    def test_merge_with_targets_can_keep_existing_target_values_on_conflict(self):
+        item = {
+            "metric": {"__name__": "pvPower_value", "db": "evcc"},
+            "timestamps": [1000, 2000],
+            "values": [10.0, 20.0],
+        }
+        existing = [
+            {
+                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "timestamps": [1000, 3000],
+                "values": [1.0, 30.0],
+            }
+        ]
+
+        merged = MODULE.merge_with_targets(
+            item,
+            existing,
+            allow_value_conflicts=False,
+            keep_target_values_on_conflict=True,
+        )
+
+        self.assertEqual(merged["timestamps"], [1000, 2000, 3000])
+        self.assertEqual(merged["values"], [1.0, 20.0, 30.0])
+
 
 if __name__ == "__main__":
     unittest.main()
-
