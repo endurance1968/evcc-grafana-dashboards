@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.15"
+SCRIPT_VERSION = "2026.04.05.16"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -864,6 +864,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
