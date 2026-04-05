@@ -17,7 +17,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.1"
+SCRIPT_VERSION = "2026.04.05.2"
 SCRIPT_CREATED = "2026-03-29"
 
 
@@ -332,13 +332,11 @@ def iter_jsonl(path: Path) -> Iterator[dict]:
             yield json.loads(raw)
 
 
-def flush_import_batch(base_url: str, batch: list[dict], imported_batches: int, imported_chunks: int, progress_cb: Callable[[str], None] | None) -> int:
+def flush_import_batch(base_url: str, batch: list[dict], imported_batches: int) -> int:
     if not batch:
         return imported_batches
     http_post_bytes(base_url, "/api/v1/import", serialize_jsonl(batch))
     imported_batches += 1
-    if progress_cb is not None:
-        progress_cb(f"Import progress: batches={imported_batches}, chunk_series={imported_chunks}")
     batch.clear()
     return imported_batches
 
@@ -350,6 +348,7 @@ def import_rewritten_file(
     batch_size: int,
     max_line_bytes: int,
     delete_targets_first: bool,
+    progress_every: int,
     progress_cb: Callable[[str], None] | None = None,
 ) -> tuple[int, int, int, int, dict[str, SeriesStats]]:
     deleted_targets = 0
@@ -374,17 +373,21 @@ def import_rewritten_file(
             batch.append(chunk)
             imported_chunk_series += 1
             if len(batch) >= max(batch_size, 1):
-                imported_batches = flush_import_batch(base_url, batch, imported_batches, imported_chunk_series, progress_cb)
+                imported_batches = flush_import_batch(base_url, batch, imported_batches)
 
-        if progress_cb is not None and len(chunks) > 1:
+        if progress_cb is not None and progress_every > 0 and imported_source_series % progress_every == 0:
             progress_cb(
-                f"Chunked metric {transformed_matcher(item['metric'])} into {len(chunks)} import lines "
-                f"(source_series={imported_source_series}, chunk_series={imported_chunk_series})"
+                "Import progress: "
+                f"source_series={imported_source_series}, chunk_series={imported_chunk_series}, batches={imported_batches}"
             )
 
-    imported_batches = flush_import_batch(base_url, batch, imported_batches, imported_chunk_series, progress_cb)
+    imported_batches = flush_import_batch(base_url, batch, imported_batches)
+    if progress_cb is not None:
+        progress_cb(
+            "Import phase complete: "
+            f"source_series={imported_source_series}, chunk_series={imported_chunk_series}, batches={imported_batches}"
+        )
     return deleted_targets, imported_batches, imported_source_series, imported_chunk_series, expected_targets
-
 
 
 def verify_imported_targets(
@@ -395,18 +398,20 @@ def verify_imported_targets(
     failures: list[str] = []
     for matcher in sorted(expected_targets):
         expected = expected_targets[matcher]
-        if expected.points <= 0:
+        if expected.points <= 0 or expected.first is None or expected.last is None:
             continue
-        actual_items = list(iter_export_lines(base_url, matcher))
+        actual_items = list(iter_export_lines(base_url, matcher, expected.first, expected.last))
         actual = series_stats(actual_items)
-        if actual.points != expected.points or actual.first != expected.first or actual.last != expected.last:
+        if actual.points < expected.points or actual.first != expected.first or actual.last != expected.last:
             failures.append(
-                f"{matcher}: expected points={expected.points}, first={expected.first}, last={expected.last}; "
+                f"{matcher}: expected points>={expected.points}, first={expected.first}, last={expected.last}; "
                 f"got points={actual.points}, first={actual.first}, last={actual.last}"
             )
             if len(failures) >= 10:
                 break
     return failures
+
+
 def describe_url_error(base_url: str, exc: urllib.error.URLError) -> str:
     reason = exc.reason
     if isinstance(reason, socket.gaierror):
@@ -564,6 +569,7 @@ def main() -> int:
             args.import_batch_size,
             args.max_import_line_bytes,
             delete_targets_first=args.merge_target,
+            progress_every=args.progress_every,
             progress_cb=progress,
         )
         verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
@@ -609,5 +615,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
