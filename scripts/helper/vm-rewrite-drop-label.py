@@ -12,12 +12,20 @@ import urllib.parse
 import urllib.request
 from datetime import datetime
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.04.1"
+SCRIPT_VERSION = "2026.04.05.1"
 SCRIPT_CREATED = "2026-03-29"
+
+
+@dataclass(frozen=True)
+class SeriesStats:
+    points: int
+    first: int | None
+    last: int | None
 
 
 def parse_args() -> argparse.Namespace:
@@ -161,6 +169,22 @@ def target_matcher(metric: dict[str, str], dropped_label: str) -> str:
 
 def fetch_target_series(base_url: str, metric: dict[str, str], dropped_label: str) -> list[dict]:
     return list(iter_export_lines(base_url, target_matcher(metric, dropped_label)))
+
+
+def series_stats(items: list[dict]) -> SeriesStats:
+    total_points = 0
+    first: int | None = None
+    last: int | None = None
+    for item in items:
+        timestamps = [int(ts) for ts in item.get("timestamps", [])]
+        if not timestamps:
+            continue
+        total_points += len(timestamps)
+        item_first = timestamps[0]
+        item_last = timestamps[-1]
+        first = item_first if first is None else min(first, item_first)
+        last = item_last if last is None else max(last, item_last)
+    return SeriesStats(points=total_points, first=first, last=last)
 
 
 def analyze_target_overlap(item: dict, existing: list[dict]) -> tuple[int, int]:
@@ -327,17 +351,19 @@ def import_rewritten_file(
     max_line_bytes: int,
     delete_targets_first: bool,
     progress_cb: Callable[[str], None] | None = None,
-) -> tuple[int, int, int, int]:
+) -> tuple[int, int, int, int, dict[str, SeriesStats]]:
     deleted_targets = 0
     imported_batches = 0
     imported_source_series = 0
     imported_chunk_series = 0
     batch: list[dict] = []
     deleted_matchers: set[str] = set()
+    expected_targets: dict[str, SeriesStats] = {}
 
     for item in iter_jsonl(rewritten_path):
         imported_source_series += 1
         matcher = target_matcher(item["metric"], dropped_label)
+        expected_targets[matcher] = series_stats([item])
         if delete_targets_first and matcher not in deleted_matchers:
             delete_target_matcher(base_url, matcher)
             deleted_matchers.add(matcher)
@@ -357,9 +383,30 @@ def import_rewritten_file(
             )
 
     imported_batches = flush_import_batch(base_url, batch, imported_batches, imported_chunk_series, progress_cb)
-    return deleted_targets, imported_batches, imported_source_series, imported_chunk_series
+    return deleted_targets, imported_batches, imported_source_series, imported_chunk_series, expected_targets
 
 
+
+def verify_imported_targets(
+    base_url: str,
+    dropped_label: str,
+    expected_targets: dict[str, SeriesStats],
+) -> list[str]:
+    failures: list[str] = []
+    for matcher in sorted(expected_targets):
+        expected = expected_targets[matcher]
+        if expected.points <= 0:
+            continue
+        actual_items = list(iter_export_lines(base_url, matcher))
+        actual = series_stats(actual_items)
+        if actual.points != expected.points or actual.first != expected.first or actual.last != expected.last:
+            failures.append(
+                f"{matcher}: expected points={expected.points}, first={expected.first}, last={expected.last}; "
+                f"got points={actual.points}, first={actual.first}, last={actual.last}"
+            )
+            if len(failures) >= 10:
+                break
+    return failures
 def describe_url_error(base_url: str, exc: urllib.error.URLError) -> str:
     reason = exc.reason
     if isinstance(reason, socket.gaierror):
@@ -510,7 +557,7 @@ def main() -> int:
         progress(
             f"Starting import phase from {rewritten_path} with batch_size={args.import_batch_size} and max_line_bytes={args.max_import_line_bytes}"
         )
-        deleted_targets, imported_batches, imported_source_series, imported_chunk_series = import_rewritten_file(
+        deleted_targets, imported_batches, imported_source_series, imported_chunk_series, expected_targets = import_rewritten_file(
             args.base_url,
             rewritten_path,
             args.drop_label,
@@ -519,6 +566,21 @@ def main() -> int:
             delete_targets_first=args.merge_target,
             progress_cb=progress,
         )
+        verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
+        if verification_failures:
+            summary["import_verification"] = {
+                "ok": False,
+                "checked_targets": len(expected_targets),
+                "failures": verification_failures,
+            }
+            print(json.dumps(summary, indent=2))
+            print(
+                "Refusing to delete the source matcher because imported target verification failed. "
+                "The host-tagged source series are still present.",
+                file=sys.stderr,
+            )
+            return 5
+
         http_post_form(args.base_url, "/api/v1/admin/tsdb/delete_series", [("match[]", args.matcher)])
         if args.reset_cache:
             http_post_form(args.base_url, "/internal/resetRollupResultCache", [])
@@ -530,6 +592,7 @@ def main() -> int:
         summary["imported_source_series"] = imported_source_series
         summary["imported_chunk_series"] = imported_chunk_series
         summary["source_series_after_delete"] = source_count
+        summary["import_verification"] = {"ok": True, "checked_targets": len(expected_targets), "failures": []}
         if temp_rewritten:
             summary["rewritten_jsonl_note"] = "temporary rewritten file was created automatically for write mode"
         progress(
@@ -546,3 +609,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
