@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.9"
+SCRIPT_VERSION = "2026.04.05.10"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -194,9 +194,8 @@ def transformed_matcher(metric: dict[str, str]) -> str:
 
 
 def target_matcher(metric: dict[str, str], dropped_label: str) -> str:
-    target_metric = dict(metric)
-    target_metric.setdefault(dropped_label, "")
-    return transformed_matcher(target_metric)
+    _ = dropped_label
+    return transformed_matcher(metric)
 
 
 def fetch_target_series(base_url: str, metric: dict[str, str], dropped_label: str) -> list[dict]:
@@ -746,5 +745,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 

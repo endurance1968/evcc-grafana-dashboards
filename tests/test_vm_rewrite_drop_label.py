@@ -35,6 +35,10 @@ class VmRewriteDropLabelTests(unittest.TestCase):
                 "db": "evcc",
             },
         )
+        self.assertEqual(
+            MODULE.target_matcher(rewritten["metric"], "host"),
+            '{__name__="pvPower_value",db="evcc"}',
+        )
 
     def test_import_rewritten_file_accumulates_expected_stats_per_target_matcher(self):
         rows = [
@@ -83,10 +87,11 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
-        matcher = '{__name__="pvPower_value",db="evcc",host=""}'
+        matcher = '{__name__="pvPower_value",db="evcc"}'
         self.assertEqual(list(expected_targets), [matcher])
         self.assertEqual(expected_targets[matcher], MODULE.SeriesStats(points=3, first=1000, last=3000))
 
 
 if __name__ == "__main__":
     unittest.main()
+
