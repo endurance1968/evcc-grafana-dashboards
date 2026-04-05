@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.04.2"
+SCRIPT_VERSION = "2026.04.05.1"
 SCRIPT_CREATED = "2026-04-03"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
@@ -322,7 +322,17 @@ def choose_vm_metric(base_url: str, db_label: str, measurement: str, start: str,
     return best_metric, best_stats
 
 
+def has_full_span(influx: SpanStats, vm: SpanStats, tolerance_seconds: int) -> bool:
+    if influx.first and vm.first and vm.first > influx.first + dt.timedelta(seconds=tolerance_seconds):
+        return False
+    if influx.last and vm.last and vm.last < influx.last - dt.timedelta(seconds=tolerance_seconds):
+        return False
+    return True
+
+
 def infer_hint(measurement: str, field_types: Sequence[str], vm_metric: str, group: str, status: str) -> str | None:
+    if status == "NORMALIZED":
+        return "likely normalized after host-label cleanup or duplicate-sample merge; use the critical PV energy check to spot real raw-data loss"
     if group == "repo-relevant":
         return None
     if any(field_type in {"string", "boolean"} for field_type in field_types):
@@ -360,17 +370,34 @@ def compare_measurement(
         status = "MISSING"
         reasons.append("no imported VM samples for this measurement")
     else:
-        if influx.series > 0 and vm.series < influx.series:
+        full_span = has_full_span(influx, vm, tolerance_seconds)
+        series_reduced = influx.series > 0 and vm.series < influx.series
+        points_reduced = influx.points > 0 and vm.points < influx.points
+
+        if series_reduced and full_span:
+            status = "NORMALIZED"
+            reasons.append(
+                f"VM has fewer series than Influx ({vm.series} < {influx.series}), but the full time span is present; likely merged infrastructure labels"
+            )
+        elif series_reduced:
             status = "TRUNCATED"
             reasons.append(f"fewer VM series than Influx ({vm.series} < {influx.series})")
+
         if influx.first and vm.first and vm.first > influx.first + dt.timedelta(seconds=tolerance_seconds):
             status = "TRUNCATED"
             reasons.append(f"VM starts later ({iso_z(vm.first)} > {iso_z(influx.first)})")
         if influx.last and vm.last and vm.last < influx.last - dt.timedelta(seconds=tolerance_seconds):
             status = "TRUNCATED"
             reasons.append(f"VM ends earlier ({iso_z(vm.last)} < {iso_z(influx.last)})")
-        if influx.points > 0 and vm.points < influx.points:
-            reasons.append(f"fewer VM samples than Influx ({vm.points} < {influx.points})")
+
+        if points_reduced:
+            if status == "NORMALIZED":
+                reasons.append(
+                    f"VM also has fewer samples than Influx ({vm.points} < {influx.points}); likely duplicate samples collapsed during label cleanup"
+                )
+            else:
+                status = "TRUNCATED"
+                reasons.append(f"fewer VM samples than Influx ({vm.points} < {influx.points})")
 
     group = measurement_group(measurement)
     return MetricCoverage(
@@ -572,13 +599,14 @@ def build_critical_energy_checks(
 
 def render_group(label: str, items: Sequence[MetricCoverage], only_problems: bool) -> None:
     relevant = [item for item in items if item.status != "SKIP"]
-    shown = [item for item in relevant if not only_problems or item.status != "OK"]
+    shown = [item for item in relevant if not only_problems or item.status in {"MISSING", "TRUNCATED"}]
     problems = [item for item in relevant if item.status in {"MISSING", "TRUNCATED"}]
 
     print(label)
     print("-" * len(label))
     print(f"- Checked: {len(relevant)}")
     print(f"- OK: {sum(1 for item in relevant if item.status == 'OK')}")
+    print(f"- Normalized: {sum(1 for item in relevant if item.status == 'NORMALIZED')}")
     print(f"- Problems: {len(problems)}")
 
     if shown:
@@ -601,13 +629,14 @@ def render_group(label: str, items: Sequence[MetricCoverage], only_problems: boo
 
 def render_energy_checks(label: str, items: Sequence[EnergyCoverage], only_problems: bool) -> None:
     relevant = [item for item in items if item.status != "SKIP"]
-    shown = [item for item in relevant if not only_problems or item.status != "OK"]
+    shown = [item for item in relevant if not only_problems or item.status in {"MISSING", "TRUNCATED"}]
     problems = [item for item in relevant if item.status in {"MISSING", "TRUNCATED"}]
 
     print(label)
     print("-" * len(label))
     print(f"- Checked: {len(relevant)}")
     print(f"- OK: {sum(1 for item in relevant if item.status == 'OK')}")
+    print(f"- Normalized: {sum(1 for item in relevant if item.status == 'NORMALIZED')}")
     print(f"- Problems: {len(problems)}")
 
     if shown:
@@ -792,3 +821,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
