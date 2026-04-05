@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.12"
+SCRIPT_VERSION = "2026.04.05.13"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -263,6 +263,10 @@ def should_delete_source_only(
     if point_count <= 0:
         return False
     return overlap_timestamps == point_count and value_conflicts == point_count
+
+
+def remaining_value_conflicts(total_value_conflicts: int, delete_only_points: int) -> int:
+    return max(total_value_conflicts - delete_only_points, 0)
 
 
 def merge_with_targets(
@@ -662,7 +666,10 @@ def main() -> int:
             )
             return 2
 
-        if value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
+        unresolved_value_conflicts = remaining_value_conflicts(value_conflicts, delete_only_points)
+        summary["unresolved_value_conflicts"] = unresolved_value_conflicts
+
+        if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
             print(json.dumps(summary, indent=2))
             print(
                 "Refusing to rewrite because transformed timestamps conflict with existing target values. Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values.",
@@ -806,6 +813,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 

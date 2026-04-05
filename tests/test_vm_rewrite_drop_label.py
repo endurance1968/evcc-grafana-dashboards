@@ -126,6 +126,11 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         self.assertFalse(MODULE.should_delete_source_only(item, 2, 1, True))
         self.assertFalse(MODULE.should_delete_source_only(item, 2, 2, False))
 
+    def test_remaining_value_conflicts_subtracts_delete_only_points(self):
+        self.assertEqual(MODULE.remaining_value_conflicts(2387, 2387), 0)
+        self.assertEqual(MODULE.remaining_value_conflicts(10, 4), 6)
+        self.assertEqual(MODULE.remaining_value_conflicts(3, 10), 0)
+
 
 if __name__ == "__main__":
     unittest.main()
