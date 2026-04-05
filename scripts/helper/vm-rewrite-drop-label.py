@@ -11,13 +11,14 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime
+from time import perf_counter
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.2"
+SCRIPT_VERSION = "2026.04.05.3"
 SCRIPT_CREATED = "2026-03-29"
 
 
@@ -113,6 +114,16 @@ def script_metadata(generated_at: str | None = None) -> dict[str, str]:
         "created": SCRIPT_CREATED,
         "generated_at": generated_at or local_timestamp(),
     }
+
+
+def elapsed_seconds(start: float, end: float) -> float:
+    return round(end - start, 3)
+
+
+def rate_per_second(count: int, seconds: float) -> float | None:
+    if seconds <= 0:
+        return None
+    return round(count / seconds, 2)
 
 
 def export_url(base_url: str, matcher: str, start_ms: int | None = None, end_ms: int | None = None) -> str:
@@ -460,6 +471,7 @@ def main() -> int:
 
     try:
         metadata = script_metadata()
+        total_started_at = perf_counter()
         progress(
             f"{metadata['name']} v{metadata['version']} (created {metadata['created']}, run {metadata['generated_at']})"
         )
@@ -518,9 +530,11 @@ def main() -> int:
                 if rewritten_handle is not None:
                     rewritten_handle.close()
 
+        analyze_finished_at = perf_counter()
+        analyze_seconds = elapsed_seconds(analyze_started_at, analyze_finished_at)
         progress(
             "Analyze phase complete: "
-            f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}"
+            f"series={exported_series}, source_points={exported_points}, overlaps={overlap_timestamps}, conflicts={value_conflicts}, seconds={analyze_seconds}"
         )
 
         summary = {
@@ -540,6 +554,12 @@ def main() -> int:
             "output_points": output_points,
             "streaming": True,
             "max_import_line_bytes": args.max_import_line_bytes,
+            "performance": {
+                "analyze_seconds": analyze_seconds,
+                "analyze_series_per_second": rate_per_second(exported_series, analyze_seconds),
+                "analyze_points_per_second": rate_per_second(exported_points, analyze_seconds),
+                "target_fetch_requests": checked_series,
+            },
         }
 
         if overlap_timestamps and not (args.allow_overlap or args.merge_target):
@@ -559,6 +579,8 @@ def main() -> int:
             return 3
 
         if not args.write:
+            total_finished_at = perf_counter()
+            summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
             print(json.dumps(summary, indent=2))
             return 0
 
@@ -568,6 +590,7 @@ def main() -> int:
         progress(
             f"Starting import phase from {rewritten_path} with batch_size={args.import_batch_size} and max_line_bytes={args.max_import_line_bytes}"
         )
+        import_started_at = perf_counter()
         deleted_targets, imported_batches, imported_source_series, imported_chunk_series, expected_targets = import_rewritten_file(
             args.base_url,
             rewritten_path,
@@ -578,8 +601,31 @@ def main() -> int:
             progress_every=args.progress_every,
             progress_cb=progress,
         )
+        import_finished_at = perf_counter()
+        import_seconds = elapsed_seconds(import_started_at, import_finished_at)
+        progress(
+            "Import stats: "
+            f"source_series={imported_source_series}, chunk_series={imported_chunk_series}, batches={imported_batches}, seconds={import_seconds}"
+        )
+        verify_started_at = perf_counter()
         verification_failures = verify_imported_targets(args.base_url, args.drop_label, expected_targets)
+        verify_finished_at = perf_counter()
+        verify_seconds = elapsed_seconds(verify_started_at, verify_finished_at)
+        progress(
+            "Verification stats: "
+            f"targets={len(expected_targets)}, seconds={verify_seconds}"
+        )
+        summary["performance"].update({
+            "import_seconds": import_seconds,
+            "import_source_series_per_second": rate_per_second(imported_source_series, import_seconds),
+            "import_chunk_series_per_second": rate_per_second(imported_chunk_series, import_seconds),
+            "import_batches_per_second": rate_per_second(imported_batches, import_seconds),
+            "verification_seconds": verify_seconds,
+            "verification_targets_per_second": rate_per_second(len(expected_targets), verify_seconds),
+        })
         if verification_failures:
+            total_finished_at = perf_counter()
+            summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
             summary["import_verification"] = {
                 "ok": False,
                 "checked_targets": len(expected_targets),
@@ -593,11 +639,19 @@ def main() -> int:
             )
             return 5
 
+        delete_source_started_at = perf_counter()
         http_post_form(args.base_url, "/api/v1/admin/tsdb/delete_series", [("match[]", args.matcher)])
+        delete_source_finished_at = perf_counter()
+        delete_source_seconds = elapsed_seconds(delete_source_started_at, delete_source_finished_at)
+        reset_cache_seconds = 0.0
         if args.reset_cache:
+            reset_cache_started_at = perf_counter()
             http_post_form(args.base_url, "/internal/resetRollupResultCache", [])
+            reset_cache_finished_at = perf_counter()
+            reset_cache_seconds = elapsed_seconds(reset_cache_started_at, reset_cache_finished_at)
 
         source_count = verify_matcher_count(args.base_url, args.matcher)
+        total_finished_at = perf_counter()
         summary["deleted_target_series"] = deleted_targets
         summary["import_batches"] = imported_batches
         summary["import_batch_size"] = args.import_batch_size
@@ -605,6 +659,11 @@ def main() -> int:
         summary["imported_chunk_series"] = imported_chunk_series
         summary["source_series_after_delete"] = source_count
         summary["import_verification"] = {"ok": True, "checked_targets": len(expected_targets), "failures": []}
+        summary["performance"].update({
+            "delete_source_seconds": delete_source_seconds,
+            "reset_cache_seconds": reset_cache_seconds,
+            "total_seconds": elapsed_seconds(total_started_at, total_finished_at),
+        })
         if temp_rewritten:
             summary["rewritten_jsonl_note"] = "temporary rewritten file was created automatically for write mode"
         progress(
