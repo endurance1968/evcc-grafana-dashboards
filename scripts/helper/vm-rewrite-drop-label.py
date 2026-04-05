@@ -375,6 +375,12 @@ def import_rewritten_file(
             if len(batch) >= max(batch_size, 1):
                 imported_batches = flush_import_batch(base_url, batch, imported_batches)
 
+        if progress_cb is not None and len(chunks) > 1:
+            progress_cb(
+                f"Chunked metric {transformed_matcher(item['metric'])} into {len(chunks)} import lines "
+                f"(source_series={imported_source_series}, chunk_series={imported_chunk_series})"
+            )
+
         if progress_cb is not None and progress_every > 0 and imported_source_series % progress_every == 0:
             progress_cb(
                 "Import progress: "
