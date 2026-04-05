@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.5"
+SCRIPT_VERSION = "2026.04.05.6"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -172,6 +172,8 @@ def append_jsonl_line(handle, item: dict) -> None:
 
 def transform_series(item: dict, drop_label: str) -> dict:
     metric = {k: v for k, v in item["metric"].items() if k != drop_label}
+    # Normalize the dropped label to an explicit empty value so merge/delete/verify use the same target identity.
+    metric[drop_label] = ""
     return {
         "metric": metric,
         "timestamps": [int(ts) for ts in item["timestamps"]],
