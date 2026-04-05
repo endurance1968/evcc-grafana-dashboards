@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.7"
+SCRIPT_VERSION = "2026.04.05.8"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -161,9 +161,13 @@ def iter_export_lines(base_url: str, matcher: str, start_ms: int | None = None, 
                     continue
                 yield json.loads(raw)
     except urllib.error.HTTPError as exc:
-        if exc.code != 422:
-            raise
-        return
+        body = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 422:
+            raise RuntimeError(
+                f"HTTP 422 while exporting matcher {matcher}: {body}. "
+                "VictoriaMetrics rejected the export request; refusing to treat this as an empty target series."
+            ) from exc
+        raise RuntimeError(f"HTTP {exc.code} while exporting matcher {matcher}: {body}") from exc
 
 
 def ensure_parent(path: Path) -> None:
@@ -724,6 +728,9 @@ def main() -> int:
         )
         print(json.dumps(summary, indent=2))
         return 0
+    except RuntimeError as exc:
+        print(str(exc), file=sys.stderr)
+        return 6
     except urllib.error.URLError as exc:
         print(describe_url_error(args.base_url, exc), file=sys.stderr)
         return 4
