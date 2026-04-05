@@ -19,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.17"
+SCRIPT_VERSION = "2026.04.05.18"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -618,25 +618,7 @@ def main() -> int:
                             }
                         )
 
-                    if should_delete_source_only(
-                        rewritten,
-                        current_overlap,
-                        current_conflicts,
-                        args.delete_source_when_fully_shadowed,
-                    ):
-                        delete_only_series += 1
-                        delete_only_points += len(rewritten.get("timestamps", []))
-                        if len(overlap_examples) < 10:
-                            overlap_examples.append(
-                                {
-                                    "metric": rewritten["metric"],
-                                    "delete_source_only": True,
-                                    "overlap_timestamps": current_overlap,
-                                    "value_conflicts": current_conflicts,
-                                    "host_points": len(rewritten["timestamps"]),
-                                }
-                            )
-                    elif rewritten_path is not None and temp_group_dir is not None:
+                    if rewritten_path is not None and temp_group_dir is not None:
                         group_path = group_files.get(matcher)
                         if group_path is None:
                             group_path = temp_group_dir / f"group_{len(group_files):05d}.jsonl"
@@ -657,11 +639,38 @@ def main() -> int:
                             list(iter_jsonl(group_files[matcher])),
                             args.allow_value_conflicts,
                         )
+                        target_existing = fetch_target_series(args.base_url, combined_source["metric"], args.drop_label)
+                        grouped_overlap, grouped_conflicts = analyze_target_overlap(combined_source, target_existing)
+                        if should_delete_source_only(
+                            combined_source,
+                            grouped_overlap,
+                            grouped_conflicts,
+                            args.delete_source_when_fully_shadowed,
+                        ):
+                            delete_only_series += 1
+                            delete_only_points += len(combined_source.get("timestamps", []))
+                            if len(overlap_examples) < 10:
+                                overlap_examples.append(
+                                    {
+                                        "metric": combined_source["metric"],
+                                        "delete_source_only": True,
+                                        "overlap_timestamps": grouped_overlap,
+                                        "value_conflicts": grouped_conflicts,
+                                        "host_points": len(combined_source["timestamps"]),
+                                    }
+                                )
+                            if args.progress_every > 0 and grouped_index % args.progress_every == 0:
+                                progress(
+                                    "Rewrite aggregation progress: "
+                                    f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}"
+                                )
+                            continue
+
                         final_item = combined_source
                         if args.merge_target:
                             final_item = merge_with_targets(
                                 combined_source,
-                                fetch_target_series(args.base_url, combined_source["metric"], args.drop_label),
+                                target_existing,
                                 args.allow_value_conflicts,
                                 args.keep_target_values_on_conflict,
                             )
@@ -670,7 +679,7 @@ def main() -> int:
                         if args.progress_every > 0 and grouped_index % args.progress_every == 0:
                             progress(
                                 "Rewrite aggregation progress: "
-                                f"targets={grouped_index}, output_points={output_points}"
+                                f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}"
                             )
         finally:
             if temp_group_dir_obj is not None:
@@ -865,6 +874,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
