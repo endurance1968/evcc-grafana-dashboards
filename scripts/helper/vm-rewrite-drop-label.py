@@ -18,7 +18,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.8"
+SCRIPT_VERSION = "2026.04.05.9"
 SCRIPT_LAST_MODIFIED = "2026-04-05"
 
 
@@ -181,8 +181,6 @@ def append_jsonl_line(handle, item: dict) -> None:
 
 def transform_series(item: dict, drop_label: str) -> dict:
     metric = {k: v for k, v in item["metric"].items() if k != drop_label}
-    # Normalize the dropped label to an explicit empty value so merge/delete/verify use the same target identity.
-    metric[drop_label] = ""
     return {
         "metric": metric,
         "timestamps": [int(ts) for ts in item["timestamps"]],
@@ -219,6 +217,12 @@ def series_stats(items: list[dict]) -> SeriesStats:
         first = item_first if first is None else min(first, item_first)
         last = item_last if last is None else max(last, item_last)
     return SeriesStats(points=total_points, first=first, last=last)
+
+
+def combine_series_stats(left: SeriesStats, right: SeriesStats) -> SeriesStats:
+    first = right.first if left.first is None else left.first if right.first is None else min(left.first, right.first)
+    last = right.last if left.last is None else left.last if right.last is None else max(left.last, right.last)
+    return SeriesStats(points=left.points + right.points, first=first, last=last)
 
 
 def analyze_target_overlap(item: dict, existing: list[dict]) -> tuple[int, int]:
@@ -396,7 +400,11 @@ def import_rewritten_file(
     for item in iter_jsonl(rewritten_path):
         imported_source_series += 1
         matcher = target_matcher(item["metric"], dropped_label)
-        expected_targets[matcher] = series_stats([item])
+        expected_stats = series_stats([item])
+        expected_targets[matcher] = combine_series_stats(
+            expected_targets.get(matcher, SeriesStats(points=0, first=None, last=None)),
+            expected_stats,
+        )
         if delete_targets_first and matcher not in deleted_matchers:
             delete_target_matcher(base_url, matcher)
             deleted_matchers.add(matcher)
@@ -738,4 +746,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
