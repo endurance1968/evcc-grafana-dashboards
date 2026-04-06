@@ -330,6 +330,15 @@ python3 vm-rewrite-drop-label.py \
   --write
 ```
 
+Verified example from 2026-04-06:
+
+- background: a short Telegraf transition phase had written duplicate raw series with `host!=""`
+- dry-run result: `175` host-tagged source series, `187695` source points, `187695` overlapping timestamps, `4774` value conflicts
+- interpretation: all host-tagged samples already had hostless counterparts, so the hostless series were treated as authoritative and host-tagged samples were merged only when timestamps were missing
+- write result with `--merge-target --keep-target-values-on-conflict`: import verification passed with `ok=true`, `checked_targets=175`, `failures=[]`, and `source_series_after_delete=0`
+
+This is the intended production case for `--keep-target-values-on-conflict`: temporary host-tagged duplicate series from an infrastructure transition, while the existing hostless EVCC series remain canonical.
+
 ## 4. Create the rollup configuration
 
 Create the production config from the example:
@@ -634,3 +643,4 @@ Summary from this verified comparison:
 - `VM rollup` is on Influx dashboard level for `Home`, `Loadpoints`, and `Battery netto`
 - `VM rollup` is closer to `VRM` than Influx for `Grid import`
 - `VM aggregation` remains visibly less reliable, especially for `PV`, `Loadpoints`, and several `Grid import` months
+
