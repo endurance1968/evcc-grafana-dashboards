@@ -128,3 +128,43 @@ python3 compare_import_coverage.py \
 ## Why this note exists
 
 This is a persistent handoff note so the current migration-debugging state is recoverable without depending on chat history.
+
+## Successful broad write (2026-04-06)
+
+The broad `host` cleanup was successfully executed with:
+
+```bash
+python3 vm-rewrite-drop-label.py \
+  --base-url http://127.0.0.1:8428 \
+  --matcher '{db="evcc",host!=""}' \
+  --drop-label host \
+  --backup-jsonl backups/evcc-host-series.jsonl \
+  --rewritten-jsonl backups/evcc-hostless.jsonl \
+  --merge-target \
+  --delete-source-when-fully-shadowed \
+  --keep-target-values-on-conflict \
+  --write \
+  --reset-cache
+```
+
+Observed write summary:
+
+- `exported_series`: `175`
+- `delete_only_series`: `2`
+- `deleted_target_series`: `173`
+- `imported_source_series`: `173`
+- `imported_chunk_series`: `590`
+- `source_series_after_delete`: `0`
+- `import_verification.ok`: `true`
+- `unresolved_value_conflicts`: `0`
+- `total_seconds`: about `1046.6`
+
+Post-write coverage result:
+
+- `Repo-relevant problems`: `0`
+- `Critical energy problems`: `0`
+- final status: `OK FOR REPO`
+
+Remaining additional missing measurements are outside the active dashboard schema and currently look like metadata / string / boolean families only.
+
+This means the repository-relevant raw data is healthy enough to proceed with rollups and the next migration steps.
