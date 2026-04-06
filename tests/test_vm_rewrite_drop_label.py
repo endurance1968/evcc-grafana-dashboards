@@ -40,6 +40,32 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             '{__name__="pvPower_value",db="evcc"}',
         )
 
+    def test_fetch_target_series_filters_out_sibling_detail_series_for_broad_matcher(self):
+        metric = {"__name__": "pvPower_value", "db": "evcc"}
+        exported = [
+            {
+                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "timestamps": [1000],
+                "values": [10.0],
+            },
+            {
+                "metric": {"__name__": "pvPower_value", "db": "evcc", "id": "1", "title": "SMA-Sued"},
+                "timestamps": [1000],
+                "values": [20.0],
+            },
+        ]
+
+        original_iter_export_lines = MODULE.iter_export_lines
+        try:
+            MODULE.iter_export_lines = lambda base_url, matcher, start_ms=None, end_ms=None: iter(exported)
+            actual = MODULE.fetch_target_series("http://127.0.0.1:8428", metric, "host")
+        finally:
+            MODULE.iter_export_lines = original_iter_export_lines
+
+        self.assertEqual(len(actual), 1)
+        self.assertEqual(actual[0]["metric"], metric)
+        self.assertEqual(actual[0]["values"], [10.0])
+
     def test_combine_rewritten_series_merges_multiple_sources_for_same_target(self):
         items = [
             {
@@ -149,6 +175,7 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         ]
 
         self.assertEqual(MODULE.count_internal_value_conflicts(items), 1)
+
     def test_should_delete_source_only_when_every_point_is_fully_shadowed(self):
         item = {
             "metric": {"__name__": "pvPower_value", "db": "evcc"},
@@ -168,4 +195,3 @@ class VmRewriteDropLabelTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

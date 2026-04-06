@@ -19,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.06.1"
+SCRIPT_VERSION = "2026.04.06.2"
 SCRIPT_LAST_MODIFIED = "2026-04-06"
 
 
@@ -210,7 +210,12 @@ def target_matcher(metric: dict[str, str], dropped_label: str) -> str:
 
 
 def fetch_target_series(base_url: str, metric: dict[str, str], dropped_label: str) -> list[dict]:
-    return list(iter_export_lines(base_url, target_matcher(metric, dropped_label)))
+    matcher = target_matcher(metric, dropped_label)
+    exact_metric = dict(metric)
+    # VM export selectors match supersets too. Filter client-side so a broad
+    # matcher like {__name__="pvPower_value",db="evcc"} only sees the exact
+    # hostless target series and not sibling detail series with extra labels.
+    return [item for item in iter_export_lines(base_url, matcher) if item.get("metric", {}) == exact_metric]
 
 
 def series_stats(items: list[dict]) -> SeriesStats:
@@ -941,25 +946,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
