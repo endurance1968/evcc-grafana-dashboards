@@ -200,18 +200,18 @@ class VmRollupTests(unittest.TestCase):
         loadpoint_item = next(metric for metric in catalog if metric.key == "loadpoint_daily_energy")
         self.assertEqual(
             pv_item.expr,
-            'python: legacy-style daily PV energy from positive max buckets',
+            'python: legacy-style daily PV energy from positive mean buckets',
         )
         self.assertEqual(
             home_item.expr,
-            'python: legacy-style daily home energy from positive max buckets',
+            'python: legacy-style daily home energy from positive mean buckets',
         )
         self.assertEqual(
             loadpoint_item.expr,
             'sum(integrate(chargePower_value{db="evcc"}[1d])) by (loadpoint) / 3600',
         )
 
-    def test_summarize_legacy_bucket_energy_samples_uses_bucket_max(self):
+    def test_summarize_legacy_bucket_energy_samples_uses_bucket_mean(self):
         value = MODULE.summarize_legacy_bucket_energy_samples(
             [
                 (0, 600.0),
@@ -223,11 +223,11 @@ class VmRollupTests(unittest.TestCase):
             start_ts=0,
             end_ts=120,
             bucket_seconds=60,
-            reducer="max",
+            reducer="mean",
         )
-        self.assertAlmostEqual(value, 25.0, places=6)
+        self.assertAlmostEqual(value, 20.0, places=6)
 
-    def test_summarize_legacy_positive_energy_rollups_from_matrix_uses_bucket_max(self):
+    def test_summarize_legacy_positive_energy_rollups_from_matrix_uses_bucket_mean(self):
         pv_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")
         window = MODULE.DayWindow(
             day="2026-03-02",
@@ -252,7 +252,7 @@ class VmRollupTests(unittest.TestCase):
         )
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0][0]["__name__"], "evcc_pv_energy_daily_wh")
-        self.assertAlmostEqual(result[0][1], 25.0, places=6)
+        self.assertAlmostEqual(result[0][1], 20.0, places=6)
 
     def test_backfill_pv_daily_energy_uses_legacy_matrix_path(self):
         pv_item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")

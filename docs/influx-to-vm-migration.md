@@ -550,4 +550,12 @@ Current recommendation:
 
 
 
+## 2026-04-06 calibration baseline before mean rollup switch
 
+Before switching the Python rollup path from `max` to `mean` for PV and home daily energy, the observed baseline was:
+
+- `evcc_pv_energy_daily_wh`: current VM rollup matched a raw `max` bucket path, while Influx and the usable VRM comparison months tracked the raw `mean` path much more closely.
+- `evcc_home_energy_daily_wh`: current VM rollup matched a raw `max` bucket path, while Influx tracked the raw `mean` path much more closely.
+- `evcc_grid_import_daily_wh`: current VM rollup matched the `gridEnergy` counter-spread path and was usually closer to VRM than the legacy Influx aggregate, so it was intentionally left unchanged.
+
+This baseline should be used as the before-state when validating the next full backfill after the PV/home reducer change.

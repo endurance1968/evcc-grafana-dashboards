@@ -18,8 +18,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.05.1"
-SCRIPT_LAST_MODIFIED = "2026-04-05"
+SCRIPT_VERSION = "2026.04.06.1"
+SCRIPT_LAST_MODIFIED = "2026-04-06"
 
 
 def current_local_timestamp() -> datetime:
@@ -402,8 +402,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="pv_daily_energy",
             record=record_name(settings, "pv_energy_daily_wh"),
-            expr="python: legacy-style daily PV energy from positive max buckets",
-            description="PV daily energy from positive raw power buckets using the legacy max-per-step integration semantics.",
+            expr="python: legacy-style daily PV energy from positive mean buckets",
+            description="PV daily energy from positive raw power buckets using the legacy mean-per-step integration semantics.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -411,8 +411,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="home_daily_energy",
             record=record_name(settings, "home_energy_daily_wh"),
-            expr="python: legacy-style daily home energy from positive max buckets",
-            description="Home daily energy from positive raw power buckets using the legacy max-per-step integration semantics.",
+            expr="python: legacy-style daily home energy from positive mean buckets",
+            description="Home daily energy from positive raw power buckets using the legacy mean-per-step integration semantics.",
             phase="phase-1",
             implemented=True,
             group_labels=(),
@@ -1372,7 +1372,7 @@ def summarize_legacy_bucket_energy_samples(
 
 def legacy_bucket_reducer_for_item(item: RollupMetric) -> str | None:
     if item.key in {"pv_daily_energy", "home_daily_energy"}:
-        return "max"
+        return "mean"
     return None
 
 
