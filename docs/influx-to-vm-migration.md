@@ -330,14 +330,22 @@ python3 vm-rewrite-drop-label.py \
   --write
 ```
 
-Verified example from 2026-04-06:
+Verified examples from 2026-04-06:
 
-- background: a short Telegraf transition phase had written duplicate raw series with `host!=""`
-- dry-run result: `175` host-tagged source series, `187695` source points, `187695` overlapping timestamps, `4774` value conflicts
-- interpretation: all host-tagged samples already had hostless counterparts, so the hostless series were treated as authoritative and host-tagged samples were merged only when timestamps were missing
-- write result with `--merge-target --keep-target-values-on-conflict`: import verification passed with `ok=true`, `checked_targets=175`, `failures=[]`, and `source_series_after_delete=0`
+- conflict-preserving case on a partially normalized test VM:
+  - background: a short Telegraf transition phase had written duplicate raw series with `host!=""`
+  - dry-run result: `175` host-tagged source series, `187695` source points, `187695` overlapping timestamps, `4774` value conflicts
+  - interpretation: all host-tagged samples already had hostless counterparts, so the hostless series were treated as authoritative and host-tagged samples were merged only when timestamps were missing
+  - write result with `--merge-target --keep-target-values-on-conflict`: import verification passed with `ok=true`, `checked_targets=175`, `failures=[]`, and `source_series_after_delete=0`
+- clean end-to-end migration run on a freshly restored VM using `vm-rewrite-drop-label.py v2026.04.06.2`:
+  - analyze result: `175` host-tagged source series, `187695` source points, `0` exact overlaps, `0` conflicts
+  - write result: `import_verification.ok=true`, `failures=[]`, `source_series_after_delete=0`, `Host-tagged series: 0`
+  - follow-up validation: `compare_import_coverage.py` reported `Repo-relevant problems: 0`, `Critical energy problems: 0`, and `OK FOR REPO`
 
-This is the intended production case for `--keep-target-values-on-conflict`: temporary host-tagged duplicate series from an infrastructure transition, while the existing hostless EVCC series remain canonical.
+This gives two verified production cases for the same command:
+
+- if exact hostless target series already exist, keep them authoritative with `--keep-target-values-on-conflict`
+- if only the host-tagged transition series exist, the rewrite cleanly recreates the hostless targets and removes the host-tagged originals
 
 ## 4. Create the rollup configuration
 
