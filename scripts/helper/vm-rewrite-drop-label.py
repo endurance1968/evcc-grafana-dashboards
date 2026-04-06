@@ -19,8 +19,8 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.05.21"
-SCRIPT_LAST_MODIFIED = "2026-04-05"
+SCRIPT_VERSION = "2026.04.06.1"
+SCRIPT_LAST_MODIFIED = "2026-04-06"
 
 
 @dataclass(frozen=True)
@@ -602,6 +602,7 @@ def main() -> int:
         grouped_source_value_conflicts = 0
 
         group_files: dict[str, Path] = {}
+        group_label_counts: dict[str, int] = {}
         temp_group_dir_obj: tempfile.TemporaryDirectory[str] | None = None
         temp_group_dir: Path | None = None
         if rewritten_path is not None:
@@ -638,6 +639,7 @@ def main() -> int:
                         if group_path is None:
                             group_path = temp_group_dir / f"group_{len(group_files):05d}.jsonl"
                             group_files[matcher] = group_path
+                            group_label_counts[matcher] = len(rewritten["metric"])
                         with group_path.open("a", encoding="utf-8", newline="\n") as group_handle:
                             append_jsonl_line(group_handle, rewritten)
 
@@ -649,7 +651,14 @@ def main() -> int:
 
             if rewritten_path is not None:
                 with rewritten_path.open("w", encoding="utf-8", newline="\n") as rewritten_handle:
-                    for grouped_index, matcher in enumerate(sorted(group_files), start=1):
+                    # Delete/import less-specific target matchers first. VictoriaMetrics
+                    # delete_series matches superset labelsets too, so importing a
+                    # specific series before its broader sibling can delete it again.
+                    ordered_group_matchers = sorted(
+                        group_files,
+                        key=lambda matcher: (group_label_counts[matcher], matcher),
+                    )
+                    for grouped_index, matcher in enumerate(ordered_group_matchers, start=1):
                         grouped_items = list(iter_jsonl(group_files[matcher]))
                         grouped_source_conflicts = count_internal_value_conflicts(grouped_items)
                         combined_source = combine_rewritten_series(grouped_items, allow_value_conflicts=True)
@@ -932,6 +941,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
 
 
