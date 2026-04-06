@@ -312,7 +312,23 @@ Important:
 
 - start with the dry-run first
 - keep the backup JSONL
+- if the analysis shows that all source points already overlap existing hostless target points and only value conflicts remain, prefer `--keep-target-values-on-conflict` so the existing hostless target values stay authoritative
 - only use `--allow-value-conflicts` if you have reviewed the differences and want source values to win explicitly
+
+Typical conflict-safe write command for that case:
+
+```bash
+python3 vm-rewrite-drop-label.py \
+  --base-url http://localhost:8428 \
+  --matcher '{db="evcc",host!=""}' \
+  --drop-label host \
+  --backup-jsonl backups/evcc-host-series.jsonl \
+  --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
+  --merge-target \
+  --keep-target-values-on-conflict \
+  --reset-cache \
+  --write
+```
 
 ## 4. Create the rollup configuration
 
