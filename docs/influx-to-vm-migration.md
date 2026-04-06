@@ -2,6 +2,11 @@
 
 This guide describes the recommended end-user path from an existing EVCC + InfluxDB setup to VictoriaMetrics.
 
+Note:
+
+- this guide uses `localhost` for VictoriaMetrics examples
+- replace `localhost` with your actual VictoriaMetrics host if VictoriaMetrics is not running locally
+
 Assumptions:
 
 - VictoriaMetrics is already installed and reachable
@@ -89,7 +94,7 @@ Before moving data, verify:
 - VictoriaMetrics responds:
 
 ```bash
-curl -fsSL http://<vm-host>:8428/health
+curl -fsSL http://localhost:8428/health
 ```
 
 - Grafana will later point to VictoriaMetrics
@@ -117,7 +122,7 @@ yes | vmctl influx \
   --influx-database='evcc' \
   --influx-filter-time-start='2024-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-30T23:59:59Z' \
-  --vm-addr='http://<vm-host>:8428'
+  --vm-addr='http://localhost:8428'
 ```
 
 If your InfluxDB requires auth:
@@ -130,7 +135,7 @@ yes | vmctl influx \
   --influx-database='evcc' \
   --influx-filter-time-start='2024-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-30T23:59:59Z' \
-  --vm-addr='http://<vm-host>:8428'
+  --vm-addr='http://localhost:8428'
 ```
 
 Notes:
@@ -144,7 +149,7 @@ Notes:
 Query VictoriaMetrics directly:
 
 ```bash
-curl -fsG 'http://<vm-host>:8428/api/v1/series' \
+curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]=pvPower_value{db="evcc"}' \
   --data-urlencode 'start=2026-03-28T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T00:00:00Z'
@@ -153,7 +158,7 @@ curl -fsG 'http://<vm-host>:8428/api/v1/series' \
 You should also inspect a few labelsets:
 
 ```bash
-curl -fsG 'http://<vm-host>:8428/api/v1/series' \
+curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]=chargePower_value{db="evcc"}' \
   --data-urlencode 'start=2026-03-28T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T00:00:00Z'
@@ -166,17 +171,17 @@ Use the VM-only checker after the import. In the default `auto` phase it validat
 For a current production VM:
 
 ```bash
-python3 check_data.py --base-url http://<vm-host>:8428 --db evcc
+python3 check_data.py --base-url http://localhost:8428 --db evcc
 
 # explicit raw-import phase
-python3 check_data.py --base-url http://<vm-host>:8428 --db evcc --phase raw
+python3 check_data.py --base-url http://localhost:8428 --db evcc --phase raw
 ```
 
 For a historical benchmark or migration VM, anchor the logical check point to the imported range:
 
 ```bash
 python3 check_data.py \
-  --base-url http://<vm-host>:8428 \
+  --base-url http://localhost:8428 \
   --db evcc \
   --end-time 2026-03-30T23:59:59Z
 ```
@@ -191,7 +196,7 @@ If this check reports problems, stop here and explicitly re-import the affected 
 python3 compare_import_coverage.py \
   --influx-url http://<influx-host>:8086 \
   --influx-db evcc \
-  --vm-base-url http://<vm-host>:8428 \
+  --vm-base-url http://localhost:8428 \
   --vm-db-label evcc \
   --start 2026-03-21T00:00:00Z \
   --end 2026-04-03T23:59:59Z \
@@ -210,7 +215,7 @@ If that critical PV check fails, the safest repair path is:
 Example repair run for `pvPower` only:
 
 ```bash
-curl -fsS -X POST 'http://<vm-host>:8428/api/v1/admin/tsdb/delete_series' \
+curl -fsS -X POST 'http://localhost:8428/api/v1/admin/tsdb/delete_series' \
   --data-urlencode 'match[]=pvPower_value{db="evcc"}'
 
 yes | vmctl influx \
@@ -221,12 +226,12 @@ yes | vmctl influx \
   --influx-filter-series "on evcc from pvPower" \
   --influx-filter-time-start='2025-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-31T23:59:59Z' \
-  --vm-addr='http://<vm-host>:8428'
+  --vm-addr='http://localhost:8428'
 
 python3 compare_import_coverage.py \
   --influx-url http://<influx-host>:8086 \
   --influx-db evcc \
-  --vm-base-url http://<vm-host>:8428 \
+  --vm-base-url http://localhost:8428 \
   --vm-db-label evcc \
   --start 2025-01-01T00:00:00Z \
   --end 2026-03-31T23:59:59Z \
@@ -262,7 +267,7 @@ The default `check_data.py` output already reports this in the `Cleanup checks` 
 You can also query it directly:
 
 ```bash
-curl -fsG 'http://<vm-host>:8428/api/v1/series' \
+curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]={db="evcc",host!=""}' \
   --data-urlencode 'start=2024-01-01T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T23:59:59Z'
@@ -274,7 +279,7 @@ If this returns no series, skip the `host` cleanup step.
 
 ```bash
 python3 vm-rewrite-drop-label.py \
-  --base-url http://<vm-host>:8428 \
+  --base-url http://localhost:8428 \
   --matcher '{db="evcc",host!=""}' \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
@@ -293,7 +298,7 @@ If the dry-run looks clean, use merge mode so existing hostless targets are pres
 
 ```bash
 python3 vm-rewrite-drop-label.py \
-  --base-url http://<vm-host>:8428 \
+  --base-url http://localhost:8428 \
   --matcher '{db="evcc",host!=""}' \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
@@ -427,7 +432,7 @@ Notes:
 Example check for a daily PV rollup:
 
 ```bash
-curl -fsG 'http://<vm-host>:8428/api/v1/series' \
+curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]=evcc_pv_energy_daily_wh{db="evcc"}' \
   --data-urlencode 'start=2026-01-01T00:00:00Z' \
   --data-urlencode 'end=2026-03-31T23:59:59Z'
@@ -437,7 +442,7 @@ Then run the repository checker again:
 
 ```bash
 python3 check_data.py \
-  --base-url http://<vm-host>:8428 \
+  --base-url http://localhost:8428 \
   --db evcc \
   --end-time 2026-03-30T23:59:59Z
 ```
