@@ -25,8 +25,8 @@ from typing import Dict, List, Sequence
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "check_data.py"
-SCRIPT_VERSION = "2026.04.05.1"
-SCRIPT_LAST_MODIFIED = "2026-04-05"
+SCRIPT_VERSION = "2026.04.06.1"
+SCRIPT_LAST_MODIFIED = "2026-04-06"
 
 
 def iso_z(value: dt.datetime) -> str:
@@ -217,14 +217,39 @@ def render_section(title: str, checks: List[dict], skipped_reason: str | None = 
         print("SKIP")
         return
     for item in checks:
-        print(f"{item['level']:<8} {item['metric']:<48} series={item['series']:<5} {item['reason']}")
+        series_summary = f"series={item['series']:<5}"
+        historical_series = item.get("historical_series")
+        if historical_series is not None:
+            series_summary = f"{series_summary} hist={historical_series:<5}"
+        print(f"{item['level']:<8} {item['metric']:<48} {series_summary} {item['reason']}")
 
 
-def run_metric_checks(base_url: str, db_label: str, items: Sequence[MetricCheck], start: str, end: str) -> List[dict]:
+def run_metric_checks(
+    base_url: str,
+    db_label: str,
+    items: Sequence[MetricCheck],
+    start: str,
+    end: str,
+    lookback_start: str | None = None,
+    window_label: str = "window",
+) -> List[dict]:
     results: List[dict] = []
     for item in items:
         count = series_count(base_url, item.metric, db_label, start, end)
-        results.append({"metric": item.metric, "level": classify_level(count, item.severity), "series": count, "reason": item.reason})
+        result = {
+            "metric": item.metric,
+            "level": classify_level(count, item.severity),
+            "series": count,
+            "reason": item.reason,
+        }
+        if count == 0 and item.severity == "warning" and lookback_start:
+            historical_count = series_count(base_url, item.metric, db_label, lookback_start, end)
+            result["historical_series"] = historical_count
+            if historical_count > 0:
+                result["reason"] = f"{item.reason} Historically present, but not active in {window_label}."
+            else:
+                result["reason"] = f"{item.reason} Not found in {window_label} or historical lookback."
+        results.append(result)
     return results
 
 
@@ -285,7 +310,7 @@ def main() -> int:
     sections: List[dict] = []
 
     if effective_phase in {"raw", "full"}:
-        sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, args.db, CORE_RAW, raw_start, end)})
+        sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, args.db, CORE_RAW, raw_start, end, feature_start, "raw window")})
         for feature_name, enabled in raw_feature_flags.items():
             if not enabled:
                 skipped_reason = (
@@ -296,12 +321,12 @@ def main() -> int:
                 sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["raw"]  # type: ignore[index]
-            sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, raw_start, end)})
+            sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, raw_start, end, feature_start, "raw window")})
     else:
         sections.append({"title": "Core raw metrics", "items": [], "skipped_reason": f"phase={effective_phase}"})
 
     if effective_phase in {"rollup", "full"}:
-        sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, args.db, CORE_ROLLUPS, rollup_start, end)})
+        sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, args.db, CORE_ROLLUPS, rollup_start, end, feature_start, "rollup window")})
         for feature_name, enabled in rollup_feature_flags.items():
             if not enabled:
                 skipped_reason = (
@@ -312,7 +337,7 @@ def main() -> int:
                 sections.append({"title": f"Conditional rollups ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["rollups"]  # type: ignore[index]
-            sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, rollup_start, end)})
+            sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, rollup_start, end, feature_start, "rollup window")})
     else:
         sections.append({
             "title": "Core rollup metrics",
@@ -388,3 +413,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
