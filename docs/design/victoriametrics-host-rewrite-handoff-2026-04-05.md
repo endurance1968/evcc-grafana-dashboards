@@ -168,3 +168,41 @@ Post-write coverage result:
 Remaining additional missing measurements are outside the active dashboard schema and currently look like metadata / string / boolean families only.
 
 This means the repository-relevant raw data is healthy enough to proceed with rollups and the next migration steps.
+## Successful initial rollup backfill (2026-04-06)
+
+The first production rollup backfill was successfully executed with:
+
+```bash
+python3 evcc-vm-rollup.py \
+  --config ./evcc-vm-rollup.conf \
+  backfill \
+  --start-day 2025-01-01 \
+  --end-day 2026-04-02 \
+  --progress \
+  --write
+```
+
+Observed write summary:
+
+- `rollup metrics`: `36`
+- `output series`: `1064`
+- `output samples`: `24885`
+- `month chunks`: `16`
+- `import batches`: `17`
+- `total runtime`: about `122.4 s`
+- `peak RAM`: about `1240.7 MB`
+
+Post-write validation:
+
+- `check_data.py` ran in `phase=full`
+- rollups were detected successfully
+- host-tagged raw series remained at `0`
+- all core raw metrics and all core rollup metrics were `OK`
+- `evcc_pv_energy_daily_wh{db="evcc"}` exists across the expected local month/year label combinations
+
+Remaining warning:
+
+- `prioritySoc_value` was `0` in the current raw window, so `check_data.py` ended with `Overall: WARNING`
+- this does not currently block the rollup migration result because the repo-relevant raw and rollup families are present and healthy
+
+This means the VM migration is now in the expected post-backfill state: raw data is normalized, production `evcc_*` daily rollups exist, and the next operational step is scheduler setup and dashboard cutover to the rollup-backed long-range panels.
