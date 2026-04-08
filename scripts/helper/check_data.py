@@ -8,8 +8,10 @@ The checker supports different phases of the migration flow:
 - full validation
 - auto mode that checks raw data first and only evaluates rollups once they exist
 
-It also reports whether host-tagged raw series are present and therefore a first
-cleanup step with vm-rewrite-drop-label.py is recommended.
+It also reports whether raw series still carry infrastructure or multiplexing
+labels such as host or db. Both are treated as a migration no-go because
+this repository assumes one VictoriaMetrics instance per EVCC instance and
+hostless raw series as the canonical shape.
 """
 
 from __future__ import annotations
@@ -25,8 +27,8 @@ from typing import Dict, List, Sequence
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "check_data.py"
-SCRIPT_VERSION = "2026.04.06.1"
-SCRIPT_LAST_MODIFIED = "2026-04-06"
+SCRIPT_VERSION = "2026.04.08.2"
+SCRIPT_LAST_MODIFIED = "2026-04-08"
 
 
 def iso_z(value: dt.datetime) -> str:
@@ -179,12 +181,12 @@ def build_matcher_url(base_url: str, matcher: str, start: str, end: str) -> str:
     return f"{base_url.rstrip('/')}/api/v1/series?{params}"
 
 
-def build_series_url(base_url: str, metric: str, db_label: str, start: str, end: str) -> str:
-    return build_matcher_url(base_url, f'{metric}{{db="{db_label}"}}', start, end)
+def build_series_url(base_url: str, metric: str, start: str, end: str) -> str:
+    return build_matcher_url(base_url, metric, start, end)
 
 
-def series_count(base_url: str, metric: str, db_label: str, start: str, end: str) -> int:
-    payload = http_json(build_series_url(base_url, metric, db_label, start, end))
+def series_count(base_url: str, metric: str, start: str, end: str) -> int:
+    payload = http_json(build_series_url(base_url, metric, start, end))
     return len(payload.get("data") or [])
 
 
@@ -226,7 +228,6 @@ def render_section(title: str, checks: List[dict], skipped_reason: str | None = 
 
 def run_metric_checks(
     base_url: str,
-    db_label: str,
     items: Sequence[MetricCheck],
     start: str,
     end: str,
@@ -235,7 +236,7 @@ def run_metric_checks(
 ) -> List[dict]:
     results: List[dict] = []
     for item in items:
-        count = series_count(base_url, item.metric, db_label, start, end)
+        count = series_count(base_url, item.metric, start, end)
         result = {
             "metric": item.metric,
             "level": classify_level(count, item.severity),
@@ -243,7 +244,7 @@ def run_metric_checks(
             "reason": item.reason,
         }
         if count == 0 and item.severity == "warning" and lookback_start:
-            historical_count = series_count(base_url, item.metric, db_label, lookback_start, end)
+            historical_count = series_count(base_url, item.metric, lookback_start, end)
             result["historical_series"] = historical_count
             if historical_count > 0:
                 result["reason"] = f"{item.reason} Historically present, but not active in {window_label}."
@@ -256,7 +257,6 @@ def run_metric_checks(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:8428", help="VictoriaMetrics base URL")
-    parser.add_argument("--db", default="evcc", help="db label value")
     parser.add_argument("--raw-hours", type=int, default=48, help="recent window for raw metric checks")
     parser.add_argument("--rollup-days", type=int, default=90, help="recent window for daily rollup checks")
     parser.add_argument("--feature-lookback-days", type=int, default=3650, help="lookback window to detect optional features")
@@ -294,14 +294,16 @@ def main() -> int:
     rollup_feature_flags: Dict[str, bool] = {}
     for feature_name, config in FEATURES.items():
         detectors: Sequence[str] = config["detect"]  # type: ignore[assignment]
-        feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, feature_start, end) > 0 for metric in detectors)
-        raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, raw_start, end) > 0 for metric in detectors)
-        live_raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, live_raw_start, live_end) > 0 for metric in detectors)
-        rollup_feature_flags[feature_name] = any(series_count(args.base_url, metric, args.db, rollup_start, end) > 0 for metric in detectors)
+        feature_flags[feature_name] = any(series_count(args.base_url, metric, feature_start, end) > 0 for metric in detectors)
+        raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, raw_start, end) > 0 for metric in detectors)
+        live_raw_feature_flags[feature_name] = any(series_count(args.base_url, metric, live_raw_start, live_end) > 0 for metric in detectors)
+        rollup_feature_flags[feature_name] = any(series_count(args.base_url, metric, rollup_start, end) > 0 for metric in detectors)
 
-    detected_rollup_presence = any(series_count(args.base_url, item.metric, args.db, rollup_start, end) > 0 for item in CORE_ROLLUPS)
-    host_matcher = f'{{db="{args.db}",host!=""}}'
+    detected_rollup_presence = any(series_count(args.base_url, item.metric, rollup_start, end) > 0 for item in CORE_ROLLUPS)
+    host_matcher = '{host!=""}'
+    db_matcher = '{db!=""}'
     host_series_count = matcher_count(args.base_url, host_matcher, feature_start, end)
+    db_series_count = matcher_count(args.base_url, db_matcher, feature_start, end)
 
     effective_phase = args.phase
     if args.phase == "auto":
@@ -310,7 +312,7 @@ def main() -> int:
     sections: List[dict] = []
 
     if effective_phase in {"raw", "full"}:
-        sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, args.db, CORE_RAW, raw_start, end, feature_start, "raw window")})
+        sections.append({"title": "Core raw metrics", "items": run_metric_checks(args.base_url, CORE_RAW, raw_start, end, feature_start, "raw window")})
         for feature_name, enabled in raw_feature_flags.items():
             if not enabled:
                 skipped_reason = (
@@ -321,12 +323,12 @@ def main() -> int:
                 sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["raw"]  # type: ignore[index]
-            sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, raw_start, end, feature_start, "raw window")})
+            sections.append({"title": f"Conditional raw metrics ({feature_name})", "items": run_metric_checks(args.base_url, items, raw_start, end, feature_start, "raw window")})
     else:
         sections.append({"title": "Core raw metrics", "items": [], "skipped_reason": f"phase={effective_phase}"})
 
     if effective_phase in {"rollup", "full"}:
-        sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, args.db, CORE_ROLLUPS, rollup_start, end, feature_start, "rollup window")})
+        sections.append({"title": "Core rollup metrics", "items": run_metric_checks(args.base_url, CORE_ROLLUPS, rollup_start, end, feature_start, "rollup window")})
         for feature_name, enabled in rollup_feature_flags.items():
             if not enabled:
                 skipped_reason = (
@@ -337,7 +339,7 @@ def main() -> int:
                 sections.append({"title": f"Conditional rollups ({feature_name})", "items": [], "skipped_reason": skipped_reason})
                 continue
             items: Sequence[MetricCheck] = FEATURES[feature_name]["rollups"]  # type: ignore[index]
-            sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, args.db, items, rollup_start, end, feature_start, "rollup window")})
+            sections.append({"title": f"Conditional rollups ({feature_name})", "items": run_metric_checks(args.base_url, items, rollup_start, end, feature_start, "rollup window")})
     else:
         sections.append({
             "title": "Core rollup metrics",
@@ -345,13 +347,21 @@ def main() -> int:
             "skipped_reason": "rollup phase not active yet" if args.phase == "auto" and not detected_rollup_presence else f"phase={effective_phase}",
         })
 
-    cleanup_items = [{
-        "metric": host_matcher,
-        "level": "WARNING" if host_series_count > 0 else "OK",
-        "series": host_series_count,
-        "reason": "Host-tagged raw series detected. Run vm-rewrite-drop-label.py if you want to normalize away infrastructure labels.",
-    }]
-    sections.append({"title": "Cleanup checks", "items": cleanup_items})
+    cleanup_items = [
+        {
+            "metric": host_matcher,
+            "level": "CRITICAL" if host_series_count > 0 else "OK",
+            "series": host_series_count,
+            "reason": "Host-tagged raw series are a no-go. Normalize away infrastructure labels before treating this VM as production-ready.",
+        },
+        {
+            "metric": db_matcher,
+            "level": "CRITICAL" if db_series_count > 0 else "OK",
+            "series": db_series_count,
+            "reason": "db-tagged series are a no-go. This repository assumes one VictoriaMetrics instance per EVCC instance and no synthetic db label.",
+        },
+    ]
+    sections.append({"title": "Label hygiene checks", "items": cleanup_items})
 
     levels = [item["level"] for section in sections for item in section["items"]]
     overall = worst_level(levels)
@@ -360,11 +370,11 @@ def main() -> int:
     payload = {
         "script": script_metadata(),
         "base_url": args.base_url,
-        "db": args.db,
         "requested_phase": args.phase,
         "effective_phase": effective_phase,
         "detected_rollup_presence": detected_rollup_presence,
         "host_series_count": host_series_count,
+        "db_series_count": db_series_count,
         "windows": {
             "raw_start": raw_start,
             "rollup_start": rollup_start,
@@ -387,11 +397,11 @@ def main() -> int:
 
     print_report_header("EVCC VM data check", "==================", str(payload.get("script", {}).get("generated_at", "")) or None)
     print(f"Base URL:           {args.base_url}")
-    print(f"db label:           {args.db}")
     print(f"Requested phase:    {args.phase}")
     print(f"Effective phase:    {effective_phase}")
     print(f"Rollups detected:   {'yes' if detected_rollup_presence else 'no'}")
     print(f"Host-tagged series: {host_series_count}")
+    print(f"DB-tagged series:   {db_series_count}")
     print(f"Raw window:         {raw_start} -> {end}")
     print(f"Live raw window:    {live_raw_start} -> {live_end}")
     print(f"Rollup window:      {rollup_start} -> {end}")

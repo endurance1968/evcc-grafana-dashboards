@@ -18,7 +18,6 @@ class VmRollupTests(unittest.TestCase):
     def setUp(self):
         self.settings = MODULE.Settings(
             base_url="http://127.0.0.1:8428",
-            db_label="evcc",
             host_label="",
             timezone="Europe/Berlin",
             metric_prefix="evcc",
@@ -155,7 +154,6 @@ class VmRollupTests(unittest.TestCase):
             labels,
             {
                 "__name__": "evcc_vehicle_energy_daily_wh",
-                "db": "evcc",
                 "local_year": "2026",
                 "local_month": "03",
                 "vehicle": "BMW i3",
@@ -182,15 +180,15 @@ class VmRollupTests(unittest.TestCase):
         vehicle_item = next(metric for metric in catalog if metric.key == "vehicle_daily_energy")
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, pv_item),
-            'sum without(host, id, title) (pvPower_value{db="evcc",id!=""}) or sum without(host) (pvPower_value{db="evcc",id=""})',
+            'sum(avg by (id) (pvPower_value{id!=""})) or avg(pvPower_value{id=""})',
         )
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, loadpoint_item),
-            'sum by (loadpoint) (chargePower_value{db="evcc"})',
+            'avg by (loadpoint) (chargePower_value{loadpoint!=""})',
         )
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, vehicle_item),
-            'sum by (vehicle) (chargePower_value{db="evcc"})',
+            'avg by (vehicle) (chargePower_value{vehicle!=""})',
         )
 
     def test_base_energy_rollups_keep_pv_and_home_on_legacy_python_path(self):
@@ -208,7 +206,7 @@ class VmRollupTests(unittest.TestCase):
         )
         self.assertEqual(
             loadpoint_item.expr,
-            'sum(integrate(chargePower_value{db="evcc"}[1d])) by (loadpoint) / 3600',
+            'integrate((avg by (loadpoint) (chargePower_value{loadpoint!=""}))[1d]) / 3600',
         )
 
     def test_summarize_legacy_bucket_energy_samples_uses_bucket_mean(self):
@@ -245,7 +243,7 @@ class VmRollupTests(unittest.TestCase):
             window,
             [
                 {
-                    "metric": {"db": "evcc"},
+                    "metric": {},
                     "samples": [(0, 600.0), (10, 1200.0), (60, 300.0), (70, -5.0)],
                 }
             ],
@@ -267,7 +265,7 @@ class VmRollupTests(unittest.TestCase):
 
         def fake_fetch_chunk_positive_energy_matrix(settings, item, chunk):
             captured["matrix_calls"] += 1
-            return [{"metric": {"db": "evcc"}, "samples": [(0, 600.0), (10, 1200.0), (60, 300.0)]}]
+            return [{"metric": {}, "samples": [(0, 600.0), (10, 1200.0), (60, 300.0)]}]
 
         def fake_build_health(*_args, **_kwargs):
             return []
@@ -296,22 +294,17 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(summary["samples"], 1)
         self.assertEqual(summary["series"], 1)
         self.assertEqual(summary["skipped"], 0)
+
     def test_serialize_import_jsonl_creates_one_json_line_per_series(self):
         payload = MODULE.serialize_import_jsonl(
             [
                 {
-                    "metric": {
-                        "__name__": "evcc_pv_energy_daily_wh",
-                        "db": "evcc",
-                            },
+                    "metric": {"__name__": "evcc_pv_energy_daily_wh"},
                     "values": [12.5],
                     "timestamps": [1774134000000],
                 },
                 {
-                    "metric": {
-                        "__name__": "evcc_home_energy_daily_wh",
-                        "db": "evcc",
-                            },
+                    "metric": {"__name__": "evcc_home_energy_daily_wh"},
                     "values": [8.0],
                     "timestamps": [1774134000000],
                 },
@@ -594,8 +587,8 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(len(result), 2)
         yearly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top30_mean_yearly_wh")
         monthly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top5_mean_monthly_wh")
-        self.assertEqual(yearly["metric"], {"__name__": "evcc_pv_top30_mean_yearly_wh", "db": "evcc", "local_year": "2025"})
-        self.assertEqual(monthly["metric"], {"__name__": "evcc_pv_top5_mean_monthly_wh", "db": "evcc", "local_year": "2025", "local_month": "01"})
+        self.assertEqual(yearly["metric"], {"__name__": "evcc_pv_top30_mean_yearly_wh", "local_year": "2025"})
+        self.assertEqual(monthly["metric"], {"__name__": "evcc_pv_top5_mean_monthly_wh", "local_year": "2025", "local_month": "01"})
         self.assertAlmostEqual(yearly["values"][0], 20.0, places=6)
         self.assertAlmostEqual(monthly["values"][0], 10.0, places=6)
 

@@ -1,3 +1,8 @@
+/**
+ * Generate localized dashboard JSON files from the selected source family.
+ * Version: 2026.04.08.1
+ * Last modified: 2026-04-08
+ */
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -87,7 +92,13 @@ function translateJsonNode(node, mapping) {
     const result = {};
     for (const [key, value] of Object.entries(node)) {
       const isSafeName = key !== "name" || (typeof value === "string" && value.startsWith("EVCC:"));
-      if (typeof value === "string" && translatableKeys.has(key) && isSafeName) {
+      const isPropertyValueForTranslatableId =
+        key === "value" && typeof node.id === "string" && translatableKeys.has(node.id);
+
+      if (
+        typeof value === "string" &&
+        ((translatableKeys.has(key) && isSafeName) || isPropertyValueForTranslatableId)
+      ) {
         result[key] = translateString(value, mapping);
       } else {
         result[key] = translateJsonNode(value, mapping);
@@ -148,4 +159,3 @@ function main() {
 }
 
 main();
-

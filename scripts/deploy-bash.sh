@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Deploy dashboards to Grafana with the bash installer flow.
+# Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 
 CONFIG_PATH="./vm-dashboard-install.env"

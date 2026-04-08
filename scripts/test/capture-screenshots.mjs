@@ -1,3 +1,6 @@
+/**
+ * Capture Grafana dashboard screenshots from an import manifest for visual checks.
+ */
 import path from "node:path";
 import fs from "node:fs";
 import { chromium } from "playwright";

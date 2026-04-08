@@ -356,7 +356,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "光伏发电",
           "range": true,
@@ -370,7 +370,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电网输入",
           "range": true,
@@ -384,7 +384,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "家庭",
           "range": true,
@@ -398,7 +398,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
+          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -412,7 +412,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "馈电",
           "range": true,
@@ -706,7 +706,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "光伏发电",
           "range": true,
@@ -720,7 +720,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电网输入",
           "range": true,
@@ -734,7 +734,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
           "legendFormat": "家庭",
           "range": true,
@@ -748,7 +748,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000, \"loadpoint\")",
+          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -762,7 +762,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
+          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
           "legendFormat": "馈电",
           "range": true,
@@ -834,7 +834,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "光伏发电",
           "range": false,
@@ -976,7 +976,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_pv_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -990,7 +990,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1004,7 +1004,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1018,7 +1018,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1032,7 +1032,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
+          "expr": "sum((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1260,7 +1260,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
+          "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
           "format": "time_series",
           "legendFormat": "自给率",
           "range": true,
@@ -1352,7 +1352,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "EXT 总计",
           "range": false,
@@ -1365,7 +1365,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "AUX 总计",
           "range": false,
@@ -1378,7 +1378,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
           "format": "table",
           "legendFormat": "家庭总计",
           "range": false,
@@ -1402,7 +1402,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1415,7 +1415,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) by (title) / 1000, \"title\")",
+          "expr": "sort_by_label(sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) by (title) / 1000, \"title\")",
           "format": "table",
           "legendFormat": "{{title}}",
           "range": false,
@@ -1545,7 +1545,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "家庭总计",
           "range": true,
@@ -1559,7 +1559,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
+          "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
           "legendFormat": "EXT 总计",
           "range": true,
@@ -1573,7 +1573,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
+          "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
           "legendFormat": "AUX 总计",
           "range": true,
@@ -1601,7 +1601,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_ext_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"title\")",
+          "expr": "sort_by_label((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -1615,7 +1615,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_aux_energy_daily_wh{db=\"$dbLabel\",title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"title\")",
+          "expr": "sort_by_label((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -1713,7 +1713,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "家庭",
           "range": true,
@@ -1727,7 +1727,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
+          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -1741,7 +1741,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电池充电",
           "range": true,
@@ -1755,7 +1755,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电池放电",
           "range": true,
@@ -1912,7 +1912,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电池充电",
           "range": true,
@@ -1926,7 +1926,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "电池放电",
           "range": true,
@@ -1951,7 +1951,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "家庭",
           "range": true,
@@ -1965,7 +1965,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
+          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -2231,7 +2231,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "日均价格",
           "range": true,
@@ -2260,7 +2260,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) * 0",
+          "expr": "sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) * 0",
           "format": "time_series",
           "legendFormat": "noop",
           "range": true,
@@ -2274,7 +2274,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "每日购入能源",
           "range": true,
@@ -2303,7 +2303,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "每日购入",
           "range": true,
@@ -2376,7 +2376,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "每日售出原始值",
           "range": true,
@@ -2581,7 +2581,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_price_max_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_price_max_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "Max",
           "range": true,
@@ -2594,7 +2594,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "平均值",
           "range": true,
@@ -2607,7 +2607,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "实际电价",
           "range": true,
@@ -2620,7 +2620,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_price_min_daily_ct_per_kwh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_price_min_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "Min",
           "range": true,
@@ -2745,7 +2745,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
+          "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
           "format": "time_series",
           "legendFormat": "购入",
           "range": true,
@@ -2929,7 +2929,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_charge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "每日电池充电",
           "range": true,
@@ -2943,7 +2943,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "每日电池放电",
           "range": true,
@@ -2998,7 +2998,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
+          "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "最高 SOC 序列",
           "range": true,
@@ -3012,7 +3012,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
+          "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "最低 SOC 序列",
           "range": true,
@@ -3194,7 +3194,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
+          "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "SOC 最高",
           "range": true,
@@ -3208,7 +3208,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{db=\"$dbLabel\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
+          "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
           "format": "time_series",
           "legendFormat": "SOC 最低",
           "range": true,
@@ -3289,7 +3289,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "hpPvWh",
           "instant": true,
@@ -3301,7 +3301,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "hpBatteryWh",
           "instant": true,
@@ -3313,7 +3313,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "hpGridWh",
           "instant": true,
@@ -3453,7 +3453,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "hpPvKwh",
           "hide": true,
           "instant": true,
@@ -3465,7 +3465,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "hpBatteryKwh",
           "hide": true,
           "instant": true,
@@ -3477,7 +3477,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{loadpoint=~\"$heatPumpLoadpointRegex\",loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "hpGridKwh",
           "hide": true,
           "instant": true,
@@ -3584,7 +3584,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "lpPvWh",
           "instant": true,
@@ -3596,7 +3596,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "lpBatteryWh",
           "instant": true,
@@ -3608,7 +3608,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
+          "expr": "(sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d]))) or on() vector(0)",
           "hide": true,
           "refId": "lpGridWh",
           "instant": true,
@@ -3748,7 +3748,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_pv_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "lpPvKwh",
           "hide": true,
           "instant": true,
@@ -3760,7 +3760,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_battery_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "lpBatteryKwh",
           "hide": true,
           "instant": true,
@@ -3772,7 +3772,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{db=\"$dbLabel\",loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((min_over_time(evcc_loadpoint_energy_from_grid_daily_wh{loadpoint!~\"$loadpointBlocklist\",loadpoint!~\"$heatPumpLoadpointRegex\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))[$__range:1d])) / 1000",
           "refId": "lpGridKwh",
           "hide": true,
           "instant": true,
@@ -3829,24 +3829,6 @@
   ],
   "templating": {
     "list": [
-      {
-        "name": "dbLabel",
-        "type": "constant",
-        "query": "evcc",
-        "label": "数据库标签",
-        "current": {
-          "text": "evcc",
-          "value": "evcc"
-        },
-        "options": [
-          {
-            "text": "evcc",
-            "value": "evcc",
-            "selected": true
-          }
-        ],
-        "hide": 2
-      },
       {
         "name": "peakPowerLimit",
         "type": "constant",

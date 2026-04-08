@@ -1,3 +1,6 @@
+/**
+ * Resolve dashboard-family specific paths and validate family arguments.
+ */
 import fs from "node:fs";
 import path from "node:path";
 

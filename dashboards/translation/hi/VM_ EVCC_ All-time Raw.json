@@ -314,7 +314,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min((sum(avg by (id) (pvPower_value{id!=\"\"})) or avg(pvPower_value{id=\"\"})), 0))[$__range:12m])) * 720 / 3600000",
           "legendFormat": "पीवी",
           "format": "time_series",
           "instant": true,
@@ -327,7 +327,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min(avg(homePower_value), 0))[$__range:12m])) * 720 / 3600000",
           "legendFormat": "घर",
           "format": "time_series",
           "instant": true,
@@ -340,7 +340,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
+          "expr": "sort_by_label(sum(sum_over_time((integrate((avg by (loadpoint) (chargePower_value{loadpoint!=\"\",loadpoint!~\"$loadpointBlocklist\"}))[1d] offset 2h) / 3600)[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
           "legendFormat": "{{loadpoint}}",
           "format": "time_series",
           "instant": true,
@@ -360,12 +360,12 @@
           "range": false
         }
       ],
-      "description": "",
+      "description": "Experimental totals: PV, home and loadpoints use validated raw-data paths. Grid import and feed-in remain on rollups for now, because raw-only All-time paths still hit VM query limits or show material energy drift.",
       "transparent": false
     },
     {
       "id": 19,
-      "title": "वार्षिक उपज",
+      "title": "Yearly yield · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -378,7 +378,7 @@
         "y": 1
       },
       "pluginVersion": "12.3.3",
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -512,7 +512,7 @@
     },
     {
       "id": 25,
-      "title": "मासिक उपज/वर्ष",
+      "title": "Monthly yield/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -762,7 +762,8 @@
             "valueField": "value"
           }
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 24,
@@ -884,7 +885,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min((sum(avg by (id) (pvPower_value{id!=\"\"})) or avg(pvPower_value{id=\"\"})), 0))[$__range:12m])) * 720 / 3600000",
           "hide": true,
           "legendFormat": "पीवी",
           "refId": "pvEnergy",
@@ -923,7 +924,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min(avg(homePower_value), 0))[$__range:12m])) * 720 / 3600000",
           "hide": true,
           "legendFormat": "घर",
           "refId": "homeEnergy",
@@ -936,7 +937,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((integrate((avg by (loadpoint) (chargePower_value{loadpoint!=\"\",loadpoint!~\"$loadpointBlocklist\"}))[1d] offset 2h) / 3600)[$__range:1d])) / 1000",
           "hide": true,
           "legendFormat": "लोडपॉइंट",
           "refId": "loadpointEnergy",
@@ -965,17 +966,18 @@
           "refId": "Self-consumption",
           "type": "math"
         }
-      ]
+      ],
+      "description": "Experimental gauges: PV, home and loadpoints use validated raw-data paths. Grid import and feed-in remain on rollups for the long-range values for now."
     },
     {
       "id": 29,
-      "title": "वार्षिक घरेलू खपत",
+      "title": "Yearly home consumption · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -1116,13 +1118,13 @@
     },
     {
       "id": 14,
-      "title": "मासिक घरेलू खपत/वर्ष",
+      "title": "Monthly home consumption/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -1371,13 +1373,13 @@
     },
     {
       "id": 27,
-      "title": "वार्षिक ग्रिड आयात",
+      "title": "Yearly grid import · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -1518,13 +1520,13 @@
     },
     {
       "id": 15,
-      "title": "मासिक ग्रिड आयात/वर्ष",
+      "title": "Monthly grid import/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -1995,18 +1997,19 @@
           "range": false
         }
       ],
-      "title": "बैटरी सारांश",
-      "type": "stat"
+      "title": "Battery summary · Rollup",
+      "type": "stat",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 17,
-      "title": "वार्षिक आपूर्ति",
+      "title": "Yearly feed-in · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -2147,13 +2150,13 @@
     },
     {
       "id": 18,
-      "title": "मासिक आपूर्ति/वर्ष",
+      "title": "Monthly feed-in/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -2402,7 +2405,7 @@
     },
     {
       "id": 38,
-      "title": "सबसे अधिक उपज वाले दिन",
+      "title": "Days with highest yield · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2469,16 +2472,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "pvEnergy"
+              "options": "PV ऊर्जा"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "PV ऊर्जा"
               },
               {
                 "id": "custom.cellOptions",
@@ -2518,16 +2517,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "pvEnergy",
+          "legendFormat": "PV ऊर्जा",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 39,
-      "title": "सबसे अधिक आपूर्ति",
+      "title": "Highest feed-in · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2594,16 +2594,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "feedIn"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "ग्रिड में आपूर्ति"
               },
               {
                 "id": "custom.cellOptions",
@@ -2643,16 +2639,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_grid_export_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "feedIn",
+          "legendFormat": "ग्रिड में आपूर्ति",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 40,
-      "title": "सबसे अधिक घरेलू खपत",
+      "title": "Highest home consumption · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2719,16 +2716,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "homeConsumption"
+              "options": "घरेलू खपत"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "घरेलू खपत"
               },
               {
                 "id": "custom.cellOptions",
@@ -2768,16 +2761,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_home_energy_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "homeConsumption",
+          "legendFormat": "घरेलू खपत",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 52,
-      "title": "प्लांट स्वास्थ्य",
+      "title": "Plant health · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2786,11 +2780,12 @@
         "x": 0,
         "y": 53
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 53,
-      "title": "प्रति वर्ष शीर्ष 30 दिनों का औसत",
+      "title": "Average top 30 days/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2803,7 +2798,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "यह प्रति वर्ष सर्वोत्तम 30 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक वर्ष अपने आप में निर्णायक नहीं होता।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nUses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2937,7 +2932,7 @@
     },
     {
       "id": 54,
-      "title": "प्रति माह शीर्ष 5 दिनों का औसत",
+      "title": "Average top 5 days/month · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3188,11 +3183,11 @@
           }
         }
       ],
-      "description": "यह प्रति माह सर्वोत्तम 5 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक महीना अपने आप में निर्णायक नहीं होता।"
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nUses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
     },
     {
       "id": 41,
-      "title": "वित्त",
+      "title": "Finances · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3201,11 +3196,12 @@
         "x": 0,
         "y": 67
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 28,
-      "title": "मासिक लागत",
+      "title": "Monthly costs · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3426,11 +3422,12 @@
             "valueField": "value"
           }
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 46,
-      "title": "संतुलन",
+      "title": "Balance · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3439,11 +3436,12 @@
         "x": 0,
         "y": 81
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 47,
-      "title": "शक्ति संतुलन",
+      "title": "Power balance · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3736,17 +3734,18 @@
           "hide": false,
           "type": "math"
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 50,
-      "title": "PV सिस्टम अमोर्टाइजेशन",
+      "title": "PV Anlage Amortisation · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nFor less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4106,13 +4105,13 @@
     },
     {
       "id": 51,
-      "title": "बैटरी अमोर्टाइजेशन",
+      "title": "Speicher Amortisation · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nFor less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4446,7 +4445,7 @@
     },
     {
       "id": 48,
-      "title": "वाहन",
+      "title": "Fahrzeuge · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4455,17 +4454,18 @@
         "x": 0,
         "y": 92
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 49,
-      "title": "$vehicle ड्राइविंग लागत",
+      "title": "Driving costs $vehicle · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "मान औसतों पर आधारित मोटे अनुमान हैं। बाहरी चार्जिंग सत्र शामिल नहीं हैं。",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nValues are rough estimates based on averages. External charging sessions are not included.",
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -4859,7 +4859,9 @@
   "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
-    "EVCC"
+    "EVCC",
+    "Raw",
+    "Experimental"
   ],
   "templating": {
     "list": [
@@ -5220,8 +5222,9 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: ऑल-टाइम",
-  "uid": "vm-alltime-en-orig",
-  "version": 6,
-  "weekStart": ""
+  "title": "VM: EVCC: All-time Raw",
+  "uid": "vm-alltime-raw-en-orig",
+  "version": 1,
+  "weekStart": "",
+  "description": "Experimental hybrid dashboard: panels with the title suffix \"· Rollup\" still use precomputed rollup metrics. In the unmarked totals/gauge panels, PV, home and loadpoints use validated raw-data paths; grid import and feed-in remain on rollups for now."
 }

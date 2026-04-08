@@ -29,7 +29,8 @@ It intentionally does not document:
 - Raw EVCC metrics stay untouched in VictoriaMetrics.
 - Rollups are written as new metrics in a separate namespace.
 - The production rollup namespace is `evcc_*`.
-- The stable history matcher is `db="evcc"`.
+- The repository assumes one VictoriaMetrics instance per EVCC instance.
+- If you operate multiple EVCC instances, run multiple VictoriaMetrics instances instead of multiplexing them through a shared `db` label.
 - Dashboards and rollups must not depend on a `host` label.
 - Units are encoded in metric names.
 - Only real business dimensions are kept as labels.
@@ -93,9 +94,9 @@ There is currently no required monthly-rollup layer.
 
 ### Raw metrics
 
-Raw EVCC history should be queried with:
+Raw EVCC history should be queried directly by metric name and business labels only:
 
-- `db="evcc"`
+- example: `pvPower_value{id=""}` or `evcc_pv_energy_daily_wh{local_year="2025",local_month="07"}`
 
 Avoid relying on:
 
@@ -111,7 +112,6 @@ Reason:
 
 All daily rollups always carry:
 
-- `db`
 - `local_year`
 - `local_month`
 
@@ -123,9 +123,9 @@ Additional labels are added only where they are real dimensions:
 
 Accepted examples:
 
-- `evcc_pv_energy_daily_wh{db="evcc",local_year="2025",local_month="07"}`
-- `evcc_vehicle_energy_daily_wh{db="evcc",vehicle="BMW i3",local_year="2025",local_month="07"}`
-- `evcc_ext_energy_daily_wh{db="evcc",title="USV",local_year="2025",local_month="07"}`
+- `evcc_pv_energy_daily_wh{local_year="2025",local_month="07"}`
+- `evcc_vehicle_energy_daily_wh{vehicle="BMW i3",local_year="2025",local_month="07"}`
+- `evcc_ext_energy_daily_wh{title="USV",local_year="2025",local_month="07"}`
 
 Not stored on rollups:
 
@@ -176,36 +176,36 @@ The production prefix is currently `evcc`.
 
 | Metric | Labels | Meaning |
 | --- | --- | --- |
-| `evcc_pv_energy_daily_wh` | `db`, `local_year`, `local_month` | Daily PV energy |
-| `evcc_home_energy_daily_wh` | `db`, `local_year`, `local_month` | Daily home energy |
-| `evcc_loadpoint_energy_daily_wh` | `db`, `local_year`, `local_month`, `loadpoint` | Daily charging energy per loadpoint |
-| `evcc_vehicle_energy_daily_wh` | `db`, `local_year`, `local_month`, `vehicle` | Daily charging energy per vehicle |
-| `evcc_vehicle_distance_daily_km` | `db`, `local_year`, `local_month`, `vehicle` | Daily driven distance per vehicle |
-| `evcc_ext_energy_daily_wh` | `db`, `local_year`, `local_month`, `title` | Daily energy per external meter title |
-| `evcc_aux_energy_daily_wh` | `db`, `local_year`, `local_month`, `title` | Daily energy per auxiliary meter title |
-| `evcc_battery_soc_daily_min_pct` | `db`, `local_year`, `local_month` | Minimum daily battery SOC |
-| `evcc_battery_soc_daily_max_pct` | `db`, `local_year`, `local_month` | Maximum daily battery SOC |
-| `evcc_grid_import_daily_wh` | `db`, `local_year`, `local_month` | Daily grid import energy |
-| `evcc_grid_export_daily_wh` | `db`, `local_year`, `local_month` | Daily grid export energy |
-| `evcc_battery_charge_daily_wh` | `db`, `local_year`, `local_month` | Daily battery charge energy |
-| `evcc_battery_discharge_daily_wh` | `db`, `local_year`, `local_month` | Daily battery discharge energy |
+| `evcc_pv_energy_daily_wh` | `local_year`, `local_month` | Daily PV energy |
+| `evcc_home_energy_daily_wh` | `local_year`, `local_month` | Daily home energy |
+| `evcc_loadpoint_energy_daily_wh` | `local_year`, `local_month`, `loadpoint` | Daily charging energy per loadpoint |
+| `evcc_vehicle_energy_daily_wh` | `local_year`, `local_month`, `vehicle` | Daily charging energy per vehicle |
+| `evcc_vehicle_distance_daily_km` | `local_year`, `local_month`, `vehicle` | Daily driven distance per vehicle |
+| `evcc_ext_energy_daily_wh` | `local_year`, `local_month`, `title` | Daily energy per external meter title |
+| `evcc_aux_energy_daily_wh` | `local_year`, `local_month`, `title` | Daily energy per auxiliary meter title |
+| `evcc_battery_soc_daily_min_pct` | `local_year`, `local_month` | Minimum daily battery SOC |
+| `evcc_battery_soc_daily_max_pct` | `local_year`, `local_month` | Maximum daily battery SOC |
+| `evcc_grid_import_daily_wh` | `local_year`, `local_month` | Daily grid import energy |
+| `evcc_grid_export_daily_wh` | `local_year`, `local_month` | Daily grid export energy |
+| `evcc_battery_charge_daily_wh` | `local_year`, `local_month` | Daily battery charge energy |
+| `evcc_battery_discharge_daily_wh` | `local_year`, `local_month` | Daily battery discharge energy |
 
 ### Daily finance and price baselines
 
 | Metric | Labels | Meaning |
 | --- | --- | --- |
-| `evcc_grid_import_cost_daily_eur` | `db`, `local_year`, `local_month` | Daily grid import cost |
-| `evcc_grid_import_price_avg_daily_ct_per_kwh` | `db`, `local_year`, `local_month` | Arithmetic daily mean of import tariff |
-| `evcc_grid_import_price_effective_daily_ct_per_kwh` | `db`, `local_year`, `local_month` | Effective daily import price weighted by import energy |
-| `evcc_grid_import_price_min_daily_ct_per_kwh` | `db`, `local_year`, `local_month` | Minimum daily import tariff |
-| `evcc_grid_import_price_max_daily_ct_per_kwh` | `db`, `local_year`, `local_month` | Maximum daily import tariff |
-| `evcc_grid_export_credit_daily_eur` | `db`, `local_year`, `local_month` | Daily feed-in compensation |
-| `evcc_vehicle_charge_cost_daily_eur` | `db`, `local_year`, `local_month`, `vehicle` | Daily charging cost at loadpoint tariff |
-| `evcc_potential_vehicle_charge_cost_daily_eur` | `db`, `local_year`, `local_month`, `vehicle` | Daily charging cost at grid tariff as no-PV baseline |
-| `evcc_potential_home_cost_daily_eur` | `db`, `local_year`, `local_month` | Daily home cost at grid tariff as no-PV baseline |
-| `evcc_potential_loadpoint_cost_daily_eur` | `db`, `local_year`, `local_month` | Daily charging cost at grid tariff as no-PV baseline |
-| `evcc_battery_discharge_value_daily_eur` | `db`, `local_year`, `local_month` | Daily value of discharged battery energy at grid tariff |
-| `evcc_battery_charge_feedin_cost_daily_eur` | `db`, `local_year`, `local_month` | Daily opportunity cost of battery charging at feed-in tariff |
+| `evcc_grid_import_cost_daily_eur` | `local_year`, `local_month` | Daily grid import cost |
+| `evcc_grid_import_price_avg_daily_ct_per_kwh` | `local_year`, `local_month` | Arithmetic daily mean of import tariff |
+| `evcc_grid_import_price_effective_daily_ct_per_kwh` | `local_year`, `local_month` | Effective daily import price weighted by import energy |
+| `evcc_grid_import_price_min_daily_ct_per_kwh` | `local_year`, `local_month` | Minimum daily import tariff |
+| `evcc_grid_import_price_max_daily_ct_per_kwh` | `local_year`, `local_month` | Maximum daily import tariff |
+| `evcc_grid_export_credit_daily_eur` | `local_year`, `local_month` | Daily feed-in compensation |
+| `evcc_vehicle_charge_cost_daily_eur` | `local_year`, `local_month`, `vehicle` | Daily charging cost at loadpoint tariff |
+| `evcc_potential_vehicle_charge_cost_daily_eur` | `local_year`, `local_month`, `vehicle` | Daily charging cost at grid tariff as no-PV baseline |
+| `evcc_potential_home_cost_daily_eur` | `local_year`, `local_month` | Daily home cost at grid tariff as no-PV baseline |
+| `evcc_potential_loadpoint_cost_daily_eur` | `local_year`, `local_month` | Daily charging cost at grid tariff as no-PV baseline |
+| `evcc_battery_discharge_value_daily_eur` | `local_year`, `local_month` | Daily value of discharged battery energy at grid tariff |
+| `evcc_battery_charge_feedin_cost_daily_eur` | `local_year`, `local_month` | Daily opportunity cost of battery charging at feed-in tariff |
 
 ### PV health rollups
 
@@ -213,8 +213,8 @@ These are helper rollups for the all-time plant-health section:
 
 | Metric | Labels | Meaning |
 | --- | --- | --- |
-| `evcc_pv_top30_mean_yearly_wh` | `db`, `local_year` | Mean of the top 30 PV daily values of a year |
-| `evcc_pv_top5_mean_monthly_wh` | `db`, `local_year`, `local_month` | Mean of the top 5 PV daily values of a month |
+| `evcc_pv_top30_mean_yearly_wh` | `local_year` | Mean of the top 30 PV daily values of a year |
+| `evcc_pv_top5_mean_monthly_wh` | `local_year`, `local_month` | Mean of the top 5 PV daily values of a month |
 
 ## Source-of-truth rules by topic
 
@@ -332,7 +332,7 @@ Examples:
 ### Host label
 
 - Historical correctness depends on hostless-safe queries.
-- If `host` reappears through ingest, dashboards should still remain correct because they query `db="evcc"` and aggregate `without(host)` where required.
+- If `host` reappears through ingest, dashboards should still remain correct because they query metric names directly and aggregate `without(host)` where required.
 
 ### Performance
 
@@ -357,7 +357,7 @@ Current intended production state:
 When adding a new raw metric or rollup family, keep these rules:
 
 1. Do not overwrite raw metrics.
-2. Prefer `db="evcc"` as the stable matcher.
+2. Keep one VictoriaMetrics instance dedicated to one EVCC instance and query metric names directly.
 3. Do not require `host`.
 4. Only add labels that represent real business dimensions.
 5. Reuse `local_year` and `local_month` only when they materially simplify long-range dashboard queries.

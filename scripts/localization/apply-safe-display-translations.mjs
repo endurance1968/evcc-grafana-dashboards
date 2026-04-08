@@ -1,3 +1,6 @@
+/**
+ * Apply curated safe display-name translations to localized dashboard JSON files.
+ */
 import fs from "node:fs";
 import path from "node:path";
 import {

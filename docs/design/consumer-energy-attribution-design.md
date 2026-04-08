@@ -140,21 +140,21 @@ That means:
 
 ### Loadpoints
 
-- `evcc_loadpoint_energy_from_pv_daily_wh{db="evcc",local_year="...",local_month="...",loadpoint="..."}`
-- `evcc_loadpoint_energy_from_battery_daily_wh{db="evcc",local_year="...",local_month="...",loadpoint="..."}`
-- `evcc_loadpoint_energy_from_grid_daily_wh{db="evcc",local_year="...",local_month="...",loadpoint="..."}`
+- `evcc_loadpoint_energy_from_pv_daily_wh{local_year="...",local_month="...",loadpoint="..."}`
+- `evcc_loadpoint_energy_from_battery_daily_wh{local_year="...",local_month="...",loadpoint="..."}`
+- `evcc_loadpoint_energy_from_grid_daily_wh{local_year="...",local_month="...",loadpoint="..."}`
 
 ### External meters
 
-- `evcc_ext_energy_from_pv_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
-- `evcc_ext_energy_from_battery_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
-- `evcc_ext_energy_from_grid_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
+- `evcc_ext_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_ext_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_ext_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
 
 ### Auxiliary meters
 
-- `evcc_aux_energy_from_pv_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
-- `evcc_aux_energy_from_battery_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
-- `evcc_aux_energy_from_grid_daily_wh{db="evcc",local_year="...",local_month="...",title="..."}`
+- `evcc_aux_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_aux_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_aux_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
 
 ## Optional aggregate helper metrics
 

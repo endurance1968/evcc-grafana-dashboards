@@ -1,3 +1,11 @@
+<#
+.SYNOPSIS
+Deploy dashboards to Grafana from a local checkout or GitHub source.
+
+.DESCRIPTION
+Loads the install environment, resolves the requested dashboard source and
+pushes the selected dashboard set into the target Grafana folder.
+#>
 param(
   [string]$config = (Join-Path $PSScriptRoot "vm-dashboard-install.env"),
   [string]$url,

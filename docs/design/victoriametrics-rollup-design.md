@@ -14,11 +14,14 @@ Important historical detail:
 
 - imported Influx history is available in VictoriaMetrics without a stable `host` label
 - live Telegraf writes may include `host`
-- therefore VM history queries and dashboards must prefer `db="evcc"` and must not rely on `host`
+- this repository assumes one VictoriaMetrics instance is dedicated to exactly one EVCC instance
+- therefore VM history queries and dashboards must not rely on either `host` or a synthetic shared `db` label
 
 ## Accepted decision
 
 Use one VictoriaMetrics server for both raw data and rollups.
+
+The repository assumes that this VictoriaMetrics server is dedicated to exactly one EVCC instance. If you operate multiple EVCC instances, run multiple VictoriaMetrics instances.
 
 Do not create a separate VM instance for rollups.
 
@@ -92,7 +95,7 @@ Only add monthly rollups if a measured dashboard bottleneck requires them.
 ## Naming and labeling rules
 
 - Use Prometheus-style metric names.
-- Prefer filtering on `db="evcc"` only for VM history queries.
+- Query VM history directly by metric name and business labels only; no synthetic `db` label is assumed.
 - Do not rely on a `host` label for EVCC history.
 - Encode units in metric names.
 - Keep only real dimensions as labels.
@@ -134,7 +137,7 @@ Why:
 ### Required baseline
 
 - production VM dashboards target one datasource: `VM-EVCC`
-- history queries filter on `db="evcc"`
+- history queries use direct metric selectors and business labels only
 - no production dashboard should depend on `host`
 - long-range dashboards should be implemented against daily rollups
 

@@ -1,3 +1,6 @@
+/**
+ * Sync display-name translation mappings with the current dashboard sources.
+ */
 import fs from "node:fs";
 import path from "node:path";
 import {

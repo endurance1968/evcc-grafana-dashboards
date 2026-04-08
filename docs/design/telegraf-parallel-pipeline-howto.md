@@ -70,11 +70,13 @@ Practical meaning:
 ## Example output fan-out
 
 ```toml
-[[outputs.influxdb]]
+[[outputs.http]]
   alias = "victoriametrics"
-  urls = ["http://<victoriametrics-host>:8428"]
-  database = "evcc"
+  url = "http://<victoriametrics-host>:8428/influx/write"
+  method = "POST"
+  data_format = "influx"
   timeout = "10s"
+  non_retryable_statuscodes = [400]
 
 [[outputs.postgresql]]
   connection = "host=<postgres-host> user=<postgres-user> password=<postgres-password> dbname=telemetry sslmode=disable"
@@ -92,7 +94,15 @@ Practical meaning:
 Practical meaning:
 
 - `alias` makes Telegraf logs easier to read when two outputs use the same plugin type.
-- VictoriaMetrics still uses the `outputs.influxdb` plugin because it accepts Influx line protocol on port `8428`.
+- VictoriaMetrics uses `outputs.http` with `data_format = "influx"` so Telegraf sends Influx line protocol directly to `/influx/write`.
+- This deliberately avoids Telegraf's `outputs.influxdb` database handling, so VictoriaMetrics does not synthesize a `db` label from the write target.
+
+Important:
+
+- Do not use `[[outputs.influxdb]]` for VictoriaMetrics in this repository.
+- If you set `database = "evcc"`, VictoriaMetrics will ingest a synthetic `db="evcc"` label.
+- If you omit `database`, Telegraf falls back to its default database name and VictoriaMetrics will still ingest a synthetic `db` label such as `db="telegraf"`.
+- The repository assumes one VictoriaMetrics instance per EVCC instance, so the live Telegraf path must stay free of any shared `db` multiplexing label.
 
 ## Operational checks after changes
 
@@ -100,9 +110,26 @@ After any listener or output change, verify all of the following:
 
 1. EVCC can write successfully to the intended Telegraf listener.
 2. A fresh probe point appears in InfluxDB.
-3. The same probe series appears in VictoriaMetrics.
+3. The same probe series appears in VictoriaMetrics without a `db` label.
 4. The same probe data appears in PostgreSQL.
 5. Telegraf logs show no continuous output errors.
+
+Quick VictoriaMetrics check:
+
+```bash
+END=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+START=$(date -u -d '10 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
+
+curl -sG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=gridPower_value' \
+  --data-urlencode "start=$START" \
+  --data-urlencode "end=$END"
+```
+
+Expected result for the live Telegraf path:
+
+- a fresh raw series such as `{ "__name__": "gridPower_value" }`
+- no `db` field in that series object
 
 ## Why we keep InfluxDB during migration
 

@@ -1,3 +1,6 @@
+/**
+ * Import raw dashboard JSON files into Grafana and emit an import manifest.
+ */
 import path from "node:path";
 import {
   buildUid,

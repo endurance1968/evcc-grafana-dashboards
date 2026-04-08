@@ -63,7 +63,7 @@ cp scripts/rollup/evcc-vm-rollup.conf.example /etc/evcc-vm-rollup.conf
 Important settings:
 
 - `base_url`
-- `db_label`
+- one VictoriaMetrics instance is dedicated to one EVCC instance
 - `timezone`
 - `metric_prefix`: use `evcc`
 - `max_fetch_points_per_series`
@@ -72,6 +72,8 @@ Important rule:
 
 - do not build the workflow around `host`
 - history and live data may differ on infrastructure labels
+- this repository assumes no synthetic `db` label
+- if you operate multiple EVCC instances, run multiple VictoriaMetrics instances
 
 ## First run
 

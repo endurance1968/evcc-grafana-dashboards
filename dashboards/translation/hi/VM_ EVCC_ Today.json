@@ -597,7 +597,7 @@
               "configRefId": "prioritySoc",
               "mappings": [
                 {
-                  "fieldName": "prioritySoc_value{db=\"evcc\"}",
+                  "fieldName": "prioritySoc_value",
                   "handlerArguments": {
                     "threshold": {
                       "color": "text"
@@ -2395,7 +2395,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg without(host) (pvPower_value{id=\"\"} / 1000)",
+          "expr": "avg(pvPower_value{id=\"\"} / 1000)",
           "format": "time_series",
           "legendFormat": "पीवी",
           "range": true,
@@ -2407,7 +2407,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg without(host) (gridPower_value / 1000)",
+          "expr": "avg(gridPower_value / 1000)",
           "format": "time_series",
           "legendFormat": "ग्रिड",
           "range": true,
@@ -2419,7 +2419,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg without(host) (homePower_value / -1000)",
+          "expr": "avg(homePower_value / -1000)",
           "format": "time_series",
           "legendFormat": "घर",
           "range": true,
@@ -2431,7 +2431,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg without(host) (batteryPower_value{id=\"\"} / 1000)",
+          "expr": "avg(batteryPower_value{id=\"\"} / 1000)",
           "format": "time_series",
           "legendFormat": "बैटरी",
           "range": true,

@@ -1,4 +1,7 @@
-﻿import {
+/**
+ * Verify that imported dashboards are present in Grafana and structurally readable.
+ */
+import {
   grafanaApi,
   loadEnvFile,
   parseArg,

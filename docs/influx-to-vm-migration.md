@@ -12,6 +12,7 @@ Assumptions:
 - VictoriaMetrics is already installed and reachable
 - `vmctl` is installed
 - EVCC already writes to VictoriaMetrics, or will do so after the migration
+- this repository assumes one VictoriaMetrics instance is dedicated to exactly one EVCC instance
 
 Not covered here:
 
@@ -122,6 +123,7 @@ yes | vmctl influx \
   --influx-database='evcc' \
   --influx-filter-time-start='2024-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-30T23:59:59Z' \
+  --influx-skip-database-label \
   --vm-addr='http://localhost:8428'
 ```
 
@@ -135,12 +137,14 @@ yes | vmctl influx \
   --influx-database='evcc' \
   --influx-filter-time-start='2024-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-30T23:59:59Z' \
+  --influx-skip-database-label \
   --vm-addr='http://localhost:8428'
 ```
 
 Notes:
 
-- `vmctl` adds `db="evcc"` from the selected Influx database
+- the repository assumes that this VictoriaMetrics instance stores data for exactly one EVCC instance, so `vmctl` is run with `--influx-skip-database-label` and no synthetic `db` label is stored
+- the live Telegraf path should mirror that model and write to VictoriaMetrics via `[[outputs.http]]` to `/influx/write` with `data_format = "influx"` instead of `[[outputs.influxdb]]`, so no synthetic `db` label is added during live ingest
 - the imported raw model can include labels such as `loadpoint`, `vehicle`, `id`, `title`, and sometimes `host`
 - that richer label model is expected and is the basis for the cleanup step below
 
@@ -150,7 +154,7 @@ Query VictoriaMetrics directly:
 
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=pvPower_value{db="evcc"}' \
+  --data-urlencode 'match[]=pvPower_value' \
   --data-urlencode 'start=2026-03-28T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T00:00:00Z'
 ```
@@ -159,7 +163,7 @@ You should also inspect a few labelsets:
 
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=chargePower_value{db="evcc"}' \
+  --data-urlencode 'match[]=chargePower_value' \
   --data-urlencode 'start=2026-03-28T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T00:00:00Z'
 ```
@@ -171,10 +175,10 @@ Use the VM-only checker after the import. In the default `auto` phase it validat
 For a current production VM:
 
 ```bash
-python3 check_data.py --base-url http://localhost:8428 --db evcc
+python3 check_data.py --base-url http://localhost:8428
 
 # explicit raw-import phase
-python3 check_data.py --base-url http://localhost:8428 --db evcc --phase raw
+python3 check_data.py --base-url http://localhost:8428 --phase raw
 ```
 
 For a historical benchmark or migration VM, anchor the logical check point to the imported range:
@@ -182,7 +186,6 @@ For a historical benchmark or migration VM, anchor the logical check point to th
 ```bash
 python3 check_data.py \
   --base-url http://localhost:8428 \
-  --db evcc \
   --end-time 2026-03-30T23:59:59Z
 ```
 
@@ -197,7 +200,6 @@ python3 compare_import_coverage.py \
   --influx-url http://<influx-host>:8086 \
   --influx-db evcc \
   --vm-base-url http://localhost:8428 \
-  --vm-db-label evcc \
   --start 2026-03-21T00:00:00Z \
   --end 2026-04-03T23:59:59Z \
   --only-problems
@@ -216,7 +218,7 @@ Example repair run for `pvPower` only:
 
 ```bash
 curl -fsS -X POST 'http://localhost:8428/api/v1/admin/tsdb/delete_series' \
-  --data-urlencode 'match[]=pvPower_value{db="evcc"}'
+  --data-urlencode 'match[]=pvPower_value'
 
 yes | vmctl influx \
   --influx-addr='http://<influx-host>:8086' \
@@ -226,13 +228,13 @@ yes | vmctl influx \
   --influx-filter-series "on evcc from pvPower" \
   --influx-filter-time-start='2025-01-01T00:00:00Z' \
   --influx-filter-time-end='2026-03-31T23:59:59Z' \
+  --influx-skip-database-label \
   --vm-addr='http://localhost:8428'
 
 python3 compare_import_coverage.py \
   --influx-url http://<influx-host>:8086 \
   --influx-db evcc \
   --vm-base-url http://localhost:8428 \
-  --vm-db-label evcc \
   --start 2025-01-01T00:00:00Z \
   --end 2026-03-31T23:59:59Z \
   --measurement-regex '^pvPower$' \
@@ -268,7 +270,7 @@ You can also query it directly:
 
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]={db="evcc",host!=""}' \
+  --data-urlencode 'match[]={host!=""}' \
   --data-urlencode 'start=2024-01-01T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T23:59:59Z'
 ```
@@ -280,7 +282,7 @@ If this returns no series, skip the `host` cleanup step.
 ```bash
 python3 vm-rewrite-drop-label.py \
   --base-url http://localhost:8428 \
-  --matcher '{db="evcc",host!=""}' \
+  --matcher '{host!=""}' \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
@@ -299,7 +301,7 @@ If the dry-run looks clean, use merge mode so existing hostless targets are pres
 ```bash
 python3 vm-rewrite-drop-label.py \
   --base-url http://localhost:8428 \
-  --matcher '{db="evcc",host!=""}' \
+  --matcher '{host!=""}' \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
@@ -320,7 +322,7 @@ Typical conflict-safe write command for that case:
 ```bash
 python3 vm-rewrite-drop-label.py \
   --base-url http://localhost:8428 \
-  --matcher '{db="evcc",host!=""}' \
+  --matcher '{host!=""}' \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
@@ -360,8 +362,6 @@ Important fields:
 
 - `base_url`
   - URL of your VictoriaMetrics instance
-- `db_label`
-  - normally `evcc`
 - `timezone`
   - for example `Europe/Berlin`
 - `metric_prefix`
@@ -371,12 +371,16 @@ Important fields:
 - `max_fetch_points_per_series`
   - limits how many raw samples per series are fetched in a single request chunk
 
+Operational assumption:
+
+- one VictoriaMetrics instance is dedicated to one EVCC instance
+- if you operate multiple EVCC instances, run multiple VictoriaMetrics instances
+
 Recommended production core:
 
 ```ini
 [victoriametrics]
 base_url = http://localhost:8428
-db_label = evcc
 host_label =
 timezone = Europe/Berlin
 metric_prefix = evcc
@@ -466,7 +470,7 @@ Example check for a daily PV rollup:
 
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=evcc_pv_energy_daily_wh{db="evcc"}' \
+  --data-urlencode 'match[]=evcc_pv_energy_daily_wh' \
   --data-urlencode 'start=2026-01-01T00:00:00Z' \
   --data-urlencode 'end=2026-03-31T23:59:59Z'
 ```
@@ -476,7 +480,6 @@ Then run the repository checker again:
 ```bash
 python3 check_data.py \
   --base-url http://localhost:8428 \
-  --db evcc \
   --end-time 2026-03-30T23:59:59Z
 ```
 

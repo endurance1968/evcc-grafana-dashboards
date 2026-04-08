@@ -1,3 +1,6 @@
+/**
+ * Shared helpers for Grafana import, deployment and screenshot test scripts.
+ */
 import fs from "node:fs";
 import path from "node:path";
 

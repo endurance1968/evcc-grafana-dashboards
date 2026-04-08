@@ -21,8 +21,8 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.05.3"
-SCRIPT_LAST_MODIFIED = "2026-04-05"
+SCRIPT_VERSION = "2026.04.08.1"
+SCRIPT_LAST_MODIFIED = "2026-04-08"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
     "auxPower",
@@ -257,9 +257,9 @@ def influx_stats(
     return SpanStats(points=points, series=series, first=first, last=last)
 
 
-def export_lines(base_url: str, metric: str, db_label: str, start: str, end: str) -> Iterable[str]:
+def export_lines(base_url: str, metric: str, start: str, end: str) -> Iterable[str]:
     params = [
-        ("match[]", f'{metric}{{db="{db_label}"}}'),
+        ("match[]", metric),
         ("start", start),
         ("end", end),
     ]
@@ -287,13 +287,13 @@ def export_lines_for_matcher(base_url: str, matcher: str, start: str, end: str) 
                 yield line
 
 
-def vm_stats(base_url: str, metric: str, db_label: str, start: str, end: str) -> SpanStats:
+def vm_stats(base_url: str, metric: str, start: str, end: str) -> SpanStats:
     total_points = 0
     total_series = 0
     first: dt.datetime | None = None
     last: dt.datetime | None = None
 
-    for line in export_lines(base_url, metric, db_label, start, end):
+    for line in export_lines(base_url, metric, start, end):
         payload = json.loads(line)
         timestamps = payload.get("timestamps", [])
         if not isinstance(timestamps, list) or not timestamps:
@@ -317,11 +317,11 @@ def candidate_metrics(measurement: str) -> List[str]:
     return candidates
 
 
-def choose_vm_metric(base_url: str, db_label: str, measurement: str, start: str, end: str) -> tuple[str, SpanStats]:
+def choose_vm_metric(base_url: str, measurement: str, start: str, end: str) -> tuple[str, SpanStats]:
     best_metric = candidate_metrics(measurement)[0]
     best_stats = SpanStats(points=0, series=0, first=None, last=None)
     for candidate in candidate_metrics(measurement):
-        stats = vm_stats(base_url, candidate, db_label, start, end)
+        stats = vm_stats(base_url, candidate, start, end)
         if stats.points > best_stats.points:
             best_metric = candidate
             best_stats = stats
@@ -354,7 +354,6 @@ def compare_measurement(
     influx_base_url: str,
     influx_db: str,
     vm_base_url: str,
-    vm_db_label: str,
     measurement: str,
     start: str,
     end: str,
@@ -364,7 +363,7 @@ def compare_measurement(
 ) -> MetricCoverage:
     influx = influx_stats(influx_base_url, influx_db, measurement, start, end, username, password)
     field_types = influx_field_types(influx_base_url, influx_db, measurement, username, password)
-    vm_metric, vm = choose_vm_metric(vm_base_url, vm_db_label, measurement, start, end)
+    vm_metric, vm = choose_vm_metric(vm_base_url, measurement, start, end)
 
     reasons: List[str] = []
     status = "OK"
@@ -475,13 +474,12 @@ def influx_legacy_pv_total_kwh(
 
 def vm_legacy_bucket_energy_kwh(
     base_url: str,
-    db_label: str,
     start: str,
     end: str,
     bucket_seconds: int,
     peak_power_limit: float,
 ) -> float:
-    matcher = f'pvPower_value{{db="{db_label}",id=""}}'
+    matcher = 'pvPower_value{id=""}'
     start_ms = int(parse_iso(start).timestamp() * 1000)
     end_ms = int(parse_iso(end).timestamp() * 1000) + 1000
     bucket_ms = bucket_seconds * 1000
@@ -516,7 +514,6 @@ def build_critical_energy_checks(
     influx_base_url: str,
     influx_db: str,
     vm_base_url: str,
-    vm_db_label: str,
     start: str,
     end: str,
     username: str | None,
@@ -550,7 +547,7 @@ def build_critical_energy_checks(
         checked_windows += 1
         vm_kwh = vm_legacy_bucket_energy_kwh(
             vm_base_url,
-            vm_db_label,
+
             window_start,
             window_end,
             bucket_seconds,
@@ -722,7 +719,6 @@ def main() -> int:
     ap.add_argument("--influx-user")
     ap.add_argument("--influx-password")
     ap.add_argument("--vm-base-url", required=True, help="VictoriaMetrics base URL, e.g. http://127.0.0.1:8428")
-    ap.add_argument("--vm-db-label", default="evcc", help='value of the db label in VM, default: "evcc"')
     ap.add_argument("--start", required=True, help="UTC start timestamp, e.g. 2026-03-21T00:00:00Z")
     ap.add_argument("--end", required=True, help="UTC end timestamp, e.g. 2026-04-03T23:59:59Z")
     ap.add_argument("--measurement-regex", help="only compare matching Influx measurements")
@@ -755,7 +751,6 @@ def main() -> int:
                 args.influx_url,
                 args.influx_db,
                 args.vm_base_url,
-                args.vm_db_label,
                 measurement,
                 args.start,
                 args.end,
@@ -768,7 +763,7 @@ def main() -> int:
         args.influx_url,
         args.influx_db,
         args.vm_base_url,
-        args.vm_db_label,
+
         args.start,
         args.end,
         args.influx_user,

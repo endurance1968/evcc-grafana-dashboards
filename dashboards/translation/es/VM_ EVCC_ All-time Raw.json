@@ -11,21 +11,21 @@
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "ईवीसीसी यूआरएल",
+      "label": "URL de EVCC",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "इन्वर्टर पोर्टल नाम",
+      "label": "Nombre del portal del inversor",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "इन्वर्टर पोर्टल URL",
+      "label": "URL del portal del inversor",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     }
@@ -44,7 +44,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "वर्ष",
+      "title": "Año",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
@@ -56,7 +56,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "माह",
+      "title": "Mes",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
@@ -70,7 +70,7 @@
         "EVCC"
       ],
       "targetBlank": false,
-      "title": "डैशबोर्ड",
+      "title": "Paneles de control",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -82,7 +82,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": true,
-      "title": "ईवीसीसी",
+      "title": "EVCC",
       "tooltip": "",
       "type": "link",
       "url": "$evccUrl"
@@ -94,7 +94,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": true,
-      "title": "$इन्वर्टरपोर्टलटाइटल",
+      "title": "$inverterPortalTitle",
       "tooltip": "",
       "type": "link",
       "url": "$inverterPortalUrl"
@@ -104,7 +104,7 @@
   "panels": [
     {
       "id": 33,
-      "title": "ऊर्जा",
+      "title": "Energía",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -117,7 +117,7 @@
     },
     {
       "id": 12,
-      "title": "ऊर्जा कुल",
+      "title": "Totales de energía",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -156,12 +156,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पीवी"
+              "options": "fotovoltaica"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "पीवी"
+                "value": "fotovoltaica"
               },
               {
                 "id": "color",
@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Importación de red"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "ग्रिड आयात"
+                "value": "Importación de red"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Casa"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "घर"
+                "value": "Casa"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड में आपूर्ति"
+              "options": "Vertido"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "ग्रिड में आपूर्ति"
+                "value": "Vertido"
               },
               {
                 "id": "color",
@@ -302,7 +302,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "ग्रिड आयात",
+          "legendFormat": "Importación de red",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -314,8 +314,8 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "पीवी",
+          "expr": "sum(sum_over_time((clamp_min((sum(avg by (id) (pvPower_value{id!=\"\"})) or avg(pvPower_value{id=\"\"})), 0))[$__range:12m])) * 720 / 3600000",
+          "legendFormat": "fotovoltaica",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -327,8 +327,8 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "घर",
+          "expr": "sum(sum_over_time((clamp_min(avg(homePower_value), 0))[$__range:12m])) * 720 / 3600000",
+          "legendFormat": "Casa",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -340,7 +340,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
+          "expr": "sort_by_label(sum(sum_over_time((integrate((avg by (loadpoint) (chargePower_value{loadpoint!=\"\",loadpoint!~\"$loadpointBlocklist\"}))[1d] offset 2h) / 3600)[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
           "legendFormat": "{{loadpoint}}",
           "format": "time_series",
           "instant": true,
@@ -354,18 +354,18 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "ग्रिड में आपूर्ति",
+          "legendFormat": "Vertido",
           "format": "time_series",
           "instant": true,
           "range": false
         }
       ],
-      "description": "",
+      "description": "Experimental totals: PV, home and loadpoints use validated raw-data paths. Grid import and feed-in remain on rollups for now, because raw-only All-time paths still hit VM query limits or show material energy drift.",
       "transparent": false
     },
     {
       "id": 19,
-      "title": "वार्षिक उपज",
+      "title": "Yearly yield · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -378,7 +378,7 @@
         "y": 1
       },
       "pluginVersion": "12.3.3",
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -512,7 +512,7 @@
     },
     {
       "id": 25,
-      "title": "मासिक उपज/वर्ष",
+      "title": "Monthly yield/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               },
               {
                 "id": "decimals",
@@ -762,11 +762,12 @@
             "valueField": "value"
           }
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 24,
-      "title": "मेट्रिक गेज",
+      "title": "Indicadores",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -804,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "आत्मनिर्भरता"
+              "options": "Autosuficiencia"
             },
             "properties": [
               {
@@ -825,14 +826,14 @@
               },
               {
                 "id": "displayName",
-                "value": "आत्मनिर्भरता"
+                "value": "Autosuficiencia"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "स्व-उपभोग"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -853,7 +854,7 @@
               },
               {
                 "id": "displayName",
-                "value": "स्व-उपभोग"
+                "value": "Autoconsumo"
               }
             ]
           }
@@ -884,9 +885,9 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min((sum(avg by (id) (pvPower_value{id!=\"\"})) or avg(pvPower_value{id=\"\"})), 0))[$__range:12m])) * 720 / 3600000",
           "hide": true,
-          "legendFormat": "पीवी",
+          "legendFormat": "fotovoltaica",
           "refId": "pvEnergy",
           "instant": true,
           "range": false
@@ -899,7 +900,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "ग्रिड आयात",
+          "legendFormat": "Importación de red",
           "refId": "gridEnergyIn",
           "instant": true,
           "range": false
@@ -912,7 +913,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "ग्रिड में आपूर्ति",
+          "legendFormat": "Vertido",
           "refId": "gridEnergyOut",
           "instant": true,
           "range": false
@@ -923,9 +924,9 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((clamp_min(avg(homePower_value), 0))[$__range:12m])) * 720 / 3600000",
           "hide": true,
-          "legendFormat": "घर",
+          "legendFormat": "Casa",
           "refId": "homeEnergy",
           "instant": true,
           "range": false
@@ -936,9 +937,9 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((integrate((avg by (loadpoint) (chargePower_value{loadpoint!=\"\",loadpoint!~\"$loadpointBlocklist\"}))[1d] offset 2h) / 3600)[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "लोडपॉइंट",
+          "legendFormat": "Puntos de carga",
           "refId": "loadpointEnergy",
           "instant": true,
           "range": false
@@ -965,17 +966,18 @@
           "refId": "Self-consumption",
           "type": "math"
         }
-      ]
+      ],
+      "description": "Experimental gauges: PV, home and loadpoints use validated raw-data paths. Grid import and feed-in remain on rollups for the long-range values for now."
     },
     {
       "id": 29,
-      "title": "वार्षिक घरेलू खपत",
+      "title": "Yearly home consumption · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -1116,13 +1118,13 @@
     },
     {
       "id": 14,
-      "title": "मासिक घरेलू खपत/वर्ष",
+      "title": "Monthly home consumption/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -1186,7 +1188,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               },
               {
                 "id": "decimals",
@@ -1371,13 +1373,13 @@
     },
     {
       "id": 27,
-      "title": "वार्षिक ग्रिड आयात",
+      "title": "Yearly grid import · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -1518,13 +1520,13 @@
     },
     {
       "id": 15,
-      "title": "मासिक ग्रिड आयात/वर्ष",
+      "title": "Monthly grid import/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -1588,7 +1590,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               },
               {
                 "id": "decimals",
@@ -1804,7 +1806,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी चार्ज"
+                "value": "Carga de batería"
               },
               {
                 "id": "decimals",
@@ -1824,7 +1826,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी डिस्चार्ज"
+                "value": "Descarga de batería"
               },
               {
                 "id": "decimals",
@@ -1844,7 +1846,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बैटरी दक्षता"
+                "value": "Eficiencia de batería"
               },
               {
                 "id": "decimals",
@@ -1871,7 +1873,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "औसत अधिकतम SOC"
+                "value": "SOC máx medio"
               },
               {
                 "id": "unit",
@@ -1891,7 +1893,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "औसत न्यूनतम SOC"
+                "value": "SOC mín medio"
               },
               {
                 "id": "unit",
@@ -1995,18 +1997,19 @@
           "range": false
         }
       ],
-      "title": "बैटरी सारांश",
-      "type": "stat"
+      "title": "Battery summary · Rollup",
+      "type": "stat",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 17,
-      "title": "वार्षिक आपूर्ति",
+      "title": "Yearly feed-in · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 3,
@@ -2147,13 +2150,13 @@
     },
     {
       "id": 18,
-      "title": "मासिक आपूर्ति/वर्ष",
+      "title": "Monthly feed-in/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.",
       "gridPos": {
         "h": 6,
         "w": 16,
@@ -2217,7 +2220,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               },
               {
                 "id": "decimals",
@@ -2402,7 +2405,7 @@
     },
     {
       "id": 38,
-      "title": "सबसे अधिक उपज वाले दिन",
+      "title": "Days with highest yield · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2469,16 +2472,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "pvEnergy"
+              "options": "Energía FV"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "PV ऊर्जा"
               },
               {
                 "id": "custom.cellOptions",
@@ -2504,7 +2503,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV ऊर्जा"
+            "displayName": "Energía FV"
           }
         ]
       },
@@ -2518,16 +2517,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "pvEnergy",
+          "legendFormat": "Energía FV",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 39,
-      "title": "सबसे अधिक आपूर्ति",
+      "title": "Highest feed-in · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2594,16 +2594,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "feedIn"
+              "options": "Vertido"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "ग्रिड में आपूर्ति"
               },
               {
                 "id": "custom.cellOptions",
@@ -2629,7 +2625,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "ग्रिड में आपूर्ति"
+            "displayName": "Vertido"
           }
         ]
       },
@@ -2643,16 +2639,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_grid_export_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "feedIn",
+          "legendFormat": "Vertido",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 40,
-      "title": "सबसे अधिक घरेलू खपत",
+      "title": "Highest home consumption · Rollup",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2719,16 +2716,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "homeConsumption"
+              "options": "Consumo de la casa"
             },
             "properties": [
               {
                 "id": "unit",
                 "value": "kWh"
-              },
-              {
-                "id": "displayName",
-                "value": "घरेलू खपत"
               },
               {
                 "id": "custom.cellOptions",
@@ -2754,7 +2747,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "घरेलू खपत"
+            "displayName": "Consumo de la casa"
           }
         ]
       },
@@ -2768,16 +2761,17 @@
           "editorMode": "code",
           "expr": "max without(local_year,local_month)(evcc_home_energy_daily_wh) / 1000",
           "format": "time_series",
-          "legendFormat": "homeConsumption",
+          "legendFormat": "Consumo de la casa",
           "interval": "1d",
           "instant": false,
           "range": true
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 52,
-      "title": "प्लांट स्वास्थ्य",
+      "title": "Plant health · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2786,11 +2780,12 @@
         "x": 0,
         "y": 53
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 53,
-      "title": "प्रति वर्ष शीर्ष 30 दिनों का औसत",
+      "title": "Average top 30 days/year · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2803,7 +2798,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "यह प्रति वर्ष सर्वोत्तम 30 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक वर्ष अपने आप में निर्णायक नहीं होता।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nUses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -2937,7 +2932,7 @@
     },
     {
       "id": 54,
-      "title": "प्रति माह शीर्ष 5 दिनों का औसत",
+      "title": "Average top 5 days/month · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3006,7 +3001,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               },
               {
                 "id": "decimals",
@@ -3188,11 +3183,11 @@
           }
         }
       ],
-      "description": "यह प्रति माह सर्वोत्तम 5 दिनों की औसत उत्पादन का उपयोग करता है। इससे संभावित गिरावट का संकेत मिल सकता है, लेकिन इसे संदर्भ में समझना चाहिए। केवल एक महीना अपने आप में निर्णायक नहीं होता।"
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nUses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
     },
     {
       "id": 41,
-      "title": "वित्त",
+      "title": "Finances · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3201,11 +3196,12 @@
         "x": 0,
         "y": 67
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 28,
-      "title": "मासिक लागत",
+      "title": "Monthly costs · Rollup",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3274,7 +3270,7 @@
               },
               {
                 "id": "displayName",
-                "value": "माह"
+                "value": "Mes"
               }
             ]
           },
@@ -3426,11 +3422,12 @@
             "valueField": "value"
           }
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 46,
-      "title": "संतुलन",
+      "title": "Balance · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3439,11 +3436,12 @@
         "x": 0,
         "y": 81
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 47,
-      "title": "शक्ति संतुलन",
+      "title": "Power balance · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3488,7 +3486,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "बिजली कीमत: अंकगणितीय औसत"
+                "value": "Precio de la electricidad: media aritmética"
               },
               {
                 "id": "color",
@@ -3511,7 +3509,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "प्रभावी बिजली कीमत, गतिशील"
+                "value": "Precio efectivo de la electricidad, dinámico"
               },
               {
                 "id": "color",
@@ -3534,7 +3532,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "गतिशील टैरिफ से बचाई गई बिजली कीमत"
+                "value": "Precio ahorrado gracias a la tarifa dinámica"
               },
               {
                 "id": "unit",
@@ -3550,19 +3548,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अंकगणितीय कीमत पर संभावित खरीद"
+                "value": "Compra potencial al precio aritmético"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "खरीदा गया"
+              "options": "Comprado"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "खरीदा गया, गतिशील"
+                "value": "Comprado, dinámico"
               }
             ]
           },
@@ -3574,19 +3572,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "गतिशील टैरिफ से बचत"
+                "value": "Ahorro mediante tarifa dinámica"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "बेचा गया"
+              "options": "Vendido"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "बेचा गया (आपूर्ति)"
+                "value": "Vendido (vertido)"
               },
               {
                 "id": "color",
@@ -3605,7 +3603,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "संतुलन"
+                "value": "Balance"
               }
             ]
           }
@@ -3665,7 +3663,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) * -1",
-          "legendFormat": "खरीदा गया",
+          "legendFormat": "Comprado",
           "instant": true,
           "range": false
         },
@@ -3721,7 +3719,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d]))",
-          "legendFormat": "बेचा गया",
+          "legendFormat": "Vendido",
           "instant": true,
           "range": false
         },
@@ -3736,17 +3734,18 @@
           "hide": false,
           "type": "math"
         }
-      ]
+      ],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 50,
-      "title": "PV सिस्टम अमोर्टाइजेशन",
+      "title": "PV Anlage Amortisation · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nFor less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -3782,7 +3781,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV के बिना अब तक ऊर्जा लागत"
+                "value": "Costes de energía hasta ahora sin FV"
               },
               {
                 "id": "color",
@@ -3801,7 +3800,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अब तक खरीदी गई ऊर्जा लागत"
+                "value": "Costes de energía comprada hasta ahora"
               },
               {
                 "id": "color",
@@ -3820,7 +3819,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अब तक आपूर्ति प्रतिफल"
+                "value": "Compensación por vertido hasta ahora"
               },
               {
                 "id": "color",
@@ -3839,7 +3838,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अब तक ऊर्जा लागत"
+                "value": "Costes de energía hasta ahora"
               },
               {
                 "id": "thresholds",
@@ -3867,7 +3866,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "अब तक पूंजी वापसी"
+                "value": "Retorno de capital hasta ahora"
               },
               {
                 "id": "color",
@@ -3886,7 +3885,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "पूर्वानुमान आधारित"
+                "value": "Pronóstico basado en"
               },
               {
                 "id": "unit",
@@ -3913,7 +3912,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वार्षिक पूंजी वापसी"
+                "value": "Retorno de capital anual"
               }
             ]
           },
@@ -3925,7 +3924,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वापसी अवधि"
+                "value": "Periodo de amortización"
               },
               {
                 "id": "unit",
@@ -3941,7 +3940,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वार्षिक वापसी दर"
+                "value": "Tasa de amortización anual"
               },
               {
                 "id": "unit",
@@ -4106,13 +4105,13 @@
     },
     {
       "id": 51,
-      "title": "बैटरी अमोर्टाइजेशन",
+      "title": "Speicher Amortisation · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nFor less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4148,7 +4147,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "चार्ज की गई ऊर्जा"
+                "value": "Energía cargada"
               },
               {
                 "id": "unit",
@@ -4171,7 +4170,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "डिस्चार्ज की गई ऊर्जा"
+                "value": "Energía descargada"
               },
               {
                 "id": "unit",
@@ -4194,7 +4193,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "स्टोरेज हानि"
+                "value": "Pérdidas de almacenamiento"
               },
               {
                 "id": "unit",
@@ -4217,7 +4216,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "पूर्ण चक्र"
+                "value": "Ciclos completos"
               },
               {
                 "id": "unit",
@@ -4237,7 +4236,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "पूर्वानुमान आधारित"
+                "value": "Pronóstico basado en"
               },
               {
                 "id": "unit",
@@ -4264,7 +4263,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वार्षिक वापसी"
+                "value": "Amortización anual"
               }
             ]
           },
@@ -4276,7 +4275,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वापसी अवधि"
+                "value": "Periodo de amortización"
               },
               {
                 "id": "unit",
@@ -4292,7 +4291,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "वार्षिक वापसी दर"
+                "value": "Tasa de amortización anual"
               },
               {
                 "id": "unit",
@@ -4446,7 +4445,7 @@
     },
     {
       "id": 48,
-      "title": "वाहन",
+      "title": "Fahrzeuge · Rollup",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4455,17 +4454,18 @@
         "x": 0,
         "y": 92
       },
-      "panels": []
+      "panels": [],
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query."
     },
     {
       "id": 49,
-      "title": "$vehicle ड्राइविंग लागत",
+      "title": "Driving costs $vehicle · Rollup",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "मान औसतों पर आधारित मोटे अनुमान हैं। बाहरी चार्जिंग सत्र शामिल नहीं हैं。",
+      "description": "Rollup-based. This panel still uses precomputed rollup metrics and does not yet run on a pure raw-data query.\n\nValues are rough estimates based on averages. External charging sessions are not included.",
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -4515,7 +4515,7 @@
               },
               {
                 "id": "displayName",
-                "value": "चले हुए किलोमीटर"
+                "value": "Kilómetros recorridos"
               },
               {
                 "id": "color",
@@ -4538,7 +4538,7 @@
               },
               {
                 "id": "displayName",
-                "value": "अनुमानित खपत"
+                "value": "Consumo estimado"
               },
               {
                 "id": "decimals",
@@ -4569,7 +4569,7 @@
               },
               {
                 "id": "displayName",
-                "value": "सौर हिस्सा"
+                "value": "Cuota solar"
               },
               {
                 "id": "color",
@@ -4596,7 +4596,7 @@
               },
               {
                 "id": "displayName",
-                "value": "प्रभावी चार्जिंग कीमत/kWh"
+                "value": "Precio efectivo de carga/kWh"
               },
               {
                 "id": "color",
@@ -4615,7 +4615,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "$vehicle ड्राइविंग लागत PV के बिना"
+                "value": "Costes de conducción $vehicle sin FV"
               },
               {
                 "id": "color",
@@ -4634,7 +4634,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "$vehicle ड्राइविंग लागत PV के साथ"
+                "value": "Costes de conducción $vehicle con FV"
               },
               {
                 "id": "color",
@@ -4653,7 +4653,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "PV से ड्राइविंग लागत की बचत"
+                "value": "Ahorro de costes de conducción gracias a FV"
               },
               {
                 "id": "thresholds",
@@ -4681,7 +4681,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "इंजन वाहन चलाने की लागत"
+                "value": "Costes de conducción motor térmico"
               }
             ]
           },
@@ -4693,7 +4693,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "इंजन वाहन की तुलना में बचत"
+                "value": "Ahorro frente a motor térmico"
               },
               {
                 "id": "thresholds",
@@ -4859,7 +4859,9 @@
   "refresh": "5m",
   "schemaVersion": 42,
   "tags": [
-    "EVCC"
+    "EVCC",
+    "Raw",
+    "Experimental"
   ],
   "templating": {
     "list": [
@@ -4867,7 +4869,7 @@
         "name": "peakPowerLimit",
         "type": "constant",
         "query": "30000",
-        "label": "अधिकतम शक्ति सीमा",
+        "label": "Límite de potencia máxima",
         "current": {
           "text": "30000",
           "value": "30000"
@@ -4885,7 +4887,7 @@
         "name": "energySampleInterval",
         "type": "constant",
         "query": "30s",
-        "label": "ऊर्जा सैंपल अंतराल",
+        "label": "Intervalo de muestreo de energía",
         "current": {
           "text": "30s",
           "value": "30s"
@@ -4903,7 +4905,7 @@
         "name": "tariffPriceInterval",
         "type": "constant",
         "query": "15m",
-        "label": "टैरिफ अंतराल",
+        "label": "Intervalo de tarifa",
         "current": {
           "text": "15m",
           "value": "15m"
@@ -4921,7 +4923,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "लोडपॉइंट ब्लॉकलिस्ट",
+        "label": "Lista de bloqueo punto de carga",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4939,7 +4941,7 @@
         "name": "extBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "EXT ब्लॉकलिस्ट",
+        "label": "Lista de bloqueo EXT",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4957,7 +4959,7 @@
         "name": "auxBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "AUX ब्लॉकलिस्ट",
+        "label": "Lista de bloqueo AUX",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4988,9 +4990,9 @@
         "label": "installedWattPeak"
       },
       {
-        "description": "छिपाए जाने वाले वाहनों के लिए Regex।",
+        "description": "Regex de vehículos que deben ocultarse.",
         "hide": 2,
-        "label": "वाहन ब्लॉकलिस्ट",
+        "label": "Lista de bloqueo vehículo",
         "name": "vehicleBlocklist",
         "query": "^Altherma-3$",
         "skipUrlSync": true,
@@ -5017,7 +5019,7 @@
         "definition": "label_values(sessionPricePerKWh_value{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
         "hide": 2,
         "includeAll": true,
-        "label": "वाहन",
+        "label": "Vehículo",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -5037,7 +5039,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "इंजन खपत l/100km",
+        "label": "Consumo térmico l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -5056,7 +5058,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "ईंधन मूल्य/लीटर",
+        "label": "Precio combustible/l",
         "name": "spritKosten",
         "options": [
           {
@@ -5075,7 +5077,7 @@
           "value": "24884"
         },
         "includeAll": false,
-        "label": "PV खरीद मूल्य",
+        "label": "Precio de compra FV",
         "name": "purchasePricePv",
         "options": [
           {
@@ -5086,7 +5088,7 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "PV सिस्टम निवेश लागत",
+        "description": "Coste de inversión FV",
         "hide": 2
       },
       {
@@ -5095,7 +5097,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "बैटरी खरीद मूल्य",
+        "label": "Precio de compra batería",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -5106,7 +5108,7 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "बैटरी निवेश लागत",
+        "description": "Coste de inversión batería",
         "hide": 2
       },
       {
@@ -5115,7 +5117,7 @@
           "value": "100"
         },
         "includeAll": false,
-        "label": "चालू लागत",
+        "label": "Costes corrientes",
         "name": "runningCosts",
         "options": [
           {
@@ -5126,7 +5128,7 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "वार्षिक आवर्ती सिस्टम लागत",
+        "description": "Costes recurrentes anuales del sistema",
         "hide": 2
       },
       {
@@ -5135,7 +5137,7 @@
           "value": "9500"
         },
         "includeAll": false,
-        "label": "बैटरी क्षमता / Wh",
+        "label": "Capacidad de batería / Wh",
         "name": "speicherkapazitaet",
         "options": [
           {
@@ -5146,13 +5148,13 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "Wh में उपयोगी घरेलू बैटरी क्षमता",
+        "description": "Capacidad útil de batería doméstica en Wh",
         "hide": 2
       },
       {
-        "description": "EVCC खोलने के लिए प्रयुक्त URL।",
+        "description": "URL utilizada para abrir EVCC.",
         "hide": 2,
-        "label": "ईवीसीसी यूआरएल",
+        "label": "URL de EVCC",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -5171,9 +5173,9 @@
         ]
       },
       {
-        "description": "पोर्टल लिंक के लिए इन्वर्टर पोर्टल का नाम।",
+        "description": "Nombre del portal del inversor para el enlace al portal.",
         "hide": 2,
-        "label": "इन्वर्टर पोर्टल नाम",
+        "label": "Nombre del portal del inversor",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -5192,9 +5194,9 @@
         ]
       },
       {
-        "description": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।",
+        "description": "URL utilizada para abrir el portal del inversor.",
         "hide": 2,
-        "label": "इन्वर्टर पोर्टल URL",
+        "label": "URL del portal del inversor",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -5220,8 +5222,9 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: ऑल-टाइम",
-  "uid": "vm-alltime-en-orig",
-  "version": 6,
-  "weekStart": ""
+  "title": "VM: EVCC: All-time Raw",
+  "uid": "vm-alltime-raw-en-orig",
+  "version": 1,
+  "weekStart": "",
+  "description": "Experimental hybrid dashboard: panels with the title suffix \"· Rollup\" still use precomputed rollup metrics. In the unmarked totals/gauge panels, PV, home and loadpoints use validated raw-data paths; grid import and feed-in remain on rollups for now."
 }

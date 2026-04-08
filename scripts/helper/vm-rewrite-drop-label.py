@@ -19,8 +19,8 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.06.2"
-SCRIPT_LAST_MODIFIED = "2026-04-06"
+SCRIPT_VERSION = "2026.04.08.1"
+SCRIPT_LAST_MODIFIED = "2026-04-08"
 
 
 @dataclass(frozen=True)
@@ -37,8 +37,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base-url", required=True, help="VictoriaMetrics base URL, e.g. http://192.168.1.160:8428")
     parser.add_argument(
         "--matcher",
-        default='{db="evcc",host!=""}',
-        help='VM series matcher for the source series, e.g. {db="evcc",host!=""}',
+        default='{host!=""}',
+        help='VM series matcher for the source series, e.g. {host!=""}',
     )
     parser.add_argument(
         "--drop-label",
@@ -213,7 +213,7 @@ def fetch_target_series(base_url: str, metric: dict[str, str], dropped_label: st
     matcher = target_matcher(metric, dropped_label)
     exact_metric = dict(metric)
     # VM export selectors match supersets too. Filter client-side so a broad
-    # matcher like {__name__="pvPower_value",db="evcc"} only sees the exact
+    # matcher like {__name__="pvPower_value"} only sees the exact
     # hostless target series and not sibling detail series with extra labels.
     return [item for item in iter_export_lines(base_url, matcher) if item.get("metric", {}) == exact_metric]
 

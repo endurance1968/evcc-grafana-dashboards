@@ -339,7 +339,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(range_sum(integrate(avg by (title)(pvPower_value{id!=\"\"}) < $peakPowerLimit)) / 3600000, \"title\")",
+          "expr": "sort_by_label(range_sum(integrate((avg by (title) (pvPower_value{id!=\"\",title!=\"\"}) or label_copy(avg by (id) (pvPower_value{id!=\"\",title=\"\"}), \"id\", \"title\")) < $peakPowerLimit)) / 3600000, \"title\")",
           "format": "time_series",
           "interval": "",
           "legendFormat": "{{title}}",
@@ -377,7 +377,9 @@
         {
           "id": "reduce",
           "options": {
+            "includeTimeField": false,
             "labelsToFields": false,
+            "mode": "seriesToRows",
             "reducers": [
               "lastNotNull"
             ]
@@ -515,7 +517,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(avg by (title)(pvPower_value{title!=\"\"}), \"title\")",
+          "expr": "sort_by_label((avg by (title) (pvPower_value{id!=\"\",title!=\"\"}) or label_copy(avg by (id) (pvPower_value{id!=\"\",title=\"\"}), \"id\", \"title\")), \"title\")",
           "format": "time_series",
           "legendFormat": "{{title}}",
           "range": true,
@@ -635,7 +637,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "batterySoc_value{id=\"\"}",
+          "expr": "avg(batterySoc_value{id=\"\"})",
           "format": "time_series",
           "legendFormat": "Totaal",
           "range": false,
@@ -861,7 +863,7 @@
           "showLegend": true
         },
         "orientation": "horizontal",
-        "showValue": "always",
+        "showValue": "never",
         "stacking": "none",
         "text": {
           "valueSize": 20
@@ -921,7 +923,9 @@
         {
           "id": "reduce",
           "options": {
+            "includeTimeField": false,
             "labelsToFields": false,
+            "mode": "seriesToRows",
             "reducers": [
               "lastNotNull"
             ]
@@ -1196,7 +1200,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1209,7 +1213,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1222,7 +1226,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))  - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1369,7 +1373,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1382,7 +1386,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1395,7 +1399,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) - avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+          "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1514,7 +1518,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 - range_sum(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"})))/3600",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 - range_sum(integrate(sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1527,7 +1531,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 ",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 ",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1540,7 +1544,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(avg(sum(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600 ",
+          "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600 ",
           "format": "time_series",
           "interval": "$energySampleInterval",
           "legendFormat": "Overig",
@@ -1717,7 +1721,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
+          "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "Overig",
@@ -1730,7 +1734,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600",
+          "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "Overig",
@@ -1743,7 +1747,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(integrate(homePower_value offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
+          "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "Overig",
@@ -1756,7 +1760,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h)/3600, \"title\")",
+          "expr": "sort_by_label(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}) offset -1h)/3600, \"title\")",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "{{title}}",
@@ -1769,7 +1773,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}offset -1h)/3600, \"title\")",
+          "expr": "sort_by_label(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}) offset -1h)/3600, \"title\")",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "__auto",
@@ -2059,7 +2063,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(integrate(homePower_value offset -1h))/3600",
+          "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600",
           "format": "time_series",
           "interval": "1h",
           "legendFormat": "Thuis",
@@ -3030,7 +3034,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "tariffCo2_value offset -$tariffPriceInterval",
+          "expr": "avg(tariffCo2_value offset -$tariffPriceInterval)",
           "format": "time_series",
           "interval": "$tariffPriceInterval",
           "legendFormat": "CO2",
@@ -3043,7 +3047,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "clamp_min(gridPower_value, 0)",
+          "expr": "clamp_min(avg(gridPower_value), 0)",
           "format": "time_series",
           "legendFormat": "Netafname",
           "range": true,
@@ -4103,13 +4107,13 @@
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "definition": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
+        "definition": "label_values(chargePower_value, loadpoint)",
         "includeAll": true,
         "label": "Laadpunt",
         "multi": true,
         "name": "loadpoint",
         "options": [],
-        "query": "label_values(chargePower_value{db=\"evcc\"}, loadpoint)",
+        "query": "label_values(chargePower_value, loadpoint)",
         "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",

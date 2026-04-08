@@ -1,3 +1,6 @@
+/**
+ * Audit localized dashboards and report untranslated or inconsistent text keys.
+ */
 import fs from "node:fs";
 import path from "node:path";
 import {

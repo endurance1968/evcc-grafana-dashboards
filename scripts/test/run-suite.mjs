@@ -1,3 +1,6 @@
+/**
+ * Run the Grafana dashboard test workflow across source and translation variants.
+ */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";

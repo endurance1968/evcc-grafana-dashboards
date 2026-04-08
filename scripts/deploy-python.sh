@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
+# Deploy dashboards to Grafana with the portable POSIX shell flow.
+# Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)

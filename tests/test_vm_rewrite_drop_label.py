@@ -19,7 +19,7 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         item = {
             "metric": {
                 "__name__": "pvPower_value",
-                "db": "evcc",
+
                 "host": "lx-telemetry-ingest",
             },
             "timestamps": [1, 2],
@@ -32,24 +32,24 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             rewritten["metric"],
             {
                 "__name__": "pvPower_value",
-                "db": "evcc",
+
             },
         )
         self.assertEqual(
             MODULE.target_matcher(rewritten["metric"], "host"),
-            '{__name__="pvPower_value",db="evcc"}',
+            '{__name__="pvPower_value"}',
         )
 
     def test_fetch_target_series_filters_out_sibling_detail_series_for_broad_matcher(self):
-        metric = {"__name__": "pvPower_value", "db": "evcc"}
+        metric = {"__name__": "pvPower_value"}
         exported = [
             {
-                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "metric": {"__name__": "pvPower_value"},
                 "timestamps": [1000],
                 "values": [10.0],
             },
             {
-                "metric": {"__name__": "pvPower_value", "db": "evcc", "id": "1", "title": "SMA-Sued"},
+                "metric": {"__name__": "pvPower_value", "id": "1", "title": "SMA-Sued"},
                 "timestamps": [1000],
                 "values": [20.0],
             },
@@ -69,12 +69,12 @@ class VmRewriteDropLabelTests(unittest.TestCase):
     def test_combine_rewritten_series_merges_multiple_sources_for_same_target(self):
         items = [
             {
-                "metric": {"__name__": "batterySoc_value", "db": "evcc", "id": "1"},
+                "metric": {"__name__": "batterySoc_value", "id": "1"},
                 "timestamps": [1000, 2000],
                 "values": [10.0, 20.0],
             },
             {
-                "metric": {"__name__": "batterySoc_value", "db": "evcc", "id": "1"},
+                "metric": {"__name__": "batterySoc_value", "id": "1"},
                 "timestamps": [3000, 4000],
                 "values": [30.0, 40.0],
             },
@@ -88,12 +88,12 @@ class VmRewriteDropLabelTests(unittest.TestCase):
     def test_import_rewritten_file_accumulates_expected_stats_per_target_matcher(self):
         rows = [
             {
-                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "metric": {"__name__": "pvPower_value"},
                 "timestamps": [1000],
                 "values": [1.0],
             },
             {
-                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "metric": {"__name__": "pvPower_value"},
                 "timestamps": [2000, 3000],
                 "values": [2.0, 3.0],
             },
@@ -132,19 +132,19 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         finally:
             shutil.rmtree(temp_dir, ignore_errors=True)
 
-        matcher = '{__name__="pvPower_value",db="evcc"}'
+        matcher = '{__name__="pvPower_value"}'
         self.assertEqual(list(expected_targets), [matcher])
         self.assertEqual(expected_targets[matcher], MODULE.SeriesStats(points=3, first=1000, last=3000))
 
     def test_merge_with_targets_can_keep_existing_target_values_on_conflict(self):
         item = {
-            "metric": {"__name__": "pvPower_value", "db": "evcc"},
+            "metric": {"__name__": "pvPower_value"},
             "timestamps": [1000, 2000],
             "values": [10.0, 20.0],
         }
         existing = [
             {
-                "metric": {"__name__": "pvPower_value", "db": "evcc"},
+                "metric": {"__name__": "pvPower_value"},
                 "timestamps": [1000, 3000],
                 "values": [1.0, 30.0],
             }
@@ -163,12 +163,12 @@ class VmRewriteDropLabelTests(unittest.TestCase):
     def test_count_internal_value_conflicts_counts_duplicate_timestamps_with_different_values(self):
         items = [
             {
-                "metric": {"__name__": "batteryCapacity_value", "db": "evcc"},
+                "metric": {"__name__": "batteryCapacity_value"},
                 "timestamps": [1000, 2000],
                 "values": [0.0, 1.0],
             },
             {
-                "metric": {"__name__": "batteryCapacity_value", "db": "evcc"},
+                "metric": {"__name__": "batteryCapacity_value"},
                 "timestamps": [1000, 3000],
                 "values": [1.0, 2.0],
             },
@@ -178,7 +178,7 @@ class VmRewriteDropLabelTests(unittest.TestCase):
 
     def test_should_delete_source_only_when_every_point_is_fully_shadowed(self):
         item = {
-            "metric": {"__name__": "pvPower_value", "db": "evcc"},
+            "metric": {"__name__": "pvPower_value"},
             "timestamps": [1000, 2000],
             "values": [10.0, 20.0],
         }

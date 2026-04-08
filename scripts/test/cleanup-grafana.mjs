@@ -1,4 +1,7 @@
-﻿import {
+/**
+ * Remove imported Grafana test dashboards and folders created during test runs.
+ */
+import {
   grafanaApi,
   loadEnvFile,
   optionalEnv,

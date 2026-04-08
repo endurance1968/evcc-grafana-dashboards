@@ -18,8 +18,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.06.1"
-SCRIPT_LAST_MODIFIED = "2026-04-06"
+SCRIPT_VERSION = "2026.04.08.2"
+SCRIPT_LAST_MODIFIED = "2026-04-08"
 
 
 def current_local_timestamp() -> datetime:
@@ -52,7 +52,6 @@ def print_report_header(title: str, underline: str, generated_at: str | None = N
 @dataclass(frozen=True)
 class Settings:
     base_url: str
-    db_label: str
     host_label: str
     timezone: str
     metric_prefix: str
@@ -256,7 +255,6 @@ def load_settings(path: str) -> Settings:
 
     return Settings(
         base_url=parser.get("victoriametrics", "base_url").rstrip("/"),
-        db_label=parser.get("victoriametrics", "db_label"),
         host_label=parser.get("victoriametrics", "host_label", fallback=""),
         timezone=parser.get("victoriametrics", "timezone"),
         metric_prefix=parser.get("victoriametrics", "metric_prefix"),
@@ -329,13 +327,23 @@ def http_post_bytes(
         bump_profile_value("http_post_bytes_payload_mb", len(payload) / (1024 * 1024))
 
 
-def quote_label(value: str) -> str:
-    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
-    return f'"{escaped}"'
+def join_matchers(*parts: str) -> str:
+    values: list[str] = []
+    for part in parts:
+        if not part:
+            continue
+        values.extend([item for item in part.split(",") if item])
+    return ",".join(values)
+
+
+def selector(metric_name: str, *parts: str) -> str:
+    matcher = join_matchers(*parts)
+    return f"{metric_name}{{{matcher}}}" if matcher else metric_name
 
 
 def base_matchers(settings: Settings) -> str:
-    return f'db={quote_label(settings.db_label)}'
+    _ = settings
+    return ""
 
 
 def record_name(settings: Settings, suffix: str) -> str:
@@ -343,7 +351,7 @@ def record_name(settings: Settings, suffix: str) -> str:
 
 
 def series_match(settings: Settings, metric_name: str) -> str:
-    return f'{metric_name}' + "{" + base_matchers(settings) + "}"
+    return selector(metric_name, base_matchers(settings))
 
 
 def collect_label_values(series: list[dict], label_name: str) -> list[str]:
@@ -397,7 +405,7 @@ def detect_dimensions(settings: Settings) -> dict[str, list[str]]:
 
 def build_catalog(settings: Settings) -> list[RollupMetric]:
     root = base_matchers(settings)
-    root_no_id = root + ',id=""'
+    root_no_id = join_matchers(root, 'id=""')
     return [
         RollupMetric(
             key="pv_daily_energy",
@@ -420,7 +428,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="loadpoint_daily_energy",
             record=record_name(settings, "loadpoint_energy_daily_wh"),
-            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (loadpoint) / 3600",
+            expr=f"integrate((avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')}))[1d]) / 3600",
             description="Per-loadpoint daily charging energy.",
             phase="phase-1",
             implemented=True,
@@ -429,7 +437,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="vehicle_daily_energy",
             record=record_name(settings, "vehicle_energy_daily_wh"),
-            expr=f"sum(integrate(chargePower_value{{{root}}}[1d])) by (vehicle) / 3600",
+            expr=f"integrate((avg by (vehicle) ({selector('chargePower_value', root, 'vehicle!=""')}))[1d]) / 3600",
             description="Per-vehicle daily charging energy.",
             phase="phase-1",
             implemented=True,
@@ -439,8 +447,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             key="vehicle_daily_distance",
             record=record_name(settings, "vehicle_distance_daily_km"),
             expr=(
-                f"max(max_over_time((vehicleOdometer_value{{{root}}} > 0)[1d])) by (vehicle) "
-                f"- max(max_over_time((vehicleOdometer_value{{{root}}} > 0)[1d] offset 1d)) by (vehicle)"
+                f"max(max_over_time(({selector('vehicleOdometer_value', root)} > 0)[1d])) by (vehicle) "
+                f"- max(max_over_time(({selector('vehicleOdometer_value', root)} > 0)[1d] offset 1d)) by (vehicle)"
             ),
             description="Per-vehicle daily driven distance from odometer spread.",
             phase="phase-1",
@@ -504,7 +512,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
-            expr=f"sum(integrate(extPower_value{{{root}}}[1d])) by (title) / 3600",
+            expr=f"integrate((avg by (title) ({selector('extPower_value', root, 'title!=""')}))[1d]) / 3600",
             description="Per-ext-title daily energy.",
             phase="phase-1",
             implemented=True,
@@ -513,7 +521,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="aux_daily_energy",
             record=record_name(settings, "aux_energy_daily_wh"),
-            expr=f"sum(integrate(auxPower_value{{{root}}}[1d])) by (title) / 3600",
+            expr=f"integrate((avg by (title) ({selector('auxPower_value', root, 'title!=""')}))[1d]) / 3600",
             description="Per-aux-title daily energy.",
             phase="phase-1",
             implemented=True,
@@ -796,7 +804,6 @@ def print_detect(settings: Settings, as_json: bool = False) -> int:
     print(f"Namespace:  {settings.metric_prefix}")
     print(f"Timezone:   {settings.timezone}")
     print(f"VM base:    {settings.base_url}")
-    print(f"db label:   {settings.db_label}")
     print(f"Range:      {settings.benchmark_start} -> {settings.benchmark_end}")
     print_list_section("Loadpoints", detection["loadpoints"])
     print_list_section("Vehicles", detection["vehicles"])
@@ -833,7 +840,6 @@ def print_plan(settings: Settings, as_json: bool = False) -> int:
     print(f"Namespace:   {settings.metric_prefix}")
     print(f"Timezone:    {settings.timezone}")
     print(f"VM base:     {settings.base_url}")
-    print(f"db label:    {settings.db_label}")
     print(f"Raw step:    {settings.raw_sample_step}")
     print(f"Energy step: {settings.energy_rollup_step}")
     print(f"Price bucket minutes: {settings.price_bucket_minutes}")
@@ -1015,7 +1021,7 @@ def fetch_battery_soc_extrema(settings: Settings, window: DayWindow) -> tuple[fl
         settings,
         "/api/v1/query_range",
         {
-            "query": f"batterySoc_value{{{base_matchers(settings)}}}",
+            "query": f"{selector('batterySoc_value', base_matchers(settings))}",
             "start": window.start_iso,
             "end": window.end_iso,
             "step": "10m",
@@ -1406,19 +1412,21 @@ def summarize_legacy_positive_energy_rollups_from_matrix(
 
 def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     root = base_matchers(settings)
-    root_no_id = root + ',id=""'
     if item.key == "pv_daily_energy":
-        return f'sum without(host, id, title) (pvPower_value{{{root},id!=""}}) or sum without(host) (pvPower_value{{{root_no_id}}})'
+        return (
+            f'sum(avg by (id) ({selector("pvPower_value", root, "id!=\"\"")})) '
+            f'or avg({selector("pvPower_value", root, "id=\"\"")})'
+        )
     if item.key == "home_daily_energy":
-        return f'sum without(host) (homePower_value{{{root}}})'
+        return f'avg({selector("homePower_value", root)})'
     if item.key == "loadpoint_daily_energy":
-        return f'sum by (loadpoint) (chargePower_value{{{root}}})'
+        return f'avg by (loadpoint) ({selector("chargePower_value", root, "loadpoint!=\"\"")})'
     if item.key == "vehicle_daily_energy":
-        return f'sum by (vehicle) (chargePower_value{{{root}}})'
+        return f'avg by (vehicle) ({selector("chargePower_value", root, "vehicle!=\"\"")})'
     if item.key == "ext_daily_energy":
-        return f'sum by (title) (extPower_value{{{root}}})'
+        return f'avg by (title) ({selector("extPower_value", root, "title!=\"\"")})'
     if item.key == "aux_daily_energy":
-        return f'sum by (title) (auxPower_value{{{root}}})'
+        return f'avg by (title) ({selector("auxPower_value", root, "title!=\"\"")})'
     raise ValueError(f"Unsupported positive energy key: {item.key}")
 
 
@@ -1615,35 +1623,35 @@ def fetch_chunk_consumer_attribution_context(settings: Settings, chunk: ChunkWin
     context = {
         "pv_samples": fetch_single_series_range(
             settings,
-            f'sum without(host) (pvPower_value{{id="",{root}}})',
+            f"avg({selector('pvPower_value', root, 'id=""')})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "battery_samples": fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (batteryPower_value{{id="",{root}}})[{settings.raw_sample_step}])',
+            f"avg_over_time(avg({selector('batteryPower_value', root, 'id=""')})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "charge_loadpoint_matrix": fetch_series_range(
             settings,
-            f'sum by (loadpoint) (chargePower_value{{{root},loadpoint!=""}})',
+            f"avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "ext_title_matrix": fetch_series_range(
             settings,
-            f'sum by (title) (extPower_value{{{root},title!=""}})',
+            f"avg by (title) ({selector('extPower_value', root, 'title!=""')})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "aux_title_matrix": fetch_series_range(
             settings,
-            f'sum by (title) (auxPower_value{{{root},title!=""}})',
+            f"avg by (title) ({selector('auxPower_value', root, 'title!=""')})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -1785,14 +1793,14 @@ def fetch_grid_energy_rollups(
     if context is None:
         grid_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("gridPower_value", base_matchers(settings))})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         grid_energy_samples = fetch_single_series_range(
             settings,
-            f'sum without(host) (gridEnergy_value{{{base_matchers(settings)}}})',
+            f'avg({selector("gridEnergy_value", base_matchers(settings))})',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -1817,7 +1825,7 @@ def fetch_battery_energy_rollups(
     if context is None:
         battery_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (batteryPower_value{{id="",{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("batteryPower_value", base_matchers(settings), "id=\"\"")})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -1835,63 +1843,63 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
         "raw_step_seconds": raw_step_seconds,
         "grid_samples": fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (gridPower_value{{{root}}})[{settings.raw_sample_step}])',
+            f"avg_over_time(avg({selector('gridPower_value', root)})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "grid_energy_samples": fetch_single_series_range(
             settings,
-            f'sum without(host) (gridEnergy_value{{{root}}})',
+            f"avg({selector('gridEnergy_value', root)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "battery_samples": fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (batteryPower_value{{id="",{root}}})[{settings.raw_sample_step}])',
+            f"avg_over_time(avg({selector('batteryPower_value', root, 'id=""')})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "home_samples": fetch_single_series_range(
             settings,
-            f'avg_over_time(sum without(host) (homePower_value{{{root}}})[{settings.raw_sample_step}])',
+            f"avg_over_time(avg({selector('homePower_value', root)})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "charge_total_samples": fetch_single_series_range(
             settings,
-            f'avg_over_time(sum without(host) (chargePower_value{{{root}}})[{settings.raw_sample_step}])',
+            f"avg_over_time((sum(avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')})))[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "charge_vehicle_matrix": fetch_series_range(
             settings,
-            f'sum by (vehicle) (chargePower_value{{{root},vehicle!=""}})',
+            f"avg by (vehicle) ({selector('chargePower_value', root, 'vehicle!=""')})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "grid_tariff_samples": fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffGrid_value{{{root}}})',
+            f"avg({selector('tariffGrid_value', root)})",
             extended_start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "feed_in_tariff_samples": fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffFeedIn_value{{{root}}})',
+            f"avg({selector('tariffFeedIn_value', root)})",
             extended_start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "loadpoint_tariff_samples": fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffPriceLoadpoints_value{{{root}}})',
+            f"avg({selector('tariffPriceLoadpoints_value', root)})",
             extended_start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -2012,21 +2020,21 @@ def fetch_grid_price_rollups(
         extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
         tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffGrid_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         feed_in_tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffFeedIn_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffFeedIn_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         grid_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (gridPower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("gridPower_value", base_matchers(settings))})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2060,21 +2068,21 @@ def fetch_vehicle_price_rollups(
         extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
         grid_tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffGrid_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         charge_tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffPriceLoadpoints_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffPriceLoadpoints_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         charge_matrix = fetch_series_range(
             settings,
-            f'sum by (vehicle) (chargePower_value{{{base_matchers(settings)},vehicle!=""}})',
+            f'avg by (vehicle) ({selector("chargePower_value", base_matchers(settings), "vehicle!=\"\"")})',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2127,35 +2135,35 @@ def fetch_aggregate_price_rollups(
         extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
         grid_tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffGrid_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffGrid_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         feed_in_tariff_samples = fetch_single_series_range(
             settings,
-            f'avg without(host) (tariffFeedIn_value{{{base_matchers(settings)}}})',
+            f'avg({selector("tariffFeedIn_value", base_matchers(settings))})',
             extended_start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         home_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(sum without(host) (homePower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("homePower_value", base_matchers(settings))})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         charge_total_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(sum without(host) (chargePower_value{{{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time((sum(avg by (loadpoint) ({selector("chargePower_value", base_matchers(settings), "loadpoint!=\"\"")})))[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         battery_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg without(host) (batteryPower_value{{id="",{base_matchers(settings)}}})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("batteryPower_value", base_matchers(settings), "id=\"\"")})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2237,9 +2245,9 @@ def window_local_labels(window: DayWindow) -> dict[str, str]:
 
 
 def base_daily_labels(settings: Settings, record: str, window: DayWindow) -> dict[str, str]:
+    _ = settings
     labels: dict[str, str] = {
         "__name__": record,
-        "db": settings.db_label,
     }
     labels.update(window_local_labels(window))
     return labels
@@ -2327,7 +2335,6 @@ def build_pv_health_rollups(
             {
                 "metric": {
                     "__name__": yearly_record,
-                    "db": settings.db_label,
                     "local_year": local_year,
                 },
                 "values": [value],
@@ -2344,7 +2351,6 @@ def build_pv_health_rollups(
             {
                 "metric": {
                     "__name__": monthly_record,
-                    "db": settings.db_label,
                     "local_year": local_year,
                     "local_month": local_month,
                 },
@@ -2995,7 +3001,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
 
 
 
