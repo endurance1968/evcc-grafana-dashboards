@@ -142,5 +142,60 @@ class CompareImportCoverageVmTests(unittest.TestCase):
         self.assertAlmostEqual(value, 0.02, places=6)
 
 
+    def test_compare_measurement_skips_ignored_additional_status_measurement(self):
+        original_influx_stats = COMPARE_MODULE.influx_stats
+        original_influx_field_types = COMPARE_MODULE.influx_field_types
+        original_choose_vm_metric = COMPARE_MODULE.choose_vm_metric
+        try:
+            COMPARE_MODULE.influx_stats = lambda *args, **kwargs: COMPARE_MODULE.SpanStats(points=738, series=8, first=None, last=None)
+            COMPARE_MODULE.influx_field_types = lambda *args, **kwargs: ["string"]
+            COMPARE_MODULE.choose_vm_metric = lambda *args, **kwargs: ("chargerIcon", COMPARE_MODULE.SpanStats(points=0, series=0, first=None, last=None))
+            result = COMPARE_MODULE.compare_measurement(
+                "http://127.0.0.1:8086",
+                "evcc",
+                "http://127.0.0.1:8428",
+                "chargerIcon",
+                "2025-01-01T00:00:00Z",
+                "2025-01-31T23:59:59Z",
+                None,
+                None,
+                3600,
+            )
+        finally:
+            COMPARE_MODULE.influx_stats = original_influx_stats
+            COMPARE_MODULE.influx_field_types = original_influx_field_types
+            COMPARE_MODULE.choose_vm_metric = original_choose_vm_metric
+
+        self.assertEqual(result.group, "additional")
+        self.assertEqual(result.status, "SKIP")
+        self.assertIsNone(result.hint)
+
+    def test_compare_measurement_keeps_non_ignored_additional_gap_as_missing(self):
+        original_influx_stats = COMPARE_MODULE.influx_stats
+        original_influx_field_types = COMPARE_MODULE.influx_field_types
+        original_choose_vm_metric = COMPARE_MODULE.choose_vm_metric
+        try:
+            COMPARE_MODULE.influx_stats = lambda *args, **kwargs: COMPARE_MODULE.SpanStats(points=1, series=1, first=None, last=None)
+            COMPARE_MODULE.influx_field_types = lambda *args, **kwargs: ["float"]
+            COMPARE_MODULE.choose_vm_metric = lambda *args, **kwargs: ("auth_test", COMPARE_MODULE.SpanStats(points=0, series=0, first=None, last=None))
+            result = COMPARE_MODULE.compare_measurement(
+                "http://127.0.0.1:8086",
+                "evcc",
+                "http://127.0.0.1:8428",
+                "auth_test",
+                "2025-01-01T00:00:00Z",
+                "2025-01-31T23:59:59Z",
+                None,
+                None,
+                3600,
+            )
+        finally:
+            COMPARE_MODULE.influx_stats = original_influx_stats
+            COMPARE_MODULE.influx_field_types = original_influx_field_types
+            COMPARE_MODULE.choose_vm_metric = original_choose_vm_metric
+
+        self.assertEqual(result.group, "additional")
+        self.assertEqual(result.status, "MISSING")
 if __name__ == "__main__":
     unittest.main()
+

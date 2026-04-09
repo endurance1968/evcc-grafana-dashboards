@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.09.1"
+SCRIPT_VERSION = "2026.04.09.2"
 SCRIPT_LAST_MODIFIED = "2026-04-09"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
@@ -45,6 +45,19 @@ REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
 )
 
 REPO_RELEVANT_SET = set(REPO_RELEVANT_MEASUREMENTS)
+
+IGNORED_ADDITIONAL_MEASUREMENTS = {
+    "battery",
+    "chargerIcon",
+    "chargerPhysicalPhases",
+    "fatal",
+    "grid",
+    "pvCapacity",
+    "pvControllable",
+    "pvSoc",
+    "smartCostType",
+    "vehicleClimaterActive",
+}
 
 
 @dataclass(frozen=True)
@@ -149,6 +162,16 @@ def iter_influx_series(payload: dict) -> Iterator[dict]:
 
 def measurement_group(measurement: str) -> str:
     return "repo-relevant" if measurement in REPO_RELEVANT_SET else "additional"
+
+
+def should_skip_additional_measurement(measurement: str, group: str, field_types: Sequence[str]) -> bool:
+    if group != "additional":
+        return False
+    if measurement in IGNORED_ADDITIONAL_MEASUREMENTS:
+        return True
+    if field_types and set(field_types).issubset({"string", "boolean"}):
+        return True
+    return False
 
 
 def influx_measurements(
@@ -337,6 +360,8 @@ def has_full_span(influx: SpanStats, vm: SpanStats, tolerance_seconds: int) -> b
 
 
 def infer_hint(measurement: str, field_types: Sequence[str], vm_metric: str, group: str, status: str) -> str | None:
+    if status == "SKIP":
+        return None
     if status == "NORMALIZED":
         return "likely normalized after host-label cleanup or duplicate-sample merge; use the critical PV energy check to spot real raw-data loss"
     if group == "repo-relevant":
@@ -364,6 +389,7 @@ def compare_measurement(
     influx = influx_stats(influx_base_url, influx_db, measurement, start, end, username, password)
     field_types = influx_field_types(influx_base_url, influx_db, measurement, username, password)
     vm_metric, vm = choose_vm_metric(vm_base_url, measurement, start, end)
+    group = measurement_group(measurement)
 
     reasons: List[str] = []
     status = "OK"
@@ -371,6 +397,9 @@ def compare_measurement(
     if influx.points <= 0:
         status = "SKIP"
         reasons.append("no source data in the selected Influx range")
+    elif should_skip_additional_measurement(measurement, group, field_types):
+        status = "SKIP"
+        reasons.append("ignored additional status/metadata measurement outside the active repo schema")
     elif vm.points <= 0:
         status = "MISSING"
         reasons.append("no imported VM samples for this measurement")
@@ -835,5 +864,7 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
 
 
