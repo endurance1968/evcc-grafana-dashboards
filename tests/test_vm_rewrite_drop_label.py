@@ -193,5 +193,57 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         self.assertEqual(MODULE.remaining_value_conflicts(3, 10), 0)
 
 
+    def test_dry_run_recommendation_returns_go_for_it_for_clean_run(self):
+        args = MODULE.parse_args.__globals__["argparse"].Namespace(
+            base_url="http://127.0.0.1:8428",
+            matcher='{host!=""}',
+            drop_label="host",
+            backup_jsonl="backups/evcc-host-series.jsonl",
+            rewritten_jsonl="backups/evcc-host-series-without-host.jsonl",
+            allow_overlap=False,
+            merge_target=False,
+            allow_value_conflicts=False,
+            keep_target_values_on_conflict=False,
+            delete_source_when_fully_shadowed=False,
+        )
+
+        recommendation = MODULE.dry_run_recommendation(
+            args,
+            exported_series=175,
+            overlap_timestamps=0,
+            unresolved_value_conflicts=0,
+            delete_only_series=0,
+        )
+
+        self.assertEqual(recommendation["status"], "GO FOR IT")
+        self.assertIn("--merge-target", recommendation["command"])
+        self.assertIn("--write", recommendation["command"])
+
+    def test_dry_run_recommendation_returns_stop_for_conflicts(self):
+        args = MODULE.parse_args.__globals__["argparse"].Namespace(
+            base_url="http://127.0.0.1:8428",
+            matcher='{host!=""}',
+            drop_label="host",
+            backup_jsonl="backups/evcc-host-series.jsonl",
+            rewritten_jsonl="backups/evcc-host-series-without-host.jsonl",
+            allow_overlap=False,
+            merge_target=False,
+            allow_value_conflicts=False,
+            keep_target_values_on_conflict=False,
+            delete_source_when_fully_shadowed=False,
+        )
+
+        recommendation = MODULE.dry_run_recommendation(
+            args,
+            exported_series=175,
+            overlap_timestamps=0,
+            unresolved_value_conflicts=4,
+            delete_only_series=0,
+        )
+
+        self.assertEqual(recommendation["status"], "STOP")
+        self.assertIn("--keep-target-values-on-conflict", recommendation["command"])
+
 if __name__ == "__main__":
     unittest.main()
+

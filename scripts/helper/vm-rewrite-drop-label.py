@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import socket
 import sys
 import tempfile
@@ -19,8 +20,8 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.08.1"
-SCRIPT_LAST_MODIFIED = "2026-04-08"
+SCRIPT_VERSION = "2026.04.09.1"
+SCRIPT_LAST_MODIFIED = "2026-04-09"
 
 
 @dataclass(frozen=True)
@@ -161,6 +162,72 @@ def export_url(base_url: str, matcher: str, start_ms: int | None = None, end_ms:
     if end_ms is not None:
         params.append(("end", str(end_ms)))
     return f"{base_url.rstrip('/')}/api/v1/export?" + urllib.parse.urlencode(params)
+
+
+def build_rewrite_command(args: argparse.Namespace, extra_flags: list[str]) -> str:
+    command = [
+        "python3",
+        SCRIPT_NAME,
+        "--base-url",
+        args.base_url,
+        "--matcher",
+        args.matcher,
+        "--drop-label",
+        args.drop_label,
+        "--backup-jsonl",
+        args.backup_jsonl,
+    ]
+    if args.rewritten_jsonl:
+        command.extend(["--rewritten-jsonl", args.rewritten_jsonl])
+    command.extend(extra_flags)
+    return " ".join(shlex.quote(part) for part in command)
+
+
+def dry_run_recommendation(
+    args: argparse.Namespace,
+    exported_series: int,
+    overlap_timestamps: int,
+    unresolved_value_conflicts: int,
+    delete_only_series: int,
+) -> dict[str, str | None]:
+    if exported_series <= 0:
+        return {
+            "status": "NOTHING TO DO",
+            "message": "No matching source series were found. Skip the rewrite.",
+            "command": None,
+        }
+    if overlap_timestamps and not (args.allow_overlap or args.merge_target):
+        return {
+            "status": "STOP",
+            "message": "Existing hostless target series overlap the rewritten data. Review the backup and rerun in merge mode.",
+            "command": build_rewrite_command(args, ["--merge-target", "--reset-cache", "--write"]),
+        }
+    if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
+        return {
+            "status": "STOP",
+            "message": "Value conflicts were detected. Review them first, then rerun with --keep-target-values-on-conflict or --allow-value-conflicts.",
+            "command": build_rewrite_command(args, ["--merge-target", "--keep-target-values-on-conflict", "--reset-cache", "--write"]),
+        }
+    if delete_only_series > 0:
+        return {
+            "status": "REVIEW",
+            "message": "Some source series are already fully shadowed by hostless targets. If that is expected, rerun with delete-only handling enabled.",
+            "command": build_rewrite_command(args, ["--merge-target", "--delete-source-when-fully-shadowed", "--reset-cache", "--write"]),
+        }
+    return {
+        "status": "GO FOR IT",
+        "message": "Dry-run is clean. You can continue with the write step.",
+        "command": build_rewrite_command(args, ["--merge-target", "--reset-cache", "--write"]),
+    }
+
+
+def print_recommendation(recommendation: dict[str, str | None]) -> None:
+    print()
+    print("Recommendation")
+    print("--------------")
+    print(f"{recommendation['status']}: {recommendation['message']}")
+    if recommendation.get("command"):
+        print(f"Next command: {recommendation['command']}")
 
 
 def iter_export_lines(base_url: str, matcher: str, start_ms: int | None = None, end_ms: int | None = None) -> Iterator[dict]:
@@ -788,7 +855,9 @@ def main() -> int:
         }
 
         if overlap_timestamps and not (args.allow_overlap or args.merge_target):
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, 0, delete_only_series)
             print(json.dumps(summary, indent=2))
+            print_recommendation(summary["recommendation"])
             print(
                 "Refusing to rewrite because transformed timestamps overlap existing target series. Use --merge-target or --allow-overlap to override.",
                 file=sys.stderr,
@@ -803,7 +872,9 @@ def main() -> int:
         summary["unresolved_value_conflicts"] = unresolved_value_conflicts
 
         if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series)
             print(json.dumps(summary, indent=2))
+            print_recommendation(summary["recommendation"])
             print(
                 "Refusing to rewrite because transformed timestamps conflict with existing target values. Use --allow-value-conflicts to prefer source values or --keep-target-values-on-conflict to keep existing target values.",
                 file=sys.stderr,
@@ -813,7 +884,9 @@ def main() -> int:
         if not args.write:
             total_finished_at = perf_counter()
             summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series)
             print(json.dumps(summary, indent=2))
+            print_recommendation(summary["recommendation"])
             return 0
 
         if rewritten_path is None:
@@ -946,3 +1019,9 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+
+
+
+
