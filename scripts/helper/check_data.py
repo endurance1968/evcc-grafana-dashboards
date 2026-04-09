@@ -27,8 +27,8 @@ from typing import Dict, List, Sequence
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "check_data.py"
-SCRIPT_VERSION = "2026.04.08.2"
-SCRIPT_LAST_MODIFIED = "2026-04-08"
+SCRIPT_VERSION = "2026.04.09.1"
+SCRIPT_LAST_MODIFIED = "2026-04-09"
 
 
 def iso_z(value: dt.datetime) -> str:
@@ -257,6 +257,11 @@ def run_metric_checks(
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-url", default="http://127.0.0.1:8428", help="VictoriaMetrics base URL")
+    parser.add_argument(
+        "--db",
+        default=None,
+        help="deprecated compatibility argument; ignored because the checker scans VictoriaMetrics without requiring a db label",
+    )
     parser.add_argument("--raw-hours", type=int, default=48, help="recent window for raw metric checks")
     parser.add_argument("--rollup-days", type=int, default=90, help="recent window for daily rollup checks")
     parser.add_argument("--feature-lookback-days", type=int, default=3650, help="lookback window to detect optional features")
@@ -423,4 +428,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
 

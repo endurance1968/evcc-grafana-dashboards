@@ -21,8 +21,8 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.08.1"
-SCRIPT_LAST_MODIFIED = "2026-04-08"
+SCRIPT_VERSION = "2026.04.09.1"
+SCRIPT_LAST_MODIFIED = "2026-04-09"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
     "auxPower",
@@ -719,6 +719,11 @@ def main() -> int:
     ap.add_argument("--influx-user")
     ap.add_argument("--influx-password")
     ap.add_argument("--vm-base-url", required=True, help="VictoriaMetrics base URL, e.g. http://127.0.0.1:8428")
+    ap.add_argument(
+        "--vm-db-label",
+        default=None,
+        help="deprecated compatibility argument; ignored because the VM side is scanned without requiring a db label",
+    )
     ap.add_argument("--start", required=True, help="UTC start timestamp, e.g. 2026-03-21T00:00:00Z")
     ap.add_argument("--end", required=True, help="UTC end timestamp, e.g. 2026-04-03T23:59:59Z")
     ap.add_argument("--measurement-regex", help="only compare matching Influx measurements")
@@ -830,4 +835,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
 
