@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shlex
 import socket
 import sys
 import tempfile
@@ -20,7 +19,7 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.09.1"
+SCRIPT_VERSION = "2026.04.09.2"
 SCRIPT_LAST_MODIFIED = "2026-04-09"
 
 
@@ -164,23 +163,14 @@ def export_url(base_url: str, matcher: str, start_ms: int | None = None, end_ms:
     return f"{base_url.rstrip('/')}/api/v1/export?" + urllib.parse.urlencode(params)
 
 
-def build_rewrite_command(args: argparse.Namespace, extra_flags: list[str]) -> str:
-    command = [
-        "python3",
-        SCRIPT_NAME,
-        "--base-url",
-        args.base_url,
-        "--matcher",
-        args.matcher,
-        "--drop-label",
-        args.drop_label,
-        "--backup-jsonl",
-        args.backup_jsonl,
-    ]
-    if args.rewritten_jsonl:
-        command.extend(["--rewritten-jsonl", args.rewritten_jsonl])
-    command.extend(extra_flags)
-    return " ".join(shlex.quote(part) for part in command)
+def build_write_flags(extra_flags: list[str]) -> str:
+    if not extra_flags:
+        return ""
+    lines: list[str] = []
+    for index, flag in enumerate(extra_flags):
+        suffix = " \\" if index < len(extra_flags) - 1 else ""
+        lines.append(f"  {flag}{suffix}")
+    return "\n".join(lines)
 
 
 def dry_run_recommendation(
@@ -190,34 +180,35 @@ def dry_run_recommendation(
     unresolved_value_conflicts: int,
     delete_only_series: int,
 ) -> dict[str, str | None]:
+    _ = args
     if exported_series <= 0:
         return {
             "status": "NOTHING TO DO",
             "message": "No matching source series were found. Skip the rewrite.",
-            "command": None,
+            "write_flags": None,
         }
     if overlap_timestamps and not (args.allow_overlap or args.merge_target):
         return {
             "status": "STOP",
             "message": "Existing hostless target series overlap the rewritten data. Review the backup and rerun in merge mode.",
-            "command": build_rewrite_command(args, ["--merge-target", "--reset-cache", "--write"]),
+            "write_flags": build_write_flags(["--merge-target", "--reset-cache", "--write"]),
         }
     if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
         return {
             "status": "STOP",
             "message": "Value conflicts were detected. Review them first, then rerun with --keep-target-values-on-conflict or --allow-value-conflicts.",
-            "command": build_rewrite_command(args, ["--merge-target", "--keep-target-values-on-conflict", "--reset-cache", "--write"]),
+            "write_flags": build_write_flags(["--merge-target", "--keep-target-values-on-conflict", "--reset-cache", "--write"]),
         }
     if delete_only_series > 0:
         return {
             "status": "REVIEW",
             "message": "Some source series are already fully shadowed by hostless targets. If that is expected, rerun with delete-only handling enabled.",
-            "command": build_rewrite_command(args, ["--merge-target", "--delete-source-when-fully-shadowed", "--reset-cache", "--write"]),
+            "write_flags": build_write_flags(["--merge-target", "--delete-source-when-fully-shadowed", "--reset-cache", "--write"]),
         }
     return {
         "status": "GO FOR IT",
         "message": "Dry-run is clean. You can continue with the write step.",
-        "command": build_rewrite_command(args, ["--merge-target", "--reset-cache", "--write"]),
+        "write_flags": build_write_flags(["--merge-target", "--reset-cache", "--write"]),
     }
 
 
@@ -226,8 +217,9 @@ def print_recommendation(recommendation: dict[str, str | None]) -> None:
     print("Recommendation")
     print("--------------")
     print(f"{recommendation['status']}: {recommendation['message']}")
-    if recommendation.get("command"):
-        print(f"Next command: {recommendation['command']}")
+    if recommendation.get("write_flags"):
+        print("Recommended write flags:")
+        print(recommendation["write_flags"])
 
 
 def iter_export_lines(base_url: str, matcher: str, start_ms: int | None = None, end_ms: int | None = None) -> Iterator[dict]:
@@ -1019,9 +1011,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-
-
-
 

@@ -216,8 +216,10 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         )
 
         self.assertEqual(recommendation["status"], "GO FOR IT")
-        self.assertIn("--merge-target", recommendation["command"])
-        self.assertIn("--write", recommendation["command"])
+        self.assertIn("--merge-target", recommendation["write_flags"])
+        self.assertIn("--write", recommendation["write_flags"])
+        self.assertNotIn("python3", recommendation["write_flags"])
+        self.assertNotIn("--base-url", recommendation["write_flags"])
 
     def test_dry_run_recommendation_returns_stop_for_conflicts(self):
         args = MODULE.parse_args.__globals__["argparse"].Namespace(
@@ -242,7 +244,7 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         )
 
         self.assertEqual(recommendation["status"], "STOP")
-        self.assertIn("--keep-target-values-on-conflict", recommendation["command"])
+        self.assertIn("--keep-target-values-on-conflict", recommendation["write_flags"])
 
 if __name__ == "__main__":
     unittest.main()
