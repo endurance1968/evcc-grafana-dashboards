@@ -47,7 +47,7 @@
       "title": "Month",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
+      "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -59,7 +59,7 @@
       "title": "Previous month",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now%2FM&timezone=browser"
+      "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -71,7 +71,7 @@
       "title": "2 months ago",
       "tooltip": "",
       "type": "link",
-      "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-1M%2FM&timezone=browser"
+      "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
     },
     {
       "asDropdown": true,
@@ -4032,7 +4032,7 @@
   },
   "time": {
     "from": "now/M",
-    "to": "now"
+    "to": "now/M"
   },
   "timepicker": {},
   "timezone": "",

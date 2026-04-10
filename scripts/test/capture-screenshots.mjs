@@ -25,7 +25,7 @@ const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "").trim();
 const timeTo = optionalEnv("GRAFANA_TIME_TO", "").trim();
 
 const viewports = [
-  { name: "desktop", width: 1440, height: 900 },
+  { name: "desktop", width: 1728, height: 900 },
   { name: "mobile", width: 390, height: 844 },
 ];
 
@@ -265,21 +265,7 @@ function resolveTimeRange(dashboard) {
   if (timeFrom && timeTo) {
     return { from: timeFrom, to: timeTo };
   }
-
-  const kind = dashboardKind(dashboard);
-  if (kind === "all-time") {
-    return { from: "now-1y/y", to: "now" };
-  }
-  if (kind === "year") {
-    return { from: "now-1y/y", to: "now/y" };
-  }
-  if (kind === "month") {
-    return { from: "now-1M/M", to: "now/M" };
-  }
-  if (kind === "today-details") {
-    return { from: "now-1d/d", to: "now/d" };
-  }
-  return { from: timeFrom, to: timeTo };
+  return { from: "", to: "" };
 }
 
 async function captureDashboard(page, dashboard, manifest) {

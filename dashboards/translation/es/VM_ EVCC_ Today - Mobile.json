@@ -2691,8 +2691,8 @@
     ]
   },
   "time": {
-    "from": "2026-01-30T23:00:00Z",
-    "to": "2026-01-31T22:59:59.999Z"
+    "from": "now/d",
+    "to": "now/d"
   },
   "timepicker": {},
   "timezone": "browser",

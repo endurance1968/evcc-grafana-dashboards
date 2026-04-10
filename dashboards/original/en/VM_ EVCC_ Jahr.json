@@ -5381,7 +5381,7 @@
     ]
   },
   "time": {
-    "from": "now-1y/y",
+    "from": "now/y",
     "to": "now/y"
   },
   "timepicker": {},

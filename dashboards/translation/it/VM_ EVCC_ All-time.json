@@ -5227,7 +5227,7 @@
     ]
   },
   "time": {
-    "from": "now-2y/y",
+    "from": "2024-12-31T23:00:00Z",
     "to": "now"
   },
   "timepicker": {},
