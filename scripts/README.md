@@ -89,11 +89,23 @@ Only if the coverage check and the data check look good, rewrite host-tagged VM-
 python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
 
-Recommended write mode after a successful dry-run:
+The dry-run now prints a `Recommendation` section with a clear status (`GO FOR IT`, `REVIEW`, or `STOP`) and the exact write flags to append next. A clean run looks like this:
+
+```text
+GO FOR IT: Dry-run is clean. You can continue with the write step.
+Recommended write flags:
+  --merge-target \
+  --reset-cache \
+  --write
+```
+
+In that clean case, rerun the same command with those flags appended:
 
 ```bash
 python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --merge-target --reset-cache --write
 ```
+
+If the recommendation mentions conflicts, follow the printed conflict-safe flag set instead, for example `--keep-target-values-on-conflict`.
 
 Compare labelsets between two import states or benchmark exports:
 
@@ -154,5 +166,3 @@ For end users, prefer:
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
 - `docs/vm-dashboard-install.md`
-
-

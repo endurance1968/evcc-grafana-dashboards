@@ -65,12 +65,14 @@ cd /opt/evcc-vm-migration
 Download the required files:
 
 ```bash
-curl -fsSLo evcc-vm-rollup.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup.py
-curl -fsSLo evcc-vm-rollup-prod.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup-prod.conf.example
-curl -fsSLo evcc-vm-rollup.conf.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/rollup/evcc-vm-rollup.conf.example
-curl -fsSLo check_data.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/check_data.py
-curl -fsSLo compare_import_coverage.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/compare_import_coverage.py
-curl -fsSLo vm-rewrite-drop-label.py https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/helper/vm-rewrite-drop-label.py
+BASE="http://192.168.1.222/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
+
+curl -fsSLo evcc-vm-rollup.py "$BASE/scripts/rollup/evcc-vm-rollup.py"
+curl -fsSLo evcc-vm-rollup-prod.conf.example "$BASE/scripts/rollup/evcc-vm-rollup-prod.conf.example"
+curl -fsSLo evcc-vm-rollup.conf.example "$BASE/scripts/rollup/evcc-vm-rollup.conf.example"
+curl -fsSLo check_data.py "$BASE/scripts/helper/check_data.py"
+curl -fsSLo compare_import_coverage.py "$BASE/scripts/helper/compare_import_coverage.py"
+curl -fsSLo vm-rewrite-drop-label.py "$BASE/scripts/helper/vm-rewrite-drop-label.py"
 ```
 
 ## Files used in this migration
@@ -264,7 +266,7 @@ Those labels carry the EVCC semantics that we want to preserve.
 
 ### 3.1 Check first whether `host` is present
 
-The default `check_data.py` output already reports this in the `Cleanup checks` section.
+The default `check_data.py` output already reports this in the `Label hygiene checks` section.
 
 You can also query it directly:
 
@@ -274,7 +276,6 @@ curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'start=2024-01-01T00:00:00Z' \
   --data-urlencode 'end=2026-03-30T23:59:59Z'
 ```
-
 If this returns no series, skip the `host` cleanup step.
 
 ### 3.2 Dry-run the rewrite first
@@ -293,10 +294,22 @@ The dry-run exports the host-tagged source series, removes `host` in memory, and
 - how many source series were exported
 - whether transformed timestamps overlap existing hostless target series
 - whether there are value conflicts
+- a `Recommendation` block with `GO FOR IT`, `REVIEW`, or `STOP`
+- the exact write flags to append for the next run
 
-### 3.3 Recommended write mode
+### 3.3 Follow the recommended write flags
 
-If the dry-run looks clean, use merge mode so existing hostless targets are preserved and merged safely:
+If the dry-run looks clean, follow the `Recommendation` block from the tool output. In the clean case it now looks like this:
+
+```text
+GO FOR IT: Dry-run is clean. You can continue with the write step.
+Recommended write flags:
+  --merge-target \
+  --reset-cache \
+  --write
+```
+
+That means the next write run should use the same base command plus exactly those flags:
 
 ```bash
 python3 vm-rewrite-drop-label.py \
@@ -314,6 +327,7 @@ Important:
 
 - start with the dry-run first
 - keep the backup JSONL
+- if the recommendation mentions overlapping or conflicting hostless targets, follow the printed conflict-safe flag set instead of the clean-case flags
 - if the analysis shows that all source points already overlap existing hostless target points and only value conflicts remain, prefer `--keep-target-values-on-conflict` so the existing hostless target values stay authoritative
 - only use `--allow-value-conflicts` if you have reviewed the differences and want source values to win explicitly
 
