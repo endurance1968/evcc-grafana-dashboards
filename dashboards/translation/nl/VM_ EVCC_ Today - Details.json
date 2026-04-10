@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "Energie",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -580,7 +580,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -714,7 +714,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -814,7 +814,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Voorspelling"
             },
             "properties": [
               {
@@ -829,7 +829,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Werkelijk"
             },
             "properties": [
               {
@@ -873,7 +873,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "Energie",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1016,7 +1016,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Werkelijk"
             },
             "properties": [
               {
@@ -1031,7 +1031,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Voorspelling"
             },
             "properties": [
               {
@@ -1144,7 +1144,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1331,7 +1331,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1462,7 +1462,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1649,7 +1649,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "Totaal"
             },
             "properties": [
               {
@@ -1679,7 +1679,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Overig"
             },
             "properties": [
               {
@@ -1811,7 +1811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Thuis"
             },
             "properties": [
               {
@@ -1990,7 +1990,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Thuis"
             },
             "properties": [
               {
@@ -2145,7 +2145,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Gemiddelde"
             },
             "properties": [
               {
@@ -2315,7 +2315,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netafname"
             },
             "properties": [
               {
@@ -2354,7 +2354,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "Prijs"
             },
             "properties": [
               {
@@ -2656,7 +2656,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Aangekocht"
             },
             "properties": [
               {
@@ -2671,7 +2671,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Verkocht"
             },
             "properties": [
               {
@@ -2782,7 +2782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Gemiddelde"
             },
             "properties": [
               {
@@ -2952,7 +2952,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netafname"
             },
             "properties": [
               {

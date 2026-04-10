@@ -243,7 +243,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -258,7 +258,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -318,7 +318,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -587,7 +587,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -602,7 +602,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -662,7 +662,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -896,7 +896,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarchia"
             },
             "properties": [
               {
@@ -924,7 +924,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -1200,7 +1200,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autosufficienza"
             },
             "properties": [
               {
@@ -1309,7 +1309,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1652,7 +1652,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1667,7 +1667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -1837,7 +1837,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -2519,7 +2519,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2534,7 +2534,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Prezzo effettivo dell’elettricità"
             },
             "properties": [
               {
@@ -2692,7 +2692,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
@@ -3390,7 +3390,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -3409,7 +3409,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Rete"
             },
             "properties": [
               {
@@ -3685,7 +3685,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -3704,7 +3704,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Rete"
             },
             "properties": [
               {

@@ -156,7 +156,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -833,7 +833,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "自耗"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "光伏能量"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "家庭消耗"
             },
             "properties": [
               {
@@ -3567,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "购电"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "售电"
             },
             "properties": [
               {

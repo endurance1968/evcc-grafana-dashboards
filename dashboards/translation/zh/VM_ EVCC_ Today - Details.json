@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "能源",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -580,7 +580,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -714,7 +714,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -814,7 +814,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "预测"
             },
             "properties": [
               {
@@ -829,7 +829,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "实际"
             },
             "properties": [
               {
@@ -873,7 +873,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "能源",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1016,7 +1016,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "实际"
             },
             "properties": [
               {
@@ -1031,7 +1031,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "预测"
             },
             "properties": [
               {
@@ -1144,7 +1144,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1331,7 +1331,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1462,7 +1462,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1649,7 +1649,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "总计"
             },
             "properties": [
               {
@@ -1679,7 +1679,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1811,7 +1811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -1990,7 +1990,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -2145,7 +2145,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2315,7 +2315,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -2354,7 +2354,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "价格"
             },
             "properties": [
               {
@@ -2656,7 +2656,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "购入"
             },
             "properties": [
               {
@@ -2671,7 +2671,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -2782,7 +2782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2952,7 +2952,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -2995,7 +2995,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CO2"
+              "options": "二氧化碳"
             },
             "properties": [
               {

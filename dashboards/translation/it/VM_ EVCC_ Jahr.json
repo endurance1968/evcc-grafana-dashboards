@@ -187,7 +187,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -206,7 +206,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -225,7 +225,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Immissione"
             },
             "properties": [
               {
@@ -687,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarchia"
             },
             "properties": [
               {
@@ -715,7 +715,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -930,7 +930,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarchia"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -1074,7 +1074,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/day"
+              "options": "FV/giorno"
             },
             "properties": [
               {
@@ -1093,7 +1093,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consumo/giorno"
             },
             "properties": [
               {
@@ -1112,7 +1112,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import/day"
+              "options": "Prelievo rete/giorno"
             },
             "properties": [
               {
@@ -1302,7 +1302,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Prelievo rete"
             },
             "properties": [
               {
@@ -1321,7 +1321,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "Consumo/giorno"
             },
             "properties": [
               {
@@ -1468,7 +1468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -1483,7 +1483,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1808,7 +1808,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1823,7 +1823,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -2082,7 +2082,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -2116,7 +2116,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "Altro"
             },
             "properties": [
               {
@@ -2333,7 +2333,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
@@ -2357,7 +2357,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Venduto"
             },
             "properties": [
               {
@@ -2604,7 +2604,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "Media"
             },
             "properties": [
               {
@@ -2619,7 +2619,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "Prezzo effettivo dell’elettricità"
             },
             "properties": [
               {
@@ -2796,7 +2796,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Acquistato"
             },
             "properties": [
               {
@@ -2811,7 +2811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Venduto"
             },
             "properties": [
               {
@@ -3419,7 +3419,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Charge"
+              "options": "Carica"
             },
             "properties": [
               {
@@ -3438,7 +3438,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Discharge"
+              "options": "Scarica"
             },
             "properties": [
               {
@@ -4060,7 +4060,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -4079,7 +4079,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Rete"
             },
             "properties": [
               {
@@ -4355,7 +4355,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "Batteria"
             },
             "properties": [
               {
@@ -4374,7 +4374,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "Rete"
             },
             "properties": [
               {

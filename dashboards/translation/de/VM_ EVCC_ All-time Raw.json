@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netzbezug"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Haus"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -833,7 +833,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Eigenverbrauch"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV Energie"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Einspeisung"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "Hausverbrauch"
             },
             "properties": [
               {
@@ -3567,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Einkauf"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Verkauf"
             },
             "properties": [
               {

@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Netafname"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Thuis"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Teruglevering"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -826,14 +826,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autarkie"
+                "value": "Zelfvoorziening"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Eigenverbruik"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV-energie"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Teruglevering"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "Thuisverbruik"
             },
             "properties": [
               {
@@ -3567,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Ingekocht"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Verkocht"
             },
             "properties": [
               {

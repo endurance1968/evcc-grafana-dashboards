@@ -156,7 +156,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "fotovoltaica"
             },
             "properties": [
               {
@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Importación de red"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Vertido"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autosuficiencia"
             },
             "properties": [
               {
@@ -833,7 +833,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsumo"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "Energía FV"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Vertido"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "Consumo de la casa"
             },
             "properties": [
               {
@@ -3567,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Comprado"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Vendido"
             },
             "properties": [
               {

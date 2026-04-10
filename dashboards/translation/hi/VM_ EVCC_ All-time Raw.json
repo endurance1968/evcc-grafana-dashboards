@@ -156,7 +156,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "पीवी"
             },
             "properties": [
               {
@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "आत्मनिर्भरता"
             },
             "properties": [
               {
@@ -833,7 +833,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "स्व-उपभोग"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV energy"
+              "options": "PV ऊर्जा"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "ग्रिड में आपूर्ति"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home consumption"
+              "options": "घरेलू खपत"
             },
             "properties": [
               {
@@ -3567,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
@@ -3591,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "बेचा गया"
             },
             "properties": [
               {

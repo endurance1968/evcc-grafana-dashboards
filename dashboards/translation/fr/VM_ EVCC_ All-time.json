@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Import réseau"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Maison"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "Injection"
             },
             "properties": [
               {
@@ -804,7 +804,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "Autarcie"
             },
             "properties": [
               {
@@ -832,7 +832,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "Autoconsommation"
             },
             "properties": [
               {
@@ -3569,7 +3569,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "Acheté"
             },
             "properties": [
               {
@@ -3593,7 +3593,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "Vendu"
             },
             "properties": [
               {

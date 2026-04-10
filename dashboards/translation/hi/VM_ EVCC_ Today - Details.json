@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "ऊर्जा",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -580,7 +580,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -714,7 +714,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -814,7 +814,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -829,7 +829,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -873,7 +873,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Energy",
+        "xField": "ऊर्जा",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1016,7 +1016,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -1031,7 +1031,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -1144,7 +1144,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1331,7 +1331,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1462,7 +1462,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1649,7 +1649,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -1679,7 +1679,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1811,7 +1811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1990,7 +1990,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -2145,7 +2145,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2315,7 +2315,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2354,7 +2354,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "मूल्य"
             },
             "properties": [
               {
@@ -2656,7 +2656,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
@@ -2671,7 +2671,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "बेचा गया"
             },
             "properties": [
               {
@@ -2782,7 +2782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2952,7 +2952,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2995,7 +2995,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CO2"
+              "options": "सीओ 2"
             },
             "properties": [
               {
