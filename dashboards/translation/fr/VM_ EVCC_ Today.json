@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Maison"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Réseau"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterie"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -248,7 +248,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Prévision PV"
+                "options": "PV forecast"
               },
               "properties": [
                 {
@@ -469,7 +469,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batterie"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -647,7 +647,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarcie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -675,7 +675,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autoconsommation"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -891,7 +891,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autarcie"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -910,7 +910,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autoconsommation"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -1117,7 +1117,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Import réseau"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1132,7 +1132,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Injection"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1147,7 +1147,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Maison"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1177,7 +1177,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Charge batterie"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1192,7 +1192,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Décharge batterie"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1286,7 +1286,7 @@
             "mode": "single",
             "sort": "none"
           },
-          "xField": "Énergie",
+          "xField": "Energy",
           "xTickLabelRotation": 0,
           "xTickLabelSpacing": 0
         },
@@ -1551,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Maison"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1566,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Import réseau"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1596,7 +1596,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Décharge batterie"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1626,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Injection"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1641,7 +1641,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Charge batterie"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1828,7 +1828,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Acheté"
+                "options": "Purchased"
               },
               "properties": [
                 {
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Vendu"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réseau"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2211,7 +2211,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batterie"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2247,7 +2247,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {

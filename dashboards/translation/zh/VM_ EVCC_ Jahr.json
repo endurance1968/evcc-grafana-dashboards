@@ -168,7 +168,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -187,7 +187,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -206,7 +206,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -225,7 +225,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "馈电"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -455,7 +455,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "馈电"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -687,7 +687,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自给率"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -715,7 +715,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自耗"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -930,7 +930,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自给率"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -945,7 +945,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自耗"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -994,7 +994,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set(1 - (sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / ((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) + (sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))), \"series\", \"Autarky\") or label_set(((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / (sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Self-consumption\")"
+          "expr": "WITH (\n  gridImport = sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  homeEnergy = sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  loadpointEnergy = sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  pvEnergy = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  gridExport = sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  autarky = label_set(1 - gridImport / (homeEnergy + loadpointEnergy), \"series\", \"Autarky\"),\n  selfConsumption = label_set((pvEnergy - gridExport) / pvEnergy, \"series\", \"Self-consumption\")\n)\nautarky or selfConsumption"
         }
       ],
       "transformations": [
@@ -1074,7 +1074,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏/日"
+              "options": "PV/day"
             },
             "properties": [
               {
@@ -1093,7 +1093,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "日消耗"
+              "options": "Consumption/day"
             },
             "properties": [
               {
@@ -1112,7 +1112,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "每日电网输入"
+              "options": "Grid import/day"
             },
             "properties": [
               {
@@ -1283,7 +1283,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -1302,7 +1302,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -1321,7 +1321,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "日消耗"
+              "options": "Consumption/day"
             },
             "properties": [
               {
@@ -1468,7 +1468,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "其他"
+              "options": "Other"
             },
             "properties": [
               {
@@ -1483,7 +1483,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1729,7 +1729,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) - sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Other\") or label_copy(((sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$extBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) /1000), \"title\", \"series\") or label_copy(((sum(sum_over_time((last_over_time(evcc_aux_energy_daily_wh{local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$auxBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) /1000), \"title\", \"series\")"
+          "expr": "WITH (\n  other = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) - sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Other\"),\n  ext = label_copy((sum(sum_over_time((last_over_time(evcc_ext_energy_daily_wh{local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$extBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) / 1000, \"title\", \"series\"),\n  aux = label_copy((sum(sum_over_time((last_over_time(evcc_aux_energy_daily_wh{local_year=\"${__from:date:YYYY}\",title!=\"\",title!~\"$auxBlocklist\"}[1d]))[$__range:1d])) by (local_month, title)) / 1000, \"title\", \"series\")\n)\nother or ext or aux"
         }
       ],
       "transformations": [
@@ -1808,7 +1808,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1823,7 +1823,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电池"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2082,7 +2082,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2116,7 +2116,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "其他"
+              "options": "Other"
             },
             "properties": [
               {
@@ -2164,7 +2164,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set(((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) ) - (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000, \"series\", \"Battery\") or label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"Home\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) /1000), \"loadpoint\", \"series\")"
+          "expr": "WITH (\n  battery = label_set(((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000, \"series\", \"Battery\"),\n  home = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) / 1000, \"loadpoint\", \"series\")\n)\nbattery or home or loadpoints"
         }
       ],
       "transformations": [
@@ -2333,7 +2333,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "购电"
+              "options": "purchased"
             },
             "properties": [
               {
@@ -2357,7 +2357,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "售电"
+              "options": "sold"
             },
             "properties": [
               {
@@ -2604,7 +2604,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "平均值"
+              "options": "Average"
             },
             "properties": [
               {
@@ -2619,7 +2619,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "实际电价"
+              "options": "Effective electricity price"
             },
             "properties": [
               {
@@ -2796,7 +2796,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "购入"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2811,7 +2811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "售电"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2859,7 +2859,19 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Purchased\") or (label_set((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Sold\") and on() (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) > 0))"
+          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Purchased\")"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "refId": "B",
+          "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"Sold\") and on() (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) > 0)"
         }
       ],
       "transformations": [
@@ -3407,7 +3419,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "充电"
+              "options": "Charge"
             },
             "properties": [
               {
@@ -3426,7 +3438,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "放电"
+              "options": "Discharge"
             },
             "properties": [
               {
@@ -3479,7 +3491,7 @@
           "editorMode": "code",
           "format": "table",
           "refId": "A",
-          "expr": "label_set(sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Charge\") or label_set(sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Discharge\")",
+          "expr": "WITH (\n  charge = label_set(sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Charge\"),\n  discharge = label_set(sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000, \"series\", \"Discharge\")\n)\ncharge or discharge",
           "instant": true,
           "range": false
         }
@@ -4029,7 +4041,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -4048,7 +4060,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电池"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -4067,7 +4079,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -4324,7 +4336,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
@@ -4343,7 +4355,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电池"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -4362,7 +4374,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网"
+              "options": "Grid"
             },
             "properties": [
               {

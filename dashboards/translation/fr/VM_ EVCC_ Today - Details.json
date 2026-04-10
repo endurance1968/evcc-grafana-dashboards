@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Énergie",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -814,7 +814,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Prévision"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -829,7 +829,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réel"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -873,7 +873,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "Énergie",
+        "xField": "Energy",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -1016,7 +1016,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Réel"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -1031,7 +1031,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Prévision"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -1144,7 +1144,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1331,7 +1331,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1462,7 +1462,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1679,7 +1679,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autre"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1811,7 +1811,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1990,7 +1990,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Maison"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2145,7 +2145,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Moyenne"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2315,7 +2315,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2354,7 +2354,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Prix"
+              "options": "Preis"
             },
             "properties": [
               {
@@ -2656,7 +2656,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Acheté"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2671,7 +2671,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendu"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2782,7 +2782,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Moyenne"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2952,7 +2952,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Import réseau"
+              "options": "Grid import"
             },
             "properties": [
               {

@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Haus"
+              "options": "Home"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einspeisung"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -805,7 +805,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -833,7 +833,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Eigenverbrauch"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -2472,7 +2472,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV Energie"
+              "options": "PV energy"
             },
             "properties": [
               {
@@ -2594,7 +2594,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einspeisung"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -2716,7 +2716,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Hausverbrauch"
+              "options": "Home consumption"
             },
             "properties": [
               {
@@ -3367,7 +3367,19 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "label_join(label_set(clamp_min((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month) - sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month)), 0), \"kind\", \"Costs\"), \"series\", \" \", \"local_year\", \"kind\") or (label_join(label_set(clamp_min((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month) - sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month)), 0), \"kind\", \"Income\"), \"series\", \" \", \"local_year\", \"kind\") and on (local_year) (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year) > 0))",
+          "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n)\nlabel_join(\n  label_set(clamp_min(monthlyImport - monthlyExport, 0), \"kind\", \"Costs\"),\n  \"series\", \" \", \"local_year\", \"kind\"\n)",
+          "format": "table",
+          "range": false,
+          "instant": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  yearlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year),\n)\nlabel_join(\n  label_set(clamp_min(monthlyExport - monthlyImport, 0), \"kind\", \"Income\"),\n  \"series\", \" \", \"local_year\", \"kind\"\n)\nand on (local_year) (yearlyExport > 0)",
           "format": "table",
           "range": false,
           "instant": true
@@ -3555,7 +3567,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Einkauf"
+              "options": "purchased"
             },
             "properties": [
               {
@@ -3579,7 +3591,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkauf"
+              "options": "sold"
             },
             "properties": [
               {
