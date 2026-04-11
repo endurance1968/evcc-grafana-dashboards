@@ -134,6 +134,7 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 
 - write only `evcc_*` rollups
 - never overwrite raw metrics
+- `backfill --write` writes completed local days only; today and future days are rejected unless the current day is explicitly allowed for diagnostics
 - validate dashboards after major rollup changes
 
 ## Production rollout

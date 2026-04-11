@@ -477,6 +477,7 @@ Notes:
 - the backfill is processed and written month by month
 - the script does not keep the full historical range in memory at once
 - that keeps memory usage and progress visibility manageable
+- `--write` refuses today or future local days by default; use the latest completed local day, usually yesterday, as `--end-day`
 
 ## 7. Verify the rollups
 
@@ -513,7 +514,7 @@ set -euo pipefail
   --config /etc/evcc-vm-rollup.conf \
   backfill \
   --start-day "$(date -d 'yesterday' +%F)" \
-  --end-day "$(date +%F)" \
+  --end-day "$(date -d 'yesterday' +%F)" \
   --write
 ```
 

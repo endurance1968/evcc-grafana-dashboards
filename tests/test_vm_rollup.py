@@ -4,6 +4,7 @@ import io
 import pathlib
 import sys
 import unittest
+from datetime import date
 from types import SimpleNamespace
 
 MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -131,6 +132,40 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(windows[0].local_month, "03")
         self.assertEqual(windows[0].local_day, "29")
         self.assertEqual(windows[0].local_date, "2026-03-29")
+
+    def test_backfill_write_window_allows_latest_completed_day(self):
+        args = SimpleNamespace(write=True, allow_incomplete_current_day=False)
+        safety = MODULE.validate_backfill_write_window(
+            self.settings,
+            args,
+            date(2026, 4, 10),
+            today=date(2026, 4, 11),
+        )
+        self.assertEqual(safety["latest_completed_day"], "2026-04-10")
+        self.assertFalse(safety["includes_incomplete_day"])
+
+    def test_backfill_write_window_rejects_current_day_by_default(self):
+        args = SimpleNamespace(write=True, allow_incomplete_current_day=False)
+        with self.assertRaises(SystemExit) as raised:
+            MODULE.validate_backfill_write_window(
+                self.settings,
+                args,
+                date(2026, 4, 11),
+                today=date(2026, 4, 11),
+            )
+        self.assertIn("NO-GO", str(raised.exception))
+        self.assertIn("--end-day 2026-04-10", str(raised.exception))
+
+    def test_backfill_write_window_rejects_future_even_with_current_day_override(self):
+        args = SimpleNamespace(write=True, allow_incomplete_current_day=True)
+        with self.assertRaises(SystemExit) as raised:
+            MODULE.validate_backfill_write_window(
+                self.settings,
+                args,
+                date(2026, 4, 12),
+                today=date(2026, 4, 11),
+            )
+        self.assertIn("future local days", str(raised.exception))
 
     def test_normalize_rollup_labels_adds_namespace_dimension_and_local_month_labels(self):
         item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "vehicle_daily_energy")

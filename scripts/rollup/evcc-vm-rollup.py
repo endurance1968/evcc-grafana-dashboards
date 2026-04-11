@@ -18,8 +18,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.08.2"
-SCRIPT_LAST_MODIFIED = "2026-04-08"
+SCRIPT_VERSION = "2026.04.11.1"
+SCRIPT_LAST_MODIFIED = "2026-04-11"
 
 
 def current_local_timestamp() -> datetime:
@@ -202,6 +202,14 @@ def parse_args() -> argparse.Namespace:
         "--write",
         action="store_true",
         help="Actually write the generated rollups to VictoriaMetrics.",
+    )
+    parser.add_argument(
+        "--allow-incomplete-current-day",
+        action="store_true",
+        help=(
+            "Dangerous override: allow --write to include the current local day. "
+            "Future days are still rejected."
+        ),
     )
     parser.add_argument(
         "--batch-size",
@@ -757,6 +765,48 @@ def build_day_windows(settings: Settings, start_day: date, end_day: date) -> lis
         )
         current += timedelta(days=1)
     return windows
+
+
+def current_local_day(settings: Settings) -> date:
+    return datetime.now(ZoneInfo(settings.timezone)).date()
+
+
+def validate_backfill_write_window(
+    settings: Settings,
+    args: argparse.Namespace,
+    end_day: date,
+    today: date | None = None,
+) -> dict[str, str | bool]:
+    local_today = today or current_local_day(settings)
+    latest_completed_day = local_today - timedelta(days=1)
+    includes_incomplete_day = end_day >= local_today
+
+    safety = {
+        "local_today": local_today.isoformat(),
+        "latest_completed_day": latest_completed_day.isoformat(),
+        "includes_incomplete_day": includes_incomplete_day,
+        "allow_incomplete_current_day": bool(getattr(args, "allow_incomplete_current_day", False)),
+    }
+
+    if not args.write:
+        return safety
+
+    if end_day > local_today:
+        raise SystemExit(
+            "NO-GO: --write must not include future local days. "
+            f"Timezone is {settings.timezone}; today is {local_today.isoformat()}. "
+            f"Use --end-day {latest_completed_day.isoformat()} for the latest safe completed day."
+        )
+
+    if end_day == local_today and not getattr(args, "allow_incomplete_current_day", False):
+        raise SystemExit(
+            "NO-GO: --write would include the current incomplete local day. "
+            f"Timezone is {settings.timezone}; today is {local_today.isoformat()}. "
+            f"Use --end-day {latest_completed_day.isoformat()} for production rollups, "
+            "or pass --allow-incomplete-current-day only for an intentional diagnostic write."
+        )
+
+    return safety
 
 
 def build_window_chunks(windows: list[DayWindow]) -> list[tuple[str, list[DayWindow]]]:
@@ -2395,6 +2445,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     started_at = time.perf_counter()
     start_day = parse_local_day(args.start_day, "--start-day")
     end_day = parse_local_day(args.end_day, "--end-day")
+    write_safety = validate_backfill_write_window(settings, args, end_day)
     windows = build_day_windows(settings, start_day, end_day)
     add_duration(ACTIVE_PROFILE, "build_windows_s", started_at)
     started_at = time.perf_counter()
@@ -2843,6 +2894,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             "end_day": end_day.isoformat(),
             "days": len(windows),
         },
+        "write_safety": write_safety,
         "metrics": [item.record for item in catalog] + [
             record_name(settings, "pv_top30_mean_yearly_wh"),
             record_name(settings, "pv_top5_mean_monthly_wh"),
@@ -2914,6 +2966,9 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     print(f"Range:        {summary['range']['start_day']} -> {summary['range']['end_day']}")
     print(f"Days:         {summary['range']['days']}")
     print(f"Timezone:     {summary['timezone']}")
+    write_safety = summary.get("write_safety", {})
+    if write_safety:
+        print(f"Latest safe:  {write_safety.get('latest_completed_day')} (completed local day)")
     print(f"Raw step:     {summary['raw_sample_step']}")
     print(f"Energy step:  {summary['energy_rollup_step']}")
     print(f"Batch size:   {summary['batch_size']}")
