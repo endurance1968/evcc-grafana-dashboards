@@ -25,6 +25,10 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$ScriptVersion = '2026.04.11.4'
+$ScriptLastModified = '2026-04-11'
+Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
+
 function Load-DotEnv([string]$Path) {
   $map = @{}
   if (-not (Test-Path -LiteralPath $Path)) { return $map }
@@ -133,18 +137,42 @@ function Build-Inputs($Raw) {
   return $inputs
 }
 
+function Get-DashboardBuildMarker() {
+  $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss zzz")
+  $source = if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+    "local:$($settings.DASHBOARD_LOCAL_DIR)"
+  } else {
+    "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
+  }
+  return "deployed $timestamp | $($settings.DASHBOARD_LANGUAGE)/$($settings.DASHBOARD_VARIANT) | $source"
+}
+
 function Get-DashboardOverrides() {
   return @{
     peakPowerLimit = $settings.DASHBOARD_FILTER_PEAK_POWER_LIMIT
     energySampleInterval = $(if ($settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL) { $settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL } else { $settings.DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL })
     tariffPriceInterval = $(if ($settings.DASHBOARD_TARIFF_PRICE_INTERVAL) { $settings.DASHBOARD_TARIFF_PRICE_INTERVAL } else { $settings.DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL })
+    installedWattPeak = $settings.DASHBOARD_INSTALLED_WATT_PEAK
     loadpointBlocklist = $settings.DASHBOARD_FILTER_LOADPOINT_BLOCKLIST
     extBlocklist = $settings.DASHBOARD_FILTER_EXT_BLOCKLIST
     auxBlocklist = $settings.DASHBOARD_FILTER_AUX_BLOCKLIST
+    vehicleBlocklist = $settings.DASHBOARD_FILTER_VEHICLE_BLOCKLIST
     evccUrl = $settings.DASHBOARD_EVCC_URL
     inverterPortalTitle = $settings.DASHBOARD_PORTAL_TITLE
     inverterPortalUrl = $settings.DASHBOARD_PORTAL_URL
   }
+}
+
+function Set-DashboardBuildDescription($Raw, [string]$BuildMarker) {
+  if ($null -eq $Raw -or [string]::IsNullOrWhiteSpace($BuildMarker)) { return $Raw }
+  if ($null -eq $Raw.PSObject.Properties['templating'] -or $null -eq $Raw.templating) { return $Raw }
+  if ($null -eq $Raw.templating.PSObject.Properties['list']) { return $Raw }
+  foreach ($variable in @($Raw.templating.list)) {
+    if ([string]$variable.name -eq 'dashboardBuild') {
+      $variable.description = $BuildMarker
+    }
+  }
+  return $Raw
 }
 
 function Apply-DashboardFilterOverrides($Raw, [hashtable]$Overrides) {
@@ -220,9 +248,11 @@ $settings = @{
   DASHBOARD_TARIFF_PRICE_INTERVAL = ''
   DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL = ''
   DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL = ''
+  DASHBOARD_INSTALLED_WATT_PEAK = ''
   DASHBOARD_FILTER_LOADPOINT_BLOCKLIST = ''
   DASHBOARD_FILTER_EXT_BLOCKLIST = ''
   DASHBOARD_FILTER_AUX_BLOCKLIST = ''
+  DASHBOARD_FILTER_VEHICLE_BLOCKLIST = ''
   DASHBOARD_EVCC_URL = ''
   DASHBOARD_PORTAL_TITLE = ''
   DASHBOARD_PORTAL_URL = ''
@@ -230,7 +260,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_API_TOKEN','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_API_TOKEN','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -248,6 +278,7 @@ Merge-Setting $settings 'GRAFANA_FOLDER_UID' $folderuid
 Merge-Setting $settings 'GRAFANA_FOLDER_TITLE' $foldertitle
 if ($settings.ContainsKey('DEPLOY_PURGE') -and -not $settings.ContainsKey('PURGE')) { $settings['PURGE'] = $settings['DEPLOY_PURGE'] }
 if (-not [string]::IsNullOrWhiteSpace($purge)) { $settings['PURGE'] = if ($purge -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
+$dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
 
 if (-not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or -token.' }
@@ -267,6 +298,7 @@ $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
   $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
+  $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
   $dashboards += @{ fileName = $fileName; raw = $raw; inputs = (Build-Inputs $raw) }
   if ($null -ne $raw.PSObject.Properties['__elements']) {
     foreach ($prop in $raw.__elements.PSObject.Properties) { $libraryElements[$prop.Name] = $prop.Value }
@@ -281,6 +313,7 @@ Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') { Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)" } else { Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)" }
 Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
 Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
+Write-Host "Build marker: $dashboardBuildMarker"
 Write-Host "Purge: $($settings.PURGE)"
 $activeDashboardOverrides = @($dashboardOverrides.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) })
 if ($activeDashboardOverrides.Count -gt 0) {

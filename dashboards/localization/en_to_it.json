@@ -307,7 +307,10 @@
     "{{local_year}}": "{{local_year}}",
     "{{series}}": "{{series}}",
     "{{title}}": "{{title}}",
-    "{{vehicle}}": "{{vehicle}}"
+    "{{vehicle}}": "{{vehicle}}",
+    "Average yearly specific yield": "Resa specifica annuale media",
+    "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.": "Produzione FV totale registrata, normalizzata per kWp installato e anni di dati coperti. Anni incompleti e lacune nei dati influenzano questo valore.",
+    "Installed PV peak in kWp. Used for specific-yield panels.": "Potenza di picco FV installata in kWp. Usata per i pannelli di resa specifica."
   },
   "Heat pump source mix": "Ripartizione fonti pompa di calore",
   "Heat pump title match": "Corrispondenza titolo pompa di calore",

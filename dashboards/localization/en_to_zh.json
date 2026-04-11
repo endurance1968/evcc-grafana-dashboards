@@ -307,7 +307,10 @@
     "{{local_year}}": "{{local_year}}",
     "{{series}}": "{{series}}",
     "{{title}}": "{{title}}",
-    "{{vehicle}}": "{{vehicle}}"
+    "{{vehicle}}": "{{vehicle}}",
+    "Average yearly specific yield": "平均年度单位收益",
+    "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.": "按已安装 kWp 和覆盖数据年数归一化的总光伏发电量。不完整年份和数据缺口会影响该值。",
+    "Installed PV peak in kWp. Used for specific-yield panels.": "已安装光伏峰值功率，单位 kWp。用于单位收益面板。"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",

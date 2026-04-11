@@ -307,7 +307,10 @@
     "{{local_year}}": "{{local_year}}",
     "{{series}}": "{{series}}",
     "{{title}}": "{{title}}",
-    "{{vehicle}}": "{{vehicle}}"
+    "{{vehicle}}": "{{vehicle}}",
+    "Average yearly specific yield": "Ø spezifischer Jahresertrag",
+    "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.": "Gesamter erfasster PV-Ertrag, normiert auf installierte kWp und erfasste Datenjahre. Unvollständige Jahre und Datenlücken beeinflussen diesen Wert.",
+    "Installed PV peak in kWp. Used for specific-yield panels.": "Installierte PV-Spitzenleistung in kWp. Wird für spezifische Ertrags-Panels verwendet."
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

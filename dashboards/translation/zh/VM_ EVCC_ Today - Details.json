@@ -4016,6 +4016,27 @@
   "templating": {
     "list": [
       {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
+      {
         "description": "最大功率过滤阈值（W）。高于此限制的功率值将被视为异常值并忽略。",
         "hide": 2,
         "label": "最大功率过滤 / W",

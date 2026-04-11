@@ -88,9 +88,11 @@ Optional dashboard variable overrides:
 - `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
 - `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
 - `DASHBOARD_TARIFF_PRICE_INTERVAL`
+- `DASHBOARD_INSTALLED_WATT_PEAK`
 - `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
 - `DASHBOARD_FILTER_EXT_BLOCKLIST`
 - `DASHBOARD_FILTER_AUX_BLOCKLIST`
+- `DASHBOARD_FILTER_VEHICLE_BLOCKLIST`
 - `DASHBOARD_EVCC_URL`
 - `DASHBOARD_PORTAL_TITLE`
 - `DASHBOARD_PORTAL_URL`
@@ -101,15 +103,19 @@ Example:
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
 DASHBOARD_TARIFF_PRICE_INTERVAL=15m
-DASHBOARD_FILTER_EXT_BLOCKLIST=.*Car.*|.*Haupt.*
+DASHBOARD_INSTALLED_WATT_PEAK=20
+DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_EVCC_URL=http://home:7070/#/
 DASHBOARD_PORTAL_TITLE=Solarman
 DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+
+The dashboards include a small visible `Build` variable in the header. Hover over it to see the deployment timestamp, selected language/variant, and source ref.
 
 Runtime overrides are also available:
 

@@ -307,7 +307,10 @@
     "{{local_year}}": "{{local_year}}",
     "{{series}}": "{{series}}",
     "{{title}}": "{{title}}",
-    "{{vehicle}}": "{{vehicle}}"
+    "{{vehicle}}": "{{vehicle}}",
+    "Average yearly specific yield": "औसत वार्षिक विशिष्ट उपज",
+    "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.": "कुल दर्ज PV उत्पादन को स्थापित kWp और उपलब्ध डेटा वर्षों के आधार पर सामान्यीकृत किया गया है। अधूरे वर्ष और डेटा अंतराल इस मान को प्रभावित करते हैं।",
+    "Installed PV peak in kWp. Used for specific-yield panels.": "स्थापित PV पीक क्षमता kWp में। विशिष्ट उपज पैनलों के लिए उपयोग किया जाता है।"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

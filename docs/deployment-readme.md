@@ -125,15 +125,19 @@ Optional dashboard variable overrides in `vm-dashboard-install.env`:
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
 DASHBOARD_TARIFF_PRICE_INTERVAL=15m
-DASHBOARD_FILTER_EXT_BLOCKLIST=.*Car.*|.*Haupt.*
+DASHBOARD_INSTALLED_WATT_PEAK=20
+DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_EVCC_URL=http://home:7070/#/
 DASHBOARD_PORTAL_TITLE=Solarman
 DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-All of these values are optional. They are applied when you run the deployer again later, so you can change hidden dashboard variables and the header buttons without editing the JSON files by hand. The behavior is the same in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+All of these values are optional. They are applied when you run the deployer again later, so you can change hidden dashboard variables and the header buttons without editing the JSON files by hand. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is the same in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+
+Every deployed dashboard also gets a small visible `Build` variable in the header. Hover over it to see the deployment timestamp, selected language/variant, and source ref.
 
 If you want to delete old EVCC dashboards and library panels before import, set:
 

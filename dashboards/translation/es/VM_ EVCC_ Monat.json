@@ -1032,7 +1032,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
+          "expr": "sum((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
           "format": "time_series",
           "hide": true,
           "legendFormat": "__auto",
@@ -1260,7 +1260,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
+          "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
           "format": "time_series",
           "legendFormat": "Autosuficiencia",
           "range": true,
@@ -3830,58 +3830,25 @@
   "templating": {
     "list": [
       {
-        "name": "peakPowerLimit",
+        "name": "dashboardBuild",
         "type": "constant",
-        "query": "30000",
-        "label": "Límite de potencia máxima",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
         "current": {
-          "text": "30000",
-          "value": "30000"
+          "text": "info",
+          "value": "info",
+          "selected": false
         },
         "options": [
           {
-            "text": "30000",
-            "value": "30000",
+            "text": "info",
+            "value": "info",
             "selected": true
           }
-        ],
-        "hide": 2
-      },
-      {
-        "name": "energySampleInterval",
-        "type": "constant",
-        "query": "30s",
-        "label": "Intervalo de muestreo de energía",
-        "current": {
-          "text": "30s",
-          "value": "30s"
-        },
-        "options": [
-          {
-            "text": "30s",
-            "value": "30s",
-            "selected": true
-          }
-        ],
-        "hide": 2
-      },
-      {
-        "name": "tariffPriceInterval",
-        "type": "constant",
-        "query": "15m",
-        "label": "Intervalo de tarifa",
-        "current": {
-          "text": "15m",
-          "value": "15m"
-        },
-        "options": [
-          {
-            "text": "15m",
-            "value": "15m",
-            "selected": true
-          }
-        ],
-        "hide": 2
+        ]
       },
       {
         "name": "loadpointBlocklist",

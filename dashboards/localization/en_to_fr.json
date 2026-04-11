@@ -307,7 +307,10 @@
     "{{local_year}}": "{{local_year}}",
     "{{series}}": "{{series}}",
     "{{title}}": "{{title}}",
-    "{{vehicle}}": "{{vehicle}}"
+    "{{vehicle}}": "{{vehicle}}",
+    "Average yearly specific yield": "Rendement spécifique annuel moyen",
+    "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.": "Production PV totale enregistrée, normalisée par kWp installé et par années de données couvertes. Les années incomplètes et les lacunes de données influencent cette valeur.",
+    "Installed PV peak in kWp. Used for specific-yield panels.": "Puissance crête PV installée en kWp. Utilisée pour les panneaux de rendement spécifique."
   },
   "Heat pump source mix": "Répartition des sources de la pompe à chaleur",
   "Heat pump title match": "Correspondance du titre de la pompe à chaleur",

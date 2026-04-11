@@ -47,8 +47,8 @@
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
       "label": "Blocklist veicoli",
-      "value": "^Mr White.*$|^.*\\(offline\\)$",
-      "description": ""
+      "value": "^none$",
+      "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
@@ -2520,6 +2520,27 @@
   ],
   "templating": {
     "list": [
+      {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
       {
         "description": "Filtro della potenza massima in W. I valori di potenza superiori a questo limite vengono ignorati come anomalie.",
         "hide": 2,

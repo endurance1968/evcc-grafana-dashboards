@@ -124,7 +124,7 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 12,
+        "h": 9,
         "w": 5,
         "x": 0,
         "y": 1
@@ -765,6 +765,80 @@
       ]
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "kWh/kWp/a"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 0,
+        "y": 10
+      },
+      "id": 55,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 24
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "WITH (pvEnergyKwh = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000, coveredYears = count_over_time((sum(last_over_time(evcc_pv_energy_daily_wh[1d])))[$__range:1d]) / 365.25) pvEnergyKwh / $installedWattPeak / clamp_min(coveredYears, 1 / 365.25)",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "Average yearly specific yield",
+          "range": false,
+          "refId": "averageYearlySpecificYield"
+        }
+      ],
+      "title": "Average yearly specific yield",
+      "type": "stat"
+    },
+    {
       "id": 24,
       "title": "Metric gauges",
       "type": "gauge",
@@ -936,7 +1010,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "legendFormat": "Loadpoints",
           "refId": "loadpointEnergy",
@@ -1370,6 +1444,233 @@
       ]
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "none",
+          "decimals": 1
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "batteryChargeTotal"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery charge"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "unit",
+                "value": "watth"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "batteryDischargeTotal"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery discharge"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              },
+              {
+                "id": "unit",
+                "value": "watth"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "batteryEfficiency"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Battery efficiency"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#5794F2"
+                }
+              },
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "maxSoc"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Avg Max SOC"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "minSoc"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Avg Min SOC"
+              },
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 0,
+        "y": 19
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 20
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh[1d]))[$__range:1d]))",
+          "legendFormat": "batteryChargeTotal",
+          "refId": "batteryChargeTotal",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh[1d]))[$__range:1d]))",
+          "legendFormat": "batteryDischargeTotal",
+          "refId": "batteryDischargeTotal",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$batteryDischargeTotal / $batteryChargeTotal",
+          "hide": false,
+          "refId": "batteryEfficiency",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(avg_over_time((last_over_time(evcc_battery_soc_daily_max_pct[1d]))[$__range:1d])) / count(avg_over_time((last_over_time(evcc_battery_soc_daily_max_pct[1d]))[$__range:1d]))",
+          "legendFormat": "maxSoc",
+          "refId": "maxSoc",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(avg_over_time((last_over_time(evcc_battery_soc_daily_min_pct[1d]))[$__range:1d])) / count(avg_over_time((last_over_time(evcc_battery_soc_daily_min_pct[1d]))[$__range:1d]))",
+          "legendFormat": "minSoc",
+          "refId": "minSoc",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "title": "Battery summary",
+      "type": "stat"
+    },
+    {
       "id": 27,
       "title": "Yearly grid import",
       "type": "barchart",
@@ -1770,233 +2071,6 @@
           }
         }
       ]
-    },
-    {
-      "datasource": {
-        "type": "victoriametrics-metrics-datasource",
-        "uid": "${DS_VM-EVCC}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "fixed",
-            "fixedColor": "#5794F2"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          },
-          "unit": "none",
-          "decimals": 1
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "batteryChargeTotal"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Battery charge"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "unit",
-                "value": "watth"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "batteryDischargeTotal"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Battery discharge"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              },
-              {
-                "id": "unit",
-                "value": "watth"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "batteryEfficiency"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Battery efficiency"
-              },
-              {
-                "id": "decimals",
-                "value": 1
-              },
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#5794F2"
-                }
-              },
-              {
-                "id": "unit",
-                "value": "percentunit"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "maxSoc"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Avg Max SOC"
-              },
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 1
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "minSoc"
-            },
-            "properties": [
-              {
-                "id": "displayName",
-                "value": "Avg Min SOC"
-              },
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 1
-              }
-            ]
-          }
-        ]
-      },
-      "gridPos": {
-        "h": 12,
-        "w": 5,
-        "x": 0,
-        "y": 19
-      },
-      "id": 16,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {
-          "titleSize": 13,
-          "valueSize": 20
-        },
-        "textMode": "value_and_name",
-        "wideLayout": true
-      },
-      "pluginVersion": "12.3.3",
-      "targets": [
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh[1d]))[$__range:1d]))",
-          "legendFormat": "batteryChargeTotal",
-          "refId": "batteryChargeTotal",
-          "instant": true,
-          "range": false
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh[1d]))[$__range:1d]))",
-          "legendFormat": "batteryDischargeTotal",
-          "refId": "batteryDischargeTotal",
-          "instant": true,
-          "range": false
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$batteryDischargeTotal / $batteryChargeTotal",
-          "hide": false,
-          "refId": "batteryEfficiency",
-          "type": "math"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(avg_over_time((last_over_time(evcc_battery_soc_daily_max_pct[1d]))[$__range:1d])) / count(avg_over_time((last_over_time(evcc_battery_soc_daily_max_pct[1d]))[$__range:1d]))",
-          "legendFormat": "maxSoc",
-          "refId": "maxSoc",
-          "instant": true,
-          "range": false
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(avg_over_time((last_over_time(evcc_battery_soc_daily_min_pct[1d]))[$__range:1d])) / count(avg_over_time((last_over_time(evcc_battery_soc_daily_min_pct[1d]))[$__range:1d]))",
-          "legendFormat": "minSoc",
-          "refId": "minSoc",
-          "instant": true,
-          "range": false
-        }
-      ],
-      "title": "Battery summary",
-      "type": "stat"
     },
     {
       "id": 17,
@@ -4876,58 +4950,25 @@
   "templating": {
     "list": [
       {
-        "name": "peakPowerLimit",
+        "name": "dashboardBuild",
         "type": "constant",
-        "query": "30000",
-        "label": "Peak Power Limit",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
         "current": {
-          "text": "30000",
-          "value": "30000"
+          "text": "info",
+          "value": "info",
+          "selected": false
         },
         "options": [
           {
-            "text": "30000",
-            "value": "30000",
+            "text": "info",
+            "value": "info",
             "selected": true
           }
-        ],
-        "hide": 2
-      },
-      {
-        "name": "energySampleInterval",
-        "type": "constant",
-        "query": "30s",
-        "label": "Energy Sample Interval",
-        "current": {
-          "text": "30s",
-          "value": "30s"
-        },
-        "options": [
-          {
-            "text": "30s",
-            "value": "30s",
-            "selected": true
-          }
-        ],
-        "hide": 2
-      },
-      {
-        "name": "tariffPriceInterval",
-        "type": "constant",
-        "query": "15m",
-        "label": "Tariff Price Interval",
-        "current": {
-          "text": "15m",
-          "value": "15m"
-        },
-        "options": [
-          {
-            "text": "15m",
-            "value": "15m",
-            "selected": true
-          }
-        ],
-        "hide": 2
+        ]
       },
       {
         "name": "loadpointBlocklist",
@@ -4948,86 +4989,37 @@
         "hide": 2
       },
       {
-        "name": "extBlocklist",
-        "type": "constant",
-        "query": "^none$",
-        "label": "EXT Blocklist",
-        "current": {
-          "text": "^none$",
-          "value": "^none$"
-        },
-        "options": [
-          {
-            "text": "^none$",
-            "value": "^none$",
-            "selected": true
-          }
-        ],
-        "hide": 2
-      },
-      {
-        "name": "auxBlocklist",
-        "type": "constant",
-        "query": "^none$",
-        "label": "AUX Blocklist",
-        "current": {
-          "text": "^none$",
-          "value": "^none$"
-        },
-        "options": [
-          {
-            "text": "^none$",
-            "value": "^none$",
-            "selected": true
-          }
-        ],
-        "hide": 2
-      },
-      {
-        "current": {
-          "selected": false,
-          "text": "20",
-          "value": "20"
-        },
+        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
         "hide": 2,
-        "includeAll": false,
-        "multi": false,
-        "name": "installedWattPeak",
-        "options": [],
-        "query": "20",
-        "skipUrlSync": false,
-        "type": "constant",
-        "label": "installedWattPeak"
-      },
-      {
-        "description": "Regex fuer Fahrzeuge, die nicht angezeigt werden sollen.",
-        "hide": 2,
-        "label": "Vehicle Blocklist",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
-        "query": "^Altherma-3$",
+        "query": "^none$",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "^Altherma-3$",
-          "text": "^Altherma-3$",
-          "selected": false
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
-            "value": "^Altherma-3$",
-            "text": "^Altherma-3$",
+            "text": "^none$",
+            "value": "^none$",
             "selected": true
           }
         ]
       },
       {
-        "current": {},
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "victoriametrics-metrics-datasource",
           "uid": "${DS_VM-EVCC}"
         },
-        "definition": "label_values(sessionPricePerKWh_value{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
-        "hide": 2,
+        "definition": "label_values(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
+        "hide": 0,
         "includeAll": true,
         "label": "Vehicle",
         "multi": true,
@@ -5035,13 +5027,16 @@
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(sessionPricePerKWh_value{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
+          "query": "label_values(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
           "refId": "VariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
         "regex": "",
         "regexApplyTo": "value",
-        "type": "query"
+        "type": "query",
+        "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+        "skipUrlSync": false,
+        "allValue": ""
       },
       {
         "current": {
@@ -5160,6 +5155,27 @@
         "type": "custom",
         "description": "Usable home battery capacity in Wh",
         "hide": 2
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "20",
+          "value": "20"
+        },
+        "description": "Installed PV peak in kWp. Used for specific-yield panels.",
+        "hide": 2,
+        "label": "installedWattPeak",
+        "name": "installedWattPeak",
+        "options": [
+          {
+            "selected": true,
+            "text": "20",
+            "value": "20"
+          }
+        ],
+        "query": "20",
+        "skipUrlSync": true,
+        "type": "constant"
       },
       {
         "description": "URL used to open EVCC.",

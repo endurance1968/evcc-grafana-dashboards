@@ -136,7 +136,7 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 12,
+        "h": 10,
         "w": 5,
         "x": 0,
         "y": 1
@@ -382,7 +382,7 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 12,
+        "h": 13,
         "w": 19,
         "x": 5,
         "y": 1
@@ -648,6 +648,89 @@
       ]
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "kWh/kWp"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 0,
+        "y": 11
+      },
+      "id": 76,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 16,
+          "valueSize": 29
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
+          "format": "table",
+          "legendFormat": "PV",
+          "range": false,
+          "refId": "pvEnergy",
+          "hide": true
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$pvEnergy / $installedWattPeak",
+          "hide": false,
+          "refId": "specificYield",
+          "type": "math"
+        }
+      ],
+      "title": "Resa specifica",
+      "type": "stat"
+    },
+    {
       "id": 44,
       "title": "Indicatori",
       "type": "gauge",
@@ -656,10 +739,10 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 5,
         "x": 0,
-        "y": 13
+        "y": 14
       },
       "pluginVersion": "12.3.3",
       "transparent": false,
@@ -819,7 +902,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
           "legendFormat": "Punti di ricarica",
           "refId": "loadpointEnergy",
@@ -861,10 +944,10 @@
         "uid": "${DS_VM-EVCC}"
       },
       "gridPos": {
-        "h": 7,
+        "h": 6,
         "w": 19,
         "x": 5,
-        "y": 13
+        "y": 14
       },
       "pluginVersion": "12.3.3",
       "fieldConfig": {
@@ -994,7 +1077,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "WITH (\n  gridImport = sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  homeEnergy = sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  loadpointEnergy = sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  pvEnergy = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  gridExport = sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  autarky = label_set(1 - gridImport / (homeEnergy + loadpointEnergy), \"series\", \"Autarky\"),\n  selfConsumption = label_set((pvEnergy - gridExport) / pvEnergy, \"series\", \"Self-consumption\")\n)\nautarky or selfConsumption"
+          "expr": "WITH (\n  gridImport = sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  homeEnergy = sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  loadpointEnergy = sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  pvEnergy = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  gridExport = sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  autarky = label_set(1 - gridImport / (homeEnergy + loadpointEnergy), \"series\", \"Autarky\"),\n  selfConsumption = label_set((pvEnergy - gridExport) / pvEnergy, \"series\", \"Self-consumption\")\n)\nautarky or selfConsumption"
         }
       ],
       "transformations": [
@@ -5214,6 +5297,27 @@
   "templating": {
     "list": [
       {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
+      {
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
@@ -5234,20 +5338,21 @@
       {
         "name": "vehicleBlocklist",
         "type": "constant",
-        "query": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
-        "label": "Blocco veicolo",
+        "query": "^none$",
+        "label": "Blocklist veicoli",
         "current": {
-          "text": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
-          "value": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$"
+          "text": "^none$",
+          "value": "^none$"
         },
         "options": [
           {
-            "text": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
-            "value": "^Mr White.*$|^.*\\(offline\\)$|^Altherma.*$",
+            "text": "^none$",
+            "value": "^none$",
             "selected": true
           }
         ],
-        "hide": 2
+        "hide": 2,
+        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
       },
       {
         "name": "extBlocklist",

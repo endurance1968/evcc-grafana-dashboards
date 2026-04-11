@@ -19,6 +19,9 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
+const SCRIPT_VERSION = "2026.04.11.4";
+const SCRIPT_LAST_MODIFIED = "2026-04-11";
+
 loadEnvFile(parseArg("env", ".env"));
 
 const baseUrl = requireEnv("GRAFANA_URL");
@@ -49,6 +52,10 @@ const tag = sanitizeTag(parseArg("tag", defaultTag));
 const manifest = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 const stagedSource = path.resolve(parseArg("staged-source", `tests/artifacts/deploy-source/${tag}`));
 const rawGitHubSource = path.resolve(parseArg("raw-source", `tests/artifacts/deploy-source-raw/${tag}`));
+
+console.log(
+  `deploy-dashboards.mjs v${SCRIPT_VERSION} (last modified ${SCRIPT_LAST_MODIFIED}, run ${new Date().toISOString()})`,
+);
 
 function run(script, args = []) {
   const cmd = ["node", script, ...args];
@@ -324,12 +331,19 @@ function applyVariableDefaults(raw, variableMap) {
   for (const variable of list) {
     const desired = variableMap?.[variable?.name];
     if (desired === undefined) continue;
+    if (variable.type !== "query") {
+      variable.query = desired;
+    }
     variable.current = {
       selected: desired === "$__all",
       text: desired === "$__all" ? "All" : desired,
       value: desired,
     };
     if (Array.isArray(variable.options)) {
+      if (variable.type === "constant") {
+        variable.options = [{ selected: true, text: variable.current.text, value: desired }];
+        continue;
+      }
       for (const option of variable.options) {
         option.selected = option?.value === desired;
       }
@@ -338,14 +352,26 @@ function applyVariableDefaults(raw, variableMap) {
 }
 
 function applyOverridesToDashboard(raw, overrides) {
-  if (!overrides || typeof overrides !== "object") return raw;
   const clone = JSON.parse(JSON.stringify(raw));
+  if (!overrides || typeof overrides !== "object") return clone;
   if (overrides.variables) applyVariableDefaults(clone, overrides.variables);
   if (overrides.colors) applyColorOverrides(clone, overrides.colors);
   return clone;
 }
 
-function stageDashboards(sourceInput, targetDir, overridesPath) {
+function buildDashboardBuildMarker(sourceLabel) {
+  return `deployed ${new Date().toISOString()} | ${language}/${variant} | ${tag} | ${sourceLabel}`;
+}
+
+function applyDashboardBuildDescription(raw, marker) {
+  for (const variable of raw?.templating?.list || []) {
+    if (variable?.name === "dashboardBuild") {
+      variable.description = marker;
+    }
+  }
+}
+
+function stageDashboards(sourceInput, targetDir, overridesPath, sourceLabel) {
   fs.rmSync(targetDir, { recursive: true, force: true });
   fs.mkdirSync(targetDir, { recursive: true });
   const files = listJsonFilesRecursive(sourceInput);
@@ -353,10 +379,12 @@ function stageDashboards(sourceInput, targetDir, overridesPath) {
     ? path.dirname(path.resolve(sourceInput))
     : path.resolve(sourceInput);
   const overrides = overridesPath ? JSON.parse(fs.readFileSync(overridesPath, "utf8")) : null;
+  const buildMarker = buildDashboardBuildMarker(sourceLabel);
 
   for (const file of files) {
     const raw = JSON.parse(fs.readFileSync(file, "utf8"));
     const patched = applyOverridesToDashboard(raw, overrides);
+    applyDashboardBuildDescription(patched, buildMarker);
     const rel = path.relative(sourceRoot, file);
     const out = path.join(targetDir, rel);
     fs.mkdirSync(path.dirname(out), { recursive: true });
@@ -393,7 +421,7 @@ async function main() {
 
   const overridesPath = resolveOverridesPath();
   const { rawSource, sourceLabel } = await resolveRawSource();
-  stageDashboards(rawSource, stagedSource, overridesPath);
+  stageDashboards(rawSource, stagedSource, overridesPath, sourceLabel);
 
   if (purgeLanguage) {
     await purgeForLanguage(stagedSource);

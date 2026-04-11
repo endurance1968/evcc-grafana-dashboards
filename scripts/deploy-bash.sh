@@ -3,6 +3,10 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 
+SCRIPT_VERSION="2026.04.11.4"
+SCRIPT_LAST_MODIFIED="2026-04-11"
+SCRIPT_NAME="${0##*/}"
+
 CONFIG_PATH="./vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
@@ -45,6 +49,8 @@ EOF
   esac
 done
 
+printf '%s v%s (last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
     echo "Missing required command: $1" >&2
@@ -72,9 +78,11 @@ DASHBOARD_ENERGY_SAMPLE_INTERVAL=""
 DASHBOARD_TARIFF_PRICE_INTERVAL=""
 DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL=""
 DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL=""
+DASHBOARD_INSTALLED_WATT_PEAK=""
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=""
 DASHBOARD_FILTER_EXT_BLOCKLIST=""
 DASHBOARD_FILTER_AUX_BLOCKLIST=""
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=""
 DASHBOARD_EVCC_URL=""
 DASHBOARD_PORTAL_TITLE=""
 DASHBOARD_PORTAL_URL=""
@@ -171,15 +179,43 @@ apply_dashboard_override() {
   mv "$tmp_file" "$file"
 }
 
+dashboard_build_marker() {
+  local source
+  if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
+    source="local:$DASHBOARD_LOCAL_DIR"
+  else
+    source="github:$GITHUB_REPO@$GITHUB_REF"
+  fi
+  printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$DASHBOARD_LANGUAGE" "$DASHBOARD_VARIANT" "$source"
+}
+
+apply_dashboard_build_description() {
+  local file="$1"
+  local marker="$2"
+  local tmp_file="${file}.tmp"
+  jq --arg description "$marker" '
+    if .templating and .templating.list then
+      .templating.list |= map(
+        if .name == "dashboardBuild" then
+          .description = $description
+        else . end
+      )
+    else . end
+  ' "$file" > "$tmp_file"
+  mv "$tmp_file" "$file"
+}
+
 print_dashboard_overrides() {
   local printed=0
   for entry in \
     "peakPowerLimit:$DASHBOARD_FILTER_PEAK_POWER_LIMIT" \
     "energySampleInterval:${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}" \
     "tariffPriceInterval:${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}" \
+    "installedWattPeak:$DASHBOARD_INSTALLED_WATT_PEAK" \
     "loadpointBlocklist:$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST" \
     "extBlocklist:$DASHBOARD_FILTER_EXT_BLOCKLIST" \
     "auxBlocklist:$DASHBOARD_FILTER_AUX_BLOCKLIST" \
+    "vehicleBlocklist:$DASHBOARD_FILTER_VEHICLE_BLOCKLIST" \
     "evccUrl:$DASHBOARD_EVCC_URL" \
     "inverterPortalTitle:$DASHBOARD_PORTAL_TITLE" \
     "inverterPortalUrl:$DASHBOARD_PORTAL_URL"; do
@@ -211,17 +247,21 @@ TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 LIB_DIR="$TMP_DIR/library"
 mkdir -p "$LIB_DIR"
+DASHBOARD_BUILD_MARKER="$(dashboard_build_marker)"
 
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
   inputs_file="$TMP_DIR/$file_name.inputs.json"
   fetch_source "$file_name" "$raw_file"
+  apply_dashboard_build_description "$raw_file" "$DASHBOARD_BUILD_MARKER"
   apply_dashboard_override "$raw_file" "peakPowerLimit" "$DASHBOARD_FILTER_PEAK_POWER_LIMIT"
   apply_dashboard_override "$raw_file" "energySampleInterval" "${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}"
   apply_dashboard_override "$raw_file" "tariffPriceInterval" "${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}"
+  apply_dashboard_override "$raw_file" "installedWattPeak" "$DASHBOARD_INSTALLED_WATT_PEAK"
   apply_dashboard_override "$raw_file" "loadpointBlocklist" "$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "extBlocklist" "$DASHBOARD_FILTER_EXT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "auxBlocklist" "$DASHBOARD_FILTER_AUX_BLOCKLIST"
+  apply_dashboard_override "$raw_file" "vehicleBlocklist" "$DASHBOARD_FILTER_VEHICLE_BLOCKLIST"
   apply_dashboard_override "$raw_file" "evccUrl" "$DASHBOARD_EVCC_URL"
   apply_dashboard_override "$raw_file" "inverterPortalTitle" "$DASHBOARD_PORTAL_TITLE"
   apply_dashboard_override "$raw_file" "inverterPortalUrl" "$DASHBOARD_PORTAL_URL"
@@ -266,6 +306,7 @@ else
 fi
 echo "Language: $DASHBOARD_LANGUAGE"
 echo "Variant: $DASHBOARD_VARIANT"
+echo "Build marker: $DASHBOARD_BUILD_MARKER"
 echo "Purge: $PURGE"
 print_dashboard_overrides
 echo
@@ -453,6 +494,3 @@ if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
 else
   echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
 fi
-
-
-

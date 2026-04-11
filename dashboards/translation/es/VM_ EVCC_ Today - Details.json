@@ -4016,6 +4016,27 @@
   "templating": {
     "list": [
       {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
+      {
         "description": "Filtro de potencia máxima en W. Los valores de potencia por encima de este límite se ignoran como valores atípicos.",
         "hide": 2,
         "label": "Filtro de potencia máxima / W",

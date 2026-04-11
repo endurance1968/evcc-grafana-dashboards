@@ -47,8 +47,8 @@
       "name": "VAR_VEHICLEBLOCKLIST",
       "type": "constant",
       "label": "वाहन ब्लॉकलिस्ट",
-      "value": "^Mr White.*$|^.*\\(offline\\)$",
-      "description": ""
+      "value": "^none$",
+      "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
@@ -2520,6 +2520,27 @@
   ],
   "templating": {
     "list": [
+      {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
       {
         "description": "W में अधिकतम शक्ति फ़िल्टर। इस सीमा से ऊपर की शक्ति मानों को अपवाद मानकर अनदेखा किया जाता है।",
         "hide": 2,

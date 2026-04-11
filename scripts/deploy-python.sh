@@ -3,6 +3,10 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
 
+SCRIPT_VERSION="2026.04.11.4"
+SCRIPT_LAST_MODIFIED="2026-04-11"
+SCRIPT_NAME="${0##*/}"
+
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 CONFIG_PATH="$SCRIPT_DIR/vm-dashboard-install.env"
 CLI_URL=""
@@ -50,6 +54,8 @@ EOF
   esac
 done
 
+printf '%s v%s (last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+
 export CLI_URL CLI_TOKEN CLI_PURGE CLI_YES
 
 python3 - "$CONFIG_PATH" <<'PY'
@@ -59,6 +65,7 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 
 config_path = Path(sys.argv[1])
@@ -81,9 +88,11 @@ settings = {
     "DASHBOARD_TARIFF_PRICE_INTERVAL": "",
     "DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL": "",
     "DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL": "",
+    "DASHBOARD_INSTALLED_WATT_PEAK": "",
     "DASHBOARD_FILTER_LOADPOINT_BLOCKLIST": "",
     "DASHBOARD_FILTER_EXT_BLOCKLIST": "",
     "DASHBOARD_FILTER_AUX_BLOCKLIST": "",
+    "DASHBOARD_FILTER_VEHICLE_BLOCKLIST": "",
     "DASHBOARD_EVCC_URL": "",
     "DASHBOARD_PORTAL_TITLE": "",
     "DASHBOARD_PORTAL_URL": "",
@@ -180,18 +189,37 @@ def build_inputs(raw):
             out.append({"name": item["name"], "type": item["type"], "value": item.get("value", "")})
     return out
 
+def build_dashboard_marker(settings):
+    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
+    if settings["DASHBOARD_SOURCE_MODE"] == "local":
+        source = f"local:{settings['DASHBOARD_LOCAL_DIR']}"
+    else:
+        source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
+    return f"deployed {timestamp} | {settings['DASHBOARD_LANGUAGE']}/{settings['DASHBOARD_VARIANT']} | {source}"
+
+
 def build_dashboard_overrides(settings):
     return {
         "peakPowerLimit": settings.get("DASHBOARD_FILTER_PEAK_POWER_LIMIT", ""),
         "energySampleInterval": settings.get("DASHBOARD_ENERGY_SAMPLE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL", ""),
         "tariffPriceInterval": settings.get("DASHBOARD_TARIFF_PRICE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL", ""),
+        "installedWattPeak": settings.get("DASHBOARD_INSTALLED_WATT_PEAK", ""),
         "loadpointBlocklist": settings.get("DASHBOARD_FILTER_LOADPOINT_BLOCKLIST", ""),
         "extBlocklist": settings.get("DASHBOARD_FILTER_EXT_BLOCKLIST", ""),
         "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
+        "vehicleBlocklist": settings.get("DASHBOARD_FILTER_VEHICLE_BLOCKLIST", ""),
         "evccUrl": settings.get("DASHBOARD_EVCC_URL", ""),
         "inverterPortalTitle": settings.get("DASHBOARD_PORTAL_TITLE", ""),
         "inverterPortalUrl": settings.get("DASHBOARD_PORTAL_URL", ""),
     }
+
+def apply_dashboard_build_description(raw, marker):
+    if not marker:
+        return raw
+    for variable in (raw.get("templating") or {}).get("list") or []:
+        if variable.get("name") == "dashboardBuild":
+            variable["description"] = marker
+    return raw
 
 def apply_dashboard_filter_overrides(raw, overrides):
     if not overrides:
@@ -235,6 +263,7 @@ def delete_and_report(kind, name, uid, path):
         print(f"Deleted {kind}: {name} [{uid}]")
     else:
         raise RuntimeError(f"Failed to delete {kind} {name} [{uid}]")
+dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
 
 dashboards = []
@@ -242,6 +271,7 @@ library = {}
 for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
     raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
+    raw = apply_dashboard_build_description(raw, dashboard_build_marker)
     dashboards.append({"raw": raw, "inputs": build_inputs(raw)})
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
@@ -257,6 +287,7 @@ else:
     print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
 print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
 print(f"Variant: {settings['DASHBOARD_VARIANT']}")
+print(f"Build marker: {dashboard_build_marker}")
 print(f"Purge: {settings['PURGE']}")
 active_dashboard_overrides = {k: v for k, v in dashboard_overrides.items() if str(v).strip()}
 if active_dashboard_overrides:
@@ -346,5 +377,3 @@ print()
 print("Install finished.")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 PY
-
-

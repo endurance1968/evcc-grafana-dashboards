@@ -4016,6 +4016,27 @@
   "templating": {
     "list": [
       {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
+      {
         "description": "Maximum power filter in W. Power values above this limit are ignored as outliers.",
         "hide": 2,
         "label": "Max power filter / W",

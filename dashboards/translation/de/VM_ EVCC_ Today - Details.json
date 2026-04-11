@@ -4016,6 +4016,27 @@
   "templating": {
     "list": [
       {
+        "name": "dashboardBuild",
+        "type": "constant",
+        "label": "Build",
+        "query": "info",
+        "hide": 0,
+        "skipUrlSync": true,
+        "description": "Build information is set during deployment.",
+        "current": {
+          "text": "info",
+          "value": "info",
+          "selected": false
+        },
+        "options": [
+          {
+            "text": "info",
+            "value": "info",
+            "selected": true
+          }
+        ]
+      },
+      {
         "description": "Grenze der maximalen Leistung in W. Leistungswerte darüber werden als Ausreißer ignoriert.",
         "hide": 2,
         "label": "Filter für maximale Leistung / W",

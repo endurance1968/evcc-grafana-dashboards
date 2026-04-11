@@ -1,11 +1,13 @@
 {
   "variables": {
-    "extBlocklist": ".*Car.*|.*Haupt.*",
+    "extBlocklist": "^none$",
     "loadpointBlocklist": "^none$",
     "auxBlocklist": "^none$",
+    "vehicleBlocklist": "^none$",
     "peakPowerLimit": "25000",
     "energySampleInterval": "30s",
-    "tariffPriceInterval": "15m"
+    "tariffPriceInterval": "15m",
+    "installedWattPeak": "20"
   },
   "colors": {
     "Autarky": "#73BF69",
