@@ -502,10 +502,7 @@ python3 check_data.py \
 
 Use a simple cron job that runs once per day after the previous local day is complete.
 
-The rollup script writes one sample per local day and series. Run it only once per day
-for `yesterday`: the day is complete, the value is stable, and VictoriaMetrics will
-not accumulate duplicate samples for the same series and timestamp. Do not run the
-daily refresh hourly.
+The rollup script writes one sample per local day and series. Run it only once per day after `yesterday` is complete. The recommended production command uses `--replace-range`: it deletes the monthly rollup scope that contains `yesterday`, then rebuilds that month up to `yesterday`. This keeps the refresh idempotent and avoids duplicate samples for the same series and timestamp. Do not run the daily refresh hourly.
 
 ### 8.1 Create the wrapper script
 
@@ -518,8 +515,9 @@ set -euo pipefail
 /usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
   backfill \
-  --start-day "$(date -d 'yesterday' +%F)" \
+  --start-day "$(date -d 'yesterday' +%Y-%m-01)" \
   --end-day "$(date -d 'yesterday' +%F)" \
+  --replace-range \
   --write
 ```
 
@@ -542,6 +540,18 @@ Add this entry:
 ```cron
 5 5 * * * /usr/local/bin/evcc-vm-rollup-daily.sh >> /var/log/evcc-vm-rollup.log 2>&1
 ```
+
+Optional manual monthly delete dry-run:
+
+```bash
+python3 evcc-vm-rollup.py \
+  --config /etc/evcc-vm-rollup.conf \
+  delete \
+  --start-day 2026-04-01 \
+  --end-day 2026-04-30
+```
+
+Add `--write` only after the dry-run matcher and series counts look correct.
 
 Optional check:
 

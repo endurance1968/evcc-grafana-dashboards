@@ -58,6 +58,18 @@ Write `evcc_*` rollups:
 python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
 ```
 
+Replace a monthly rollup scope before writing it again:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2026-04-01 --end-day 2026-04-10 --replace-range --progress --write
+```
+
+Delete a monthly rollup scope without rebuilding it:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example delete --start-day 2026-04-01 --end-day 2026-04-30
+```
+
 ## VM cleanup and validation helpers
 
 Check whether raw EVCC metrics and expected daily rollups exist after import/backfill. In the default `auto` phase the script checks raw data first, then automatically includes rollups once they exist. It also reports whether `host` cleanup is recommended:

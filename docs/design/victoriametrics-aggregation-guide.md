@@ -145,16 +145,21 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 
 ## Recommended scheduler setup
 
-Rollups are daily values. Schedule the refresh once per day and write only
-`yesterday`, because that local day is complete. Do not run this hourly: repeated
-writes for the same day can leave duplicate samples with the same series labels and
-timestamp in VictoriaMetrics.
+Rollups are daily values. Schedule the refresh once per day after `yesterday` is complete. For production, prefer `--replace-range`: delete the monthly rollup scope that contains `yesterday`, then rebuild that month up to `yesterday`. This makes the refresh idempotent and avoids duplicate samples with the same series labels and timestamp in VictoriaMetrics.
 
 Example cron:
 
 ```cron
-5 5 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date -d 'yesterday' +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
+5 5 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%Y-\%m-01) --end-day $(date -d 'yesterday' +\%F) --replace-range --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
+
+Manual delete dry-run for a monthly rollup scope:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf delete --start-day 2026-04-01 --end-day 2026-04-30
+```
+
+Add `--write` only after the matcher and series counts look correct.
 
 ## Validation
 

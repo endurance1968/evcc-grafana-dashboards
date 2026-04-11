@@ -7,6 +7,7 @@ import argparse
 import configparser
 import json
 import math
+import re
 import sys
 import time
 import urllib.error
@@ -18,7 +19,7 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.11.1"
+SCRIPT_VERSION = "2026.04.11.2"
 SCRIPT_LAST_MODIFIED = "2026-04-11"
 
 
@@ -85,6 +86,15 @@ class DayWindow:
     local_month: str
     local_day: str
     local_date: str
+
+
+@dataclass(frozen=True)
+class MonthScope:
+    local_year: str
+    local_month: str
+    start_iso: str
+    end_iso: str
+    matcher: str
 
 
 @dataclass(frozen=True)
@@ -187,7 +197,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "command",
-        choices=["detect", "plan", "benchmark", "backfill"],
+        choices=["detect", "plan", "benchmark", "backfill", "delete"],
         help="Action to perform.",
     )
     parser.add_argument(
@@ -201,7 +211,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--write",
         action="store_true",
-        help="Actually write the generated rollups to VictoriaMetrics.",
+        help="Actually write generated rollups or execute delete operations in VictoriaMetrics.",
+    )
+    parser.add_argument(
+        "--replace-range",
+        action="store_true",
+        help=(
+            "For backfill, delete the affected monthly evcc_* rollup scopes before writing them again. "
+            "Dry-run mode only reports the planned deletes."
+        ),
     )
     parser.add_argument(
         "--allow-incomplete-current-day",
@@ -333,6 +351,26 @@ def http_post_bytes(
         bump_profile_value("http_post_bytes_s", time.perf_counter() - started_at)
         bump_profile_value("http_post_bytes_calls")
         bump_profile_value("http_post_bytes_payload_mb", len(payload) / (1024 * 1024))
+
+
+def http_post_form(settings: Settings, path: str, fields: list[tuple[str, str]]) -> ImportResponse:
+    payload = urllib.parse.urlencode(fields).encode("utf-8")
+    request = urllib.request.Request(
+        settings.base_url + path,
+        data=payload,
+        method="POST",
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    started_at = time.perf_counter()
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return ImportResponse(
+                status_code=response.getcode(),
+                body=response.read().decode("utf-8", errors="replace"),
+            )
+    finally:
+        bump_profile_value("http_post_form_s", time.perf_counter() - started_at)
+        bump_profile_value("http_post_form_calls")
 
 
 def join_matchers(*parts: str) -> str:
@@ -767,6 +805,12 @@ def build_day_windows(settings: Settings, start_day: date, end_day: date) -> lis
     return windows
 
 
+def last_day_of_month(value: date) -> date:
+    if value.month == 12:
+        return date(value.year, 12, 31)
+    return date(value.year, value.month + 1, 1) - timedelta(days=1)
+
+
 def current_local_day(settings: Settings) -> date:
     return datetime.now(ZoneInfo(settings.timezone)).date()
 
@@ -807,6 +851,103 @@ def validate_backfill_write_window(
         )
 
     return safety
+
+
+def validate_month_replace_range(
+    settings: Settings,
+    start_day: date,
+    end_day: date,
+    today: date | None = None,
+) -> None:
+    local_today = today or current_local_day(settings)
+    latest_completed_day = local_today - timedelta(days=1)
+
+    if start_day.day != 1:
+        raise SystemExit(
+            "NO-GO: monthly rollup replacement deletes whole local_month scopes, "
+            f"so --start-day must be the first day of a month. Got {start_day.isoformat()}."
+        )
+
+    allowed_end_day = last_day_of_month(end_day)
+    if end_day != allowed_end_day and end_day != latest_completed_day:
+        raise SystemExit(
+            "NO-GO: monthly rollup replacement deletes whole local_month scopes. "
+            f"Use --end-day {allowed_end_day.isoformat()} for a completed historical month, "
+            f"or --end-day {latest_completed_day.isoformat()} for the current in-progress month."
+        )
+
+
+def promql_string(value: str) -> str:
+    return value.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def rollup_month_matcher(settings: Settings, local_year: str, local_month: str) -> str:
+    name_regex = re.escape(f"{settings.metric_prefix}_") + ".*"
+    return (
+        "{"
+        f'__name__=~"{promql_string(name_regex)}",'
+        f'local_year="{promql_string(local_year)}",'
+        f'local_month="{promql_string(local_month)}"'
+        "}"
+    )
+
+
+def build_month_scopes(settings: Settings, windows: list[DayWindow]) -> list[MonthScope]:
+    month_windows: dict[tuple[str, str], list[DayWindow]] = {}
+    for window in windows:
+        month_windows.setdefault((window.local_year, window.local_month), []).append(window)
+
+    scopes: list[MonthScope] = []
+    for (local_year, local_month), items in sorted(month_windows.items()):
+        ordered = sorted(items, key=lambda item: item.start_iso)
+        scopes.append(
+            MonthScope(
+                local_year=local_year,
+                local_month=local_month,
+                start_iso=ordered[0].start_iso,
+                end_iso=ordered[-1].end_iso,
+                matcher=rollup_month_matcher(settings, local_year, local_month),
+            )
+        )
+    return scopes
+
+
+def count_matching_series(settings: Settings, matcher: str, start_iso: str, end_iso: str) -> int:
+    response = http_get_json(
+        settings,
+        "/api/v1/series",
+        {
+            "match[]": [matcher],
+            "start": start_iso,
+            "end": end_iso,
+        },
+    )
+    return len(response.get("data", []))
+
+
+def delete_rollup_scopes(settings: Settings, scopes: list[MonthScope], write: bool) -> list[dict[str, str | int]]:
+    results: list[dict[str, str | int]] = []
+    for scope in scopes:
+        before = count_matching_series(settings, scope.matcher, scope.start_iso, scope.end_iso)
+        after = before
+        status = "dry-run"
+        if write:
+            http_post_form(settings, "/api/v1/admin/tsdb/delete_series", [("match[]", scope.matcher)])
+            after = count_matching_series(settings, scope.matcher, scope.start_iso, scope.end_iso)
+            status = "deleted"
+        results.append(
+            {
+                "local_year": scope.local_year,
+                "local_month": scope.local_month,
+                "matcher": scope.matcher,
+                "start": scope.start_iso,
+                "end": scope.end_iso,
+                "series_before": before,
+                "series_after": after,
+                "status": status,
+            }
+        )
+    return results
 
 
 def build_window_chunks(windows: list[DayWindow]) -> list[tuple[str, list[DayWindow]]]:
@@ -2447,6 +2588,10 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     end_day = parse_local_day(args.end_day, "--end-day")
     write_safety = validate_backfill_write_window(settings, args, end_day)
     windows = build_day_windows(settings, start_day, end_day)
+    replace_summary = []
+    if getattr(args, "replace_range", False):
+        validate_month_replace_range(settings, start_day, end_day)
+        replace_summary = delete_rollup_scopes(settings, build_month_scopes(settings, windows), args.write)
     add_duration(ACTIVE_PROFILE, "build_windows_s", started_at)
     started_at = time.perf_counter()
     chunks = build_window_chunks(windows)
@@ -2895,6 +3040,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             "days": len(windows),
         },
         "write_safety": write_safety,
+        "replace_range": bool(getattr(args, "replace_range", False)),
+        "replace_delete_results": replace_summary,
         "metrics": [item.record for item in catalog] + [
             record_name(settings, "pv_top30_mean_yearly_wh"),
             record_name(settings, "pv_top5_mean_monthly_wh"),
@@ -2915,6 +3062,64 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     else:
         print_backfill_summary(summary, args)
     return 0
+
+
+def delete_rollups(settings: Settings, args: argparse.Namespace) -> int:
+    if not args.start_day or not args.end_day:
+        raise SystemExit("delete requires --start-day and --end-day.")
+    if getattr(args, "replace_range", False):
+        raise SystemExit("delete does not use --replace-range. Use delete --write to execute deletion.")
+
+    start_day = parse_local_day(args.start_day, "--start-day")
+    end_day = parse_local_day(args.end_day, "--end-day")
+    if end_day < start_day:
+        raise SystemExit("--end-day must not be earlier than --start-day.")
+    validate_month_replace_range(settings, start_day, end_day)
+    windows = build_day_windows(settings, start_day, end_day)
+    scopes = build_month_scopes(settings, windows)
+    delete_results = delete_rollup_scopes(settings, scopes, args.write)
+    summary = {
+        "script": script_metadata(),
+        "mode": "write" if args.write else "dry-run",
+        "timezone": settings.timezone,
+        "range": {
+            "start_day": start_day.isoformat(),
+            "end_day": end_day.isoformat(),
+            "days": len(windows),
+        },
+        "delete_results": delete_results,
+    }
+    if args.json:
+        print(json.dumps(summary, indent=2, ensure_ascii=True))
+    else:
+        print_delete_summary(summary, args)
+    return 0
+
+
+def print_delete_summary(summary: dict, args: argparse.Namespace) -> None:
+    print_report_header(
+        f"EVCC rollup delete {'write' if args.write else 'dry-run'}",
+        "========================",
+        str(summary.get("script", {}).get("generated_at", "")) or None,
+    )
+    print(f"Range:    {summary['range']['start_day']} -> {summary['range']['end_day']}")
+    print(f"Days:     {summary['range']['days']}")
+    print(f"Timezone: {summary['timezone']}")
+    print("\nMonthly rollup scopes")
+    print("---------------------")
+    for item in summary.get("delete_results", []):
+        print(
+            f"- {item['local_year']}-{item['local_month']}: {item['status']}, "
+            f"series_before={item['series_before']}, series_after={item['series_after']}"
+        )
+        print(f"  matcher: {item['matcher']}")
+
+    print("\nResult")
+    print("------")
+    if args.write:
+        print("OK: matching monthly rollup scopes were deleted.")
+    else:
+        print("GO: dry-run completed. Rerun with --write to delete these monthly rollup scopes.")
 
 
 def bump_skip_reason(skip_reasons: dict[str, int], reason: str) -> None:
@@ -2972,6 +3177,8 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     print(f"Raw step:     {summary['raw_sample_step']}")
     print(f"Energy step:  {summary['energy_rollup_step']}")
     print(f"Batch size:   {summary['batch_size']}")
+    if summary.get("replace_range"):
+        print("Replace mode: enabled")
 
     print("\nSummary")
     print("-------")
@@ -2985,6 +3192,16 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     print(f"- Total runtime: {round(total_s, 2)} s")
     if peak_memory is not None:
         print(f"- Peak RAM: {round(float(peak_memory), 2)} MB")
+
+    replace_results = summary.get("replace_delete_results", [])
+    if replace_results:
+        print("\nReplace deletes")
+        print("---------------")
+        for item in replace_results:
+            print(
+                f"- {item['local_year']}-{item['local_month']}: {item['status']}, "
+                f"series_before={item['series_before']}, series_after={item['series_after']}"
+            )
 
     if skip_reasons:
         print("\nSkip reasons")
@@ -3015,8 +3232,12 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     print("- 'Skipped items' are grouped below so you can see whether they mostly come from missing source data, invalid values, or missing labels.")
     if args.write:
         print("- Write mode calculated the rollups and imported the resulting evcc_* metrics into VictoriaMetrics.")
+        if summary.get("replace_range"):
+            print("- Replace mode deleted the affected monthly rollup scopes before importing fresh samples.")
     else:
         print("- Dry-run mode calculates the rollups but does not write any evcc_* metrics.")
+        if summary.get("replace_range"):
+            print("- Replace mode is dry-run only here: planned deletes were counted but not executed.")
         print("- If this dry-run looks plausible, the next step is the same command with --write.")
 
     print("\nResult")
@@ -3050,6 +3271,8 @@ def main() -> int:
         return run_benchmark(settings, as_json=args.json)
     if args.command == "backfill":
         return backfill(settings, args)
+    if args.command == "delete":
+        return delete_rollups(settings, args)
 
     raise AssertionError(f"Unhandled command: {args.command}")
 

@@ -351,6 +351,73 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(decoded[0]["metric"]["__name__"], "evcc_pv_energy_daily_wh")
         self.assertEqual(decoded[1]["values"], [8.0])
 
+    def test_rollup_month_matcher_uses_configured_prefix_and_month_labels(self):
+        matcher = MODULE.rollup_month_matcher(self.settings, "2026", "04")
+        self.assertEqual(matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="04"}')
+
+    def test_build_month_scopes_groups_windows_by_local_month(self):
+        windows = MODULE.build_day_windows(
+            self.settings,
+            MODULE.parse_local_day("2026-01-30", "--start-day"),
+            MODULE.parse_local_day("2026-02-02", "--end-day"),
+        )
+        scopes = MODULE.build_month_scopes(self.settings, windows)
+        self.assertEqual([(item.local_year, item.local_month) for item in scopes], [("2026", "01"), ("2026", "02")])
+        self.assertEqual(scopes[0].matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="01"}')
+        self.assertEqual(scopes[1].matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="02"}')
+
+    def test_validate_month_replace_range_rejects_non_month_start(self):
+        with self.assertRaises(SystemExit) as raised:
+            MODULE.validate_month_replace_range(
+                self.settings,
+                date(2026, 4, 2),
+                date(2026, 4, 10),
+                today=date(2026, 4, 11),
+            )
+        self.assertIn("--start-day must be the first day", str(raised.exception))
+
+    def test_validate_month_replace_range_rejects_historical_partial_month_end(self):
+        with self.assertRaises(SystemExit) as raised:
+            MODULE.validate_month_replace_range(
+                self.settings,
+                date(2026, 3, 1),
+                date(2026, 3, 15),
+                today=date(2026, 4, 11),
+            )
+        self.assertIn("completed historical month", str(raised.exception))
+
+    def test_delete_rollup_scopes_dry_run_counts_without_deleting(self):
+        calls = {"count": 0, "delete": 0}
+
+        def fake_http_get_json(settings, path, params=None):
+            calls["count"] += 1
+            self.assertEqual(path, "/api/v1/series")
+            self.assertIn("match[]", params)
+            return {"data": [{"__name__": "evcc_pv_energy_daily_wh"}]}
+
+        def fake_http_post_form(*_args, **_kwargs):
+            calls["delete"] += 1
+            raise AssertionError("dry-run must not delete")
+
+        original_get = MODULE.http_get_json
+        original_post = MODULE.http_post_form
+        MODULE.http_get_json = fake_http_get_json
+        MODULE.http_post_form = fake_http_post_form
+        try:
+            result = MODULE.delete_rollup_scopes(
+                self.settings,
+                [MODULE.MonthScope("2026", "04", "2026-03-31T22:00:00Z", "2026-04-10T22:00:00Z", "matcher")],
+                write=False,
+            )
+        finally:
+            MODULE.http_get_json = original_get
+            MODULE.http_post_form = original_post
+
+        self.assertEqual(calls, {"count": 1, "delete": 0})
+        self.assertEqual(result[0]["status"], "dry-run")
+        self.assertEqual(result[0]["series_before"], 1)
+        self.assertEqual(result[0]["series_after"], 1)
+
     def test_build_window_chunks_groups_days_by_month(self):
         windows = MODULE.build_day_windows(
             self.settings,
