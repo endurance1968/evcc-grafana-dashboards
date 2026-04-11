@@ -1,7 +1,8 @@
 /**
- * Generate localized dashboard JSON files from the selected source family.
- * Version: 2026.04.08.1
- * Last modified: 2026-04-08
+ * Script: generate-localized-dashboards.mjs
+ * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
+ * Version: 2026.04.11.1
+ * Last modified: 2026-04-11
  */
 import fs from "node:fs";
 import path from "node:path";

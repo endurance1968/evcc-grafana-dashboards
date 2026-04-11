@@ -153,7 +153,7 @@
       "title": "Aujourd’hui",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
+      "url": "/d/adddvtj?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -165,7 +165,7 @@
       "title": "Hier",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -177,7 +177,7 @@
       "title": "Avant-hier",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
+      "url": "/d/adddvtj?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,

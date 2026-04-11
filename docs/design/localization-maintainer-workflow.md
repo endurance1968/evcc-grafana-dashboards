@@ -78,9 +78,37 @@ Edit:
 
 Only do this for real source changes or structural panel refactors.
 
-### 2. Update mapping files
+### 2. Prune stale mapping entries
 
-Edit the relevant mapping JSON files, for example:
+Run this when the source dashboards changed and you want mapping files to reflect only current source texts:
+
+```bash
+node scripts/localization/prune-mappings-to-source.mjs --family=vm
+```
+
+The command is a dry-run by default. If the reported removals are expected, write the pruned mapping files explicitly:
+
+```bash
+node scripts/localization/prune-mappings-to-source.mjs --family=vm --write
+```
+
+This removes `exact` and `contains` entries that no longer match any current source-dashboard text only when `--write` is set.
+
+### 3. Audit missing mapping coverage
+
+```bash
+node scripts/localization/audit-localization.mjs --family=vm
+```
+
+Review generated candidate files:
+
+- `dashboards/localization/missing-<source>_to_<target>.exact.json`
+
+The `exactSources` section lists the source dashboard file names that produced each candidate.
+
+### 4. Translate or adopt mapping candidates
+
+The scripts do not perform the actual language translation. A human translator or AI must provide the final target-language text in the mapping JSON files, for example:
 
 - `dashboards/localization/en_to_de.json`
 - `dashboards/localization/en_to_fr.json`
@@ -90,15 +118,29 @@ Use `exact` for full labels and stable phrases.
 
 Use `contains` only for very stable token replacements that are safe across contexts.
 
-### 3. Generate localized dashboards
+If all missing candidates should first be accepted as intentional placeholders, run:
+
+```bash
+node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all
+```
+
+The command is a dry-run by default. If the reported placeholder additions are expected, write them explicitly:
+
+```bash
+node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all --write
+```
+
+This copies candidates from `missing-*.exact.json` into the real mapping files as `source -> source` only when `--write` is set. It is not a translation step; replace those placeholder values with real translations before expecting localized output.
+
+### 5. Generate localized dashboards
 
 ```bash
 node scripts/localization/generate-localized-dashboards.mjs --family=vm
 ```
 
-### 4. Apply safe display-only translations
+### 6. Apply safe display-only translations
 
-Important: run this step only after step 3 has fully finished. Do not run both scripts in parallel.
+Important: run this step only after step 5 has fully finished. Do not run both scripts in parallel.
 
 ```bash
 node scripts/localization/apply-safe-display-translations.mjs --family=vm
@@ -111,33 +153,20 @@ This step only touches user-visible fields in generated dashboards, for example:
 - variable labels and descriptions
 - override `displayName` values
 
-### 5. Audit missing mapping coverage
-
-```bash
-node scripts/localization/audit-localization.mjs --family=vm
-```
-
-Review generated candidate files:
-
-- `dashboards/localization/missing-<source>_to_<target>.exact.json`
-
-Merge relevant entries into the real mapping file and regenerate.
-
-### 6. Review generated dashboards for remaining visible source-language text
+### 7. Review generated dashboards for remaining visible source-language text
 
 Review methods:
 
 - inspect JSON directly
 - or preferably run Grafana screenshots and inspect the rendered dashboards
 
-### 7. Validate in Grafana
+### 8. Validate in Grafana
 
 Use the full testing workflow from:
 
 - `docs/design/grafana-localization-testing.md`
 
 For the standard end-to-end path, `run-suite.mjs` runs both preparation steps automatically unless disabled with `--prepare=false`.
-
 ## Safe vs unsafe translation rule
 
 ### Safe

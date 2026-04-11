@@ -108,7 +108,7 @@ Typical unsafe cases that must not be translated blindly:
 node scripts/localization/audit-localization.mjs --family=vm
 ```
 
-This creates per-language candidate files under `dashboards/localization/missing-*.exact.json`.
+This creates per-language candidate files under `dashboards/localization/missing-*.exact.json`. Each report includes `exactSources` with the source dashboard file names for every missing candidate.
 
 ## Step 4: Import one language set and smoke-check
 

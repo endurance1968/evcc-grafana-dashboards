@@ -2012,7 +2012,7 @@
       "title": "आज",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now&timezone=browser&refresh=10s"
+      "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
     },
     {
       "asDropdown": false,
@@ -2024,7 +2024,7 @@
       "title": "कल",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now%2Fd&timezone=browser"
+      "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
     },
     {
       "asDropdown": false,
@@ -2036,7 +2036,7 @@
       "title": "परसों",
       "tooltip": "",
       "type": "link",
-      "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-1d%2Fd&timezone=browser"
+      "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
     },
     {
       "asDropdown": true,

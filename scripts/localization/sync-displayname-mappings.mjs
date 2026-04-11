@@ -1,5 +1,8 @@
 /**
- * Sync display-name translation mappings with the current dashboard sources.
+ * Script: sync-displayname-mappings.mjs
+ * Purpose: Syncs missing displayName-related exact mappings from the current source and generated dashboards.
+ * Version: 2026.04.11.1
+ * Last modified: 2026-04-11
  */
 import fs from "node:fs";
 import path from "node:path";
