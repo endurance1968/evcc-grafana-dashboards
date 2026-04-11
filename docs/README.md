@@ -14,7 +14,7 @@ This is the fastest end-to-end entry point for a user who:
 4. Generate the daily rollups
 5. Connect Grafana to VictoriaMetrics
 6. Deploy the EVCC dashboards
-7. Set up the hourly rollup refresh
+7. Set up the daily rollup refresh
 
 ## Choose your runtime
 
@@ -42,7 +42,7 @@ That guide covers:
 
 - one-time raw-data import from InfluxDB into VictoriaMetrics
 - initial rollup backfill
-- ongoing hourly rollup refresh
+- ongoing daily rollup refresh
 
 ## Then connect Grafana and deploy dashboards
 

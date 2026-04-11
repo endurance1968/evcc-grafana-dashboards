@@ -498,13 +498,18 @@ python3 check_data.py \
   --end-time 2026-03-30T23:59:59Z
 ```
 
-## 8. Set up the hourly rollup refresh
+## 8. Set up the daily rollup refresh
 
-Use a simple cron job that runs every hour.
+Use a simple cron job that runs once per day after the previous local day is complete.
+
+The rollup script writes one sample per local day and series. Run it only once per day
+for `yesterday`: the day is complete, the value is stable, and VictoriaMetrics will
+not accumulate duplicate samples for the same series and timestamp. Do not run the
+daily refresh hourly.
 
 ### 8.1 Create the wrapper script
 
-Create `/usr/local/bin/evcc-vm-rollup-hourly.sh`:
+Create `/usr/local/bin/evcc-vm-rollup-daily.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -521,7 +526,7 @@ set -euo pipefail
 Then:
 
 ```bash
-sudo chmod +x /usr/local/bin/evcc-vm-rollup-hourly.sh
+sudo chmod +x /usr/local/bin/evcc-vm-rollup-daily.sh
 ```
 
 ### 8.2 Create the cron job
@@ -535,7 +540,7 @@ sudo crontab -e
 Add this entry:
 
 ```cron
-7 * * * * /usr/local/bin/evcc-vm-rollup-hourly.sh >> /var/log/evcc-vm-rollup.log 2>&1
+5 5 * * * /usr/local/bin/evcc-vm-rollup-daily.sh >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
 Optional check:
@@ -601,7 +606,7 @@ Current recommendation:
 6. run `detect`, `plan`, and `benchmark`
 7. run the initial rollup backfill with `--write`
 8. verify the rollups
-9. set up the hourly rollup job
+9. set up the daily rollup job
 10. keep InfluxDB only as fallback or historical reference
 
 

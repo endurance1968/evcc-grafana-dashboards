@@ -24,7 +24,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [ ] If Docker is part of the first release promise: Grafana Docker guide is validated on a clean host
 - [ ] InfluxDB raw-data import works on a realistic EVCC history dataset
 - [ ] Initial rollup backfill works without manual fixes
-- [ ] Hourly rollup refresh works via `systemd` timer or `cron`
+- [ ] Daily rollup refresh works via `systemd` timer or `cron`
 - [ ] At least one clean “new user” dry run exists using only the published docs
 
 ## 3. Dashboard deployment validation
@@ -83,7 +83,7 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [ ] Debian 13 Grafana install tested
 - [ ] InfluxDB migration tested
 - [ ] rollup backfill tested
-- [ ] hourly rollup refresh tested
+- [ ] daily rollup refresh tested
 - [ ] Windows and Linux deployers tested
 - [ ] localization audit at `0`
 - [ ] screenshot set regenerated from the final sources

@@ -145,10 +145,15 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 
 ## Recommended scheduler setup
 
+Rollups are daily values. Schedule the refresh once per day and write only
+`yesterday`, because that local day is complete. Do not run this hourly: repeated
+writes for the same day can leave duplicate samples with the same series labels and
+timestamp in VictoriaMetrics.
+
 Example cron:
 
 ```cron
-10 0 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date -d 'yesterday' +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
+5 5 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%F) --end-day $(date -d 'yesterday' +\%F) --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
 ## Validation
