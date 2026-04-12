@@ -220,8 +220,8 @@ The deployer:
 
 With `purge=false`:
 
-- existing EVCC dashboards and libraries are kept unless Grafana overwrites matching UIDs during import
-- this is the safe starting mode
+- existing EVCC dashboards are overwritten by UID
+- existing EVCC library panels referenced by `__elements` are updated before dashboard import, so stale panel models are not kept
 
 With `purge=true`:
 

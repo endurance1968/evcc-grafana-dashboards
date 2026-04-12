@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 
-SCRIPT_VERSION="2026.04.11.4"
-SCRIPT_LAST_MODIFIED="2026-04-11"
+SCRIPT_VERSION="2026.04.12.1"
+SCRIPT_LAST_MODIFIED="2026-04-12"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -232,7 +232,7 @@ print_dashboard_overrides() {
   done
 }
 
-replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds else . end)'
+replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end)'
 
 DASHBOARD_FILES=(
   "VM_ EVCC_ All-time.json"
@@ -265,6 +265,10 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "evccUrl" "$DASHBOARD_EVCC_URL"
   apply_dashboard_override "$raw_file" "inverterPortalTitle" "$DASHBOARD_PORTAL_TITLE"
   apply_dashboard_override "$raw_file" "inverterPortalUrl" "$DASHBOARD_PORTAL_URL"
+
+  tmp_ds_file="$raw_file.ds"
+  jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" "$replace_ds_filter" "$raw_file" > "$tmp_ds_file"
+  mv "$tmp_ds_file" "$raw_file"
 
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
     [.__inputs[]? | select(.name and .type) |
@@ -338,11 +342,11 @@ done
 
 if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo
-  echo "Existing library panels already present and will be left in place because purge=false:"
+  echo "Existing library panels already present and will be updated because purge=false:"
   for item in "${existing_library[@]}"; do
     echo "- $item"
   done
-  echo "Dashboard import will rely on the embedded __elements definitions."
+  echo "Dashboard import will use the updated embedded __elements definitions."
 fi
 
 if [[ "${PURGE,,}" == "true" ]]; then
@@ -427,11 +431,11 @@ done
 
 if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo
-  echo "Existing library panels already present and will be left in place because purge=false:"
+  echo "Existing library panels already present and will be updated because purge=false:"
   for item in "${existing_library[@]}"; do
     echo "- $item"
   done
-  echo "Dashboard import will rely on the embedded __elements definitions."
+  echo "Dashboard import will use the updated embedded __elements definitions."
 fi
 
 if [[ "${PURGE,,}" == "true" ]]; then
@@ -463,6 +467,37 @@ if [[ "${PURGE,,}" == "true" ]]; then
       exit 1
     else
       echo "Deleted library panel: $(jq -r '.name' "$lib_file") [$uid]"
+    fi
+  done
+fi
+
+if [[ "${PURGE,,}" != "true" ]]; then
+  for lib_file in "$LIB_DIR"/*.json; do
+    [[ -e "$lib_file" ]] || continue
+    uid=$(jq -r '.uid' "$lib_file")
+    existing_out="$TMP_DIR/update-library-existing-$uid.json"
+    status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$existing_out")
+    if [[ "$status" == "200" ]]; then
+      body_file="$TMP_DIR/update-library-$uid.json"
+      jq -n --slurpfile entry "$lib_file" --slurpfile existing "$existing_out" '
+        {
+          name: $entry[0].name,
+          kind: ($entry[0].kind // $existing[0].result.kind // 1),
+          model: $entry[0].model,
+          version: $existing[0].result.version
+        }
+        + (if (($existing[0].result.folderUid // "") != "") then {folderUid: $existing[0].result.folderUid} else {} end)
+      ' > "$body_file"
+      update_out="$TMP_DIR/update-library-$uid.out.json"
+      update_status=$(api PATCH "/api/library-elements/$(urlencode "$uid")" "$body_file" "$update_out")
+      if [[ "$update_status" -lt 200 || "$update_status" -ge 300 ]]; then
+        echo "Failed to update library panel $uid: $(cat "$update_out")" >&2
+        exit 1
+      fi
+      echo "Updated library panel: $(jq -r '.name' "$lib_file") [$uid]"
+    elif [[ "$status" != "404" ]]; then
+      echo "Failed to inspect library panel $uid: $(cat "$existing_out")" >&2
+      exit 1
     fi
   done
 fi

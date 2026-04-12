@@ -175,7 +175,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netafname"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -194,7 +194,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Thuis"
+              "options": "Home"
             },
             "properties": [
               {
@@ -213,7 +213,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Teruglevering"
+              "options": "Feed-in"
             },
             "properties": [
               {
@@ -878,7 +878,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -899,14 +899,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Zelfvoorziening"
+                "value": "Autarkie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Eigenverbruik"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -3643,7 +3643,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Ingekocht"
+              "options": "purchased"
             },
             "properties": [
               {
@@ -3667,7 +3667,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkocht"
+              "options": "sold"
             },
             "properties": [
               {

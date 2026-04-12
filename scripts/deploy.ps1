@@ -25,8 +25,8 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.04.11.4'
-$ScriptLastModified = '2026-04-11'
+$ScriptVersion = '2026.04.12.1'
+$ScriptLastModified = '2026-04-12'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -115,6 +115,9 @@ function Replace-DatasourcePlaceholders($Node) {
   if ($Node -is [hashtable] -or $Node -is [pscustomobject]) {
     $out = @{}
     foreach ($prop in $Node.PSObject.Properties) { $out[$prop.Name] = Replace-DatasourcePlaceholders $prop.Value }
+    if ($out.ContainsKey('type') -and [string]$out['type'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('uid')) {
+      $out['uid'] = $settings.GRAFANA_DS_VM_EVCC_UID
+    }
     return [pscustomobject]$out
   }
   return $Node
@@ -225,6 +228,19 @@ function Remove-And-Report([string]$Kind, [string]$Name, [string]$Uid, [string]$
   }
 }
 
+function Update-LibraryPanel($Element, $Existing) {
+  if ($null -eq $Element -or -not $Element.uid) { return }
+  $body = @{
+    name = $(if ($Element.name) { $Element.name } else { $Existing.name })
+    kind = $(if ($Element.kind) { $Element.kind } elseif ($Existing.kind) { $Existing.kind } else { 1 })
+    model = (Replace-DatasourcePlaceholders $Element.model)
+    version = $Existing.version
+  }
+  if ($Existing.folderUid) { $body.folderUid = $Existing.folderUid }
+  elseif ($Element.folderUid) { $body.folderUid = $Element.folderUid }
+  Invoke-GrafanaApi PATCH "/api/library-elements/$([Uri]::EscapeDataString($Element.uid))" $body | Out-Null
+  Write-Host "Updated library panel: $($body.name) [$($Element.uid)]" -ForegroundColor Green
+}
 function Confirm-Apply() {
   $answer = Read-Host 'Proceed with dashboard deployment? [y/N]'
   return $answer -match '^(y|yes)$'
@@ -299,6 +315,7 @@ foreach ($fileName in $dashboardFiles) {
   $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
   $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
+  $raw = Replace-DatasourcePlaceholders $raw
   $dashboards += @{ fileName = $fileName; raw = $raw; inputs = (Build-Inputs $raw) }
   if ($null -ne $raw.PSObject.Properties['__elements']) {
     foreach ($prop in $raw.__elements.PSObject.Properties) { $libraryElements[$prop.Name] = $prop.Value }
@@ -338,9 +355,9 @@ foreach ($element in $libraryElements.Values) {
 }
 if ($settings.PURGE -ne 'true' -and $existingLibrary.Count -gt 0) {
   Write-Host ''
-  Write-Host 'Existing library panels already present and will be left in place because purge=false:' -ForegroundColor Yellow
+  Write-Host 'Existing library panels already present and will be updated because purge=false:' -ForegroundColor Yellow
   foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" }
-  Write-Host 'Dashboard import will rely on the embedded __elements definitions.' -ForegroundColor Yellow
+  Write-Host 'Dashboard import will use the updated embedded __elements definitions.' -ForegroundColor Yellow
 }
 
 if ($settings.PURGE -eq 'true') {
@@ -374,6 +391,10 @@ if ($settings.PURGE -eq 'true') {
   foreach ($uid in $existingLibrary.Keys) {
     $item = $existingLibrary[$uid]
     Remove-And-Report 'library panel' $item.name $uid "/api/library-elements/$([Uri]::EscapeDataString($uid))"
+  }
+} else {
+  foreach ($uid in $existingLibrary.Keys) {
+    Update-LibraryPanel $libraryElements[$uid] $existingLibrary[$uid]
   }
 }
 

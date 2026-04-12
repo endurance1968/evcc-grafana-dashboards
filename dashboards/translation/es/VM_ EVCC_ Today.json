@@ -143,7 +143,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "fotovoltaica"
+                "options": "PV"
               },
               "properties": [
                 {
@@ -158,7 +158,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Casa"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -173,7 +173,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Red"
+                "options": "Grid"
               },
               "properties": [
                 {
@@ -203,7 +203,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batería"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -248,7 +248,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Pronóstico FV"
+                "options": "PV forecast"
               },
               "properties": [
                 {
@@ -311,7 +311,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "max(pvPower_value{id=\"\"}) < $peakPowerLimit",
@@ -324,7 +324,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "max(gridPower_value) < $peakPowerLimit",
@@ -338,7 +338,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "max(homePower_value) * (-1) > (-$peakPowerLimit)",
@@ -352,7 +352,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg(batteryPower_value{id=\"\"}) < $peakPowerLimit",
@@ -366,7 +366,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg by (loadpoint) (chargePower_value{id=\"\", loadpoint!~\"$loadpointBlocklist\"}) * (-1) > (-$peakPowerLimit)",
@@ -380,7 +380,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg(tariffSolar_value)",
@@ -469,7 +469,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Batería"
+                "options": "Battery"
               },
               "properties": [
                 {
@@ -546,7 +546,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg(batterySoc_value{id=\"\"}) < 100",
@@ -559,7 +559,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "sort_by_label(avg by(vehicle) (vehicleSoc_value{vehicle!=\"\", vehicle!~\"$vehicleBlocklist\"}), \"vehicle\")",
@@ -573,7 +573,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "last_over_time(prioritySoc_value[5m])",
@@ -647,7 +647,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autosuficiencia"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -675,7 +675,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autoconsumo"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -725,10 +725,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600)",
+            "expr": "sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
@@ -739,10 +739,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum(integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600)",
+            "expr": "sum(integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
@@ -753,10 +753,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum(integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / -3600)",
+            "expr": "sum(integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / -3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
@@ -767,10 +767,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum(integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / 3600)",
+            "expr": "sum(integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
             "format": "time_series",
             "hide": true,
             "interval": "$energySampleInterval",
@@ -781,10 +781,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[1d]) / 3600)",
+            "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[$__range:$energySampleInterval]) / 3600)",
             "format": "time_series",
             "hide": true,
             "legendFormat": "__auto",
@@ -805,10 +805,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[1d:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d:$energySampleInterval]) / 3600), 0.001), 0), 1)",
+            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600), 0.001), 0), 1)",
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
@@ -891,7 +891,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autosuficiencia"
+                "options": "Autarky"
               },
               "properties": [
                 {
@@ -910,7 +910,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Autoconsumo"
+                "options": "Self-consumption"
               },
               "properties": [
                 {
@@ -971,7 +971,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1h:$energySampleInterval]) / 3600",
@@ -985,7 +985,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "integrate(clamp_min(avg(gridPower_value{id=\"\"} offset -1h) < $peakPowerLimit[1h], 0)) / 3600",
@@ -999,7 +999,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "integrate(clamp_max(avg(gridPower_value{id=\"\"} offset -1h) > (-$peakPowerLimit)[1h],0)) / -3600",
@@ -1013,7 +1013,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "integrate((homePower_value < $peakPowerLimit)[1h]  offset -1h) / 3600",
@@ -1027,7 +1027,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[1h] offset -1h) / 3600)",
@@ -1117,7 +1117,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Importación de red"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1132,7 +1132,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Vertido"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1147,7 +1147,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Casa"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1177,7 +1177,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Carga de batería"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1192,7 +1192,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Descarga de batería"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1222,7 +1222,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "fotovoltaica"
+                "options": "PV"
               },
               "properties": [
                 {
@@ -1286,7 +1286,7 @@
             "mode": "single",
             "sort": "none"
           },
-          "xField": "Energía",
+          "xField": "__panel_axis",
           "xTickLabelRotation": 0,
           "xTickLabelSpacing": 0
         },
@@ -1295,10 +1295,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1d]) / 3600000)",
+            "expr": "sum without(host) (integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600000)",
             "format": "time_series",
             "legendFormat": "fotovoltaica",
             "range": true,
@@ -1307,10 +1307,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
+            "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Importación de red",
@@ -1320,10 +1320,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
+            "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Vertido",
@@ -1333,10 +1333,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate((homePower_value{id=\"\"} < $peakPowerLimit)[1d]) / -3600000)",
+            "expr": "sum without(host) (integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Casa",
@@ -1346,10 +1346,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
+            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Descarga de batería",
@@ -1359,10 +1359,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [1d:$energySampleInterval]\n) / 3600000)",
+            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Carga de batería",
@@ -1372,10 +1372,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sort_by_label(\n  sum without(host) (\n    integrate(\n      ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [1d:$energySampleInterval]\n    ) / -3600000\n  )\n, \"vehicle\")",
+            "expr": "sort_by_label(\n  sum without(host) (\n    integrate(\n      ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [$__range:$energySampleInterval]\n    ) / -3600000\n  )\n, \"vehicle\")",
             "format": "time_series",
             "hide": false,
             "legendFormat": "{{vehicle}}",
@@ -1385,10 +1385,10 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "sum without(host) ((integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[1d:$energySampleInterval]) / -3600000))",
+            "expr": "sum without(host) ((integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[$__range:$energySampleInterval]) / -3600000))",
             "format": "time_series",
             "hide": false,
             "legendFormat": "Invitado: {{loadpoint}}",
@@ -1398,15 +1398,15 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "1",
             "format": "time_series",
             "hide": false,
-            "legendFormat": "Energía",
+            "legendFormat": "__panel_axis",
             "range": true,
-            "refId": "workaround"
+            "refId": "panelGuard"
           }
         ],
         "title": "Energía (kWh)",
@@ -1536,7 +1536,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "fotovoltaica"
+                "options": "PV"
               },
               "properties": [
                 {
@@ -1551,7 +1551,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Casa"
+                "options": "Home"
               },
               "properties": [
                 {
@@ -1566,7 +1566,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Importación de red"
+                "options": "Grid import"
               },
               "properties": [
                 {
@@ -1596,7 +1596,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Descarga de batería"
+                "options": "Battery discharge"
               },
               "properties": [
                 {
@@ -1626,7 +1626,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Vertido"
+                "options": "Feed-in"
               },
               "properties": [
                 {
@@ -1641,7 +1641,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Carga de batería"
+                "options": "Battery charge"
               },
               "properties": [
                 {
@@ -1686,7 +1686,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "clamp_min(avg(gridPower_value) < $peakPowerLimit,0)",
@@ -1700,7 +1700,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "clamp_max(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
@@ -1714,7 +1714,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg(pvPower_value{id=\"\"}) < $peakPowerLimit",
@@ -1728,7 +1728,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "clamp_max(avg(gridPower_value) < $peakPowerLimit,0)",
@@ -1742,7 +1742,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "clamp_min(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
@@ -1756,7 +1756,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg by (loadpoint) (chargePower_value{id=\"\"}) * (-1) > (-$peakPowerLimit)",
@@ -1770,7 +1770,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "avg(homePower_value) * (-1) > (-$peakPowerLimit)",
@@ -1828,7 +1828,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Comprado"
+                "options": "Purchased"
               },
               "properties": [
                 {
@@ -1843,7 +1843,7 @@
             {
               "matcher": {
                 "id": "byName",
-                "options": "Vendido"
+                "options": "Sold"
               },
               "properties": [
                 {
@@ -1914,7 +1914,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
@@ -1928,7 +1928,7 @@
           {
             "datasource": {
               "type": "victoriametrics-metrics-datasource",
-              "uid": "bfbufhesv65fkc"
+              "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
             "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
@@ -2120,7 +2120,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "fotovoltaica"
+              "options": "PV"
             },
             "properties": [
               {
@@ -2166,7 +2166,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Red"
+              "options": "Grid"
             },
             "properties": [
               {
@@ -2211,7 +2211,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Batería"
+              "options": "Battery"
             },
             "properties": [
               {
@@ -2247,7 +2247,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Casa"
+              "options": "Home"
             },
             "properties": [
               {

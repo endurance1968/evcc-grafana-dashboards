@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -327,7 +327,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "ऊर्जा",
+        "xField": "__panel_axis",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -354,9 +354,10 @@
           "editorMode": "code",
           "expr": "min(chargePower_value)",
           "format": "time_series",
-          "legendFormat": "ऊर्जा",
+          "hide": false,
+          "legendFormat": "__panel_axis",
           "range": true,
-          "refId": "workaround"
+          "refId": "panelGuard"
         },
         {
           "datasource": {
@@ -470,7 +471,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -580,7 +581,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -714,7 +715,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -814,7 +815,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पूर्वानुमान"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -829,7 +830,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "वास्तविक"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -873,7 +874,7 @@
           "mode": "single",
           "sort": "none"
         },
-        "xField": "ऊर्जा",
+        "xField": "__panel_axis",
         "xTickLabelRotation": 0,
         "xTickLabelSpacing": 0
       },
@@ -898,12 +899,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
+          "expr": "min(chargePower_value)",
           "format": "time_series",
-          "interval": "",
-          "legendFormat": "वास्तविक",
+          "hide": false,
+          "legendFormat": "__panel_axis",
           "range": true,
-          "refId": "pvStringEnergy"
+          "refId": "panelGuard"
         },
         {
           "datasource": {
@@ -911,11 +912,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "min(chargePower_value)",
+          "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
           "format": "time_series",
-          "legendFormat": "ऊर्जा",
+          "interval": "",
+          "legendFormat": "वास्तविक",
           "range": true,
-          "refId": "workaround"
+          "refId": "pvStringEnergy"
         }
       ],
       "title": "पूर्वानुमान",
@@ -1016,7 +1018,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "वास्तविक"
+              "options": "Actual"
             },
             "properties": [
               {
@@ -1031,7 +1033,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "पूर्वानुमान"
+              "options": "Forecast"
             },
             "properties": [
               {
@@ -1144,7 +1146,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1331,7 +1333,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1462,7 +1464,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1649,7 +1651,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "कुल"
+              "options": "Total"
             },
             "properties": [
               {
@@ -1679,7 +1681,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "अन्य"
+              "options": "Sonstige"
             },
             "properties": [
               {
@@ -1811,7 +1813,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -1990,7 +1992,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "घर"
+              "options": "Home"
             },
             "properties": [
               {
@@ -2145,7 +2147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "औसत"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2315,7 +2317,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2354,7 +2356,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "मूल्य"
+              "options": "Preis"
             },
             "properties": [
               {
@@ -2656,7 +2658,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "खरीदा गया"
+              "options": "Purchased"
             },
             "properties": [
               {
@@ -2671,7 +2673,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "बेचा गया"
+              "options": "Sold"
             },
             "properties": [
               {
@@ -2782,7 +2784,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "औसत"
+              "options": "Durchschnitt"
             },
             "properties": [
               {
@@ -2952,7 +2954,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "ग्रिड आयात"
+              "options": "Grid import"
             },
             "properties": [
               {
@@ -2995,7 +2997,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "सीओ 2"
+              "options": "CO2"
             },
             "properties": [
               {
@@ -3625,7 +3627,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "expr": "last_over_time(avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"}))",
           "format": "time_series",
           "legendFormat": "धारा L3",
           "range": true,
@@ -3728,7 +3730,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(chargeCurrents_l1 {loadpoint=\"$loadpoint\"})",
+          "expr": "avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L1",
           "range": true,
@@ -3740,7 +3742,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(chargeCurrents_l2 {loadpoint=\"$loadpoint\"})",
+          "expr": "avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L2",
           "range": true,
@@ -3752,7 +3754,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(chargeCurrents_l3 {loadpoint=\"$loadpoint\"})",
+          "expr": "avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L3",
           "range": true,
@@ -3825,23 +3827,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byRegexp",
-              "options": "/^1-phase.*/"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "/^3-phase.*/"
+              "id": "byName",
+              "options": "Active phases"
             },
             "properties": [
               {
@@ -3883,25 +3870,12 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) < 2",
+          "expr": "((avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"}) > bool 0.1) + (avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}) > bool 0.1) + (avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"}) > bool 0.1))",
           "format": "time_series",
           "interval": "1m",
-          "legendFormat": "1-फेज",
+          "legendFormat": "सक्रिय फेज़",
           "range": true,
-          "refId": "1P"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "avg(phasesActive_value{loadpoint=\"$loadpoint\"}) > 2",
-          "format": "time_series",
-          "interval": "1m",
-          "legendFormat": "3-फेज",
-          "range": true,
-          "refId": "3P"
+          "refId": "activePhases"
         }
       ],
       "title": "फेज़: $loadpoint",

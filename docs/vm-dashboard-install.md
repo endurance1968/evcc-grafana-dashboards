@@ -35,7 +35,7 @@ The deployer defaults to the generated dashboard set:
 - datasource UID: `vm-evcc`
 - purge before import: `false`
 
-Default is `PURGE=false`, so existing dashboards stay in place unless you explicitly choose to delete them first.
+Default is `PURGE=false`, so existing dashboards are overwritten by UID and matching library panels are updated in place. Use `PURGE=true` only when you explicitly want to delete and recreate the known dashboard/library UIDs first.
 
 When `PURGE=true`, the deployer deletes only:
 

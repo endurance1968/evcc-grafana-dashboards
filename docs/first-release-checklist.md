@@ -33,7 +33,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [ ] `deploy-python.sh` works on Linux with a clean dashboard deployment
 - [ ] `deploy-bash.sh` works on Linux with a clean dashboard deployment
 - [ ] `purge=true` deletes and recreates dashboards and embedded library panels correctly
-- [ ] `purge=false` keeps existing library panels and shows the correct preflight information
+- [ ] `purge=false` updates existing library panels and shows the correct preflight information
 - [ ] Dashboard override variables are documented and verified:
 - [ ] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
 - [ ] `DASHBOARD_ENERGY_SAMPLE_INTERVAL`

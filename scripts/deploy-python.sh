@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
 
-SCRIPT_VERSION="2026.04.11.4"
-SCRIPT_LAST_MODIFIED="2026-04-11"
+SCRIPT_VERSION="2026.04.12.1"
+SCRIPT_LAST_MODIFIED="2026-04-12"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -169,7 +169,10 @@ def replace_ds(node):
     if isinstance(node, list):
         return [replace_ds(item) for item in node]
     if isinstance(node, dict):
-        return {k: replace_ds(v) for k, v in node.items()}
+        out = {k: replace_ds(v) for k, v in node.items()}
+        if out.get("type") == "victoriametrics-metrics-datasource" and "uid" in out:
+            out["uid"] = settings["GRAFANA_DS_VM_EVCC_UID"]
+        return out
     return node
 
 def build_inputs(raw):
@@ -263,6 +266,23 @@ def delete_and_report(kind, name, uid, path):
         print(f"Deleted {kind}: {name} [{uid}]")
     else:
         raise RuntimeError(f"Failed to delete {kind} {name} [{uid}]")
+
+
+def update_library_panel(element, existing):
+    uid = element.get("uid")
+    if not uid:
+        return
+    body = {
+        "name": element.get("name") or existing.get("name"),
+        "kind": element.get("kind") or existing.get("kind") or 1,
+        "model": replace_ds(element.get("model") or {}),
+        "version": existing.get("version"),
+    }
+    folder_uid = existing.get("folderUid") or element.get("folderUid")
+    if folder_uid:
+        body["folderUid"] = folder_uid
+    api("PATCH", f"/api/library-elements/{urllib.parse.quote(uid)}", body)
+    print(f"Updated library panel: {body['name']} [{uid}]")
 dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
 
@@ -272,6 +292,7 @@ for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
     raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
     raw = apply_dashboard_build_description(raw, dashboard_build_marker)
+    raw = replace_ds(raw)
     dashboards.append({"raw": raw, "inputs": build_inputs(raw)})
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
@@ -315,10 +336,10 @@ for element in library.values():
 
 if settings["PURGE"].lower() != "true" and existing_library:
     print()
-    print("Existing library panels already present and will be left in place because purge=false:")
+    print("Existing library panels already present and will be updated because purge=false:")
     for item in existing_library.values():
         print(f"- {item.get('name')} [{item.get('uid')}]")
-    print("Dashboard import will rely on the embedded __elements definitions.")
+    print("Dashboard import will use the updated embedded __elements definitions.")
 
 if settings["PURGE"].lower() == "true":
     existing_dashboards = []
@@ -362,6 +383,9 @@ if settings["PURGE"].lower() == "true":
             delete_and_report("dashboard", dashboard["raw"].get("title"), uid, f"/api/dashboards/uid/{urllib.parse.quote(uid)}")
     for uid, item in existing_library.items():
         delete_and_report("library panel", item.get("name"), uid, f"/api/library-elements/{urllib.parse.quote(uid)}")
+else:
+    for uid, item in existing_library.items():
+        update_library_panel(library[uid], item)
 for dashboard in dashboards:
     body = {
         "dashboard": dashboard["raw"],
