@@ -1754,6 +1754,79 @@
               {
                 "id": "unit",
                 "value": "none"
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": {
+                        "text": "01"
+                      },
+                      "2": {
+                        "text": "02"
+                      },
+                      "3": {
+                        "text": "03"
+                      },
+                      "4": {
+                        "text": "04"
+                      },
+                      "5": {
+                        "text": "05"
+                      },
+                      "6": {
+                        "text": "06"
+                      },
+                      "7": {
+                        "text": "07"
+                      },
+                      "8": {
+                        "text": "08"
+                      },
+                      "9": {
+                        "text": "09"
+                      },
+                      "10": {
+                        "text": "10"
+                      },
+                      "11": {
+                        "text": "11"
+                      },
+                      "12": {
+                        "text": "12"
+                      },
+                      "01": {
+                        "text": "01"
+                      },
+                      "02": {
+                        "text": "02"
+                      },
+                      "03": {
+                        "text": "03"
+                      },
+                      "04": {
+                        "text": "04"
+                      },
+                      "05": {
+                        "text": "05"
+                      },
+                      "06": {
+                        "text": "06"
+                      },
+                      "07": {
+                        "text": "07"
+                      },
+                      "08": {
+                        "text": "08"
+                      },
+                      "09": {
+                        "text": "09"
+                      }
+                    }
+                  }
+                ]
               }
             ]
           },
@@ -2180,7 +2253,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "batteryTotalDaily"
+              "options": "Battery discharge"
             },
             "properties": [
               {
@@ -2192,7 +2265,33 @@
               },
               {
                 "id": "displayName",
-                "value": "Batterij"
+                "value": "Batterij ontladen"
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "batteryNegative",
+                  "mode": "normal"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery charge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#447EBC",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Batterij laden"
               }
             ]
           },
@@ -2247,7 +2346,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "WITH (\n  battery = label_set(((sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000, \"series\", \"Battery\"),\n  home = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) / 1000, \"loadpoint\", \"series\")\n)\nbattery or home or loadpoints"
+          "expr": "WITH (\n  batteryNet = ((sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000,\n  batteryCharge = label_set((batteryNet > 0), \"series\", \"Battery charge\"),\n  batteryDischarge = label_set((batteryNet < 0), \"series\", \"Battery discharge\"),\n  home = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) / 1000, \"loadpoint\", \"series\")\n)\nbatteryCharge or batteryDischarge or home or loadpoints"
         }
       ],
       "transformations": [
