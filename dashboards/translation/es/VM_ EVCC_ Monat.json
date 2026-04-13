@@ -1651,8 +1651,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Home"
+              "id": "byRegexp",
+              "options": "^(Home|Haus|Maison|Hogar|Casa|Thuis|家|घर)$"
             },
             "properties": [
               {
@@ -1661,13 +1661,17 @@
                   "fixedColor": "purple",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Casa"
               }
             ]
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Battery"
+              "id": "byRegexp",
+              "options": "^(Battery|Speicher|Batterie|Batería|Batteria|Accu|电池|बैटरी)$"
             },
             "properties": [
               {
@@ -1779,7 +1783,7 @@
     {
       "id": 37,
       "title": "Total: distribución de energía",
-      "type": "barchart",
+      "type": "timeseries",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
@@ -1804,6 +1808,9 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "axisWidth": 80,
+            "barAlignment": 1,
+            "barWidthFactor": 0.6,
+            "drawStyle": "bars",
             "fillOpacity": 80,
             "gradientMode": "none",
             "hideFrom": {
@@ -1811,9 +1818,19 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
             "lineWidth": 1,
+            "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -1836,8 +1853,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Home"
+              "id": "byRegexp",
+              "options": "^(Home|Haus|Maison|Hogar|Casa|Thuis|家|घर)$"
             },
             "properties": [
               {
@@ -1846,13 +1863,17 @@
                   "fixedColor": "purple",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Casa"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "batteryTotalDaily"
+              "options": "Battery charge"
             },
             "properties": [
               {
@@ -1864,7 +1885,33 @@
               },
               {
                 "id": "displayName",
-                "value": "Batería"
+                "value": "Carga de batería"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery discharge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Descarga de batería"
+              },
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "batteryNegative",
+                  "mode": "normal"
+                }
               }
             ]
           },
@@ -1883,27 +1930,17 @@
         ]
       },
       "options": {
-        "barRadius": 0.2,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
         "legend": {
           "calcs": [],
           "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "normal",
         "tooltip": {
           "hideZeros": false,
           "mode": "multi",
           "sort": "none"
-        },
-        "xField": "Time",
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
+        }
       },
       "targets": [
         {
@@ -1912,64 +1949,11 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "WITH (\n  batteryNet = ((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) - (last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000,\n  batteryCharge = label_set((batteryNet > 0), \"series\", \"Battery charge\"),\n  batteryDischarge = label_set((batteryNet < 0), \"series\", \"Battery discharge\"),\n  home = label_set((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\", \"series\")\n)\nhome or sort_by_label(loadpoints, \"series\") or batteryCharge or batteryDischarge",
           "format": "time_series",
-          "legendFormat": "Carga de batería",
+          "legendFormat": "{{series}}",
           "range": true,
-          "refId": "batteryChargeDaily",
-          "hide": true,
-          "interval": "1d"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
-          "format": "time_series",
-          "legendFormat": "Descarga de batería",
-          "range": true,
-          "refId": "batteryDischargeDaily",
-          "hide": true,
-          "interval": "1d"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$batteryChargeDaily - $batteryDischargeDaily",
-          "hide": false,
-          "refId": "batteryTotalDaily",
-          "type": "math"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
-          "format": "time_series",
-          "legendFormat": "Casa",
-          "range": true,
-          "refId": "homeDailyTotal",
-          "hide": false,
-          "interval": "1d"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sort_by_label((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000, \"loadpoint\")",
-          "format": "time_series",
-          "legendFormat": "{{loadpoint}}",
-          "range": true,
-          "refId": "loadpointDailySeries",
+          "refId": "energyDistributionDaily",
           "hide": false,
           "interval": "1d"
         }
