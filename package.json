@@ -8,7 +8,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test/local-checks.ps1"
+    "test": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test/local-checks.ps1",
+    "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker"
   },
   "repository": {
     "type": "git",
