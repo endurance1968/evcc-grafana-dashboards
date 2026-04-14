@@ -1,7 +1,7 @@
 /**
  * Script: run-suite.mjs
  * Purpose: Run the Grafana dashboard test workflow across source and translation variants.
- * Version: 2026.04.14.1
+ * Version: 2026.04.14.2
  * Last modified: 2026-04-14
  */
 import path from "node:path";
@@ -18,6 +18,7 @@ import {
 loadEnvFile(parseArg("env", ".env"));
 
 const withScreenshots = parseArg("screenshots", "false") === "true";
+const withRenderSmoke = parseArg("render-smoke", "false") === "true";
 const withPrepare = parseArg("prepare", "true") !== "false";
 const withFinalCleanup = parseArg("cleanup-final", "false") === "true";
 const withSetCleanup = parseArg("cleanup-between", "true") !== "false";
@@ -60,6 +61,9 @@ for (const set of sets) {
     `--manifest=${manifest}`,
   ]);
   run("scripts/test/smoke-check.mjs", [`--manifest=${manifest}`]);
+  if (withRenderSmoke) {
+    run("scripts/test/render-smoke-check.mjs", [`--manifest=${manifest}`]);
+  }
   if (withScreenshots) {
     run("scripts/test/capture-screenshots.mjs", [`--manifest=${manifest}`]);
   }

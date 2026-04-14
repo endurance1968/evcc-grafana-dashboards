@@ -12,6 +12,7 @@ Default family:
 - `import-dashboards-raw.mjs`: import via Grafana's raw dashboard import endpoint
 - `smoke-check.mjs`: post-import validation
 - `dashboard-semantic-check.mjs`: static semantic checks for dashboard time ranges, critical panels, bar chart axes, and known Grafana error regressions
+- `render-smoke-check.mjs`: browser-based rendered dashboard and critical solo-panel smoke checks
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
 - `local-checks.ps1` / `local-checks.mjs`: local deterministic check runners used by `npm test`
@@ -33,7 +34,7 @@ Always required:
 - `GRAFANA_API_TOKEN`
 - `GRAFANA_DS_VM_EVCC_UID`
 
-Required for screenshots:
+Required for render smoke checks and screenshots:
 
 - `GRAFANA_USERNAME`
 - `GRAFANA_PASSWORD`
@@ -43,6 +44,7 @@ Optional:
 - `GRAFANA_TEST_FOLDER_UID` default: `evcc-test`
 - `GRAFANA_TEST_FOLDER_TITLE` default: `EVCC Test`
 - `GRAFANA_SCREENSHOT_WAIT_MS` default: `3500`
+- `GRAFANA_RENDER_SMOKE_WAIT_MS` default: `GRAFANA_SCREENSHOT_WAIT_MS` or `3500`
 - `GRAFANA_TIME_FROM` and `GRAFANA_TIME_TO` for a global screenshot time override
 
 ## Naming convention
@@ -89,6 +91,15 @@ Outputs:
 - `tests/artifacts/screenshots/vm/<tag>/desktop/*.png`
 - `tests/artifacts/screenshots/vm/<tag>/mobile/*.png`
 
+## render-smoke-check.mjs
+
+Checks:
+
+- imported dashboard page renders at least one panel grid item
+- known Grafana error texts are not visible
+- critical panels are opened via `/d-solo/...&panelId=...`
+- critical panels do not render `No data` unless `--fail-no-data=false` is passed
+
 ## run-suite.mjs
 
 Behavior:
@@ -101,12 +112,14 @@ Behavior:
 - by default, runs `cleanup-grafana.mjs` before each set even without screenshots so library panel UIDs cannot collide across languages; pass `--cleanup-between=false` only when you intentionally want all imported sets to remain side by side
 - imports the set
 - runs smoke-check
+- optionally runs render-smoke-check with `--render-smoke=true`
 - optionally captures screenshots
 
 Examples:
 
 ```bash
 node scripts/test/run-suite.mjs --env=.env.local --screenshots=true
+node scripts/test/run-suite.mjs --env=.env.local --render-smoke=true
 node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
 node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
 ```
