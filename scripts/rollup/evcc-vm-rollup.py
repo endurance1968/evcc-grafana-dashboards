@@ -19,8 +19,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.11.2"
-SCRIPT_LAST_MODIFIED = "2026-04-11"
+SCRIPT_VERSION = "2026.04.14.1"
+SCRIPT_LAST_MODIFIED = "2026-04-14"
 
 
 def current_local_timestamp() -> datetime:
@@ -711,8 +711,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="grid_import_cost_daily",
             record=record_name(settings, "grid_import_cost_daily_eur"),
-            expr="python: 15m raw grid import cost calculation",
-            description="Daily grid import cost from 15-minute raw import energy weighted by matching tariff.",
+            expr="python: gridEnergy counter import energy weighted by 15m effective grid tariff",
+            description="Daily grid import cost from the gridEnergy counter-spread import energy weighted by the 15-minute effective tariff.",
             phase="phase-2",
             implemented=True,
             group_labels=(),
@@ -1871,6 +1871,7 @@ def quarter_hour_price_rollups(
     bucket_starts: list[int],
     raw_step_seconds: int,
     bucket_minutes: int,
+    import_kwh_override: float | None = None,
 ) -> dict[str, float | None]:
     bucket_seconds = bucket_minutes * 60
     bucket_prices: list[float] = []
@@ -1963,9 +1964,12 @@ def quarter_hour_price_rollups(
         if total_import_kwh > 0
         else None
     )
+    grid_import_cost_eur = total_import_cost_eur
+    if import_kwh_override is not None and effective_price is not None:
+        grid_import_cost_eur = import_kwh_override * effective_price / 100
 
     return {
-        "grid_import_cost_daily": total_import_cost_eur,
+        "grid_import_cost_daily": grid_import_cost_eur,
         "grid_import_price_avg_daily": arithmetic_avg,
         "grid_import_price_effective_daily": effective_price,
         "grid_import_price_min_daily": minimum_price,
@@ -2230,10 +2234,20 @@ def fetch_grid_price_rollups(
             window.end_iso,
             settings.raw_sample_step,
         )
+        grid_energy_samples = fetch_single_series_range(
+            settings,
+            f'avg({selector("gridEnergy_value", base_matchers(settings))})',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
     else:
         tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
         feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
         grid_samples = slice_samples(context["grid_samples"], start_ts, end_ts)
+        grid_energy_samples = slice_samples(context["grid_energy_samples"], start_ts, end_ts)
+    counter_import_wh = summarize_counter_spread_samples(grid_energy_samples)
+    counter_import_kwh = (counter_import_wh / 1000.0) if counter_import_wh is not None else None
     return quarter_hour_price_rollups(
         grid_samples=grid_samples,
         tariff_samples=tariff_samples,
@@ -2241,6 +2255,7 @@ def fetch_grid_price_rollups(
         bucket_starts=bucket_starts,
         raw_step_seconds=raw_step_seconds,
         bucket_minutes=settings.price_bucket_minutes,
+        import_kwh_override=counter_import_kwh,
     )
 
 

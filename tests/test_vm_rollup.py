@@ -524,6 +524,25 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_price_effective_daily"], 24.0, places=6)
         self.assertAlmostEqual(result["grid_import_cost_daily"], 0.12, places=6)
 
+    def test_quarter_hour_price_rollups_can_price_counter_import_energy(self):
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=[
+                (0, 1000.0),
+                (30, 1000.0),
+                (900, 2000.0),
+                (930, 2000.0),
+            ],
+            tariff_samples=[(0, 0.20), (600, 0.24), (900, 0.40), (1500, 0.44)],
+            feed_in_tariff_samples=[(0, 0.08), (900, 0.10)],
+            bucket_starts=[0, 900],
+            raw_step_seconds=30,
+            bucket_minutes=15,
+            import_kwh_override=1.25,
+        )
+
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 37.333333333333336, places=6)
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.46666666666666673, places=6)
+
     def test_bucket_price_rollups_uses_bucket_import_kwh(self):
         result = MODULE.bucket_price_rollups(
             bucket_import_samples=[(900, 0.25), (1800, 0.50)],
@@ -595,6 +614,38 @@ class VmRollupTests(unittest.TestCase):
 
         self.assertAlmostEqual(result["grid_import_daily_energy"], 1200.0, places=6)
         self.assertAlmostEqual(result["grid_export_daily_energy"], 1.6666666666666667, places=6)
+
+    def test_fetch_grid_price_rollups_prices_grid_energy_counter_import(self):
+        def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):
+            if "tariffGrid_value" in query:
+                return [(0, 0.20), (900, 0.40)]
+            if "tariffFeedIn_value" in query:
+                return [(0, 0.08), (900, 0.10)]
+            if "gridPower_value" in query:
+                return [(0, 1000.0), (10, 1000.0), (900, 1000.0), (910, 1000.0)]
+            if "gridEnergy_value" in query:
+                return [(0, 100.0), (600, 101.0)]
+            raise AssertionError(query)
+
+        original = MODULE.fetch_single_series_range
+        MODULE.fetch_single_series_range = fake_fetch_single_series_range
+        try:
+            window = MODULE.DayWindow(
+                day="1970-01-01",
+                start_iso="1970-01-01T00:00:00Z",
+                end_iso="1970-01-01T00:30:00Z",
+                sample_timestamp_ms=0,
+                local_year="1970",
+                local_month="01",
+                local_day="01",
+                local_date="1970-01-01",
+            )
+            result = MODULE.fetch_grid_price_rollups(self.settings, window)
+        finally:
+            MODULE.fetch_single_series_range = original
+
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 30.0, places=6)
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.30, places=6)
 
     def test_fetch_vehicle_price_rollups_uses_matching_tariffs(self):
         def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):
