@@ -1,0 +1,18 @@
+{
+  "monthly": [
+    {
+      "period": "2025-09",
+      "tibber_kwh": 100.0,
+      "vm_kwh": 101.0,
+      "tibber_eur": 20.0,
+      "vm_eur": 19.5
+    },
+    {
+      "period": "2025-10",
+      "tibber_kwh": 200.0,
+      "vm_kwh": 0.0,
+      "tibber_eur": 40.0,
+      "vm_eur": 0.0
+    }
+  ]
+}

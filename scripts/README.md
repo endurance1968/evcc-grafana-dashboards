@@ -140,6 +140,14 @@ python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/targ
 python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/target-stats.json --left-name before --right-json /tmp/after-cleanup/target-stats.json --right-name after --metric-regex '^pvPower_value$'
 ```
 
+Validate cached external energy comparison snapshots after rollup or dashboard-cost changes:
+
+```bash
+python3 scripts/helper/validate_energy_comparison.py
+```
+
+This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months such as `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, and VRM cache summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals against live VM rollups.
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.

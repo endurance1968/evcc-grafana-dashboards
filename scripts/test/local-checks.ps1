@@ -1,12 +1,12 @@
 <#
 Script: local-checks.ps1
 Purpose: Run the local deterministic validation checks for this repository.
-Version: 2026.04.14.3
+Version: 2026.04.14.4
 Last modified: 2026-04-14
 #>
 $ErrorActionPreference = "Stop"
 
-$scriptVersion = "2026.04.14.3"
+$scriptVersion = "2026.04.14.4"
 $scriptLastModified = "2026-04-14"
 $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))
 $pythonScripts = @(
@@ -15,6 +15,7 @@ $pythonScripts = @(
     "scripts/helper/compare_labelsets.py",
     "scripts/helper/compare_tibber_vm.py",
     "scripts/helper/fetch_vrm_kwh_cache.py",
+    "scripts/helper/validate_energy_comparison.py",
     "scripts/helper/vm-rewrite-drop-label.py",
     "scripts/rollup/evcc-vm-rollup.py",
     "scripts/test/rollup-e2e.py"
