@@ -26,4 +26,9 @@ __pycache__/
 
 # Local backups and temporary work files
 tmp/
+# Local external energy comparison caches
+data/energy-comparison/tibber/*
+!data/energy-comparison/tibber/.gitkeep
+data/energy-comparison/vrm/*
+!data/energy-comparison/vrm/.gitkeep
 

@@ -16,11 +16,11 @@ from typing import Dict, List
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "fetch_vrm_kwh_cache.py"
-SCRIPT_VERSION = "2026.04.06.1"
-SCRIPT_LAST_MODIFIED = "2026-04-06"
+SCRIPT_VERSION = "2026.04.14.1"
+SCRIPT_LAST_MODIFIED = "2026-04-14"
 ROOT = Path(__file__).resolve().parents[2]
 ENV_LOCAL = ROOT / ".env.local"
-DEFAULT_OUTPUT_DIR = ROOT / "tmp" / "vrm"
+DEFAULT_OUTPUT_DIR = ROOT / "data" / "energy-comparison" / "vrm"
 KWH_KEYS = ("Gc", "Bc", "Bg", "Gb", "Pc", "Pg", "Pb", "kwh")
 
 KEY_DESCRIPTIONS = {
