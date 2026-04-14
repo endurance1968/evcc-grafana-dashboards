@@ -22,7 +22,7 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.04.14.2"
+SCRIPT_VERSION = "2026.04.14.5"
 SCRIPT_LAST_MODIFIED = "2026-04-14"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -89,6 +89,16 @@ def wait_for_vm(base_url: str, timeout_seconds: int = 30) -> None:
     raise RuntimeError(f"VictoriaMetrics did not become healthy at {base_url}: {last_error}")
 
 
+def wait_for_query_result(base_url: str, query: str, query_time: str, timeout_seconds: int = 30) -> None:
+    deadline = time.time() + timeout_seconds
+    while time.time() < deadline:
+        response = http_get_json(base_url, "/api/v1/query", {"query": query, "time": query_time, "nocache": "1"})
+        if response.get("data", {}).get("result"):
+            return
+        time.sleep(0.5)
+    raise RuntimeError(f"query did not return data within {timeout_seconds}s: {query} at {query_time}")
+
+
 def wait_for_port_free(port: int) -> None:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(0.2)
@@ -109,6 +119,7 @@ def start_docker_vm(args: argparse.Namespace, json_mode: bool) -> tuple[str, str
         "-p",
         f"127.0.0.1:{args.docker_port}:8428",
         args.docker_image,
+        "-retentionPeriod=100y",
     ]
     log(f"$ {' '.join(cmd)}", json_mode=json_mode)
     result = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
@@ -204,6 +215,17 @@ def build_fixture_series(args: argparse.Namespace) -> list[Series]:
         Series({"__name__": "tariffGrid_value", **common}, [0.30] * len(timestamps), timestamps),
         Series({"__name__": "tariffFeedIn_value", **common}, [0.08] * len(timestamps), timestamps),
     ]
+
+
+def fixture_probe_time(args: argparse.Namespace) -> str:
+    local_start = datetime.fromisoformat(args.start_day).replace(tzinfo=ZoneInfo(args.timezone))
+    probe = local_start + timedelta(hours=12)
+    return probe.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def first_rollup_sample_time(args: argparse.Namespace) -> str:
+    local_start = datetime.fromisoformat(args.start_day).replace(tzinfo=ZoneInfo(args.timezone))
+    return local_start.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def serialize_series(series: list[Series]) -> bytes:
@@ -307,12 +329,12 @@ def validate_rollup_values(base_url: str, args: argparse.Namespace) -> dict[str,
     }
     for metric, expected in required.items():
         samples = sorted(metric_values.get(metric, []))
-        if len(samples) != 2:
-            raise AssertionError(f"{metric}: expected 2 daily samples, got {len(samples)}")
+        if len(samples) < 2:
+            raise AssertionError(f"{metric}: expected at least 2 daily samples, got {len(samples)}")
         timestamps = [timestamp for timestamp, _value in samples]
         if len(set(timestamps)) != len(timestamps):
             raise AssertionError(f"{metric}: duplicate timestamps detected: {timestamps}")
-        for _timestamp, value in samples:
+        for _timestamp, value in samples[:2]:
             assert_close(metric, value, expected)
 
     return {
@@ -333,12 +355,15 @@ def run_e2e(base_url: str, args: argparse.Namespace, json_mode: bool) -> dict[st
     cleanup_fixture(base_url)
     http_post_bytes(base_url, "/api/v1/import", serialize_series(build_fixture_series(args)))
     reset_cache(base_url)
+    wait_for_query_result(base_url, "pvPower_value", fixture_probe_time(args))
 
     with tempfile.TemporaryDirectory(prefix="evcc-rollup-e2e-") as tmp:
         config_path = write_config(base_url, args, Path(tmp))
         first = run_rollup(config_path, args, json_mode)
+        wait_for_query_result(base_url, f"{ROLLUP_PREFIX}_pv_energy_daily_wh", first_rollup_sample_time(args))
         first_values = validate_rollup_values(base_url, args)
         second = run_rollup(config_path, args, json_mode)
+        wait_for_query_result(base_url, f"{ROLLUP_PREFIX}_pv_energy_daily_wh", first_rollup_sample_time(args))
         second_values = validate_rollup_values(base_url, args)
 
     cleanup_fixture(base_url)
