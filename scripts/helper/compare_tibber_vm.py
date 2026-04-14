@@ -30,7 +30,7 @@ from typing import Dict, Iterable, List, Mapping, Optional, Tuple
 from zoneinfo import ZoneInfo
 
 SCRIPT_NAME = "compare_tibber_vm.py"
-SCRIPT_VERSION = "2026.04.14.2"
+SCRIPT_VERSION = "2026.04.14.3"
 SCRIPT_LAST_MODIFIED = "2026-04-14"
 TIBBER_GQL_URL = "https://api.tibber.com/v1-beta/gql"
 UTC = dt.timezone.utc
@@ -124,7 +124,7 @@ def tibber_query(token: str, query: str, variables: Optional[Mapping[str, object
     return data
 
 
-def discover_tibber_home_id(token: str) -> str:
+def discover_tibber_home_id(token: str, *, quiet: bool = False) -> str:
     query = """
     query Homes {
       viewer {
@@ -140,7 +140,8 @@ def discover_tibber_home_id(token: str) -> str:
     homes = (((data.get("data") or {}).get("viewer") or {}).get("homes") or [])
     if len(homes) == 1:
         home = homes[0]
-        print(f"Tibber home:          {home.get('appNickname') or '-'} ({home.get('address', {}).get('city') or '-'})")
+        if not quiet:
+            print(f"Tibber home:          {home.get('appNickname') or '-'} ({home.get('address', {}).get('city') or '-'})")
         return str(home["id"])
     if not homes:
         raise RuntimeError("Tibber token returned no homes; set TIBBER_HOME_ID if this is unexpected")
@@ -424,7 +425,7 @@ def main() -> int:
     token = args.tibber_token or os.environ.get("TIBBER_API_TOKEN", "")
     if not token:
         raise SystemExit("Missing Tibber token. Set TIBBER_API_TOKEN in .env.local or pass --tibber-token.")
-    home_id = args.tibber_home_id or os.environ.get("TIBBER_HOME_ID", "") or discover_tibber_home_id(token)
+    home_id = args.tibber_home_id or os.environ.get("TIBBER_HOME_ID", "") or discover_tibber_home_id(token, quiet=args.json)
     vm_base_url = args.vm_base_url or os.environ.get("VM_BASE_URL", "") or "http://127.0.0.1:8428"
 
     if not args.json:

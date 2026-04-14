@@ -9,6 +9,7 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CHECK_DATA_PATH = ROOT / "scripts" / "helper" / "check_data.py"
 COMPARE_PATH = ROOT / "scripts" / "helper" / "compare_import_coverage.py"
+TIBBER_PATH = ROOT / "scripts" / "helper" / "compare_tibber_vm.py"
 
 
 CHECK_SPEC = importlib.util.spec_from_file_location("check_data_helper", CHECK_DATA_PATH)
@@ -22,6 +23,12 @@ COMPARE_MODULE = importlib.util.module_from_spec(COMPARE_SPEC)
 sys.modules[COMPARE_SPEC.name] = COMPARE_MODULE
 assert COMPARE_SPEC.loader is not None
 COMPARE_SPEC.loader.exec_module(COMPARE_MODULE)
+
+TIBBER_SPEC = importlib.util.spec_from_file_location("compare_tibber_vm_helper", TIBBER_PATH)
+TIBBER_MODULE = importlib.util.module_from_spec(TIBBER_SPEC)
+sys.modules[TIBBER_SPEC.name] = TIBBER_MODULE
+assert TIBBER_SPEC.loader is not None
+TIBBER_SPEC.loader.exec_module(TIBBER_MODULE)
 
 
 class CheckDataCliTests(unittest.TestCase):
@@ -81,6 +88,58 @@ class CompareImportCoverageCliTests(unittest.TestCase):
             COMPARE_MODULE.influx_measurements = original_influx_measurements
             COMPARE_MODULE.build_critical_energy_checks = original_build_critical_energy_checks
             COMPARE_MODULE.render_report = original_render_report
+
+
+class CompareTibberVmTests(unittest.TestCase):
+    def test_discover_tibber_home_id_can_stay_quiet_for_json_mode(self):
+        original_tibber_query = TIBBER_MODULE.tibber_query
+        try:
+            TIBBER_MODULE.tibber_query = lambda token, query: {
+                "data": {
+                    "viewer": {
+                        "homes": [
+                            {
+                                "id": "home-1",
+                                "appNickname": "Home",
+                                "address": {"city": "Berlin"},
+                            }
+                        ]
+                    }
+                }
+            }
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                home_id = TIBBER_MODULE.discover_tibber_home_id("token", quiet=True)
+        finally:
+            TIBBER_MODULE.tibber_query = original_tibber_query
+
+        self.assertEqual(home_id, "home-1")
+        self.assertEqual(output.getvalue(), "")
+
+    def test_discover_tibber_home_id_prints_in_text_mode(self):
+        original_tibber_query = TIBBER_MODULE.tibber_query
+        try:
+            TIBBER_MODULE.tibber_query = lambda token, query: {
+                "data": {
+                    "viewer": {
+                        "homes": [
+                            {
+                                "id": "home-1",
+                                "appNickname": "Home",
+                                "address": {"city": "Berlin"},
+                            }
+                        ]
+                    }
+                }
+            }
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                home_id = TIBBER_MODULE.discover_tibber_home_id("token")
+        finally:
+            TIBBER_MODULE.tibber_query = original_tibber_query
+
+        self.assertEqual(home_id, "home-1")
+        self.assertIn("Tibber home:", output.getvalue())
 
 
 class CompareImportCoverageVmTests(unittest.TestCase):

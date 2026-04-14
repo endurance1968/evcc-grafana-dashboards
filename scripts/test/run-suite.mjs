@@ -1,5 +1,8 @@
 /**
- * Run the Grafana dashboard test workflow across source and translation variants.
+ * Script: run-suite.mjs
+ * Purpose: Run the Grafana dashboard test workflow across source and translation variants.
+ * Version: 2026.04.14.1
+ * Last modified: 2026-04-14
  */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -17,6 +20,7 @@ loadEnvFile(parseArg("env", ".env"));
 const withScreenshots = parseArg("screenshots", "false") === "true";
 const withPrepare = parseArg("prepare", "true") !== "false";
 const withFinalCleanup = parseArg("cleanup-final", "false") === "true";
+const withSetCleanup = parseArg("cleanup-between", "true") !== "false";
 const repoRoot = process.cwd();
 const family = resolveDashboardFamily(parseFamilyArg());
 const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
@@ -46,7 +50,7 @@ if (withPrepare) {
 
 for (const set of sets) {
   const manifest = `tests/artifacts/import-manifest-${set.tag}.json`;
-  if (withScreenshots) {
+  if (withSetCleanup || withScreenshots) {
     run("scripts/test/cleanup-grafana.mjs");
   }
   run("scripts/test/import-dashboards-raw.mjs", [

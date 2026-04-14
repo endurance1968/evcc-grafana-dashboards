@@ -13,6 +13,7 @@ Default family:
 - `smoke-check.mjs`: post-import validation
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
+- `local-checks.ps1` / `local-checks.mjs`: local deterministic check runners used by `npm test`
 - `cleanup-grafana.mjs`: full cleanup of dashboards and library panels in the Grafana test folder
 - `_lib.mjs`: shared helpers
 
@@ -96,6 +97,7 @@ Behavior:
 - includes the source reference set as `<familyTagPrefix>-original-<sourceLanguage>`
 - includes each generated target folder as `<familyTagPrefix>-<language>-gen`
 - when `--screenshots=true`, runs `cleanup-grafana.mjs` before each set
+- by default, runs `cleanup-grafana.mjs` before each set even without screenshots so library panel UIDs cannot collide across languages; pass `--cleanup-between=false` only when you intentionally want all imported sets to remain side by side
 - imports the set
 - runs smoke-check
 - optionally captures screenshots
