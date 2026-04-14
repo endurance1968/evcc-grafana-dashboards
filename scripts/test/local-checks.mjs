@@ -1,7 +1,7 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.14.2
+ * Version: 2026.04.14.3
  * Last modified: 2026-04-14
  */
 import fs from "node:fs";
@@ -17,10 +17,11 @@ const pythonScripts = [
   "scripts/helper/fetch_vrm_kwh_cache.py",
   "scripts/helper/vm-rewrite-drop-label.py",
   "scripts/rollup/evcc-vm-rollup.py",
+  "scripts/test/rollup-e2e.py",
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.14.2 (last modified 2026-04-14)");
+  console.log("local-checks.mjs v2026.04.14.3 (last modified 2026-04-14)");
 }
 
 function commandExists(command, args = ["--version"]) {

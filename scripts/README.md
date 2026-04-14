@@ -58,6 +58,18 @@ Write `evcc_*` rollups:
 python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
 ```
 
+Run the disposable rollup end-to-end test before changing the rollup write/delete path:
+
+```bash
+python3 scripts/test/rollup-e2e.py --docker
+```
+
+The test imports a tiny raw fixture into an isolated VictoriaMetrics, runs `backfill --replace-range --write` twice, and verifies that repeated replacement does not leave duplicate daily rollup samples. If Docker is not available, use a local disposable VM only:
+
+```bash
+python3 scripts/test/rollup-e2e.py --base-url http://127.0.0.1:8428 --confirm-disposable
+```
+
 Replace a monthly rollup scope before writing it again:
 
 ```bash

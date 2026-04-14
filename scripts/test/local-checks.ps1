@@ -1,12 +1,12 @@
 <#
 Script: local-checks.ps1
 Purpose: Run the local deterministic validation checks for this repository.
-Version: 2026.04.14.2
+Version: 2026.04.14.3
 Last modified: 2026-04-14
 #>
 $ErrorActionPreference = "Stop"
 
-$scriptVersion = "2026.04.14.2"
+$scriptVersion = "2026.04.14.3"
 $scriptLastModified = "2026-04-14"
 $repoRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))
 $pythonScripts = @(
@@ -16,7 +16,8 @@ $pythonScripts = @(
     "scripts/helper/compare_tibber_vm.py",
     "scripts/helper/fetch_vrm_kwh_cache.py",
     "scripts/helper/vm-rewrite-drop-label.py",
-    "scripts/rollup/evcc-vm-rollup.py"
+    "scripts/rollup/evcc-vm-rollup.py",
+    "scripts/test/rollup-e2e.py"
 )
 
 function Invoke-CheckedCommand {

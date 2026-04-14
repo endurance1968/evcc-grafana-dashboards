@@ -13,6 +13,7 @@ Default family:
 - `smoke-check.mjs`: post-import validation
 - `dashboard-semantic-check.mjs`: static semantic checks for dashboard time ranges, critical panels, bar chart axes, and known Grafana error regressions
 - `render-smoke-check.mjs`: browser-based rendered dashboard and critical solo-panel smoke checks
+- `rollup-e2e.py`: optional disposable VictoriaMetrics rollup read/write/replace end-to-end test
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
 - `local-checks.ps1` / `local-checks.mjs`: local deterministic check runners used by `npm test`
@@ -99,6 +100,31 @@ Checks:
 - known Grafana error texts are not visible
 - critical panels are opened via `/d-solo/...&panelId=...`
 - critical panels do not render `No data` unless `--fail-no-data=false` is passed
+
+## rollup-e2e.py
+
+Purpose: validate the real rollup write path against a disposable VictoriaMetrics instance.
+
+Checks:
+
+- imports a tiny raw EVCC fixture into an isolated VM
+- runs `evcc-vm-rollup.py backfill --replace-range --write` twice
+- verifies expected daily PV, home, grid import, and loadpoint rollup values
+- verifies the repeated replace run does not leave duplicate daily samples
+
+Docker mode starts and stops a temporary VM container:
+
+```bash
+python scripts/test/rollup-e2e.py --docker
+```
+
+External disposable VM mode is deliberately guarded:
+
+```bash
+python scripts/test/rollup-e2e.py --base-url=http://127.0.0.1:8428 --confirm-disposable
+```
+
+Do not point this at production. The test writes raw fixture data and deletes all `e2e_evcc_*` rollup series plus its own `e2e_fixture` raw series.
 
 ## run-suite.mjs
 
