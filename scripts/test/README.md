@@ -11,6 +11,7 @@ Default family:
 - `deploy-dashboards.mjs`: high-level deploy workflow for a single language or variant
 - `import-dashboards-raw.mjs`: import via Grafana's raw dashboard import endpoint
 - `smoke-check.mjs`: post-import validation
+- `dashboard-semantic-check.mjs`: static semantic checks for dashboard time ranges, critical panels, bar chart axes, and known Grafana error regressions
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
 - `local-checks.ps1` / `local-checks.mjs`: local deterministic check runners used by `npm test`

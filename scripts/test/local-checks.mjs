@@ -1,7 +1,7 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.14.1
+ * Version: 2026.04.14.2
  * Last modified: 2026-04-14
  */
 import fs from "node:fs";
@@ -20,7 +20,7 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.14.1 (last modified 2026-04-14)");
+  console.log("local-checks.mjs v2026.04.14.2 (last modified 2026-04-14)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -160,6 +160,7 @@ function main() {
     runNodeSyntaxChecks();
     validateDashboardJson();
     auditOriginalQueries();
+    run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
     console.log("\nLocal JS checks passed.");
     return;
   }
@@ -170,6 +171,7 @@ function main() {
   runNodeSyntaxChecks();
   validateDashboardJson();
   auditOriginalQueries();
+  run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
   runOptionalBashSyntaxChecks();
   console.log("\nLocal checks passed.");
 }
