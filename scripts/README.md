@@ -159,6 +159,14 @@ npm run test:energy-validation -- \
 
 Add `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` when the runner also has access to a VM instance with rollups. Without `--require-cache`, missing private caches are reported as `SKIP` so the command remains safe for public CI and fresh developer checkouts.
 
+Verify that generated dashboard translations are reproducible from `dashboards/original/` and that the localization scripts do not create diffs on a clean tree:
+
+```bash
+npm run test:localization-idempotency
+```
+
+This runs `generate-localized-dashboards.mjs` and `apply-safe-display-translations.mjs`, compares the generated translation files before/after, and checks that the source language output under `dashboards/translation/en/` is a JSON-equivalent copy of `dashboards/original/en/`.
+
 Execute every MetricsQL panel target from the VM originals against VictoriaMetrics after Grafana macro and variable substitution:
 
 ```bash
