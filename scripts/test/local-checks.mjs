@@ -2,7 +2,7 @@
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
  * Version: 2026.04.15.1
- * Last modified: 2026-04-14
+ * Last modified: 2026-04-15
  */
 import fs from "node:fs";
 import path from "node:path";
