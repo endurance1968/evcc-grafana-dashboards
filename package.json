@@ -15,7 +15,8 @@
     "test:localization-idempotency": "node scripts/test/localization-idempotency-check.mjs --family=vm",
     "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker",
     "test:render-e2e": "node scripts/test/render-e2e.mjs",
-    "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e"
+    "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e",
+    "test:rollup-path": "node scripts/test/rollup-path-check.mjs"
   },
   "repository": {
     "type": "git",

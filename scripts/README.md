@@ -180,11 +180,21 @@ npm run test:query-readback
 
 The default command starts a disposable empty VictoriaMetrics container. Empty data is intentional here: the check verifies query syntax, dashboard macros, and unsupported Influx/Grafana leftovers. Use `node scripts/test/dashboard-query-readback.mjs --base-url http://127.0.0.1:8428` to run against an existing VM instead.
 
-The Forgejo CI workflow runs the deterministic checks plus both Docker-backed VM checks:
+Run the complete deterministic rollup path after rollup, query, dashboard, or validation changes:
+
+```bash
+npm run test:rollup-path
+```
+
+This orchestrates `test:ci`, `test:energy-validation`, `test:query-readback`, `test:render-e2e`, and `test:rollup-e2e`. Use `-- --strict-energy` on a private runner with refreshed Tibber/Influx/VRM caches, and add `-- --vm-base-url http://127.0.0.1:8428` when a live rollup VM should be compared to the VRM cache.
+
+The Forgejo CI workflow runs the same deterministic checks as separate steps so failures stay easy to identify:
 
 ```bash
 npm run test:ci
+npm run test:energy-validation
 npm run test:query-readback
+npm run test:render-e2e
 npm run test:rollup-e2e
 ```
 

@@ -13,6 +13,7 @@ Default family:
 - `smoke-check.mjs`: post-import validation
 - `dashboard-semantic-check.mjs`: static semantic checks for dashboard time ranges, critical panels, bar chart axes, and known Grafana error regressions
 - `render-smoke-check.mjs`: browser-based rendered dashboard and critical solo-panel smoke checks
+- `rollup-path-check.mjs`: complete deterministic rollup path orchestrator (`npm run test:rollup-path`)
 - `rollup-e2e.py`: optional disposable VictoriaMetrics rollup read/write/replace end-to-end test
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
@@ -125,6 +126,22 @@ python scripts/test/rollup-e2e.py --base-url=http://127.0.0.1:8428 --confirm-dis
 ```
 
 Do not point this at production. The test writes raw fixture data and deletes all `e2e_evcc_*` rollup series plus its own `e2e_fixture` raw series.
+
+## rollup-path-check.mjs
+
+Purpose: run the complete deterministic rollup validation path from one command after rollup, query, or dashboard changes.
+
+```bash
+npm run test:rollup-path
+```
+
+The command runs static/unit/dashboard checks, external Tibber/Influx/VRM cache validation, MetricsQL query readback against disposable VictoriaMetrics, Grafana render E2E with fixture data, and the disposable rollup replace E2E. It intentionally takes longer than `npm run test:ci` because it covers the full rollup-to-dashboard path.
+
+Useful options:
+
+- `-- --skip-render` skips only the browser render E2E when you need a faster local precheck.
+- `-- --strict-energy` requires private Tibber/Influx/VRM cache snapshots instead of treating missing caches as non-blocking skips.
+- `-- --vm-base-url http://127.0.0.1:8428` adds live VM rollup comparison to the energy validation step.
 
 ## run-suite.mjs
 
