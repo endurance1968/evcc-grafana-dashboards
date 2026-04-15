@@ -37,7 +37,20 @@ jobs:
         run: npm run test:ci
 
       - name: External energy validation
-        run: npm run test:energy-validation
+        shell: bash
+        run: |
+          args=()
+          if [ "${ENERGY_VALIDATION_STRICT:-}" = "1" ]; then
+            args+=(--require-cache tibber-vm --require-cache tibber-influx --require-cache vrm)
+            if [ -n "${ENERGY_VALIDATION_VM_BASE_URL:-}" ]; then
+              args+=(--vm-base-url "$ENERGY_VALIDATION_VM_BASE_URL" --require-cache vrm-vm)
+            fi
+          fi
+          if [ "${#args[@]}" -gt 0 ]; then
+            npm run test:energy-validation -- "${args[@]}"
+          else
+            npm run test:energy-validation
+          fi
 
       - name: Dashboard query readback
         run: npm run test:query-readback

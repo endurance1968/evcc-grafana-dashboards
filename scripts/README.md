@@ -159,6 +159,11 @@ npm run test:energy-validation -- \
 
 Add `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` when the runner also has access to a VM instance with rollups. Without `--require-cache`, missing private caches are reported as `SKIP` so the command remains safe for public CI and fresh developer checkouts.
 
+The Forgejo workflow keeps the public/default path cache-optional, but can be switched into strict private validation by setting runner environment variables:
+
+- `ENERGY_VALIDATION_STRICT=1` requires Tibber-vs-VM, Tibber-vs-Influx, and VRM cache snapshots.
+- `ENERGY_VALIDATION_VM_BASE_URL=http://127.0.0.1:8428` additionally enables the live VM rollup comparison and requires the VRM-vs-VM cache path.
+
 Verify that generated dashboard translations are reproducible from `dashboards/original/` and that the localization scripts do not create diffs on a clean tree:
 
 ```bash
@@ -198,6 +203,8 @@ npm run test:render-e2e
 ```
 
 This starts temporary Grafana and VictoriaMetrics containers, imports minimal VM fixture data, creates the VM datasource, imports the original VM dashboards, and runs the hardened browser render smoke against critical panels. The Forgejo CI workflow runs this command after installing the Chromium browser for Playwright.
+
+The rollup E2E test is not just a smoke test. It imports deterministic raw fixture data, runs `evcc-vm-rollup.py --replace-range --write` twice, then asserts expected daily energy, tariff, and cost values, duplicate-free daily timestamps, and identical required rollup output after the second replace run.
 
 ## Configuration
 

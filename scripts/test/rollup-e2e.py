@@ -22,8 +22,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.04.14.5"
-SCRIPT_LAST_MODIFIED = "2026-04-14"
+SCRIPT_VERSION = "2026.04.15.1"
+SCRIPT_LAST_MODIFIED = "2026-04-15"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -293,6 +293,10 @@ def assert_close(name: str, actual: float, expected: float, tolerance: float = 0
         raise AssertionError(f"{name}: expected {expected}, got {actual}")
 
 
+def stable_value(value: float) -> float:
+    return round(value, 6)
+
+
 def flatten_export_values(rows: list[dict]) -> list[tuple[int, float]]:
     values: list[tuple[int, float]] = []
     for row in rows:
@@ -326,7 +330,14 @@ def validate_rollup_values(base_url: str, args: argparse.Namespace) -> dict[str,
         f"{ROLLUP_PREFIX}_home_energy_daily_wh": 12000.0,
         f"{ROLLUP_PREFIX}_grid_import_daily_wh": 6000.0,
         f"{ROLLUP_PREFIX}_loadpoint_energy_daily_wh": 2400.0,
+        f"{ROLLUP_PREFIX}_ext_energy_daily_wh": 1200.0,
+        f"{ROLLUP_PREFIX}_grid_import_cost_daily_eur": 1.8,
+        f"{ROLLUP_PREFIX}_grid_import_price_avg_daily_ct_per_kwh": 30.0,
+        f"{ROLLUP_PREFIX}_grid_import_price_effective_daily_ct_per_kwh": 30.0,
+        f"{ROLLUP_PREFIX}_grid_import_price_min_daily_ct_per_kwh": 30.0,
+        f"{ROLLUP_PREFIX}_grid_import_price_max_daily_ct_per_kwh": 30.0,
     }
+    required_values: dict[str, list[tuple[int, float]]] = {}
     for metric, expected in required.items():
         samples = sorted(metric_values.get(metric, []))
         if len(samples) < 2:
@@ -336,12 +347,23 @@ def validate_rollup_values(base_url: str, args: argparse.Namespace) -> dict[str,
             raise AssertionError(f"{metric}: duplicate timestamps detected: {timestamps}")
         for _timestamp, value in samples[:2]:
             assert_close(metric, value, expected)
+        required_values[metric] = [(timestamp, stable_value(value)) for timestamp, value in samples]
 
     return {
         "exported_series": len(rows),
         "required_metrics": sorted(required),
         "required_sample_counts": {metric: len(metric_values.get(metric, [])) for metric in required},
+        "required_values": required_values,
     }
+
+
+def assert_replace_idempotent(first_values: dict[str, object], second_values: dict[str, object]) -> None:
+    for key in ("required_sample_counts", "required_values"):
+        if first_values.get(key) != second_values.get(key):
+            raise AssertionError(
+                f"replace-range is not idempotent for {key}: "
+                f"first={first_values.get(key)} second={second_values.get(key)}"
+            )
 
 
 def cleanup_fixture(base_url: str) -> None:
@@ -365,6 +387,7 @@ def run_e2e(base_url: str, args: argparse.Namespace, json_mode: bool) -> dict[st
         second = run_rollup(config_path, args, json_mode)
         wait_for_query_result(base_url, f"{ROLLUP_PREFIX}_pv_energy_daily_wh", first_rollup_sample_time(args))
         second_values = validate_rollup_values(base_url, args)
+        assert_replace_idempotent(first_values, second_values)
 
     cleanup_fixture(base_url)
     return {
