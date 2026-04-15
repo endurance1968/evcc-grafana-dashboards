@@ -1,7 +1,7 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.04.15.1
+ * Version: 2026.04.15.4
  * Last modified: 2026-04-15
  */
 import path from "node:path";
@@ -22,6 +22,8 @@ const password = requireEnv("GRAFANA_PASSWORD");
 const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-set.json");
 const orgId = optionalEnv("GRAFANA_ORG_ID", "1");
 const waitMs = Number(parseArg("wait-ms", optionalEnv("GRAFANA_RENDER_SMOKE_WAIT_MS", optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500"))));
+const overrideFrom = parseArg("from", "");
+const overrideTo = parseArg("to", "");
 const failNoData = parseArg("fail-no-data", "true") !== "false";
 const failQueryErrors = parseArg("fail-query-errors", "true") !== "false";
 const failPageErrors = parseArg("fail-page-errors", "false") === "true";
@@ -73,8 +75,8 @@ const criticalPanelsByFile = {
   "VM_ EVCC_ Today - Details.json": [
     { id: 2, title: "PV energy" },
     { id: 35, title: "Forecast" },
-    { id: 11, title: "Charge currents/phase" },
-    { id: 15, title: "Phases" },
+    { id: 11, title: "Charge currents/phase", vars: { loadpoint: "LP1" } },
+    { id: 15, title: "Phases", vars: { loadpoint: "LP1" } },
   ],
   "VM_ EVCC_ Today - Mobile.json": [
     { id: 74, title: "Power" },
@@ -111,11 +113,14 @@ function readSourceTime(dashboard) {
   try {
     const source = readJson(sourcePath);
     return {
-      from: source?.time?.from || "",
-      to: source?.time?.to || "",
+      from: overrideFrom || source?.time?.from || "",
+      to: overrideTo || source?.time?.to || "",
     };
   } catch {
-    return {};
+    return {
+      from: overrideFrom,
+      to: overrideTo,
+    };
   }
 }
 
@@ -142,18 +147,27 @@ function dashboardUrl(dashboard) {
 
 function panelUrl(dashboard, panelId) {
   const range = readSourceTime(dashboard);
-  const query = queryString({
+  const params = {
     orgId,
     panelId,
     from: range.from,
     to: range.to,
     theme: "dark",
-  });
+  };
+  const panel = (criticalPanelsByFile[sourceFileName(dashboard)] || []).find((item) => item.id === panelId);
+  for (const [name, value] of Object.entries(panel?.vars || {})) {
+    params[`var-${name}`] = value;
+  }
+  const query = queryString(params);
   return `${baseUrl}${soloPanelPath(dashboard)}?${query}`;
 }
 
 function findTextHits(text, candidates) {
   return candidates.filter((candidate) => text.includes(candidate));
+}
+
+function hasPanelContent(state) {
+  return state.tableRowCount > 0 || state.numericTextCount > 0 || state.canvasCount > 0;
 }
 
 function isGrafanaDataRequest(url) {
@@ -269,8 +283,9 @@ async function checkSoloPanel(page, dashboard, panel) {
   if (errorHits.length > 0) {
     throw new Error(`panel ${panel.id} '${panel.title}' rendered error(s): ${errorHits.join(", ")}`);
   }
+  const hasContent = hasPanelContent(state);
   const emptyHits = findTextHits(state.text, emptyPanelTexts);
-  if (failNoData && emptyHits.length > 0) {
+  if (failNoData && emptyHits.length > 0 && !hasContent) {
     throw new Error(`panel ${panel.id} '${panel.title}' rendered empty state(s): ${emptyHits.join(", ")}`);
   }
   if (state.alertCount > 0) {
@@ -279,7 +294,7 @@ async function checkSoloPanel(page, dashboard, panel) {
   if (state.loadingCount > 0) {
     throw new Error(`panel ${panel.id} '${panel.title}' still shows loading text after ${waitMs}ms`);
   }
-  if (state.canvasCount + state.svgCount + state.tableRowCount === 0 && state.numericTextCount === 0) {
+  if (!hasContent) {
     throw new Error(
       `panel ${panel.id} '${panel.title}' rendered without visual/table/numeric content ` +
       `(canvas=${state.canvasCount}, svg=${state.svgCount}, rows=${state.tableRowCount}, numbers=${state.numericTextCount})`,

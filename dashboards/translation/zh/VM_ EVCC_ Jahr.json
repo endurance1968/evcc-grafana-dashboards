@@ -168,7 +168,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -187,7 +187,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -206,7 +206,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -225,7 +225,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -455,7 +455,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -470,7 +470,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -485,7 +485,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -500,7 +500,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Feed-in"
+              "options": "馈电"
             },
             "properties": [
               {
@@ -770,7 +770,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -798,7 +798,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "自耗"
             },
             "properties": [
               {
@@ -1013,7 +1013,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarky"
+              "options": "自给率"
             },
             "properties": [
               {
@@ -1028,7 +1028,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Self-consumption"
+              "options": "自耗"
             },
             "properties": [
               {
@@ -1157,7 +1157,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV/day"
+              "options": "光伏/日"
             },
             "properties": [
               {
@@ -1176,7 +1176,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "日消耗"
             },
             "properties": [
               {
@@ -1195,7 +1195,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import/day"
+              "options": "每日电网输入"
             },
             "properties": [
               {
@@ -1366,7 +1366,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -1385,7 +1385,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "电网输入"
             },
             "properties": [
               {
@@ -1404,7 +1404,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Consumption/day"
+              "options": "日消耗"
             },
             "properties": [
               {
@@ -1551,7 +1551,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "其他"
             },
             "properties": [
               {
@@ -1566,7 +1566,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -1964,7 +1964,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -1979,7 +1979,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "电池"
             },
             "properties": [
               {
@@ -2238,7 +2238,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "家庭"
             },
             "properties": [
               {
@@ -2253,7 +2253,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery discharge"
+              "options": "电池放电"
             },
             "properties": [
               {
@@ -2279,7 +2279,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery charge"
+              "options": "电池充电"
             },
             "properties": [
               {
@@ -2298,7 +2298,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Other"
+              "options": "其他"
             },
             "properties": [
               {
@@ -2515,7 +2515,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "purchased"
+              "options": "购电"
             },
             "properties": [
               {
@@ -2539,7 +2539,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -2786,7 +2786,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Average"
+              "options": "平均值"
             },
             "properties": [
               {
@@ -2801,7 +2801,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Effective electricity price"
+              "options": "实际电价"
             },
             "properties": [
               {
@@ -2978,7 +2978,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "购入"
             },
             "properties": [
               {
@@ -2993,7 +2993,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "售电"
             },
             "properties": [
               {
@@ -3601,7 +3601,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Charge"
+              "options": "充电"
             },
             "properties": [
               {
@@ -3620,7 +3620,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Discharge"
+              "options": "放电"
             },
             "properties": [
               {
@@ -4223,7 +4223,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -4242,7 +4242,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "电池"
             },
             "properties": [
               {
@@ -4261,7 +4261,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "电网"
             },
             "properties": [
               {
@@ -4518,7 +4518,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "PV"
+              "options": "光伏发电"
             },
             "properties": [
               {
@@ -4537,7 +4537,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Battery"
+              "options": "电池"
             },
             "properties": [
               {
@@ -4556,7 +4556,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid"
+              "options": "电网"
             },
             "properties": [
               {

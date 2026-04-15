@@ -284,7 +284,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -471,7 +471,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -581,7 +581,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -715,7 +715,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -815,7 +815,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -830,7 +830,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -1018,7 +1018,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "वास्तविक"
             },
             "properties": [
               {
@@ -1033,7 +1033,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "पूर्वानुमान"
             },
             "properties": [
               {
@@ -1146,7 +1146,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1333,7 +1333,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1464,7 +1464,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1651,7 +1651,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Total"
+              "options": "कुल"
             },
             "properties": [
               {
@@ -1681,7 +1681,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "अन्य"
             },
             "properties": [
               {
@@ -1813,7 +1813,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -1992,7 +1992,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "घर"
             },
             "properties": [
               {
@@ -2147,7 +2147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2317,7 +2317,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2356,7 +2356,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "मूल्य"
             },
             "properties": [
               {
@@ -2658,7 +2658,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "खरीदा गया"
             },
             "properties": [
               {
@@ -2673,7 +2673,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "बेचा गया"
             },
             "properties": [
               {
@@ -2784,7 +2784,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "औसत"
             },
             "properties": [
               {
@@ -2954,7 +2954,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "ग्रिड आयात"
             },
             "properties": [
               {
@@ -2997,7 +2997,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "CO2"
+              "options": "सीओ 2"
             },
             "properties": [
               {
@@ -3603,7 +3603,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L1",
           "range": true,
@@ -3615,7 +3615,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L2",
           "range": true,
@@ -3627,7 +3627,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "धारा L3",
           "range": true,
@@ -3828,7 +3828,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Active phases"
+              "options": "सक्रिय फेज़"
             },
             "properties": [
               {

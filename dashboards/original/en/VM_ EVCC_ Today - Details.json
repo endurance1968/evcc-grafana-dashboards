@@ -3603,7 +3603,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Current L1",
           "range": true,
@@ -3615,7 +3615,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Current L2",
           "range": true,
@@ -3627,7 +3627,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Current L3",
           "range": true,

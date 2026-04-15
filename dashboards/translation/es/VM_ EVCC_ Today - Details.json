@@ -815,7 +815,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Pronóstico"
             },
             "properties": [
               {
@@ -830,7 +830,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Real"
             },
             "properties": [
               {
@@ -1018,7 +1018,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Actual"
+              "options": "Real"
             },
             "properties": [
               {
@@ -1033,7 +1033,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Forecast"
+              "options": "Pronóstico"
             },
             "properties": [
               {
@@ -1146,7 +1146,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Otros"
             },
             "properties": [
               {
@@ -1333,7 +1333,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Otros"
             },
             "properties": [
               {
@@ -1464,7 +1464,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Otros"
             },
             "properties": [
               {
@@ -1681,7 +1681,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sonstige"
+              "options": "Otros"
             },
             "properties": [
               {
@@ -1813,7 +1813,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -1992,7 +1992,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Home"
+              "options": "Casa"
             },
             "properties": [
               {
@@ -2147,7 +2147,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Promedio"
             },
             "properties": [
               {
@@ -2317,7 +2317,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Importación de red"
             },
             "properties": [
               {
@@ -2356,7 +2356,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Preis"
+              "options": "Precio"
             },
             "properties": [
               {
@@ -2658,7 +2658,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Purchased"
+              "options": "Comprado"
             },
             "properties": [
               {
@@ -2673,7 +2673,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Sold"
+              "options": "Vendido"
             },
             "properties": [
               {
@@ -2784,7 +2784,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Durchschnitt"
+              "options": "Promedio"
             },
             "properties": [
               {
@@ -2954,7 +2954,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Grid import"
+              "options": "Importación de red"
             },
             "properties": [
               {
@@ -3603,7 +3603,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l1{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Corriente L1",
           "range": true,
@@ -3615,7 +3615,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l2{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Corriente L2",
           "range": true,
@@ -3627,7 +3627,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "last_over_time(avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"}))",
+          "expr": "avg(chargeCurrents_l3{loadpoint=\"$loadpoint\"})",
           "format": "time_series",
           "legendFormat": "Corriente L3",
           "range": true,
@@ -3828,7 +3828,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Active phases"
+              "options": "Fases activas"
             },
             "properties": [
               {

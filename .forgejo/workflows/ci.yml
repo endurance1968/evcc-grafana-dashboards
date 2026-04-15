@@ -37,5 +37,11 @@ jobs:
       - name: Dashboard query readback
         run: npm run test:query-readback
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Grafana render smoke E2E
+        run: npm run test:render-e2e
+
       - name: Rollup disposable E2E
         run: npm run test:rollup-e2e

@@ -172,6 +172,14 @@ node scripts/test/run-suite.mjs --family=vm --env=.env.local --render-smoke=true
 
 `render-smoke-check.mjs` fails on Grafana datasource/query HTTP errors, known panel error texts, empty critical panels, stuck loading states, and critical panels that render without visual, table, or numeric content. Use `--fail-no-data=false` only when intentionally checking layout/rendering against incomplete test data.
 
+For a fully disposable render smoke run with fixture data, use:
+
+```bash
+npm run test:render-e2e
+```
+
+This starts temporary Grafana and VictoriaMetrics containers, imports minimal VM fixture data, creates the VM datasource, imports the original VM dashboards, and runs the hardened browser render smoke against critical panels. The Forgejo CI workflow runs this command after installing the Chromium browser for Playwright.
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.
