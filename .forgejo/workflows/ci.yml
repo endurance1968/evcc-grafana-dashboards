@@ -6,6 +6,8 @@ on:
       - main
   pull_request:
   workflow_dispatch:
+  schedule:
+    - cron: "23 4 * * 1"
 
 jobs:
   checks:
@@ -33,6 +35,9 @@ jobs:
 
       - name: Static and unit checks
         run: npm run test:ci
+
+      - name: External energy validation
+        run: npm run test:energy-validation
 
       - name: Dashboard query readback
         run: npm run test:query-readback

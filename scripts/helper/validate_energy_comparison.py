@@ -28,13 +28,17 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from zoneinfo import ZoneInfo
 
 SCRIPT_NAME = "validate_energy_comparison.py"
-SCRIPT_VERSION = "2026.04.14.1"
-SCRIPT_LAST_MODIFIED = "2026-04-14"
+SCRIPT_VERSION = "2026.04.15.1"
+SCRIPT_LAST_MODIFIED = "2026-04-15"
 UTC = dt.timezone.utc
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TIBBER_DIR = ROOT / "data" / "energy-comparison" / "tibber"
 DEFAULT_VRM_DIR = ROOT / "data" / "energy-comparison" / "vrm"
-DEFAULT_EXCLUDED_MONTHS = ("2025-10",)
+DEFAULT_EXCLUDED_MONTHS = ("2025-04", "2025-10")
+EXCLUDED_MONTH_RATIONALE = {
+    "2025-04": "documented Tibber/EVCC transition anomaly; exclude from dashboard accuracy validation",
+    "2025-10": "documented Tibber billing/import anomaly; exclude from dashboard accuracy validation",
+}
 
 
 @dataclass(frozen=True)
@@ -429,6 +433,22 @@ def evaluate_vrm_rows(rows: Sequence[VrmMonthlyRow], monthly_pct_tolerance: floa
     )
 
 
+def required_status(name: str, status: str, details: str, cache_key: str, required_caches: Sequence[str]) -> CheckResult:
+    if status == "SKIP" and cache_key in required_caches:
+        return CheckResult(name=name, status="CHECK", details=f"{details}; required by --require-cache {cache_key}")
+    return CheckResult(name=name, status=status, details=details)
+
+
+def print_exclusion_rationale(excluded_months: Sequence[str]) -> None:
+    if not excluded_months:
+        return
+    print("Excluded month rationale")
+    print("------------------------")
+    for month in excluded_months:
+        print(f"- {month}: {EXCLUDED_MONTH_RATIONALE.get(month, 'manually excluded by --exclude-month')}")
+    print()
+
+
 def print_cost_table(title: str, rows: Sequence[MonthlyCostRow], candidate_label: str) -> None:
     if not rows:
         print(f"{title}: SKIP - no rows")
@@ -495,6 +515,13 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--total-eur-pct-tolerance", type=float, default=5.0, help="Allowed total cost delta percent.")
     parser.add_argument("--vrm-monthly-pct-tolerance", type=float, default=3.0, help="Allowed max monthly VRM-vs-VM energy delta percent.")
     parser.add_argument("--vrm-total-pct-tolerance", type=float, default=2.0, help="Allowed total VRM-vs-VM energy delta percent.")
+    parser.add_argument(
+        "--require-cache",
+        action="append",
+        choices=("tibber-vm", "tibber-influx", "vrm", "vrm-vm"),
+        default=[],
+        help="Turn a missing cache/comparison into CHECK. Repeat for multiple required inputs.",
+    )
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of text tables.")
     return parser.parse_args(argv)
 
@@ -507,6 +534,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     tibber_influx_path = path_or_none(args.tibber_influx_csv, default_tibber_influx_csv())
     vrm_path = path_or_none(args.vrm_json, default_vrm_json())
     vm_base_url = args.vm_base_url or os.environ.get("VM_BASE_URL", "")
+    required_caches = tuple(sorted(set(args.require_cache or [])))
 
     checks: List[CheckResult] = []
     tibber_vm_rows: List[MonthlyCostRow] = []
@@ -527,7 +555,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             )
         )
     else:
-        checks.append(CheckResult("Tibber vs VM", "SKIP", "no local Tibber/VM JSON cache found"))
+        checks.append(required_status("Tibber vs VM", "SKIP", "no local Tibber/VM JSON cache found", "tibber-vm", required_caches))
 
     if tibber_influx_path and tibber_influx_path.exists():
         tibber_influx_rows = load_tibber_influx_months(tibber_influx_path, excluded_months)
@@ -542,16 +570,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             )
         )
     else:
-        checks.append(CheckResult("Tibber vs Influx", "SKIP", "no local Tibber/Influx CSV cache found"))
+        checks.append(
+            required_status("Tibber vs Influx", "SKIP", "no local Tibber/Influx CSV cache found", "tibber-influx", required_caches)
+        )
 
     if vrm_path and vrm_path.exists():
         vrm_rows = load_vrm_rows(vrm_path, excluded_months)
-        checks.append(CheckResult("VRM cache", "OK" if vrm_rows else "SKIP", f"rows={len(vrm_rows)}"))
+        checks.append(required_status("VRM cache", "OK" if vrm_rows else "SKIP", f"rows={len(vrm_rows)}", "vrm", required_caches))
         if vm_base_url:
             vrm_vm_rows = build_vrm_vm_months(vrm_rows, vm_base_url, args.timezone)
             checks.append(evaluate_vrm_rows(vrm_vm_rows, args.vrm_monthly_pct_tolerance, args.vrm_total_pct_tolerance))
+        elif "vrm-vm" in required_caches:
+            checks.append(CheckResult("VRM vs VM", "CHECK", "--require-cache vrm-vm needs --vm-base-url or VM_BASE_URL"))
     else:
-        checks.append(CheckResult("VRM cache", "SKIP", "no local VRM JSON cache found"))
+        checks.append(required_status("VRM cache", "SKIP", "no local VRM JSON cache found", "vrm", required_caches))
+        if "vrm-vm" in required_caches:
+            checks.append(CheckResult("VRM vs VM", "CHECK", "--require-cache vrm-vm needs a VRM cache and --vm-base-url/VM_BASE_URL"))
 
     if args.json:
         print(
@@ -560,6 +594,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     "script": {"name": SCRIPT_NAME, "version": SCRIPT_VERSION, "last_modified": SCRIPT_LAST_MODIFIED},
                     "generated_at": local_timestamp(),
                     "excluded_months": list(excluded_months),
+                    "excluded_month_rationale": {month: EXCLUDED_MONTH_RATIONALE.get(month, "") for month in excluded_months},
+                    "required_caches": list(required_caches),
                     "inputs": {
                         "tibber_vm_json": str(tibber_vm_path) if tibber_vm_path else None,
                         "tibber_influx_csv": str(tibber_influx_path) if tibber_influx_path else None,
@@ -583,7 +619,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Last modified: {SCRIPT_LAST_MODIFIED}")
         print(f"Run at:        {local_timestamp()}")
         print(f"Excluded:      {', '.join(excluded_months) if excluded_months else '-'}")
+        print(f"Required:      {', '.join(required_caches) if required_caches else '-'}")
         print()
+        print_exclusion_rationale(excluded_months)
         print_cost_table("Tibber vs VM rollup costs", tibber_vm_rows, "VM")
         print_cost_table("Tibber vs Influx dashboard costs", tibber_influx_rows, "Influx")
         print_vrm_summary(vrm_rows)

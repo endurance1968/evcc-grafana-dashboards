@@ -29,6 +29,24 @@ class EnergyComparisonValidationTests(unittest.TestCase):
         self.assertEqual(total.candidate_kwh, 101.0)
         self.assertEqual(total.delta_kwh, 1.0)
 
+    def test_default_exclusions_include_documented_april_and_october_anomalies(self):
+        self.assertIn("2025-04", VALIDATE_MODULE.DEFAULT_EXCLUDED_MONTHS)
+        self.assertIn("2025-10", VALIDATE_MODULE.DEFAULT_EXCLUDED_MONTHS)
+        self.assertIn("transition anomaly", VALIDATE_MODULE.EXCLUDED_MONTH_RATIONALE["2025-04"])
+        self.assertIn("billing/import anomaly", VALIDATE_MODULE.EXCLUDED_MONTH_RATIONALE["2025-10"])
+
+    def test_required_cache_turns_missing_optional_cache_into_check(self):
+        result = VALIDATE_MODULE.required_status(
+            "Tibber vs VM",
+            "SKIP",
+            "no local cache",
+            "tibber-vm",
+            ("tibber-vm",),
+        )
+
+        self.assertEqual(result.status, "CHECK")
+        self.assertIn("--require-cache tibber-vm", result.details)
+
     def test_tibber_influx_csv_reads_decimal_comma_values(self):
         rows = VALIDATE_MODULE.load_tibber_influx_months(FIXTURE_DIR / "tibber-influx.csv", ())
 

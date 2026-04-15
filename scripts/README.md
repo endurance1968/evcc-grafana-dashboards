@@ -143,10 +143,21 @@ python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/targ
 Validate cached external energy comparison snapshots after rollup or dashboard-cost changes:
 
 ```bash
-python3 scripts/helper/validate_energy_comparison.py
+npm run test:energy-validation
 ```
 
-This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months such as `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, and VRM cache summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals against live VM rollups.
+This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months `2025-04` and `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, and VRM cache summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals against live VM rollups.
+
+For a strict private validation job on a runner that has refreshed cache snapshots, use:
+
+```bash
+npm run test:energy-validation -- \
+  --require-cache tibber-vm \
+  --require-cache tibber-influx \
+  --require-cache vrm
+```
+
+Add `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` when the runner also has access to a VM instance with rollups. Without `--require-cache`, missing private caches are reported as `SKIP` so the command remains safe for public CI and fresh developer checkouts.
 
 Execute every MetricsQL panel target from the VM originals against VictoriaMetrics after Grafana macro and variable substitution:
 
