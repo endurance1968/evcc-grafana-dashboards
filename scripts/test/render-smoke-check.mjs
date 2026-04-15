@@ -1,8 +1,8 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.04.14.1
- * Last modified: 2026-04-14
+ * Version: 2026.04.15.1
+ * Last modified: 2026-04-15
  */
 import path from "node:path";
 import { chromium } from "playwright";
@@ -23,6 +23,9 @@ const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-set.j
 const orgId = optionalEnv("GRAFANA_ORG_ID", "1");
 const waitMs = Number(parseArg("wait-ms", optionalEnv("GRAFANA_RENDER_SMOKE_WAIT_MS", optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500"))));
 const failNoData = parseArg("fail-no-data", "true") !== "false";
+const failQueryErrors = parseArg("fail-query-errors", "true") !== "false";
+const failPageErrors = parseArg("fail-page-errors", "false") === "true";
+const requireCriticalPanels = parseArg("require-critical-panels", "true") !== "false";
 
 const renderedErrorTexts = [
   "No numeric fields found",
@@ -32,11 +35,18 @@ const renderedErrorTexts = [
   "Datasource named",
   "Datasource was not found",
   "Templating init failed",
+  "Query error",
+  "parse error",
+  "execution error",
+  "bad_data",
+  "An unexpected error happened",
 ];
 
 const emptyPanelTexts = [
   "No data",
   "No series",
+  "No fields found",
+  "No value",
 ];
 
 const criticalPanelsByFile = {
@@ -146,6 +156,59 @@ function findTextHits(text, candidates) {
   return candidates.filter((candidate) => text.includes(candidate));
 }
 
+function isGrafanaDataRequest(url) {
+  return (
+    url.includes("/api/ds/query") ||
+    url.includes("/api/tsdb/query") ||
+    url.includes("/api/datasources/proxy")
+  );
+}
+
+async function withPageDiagnostics(page, action) {
+  const diagnostics = [];
+  const onResponse = (response) => {
+    if (!failQueryErrors || response.status() < 400 || !isGrafanaDataRequest(response.url())) {
+      return;
+    }
+    diagnostics.push(`HTTP ${response.status()} ${response.url()}`);
+  };
+  const onRequestFailed = (request) => {
+    if (!failQueryErrors || !isGrafanaDataRequest(request.url())) {
+      return;
+    }
+    const failure = request.failure();
+    diagnostics.push(`request failed ${request.url()}: ${failure?.errorText || "unknown error"}`);
+  };
+  const onPageError = (error) => {
+    if (!failPageErrors) {
+      return;
+    }
+    diagnostics.push(`browser page error: ${error.message || error}`);
+  };
+
+  page.on("response", onResponse);
+  page.on("requestfailed", onRequestFailed);
+  page.on("pageerror", onPageError);
+  try {
+    const result = await action();
+    return { result, diagnostics };
+  } finally {
+    page.off("response", onResponse);
+    page.off("requestfailed", onRequestFailed);
+    page.off("pageerror", onPageError);
+  }
+}
+
+async function waitForDashboardSettled(page) {
+  await page.waitForTimeout(waitMs);
+  try {
+    await page.waitForLoadState("networkidle", { timeout: 5000 });
+  } catch {
+    // Grafana keeps some long-polling/background requests open. The fixed wait
+    // above is the primary settling mechanism; networkidle is best-effort.
+  }
+}
+
 async function login(page) {
   await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded" });
   await page.fill('input[name="user"]', username);
@@ -158,18 +221,28 @@ async function login(page) {
 async function pageState(page) {
   return page.evaluate(() => {
     const bodyText = (document.body?.textContent || "").replace(/\s+/g, " ").trim();
+    const numericMatches = bodyText.match(/[-+]?\d+(?:[.,]\d+)?\s*(?:kWh|MWh|Wh|kW|W|%|€|ct|km|A|kWh\/kWp)?/g) || [];
     return {
       text: bodyText,
       panelCount: document.querySelectorAll(".react-grid-item").length,
       canvasCount: document.querySelectorAll("canvas").length,
       svgCount: document.querySelectorAll("svg").length,
+      tableRowCount: document.querySelectorAll("tbody tr, [role='row']").length,
+      alertCount: document.querySelectorAll("[role='alert']").length,
+      loadingCount: [...document.querySelectorAll("*")].filter((node) => (node.textContent || "").trim() === "Loading...").length,
+      numericTextCount: numericMatches.length,
     };
   });
 }
 
 async function checkFullDashboard(page, dashboard) {
-  await page.goto(dashboardUrl(dashboard), { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(waitMs);
+  const { diagnostics } = await withPageDiagnostics(page, async () => {
+    await page.goto(dashboardUrl(dashboard), { waitUntil: "domcontentloaded" });
+    await waitForDashboardSettled(page);
+  });
+  if (diagnostics.length > 0) {
+    throw new Error(`dashboard data request error(s): ${diagnostics.slice(0, 3).join(" | ")}`);
+  }
   const state = await pageState(page);
   const errorHits = findTextHits(state.text, renderedErrorTexts);
   if (errorHits.length > 0) {
@@ -178,11 +251,19 @@ async function checkFullDashboard(page, dashboard) {
   if (state.panelCount === 0) {
     throw new Error("rendered dashboard contains no panel grid items");
   }
+  if (state.alertCount > 0) {
+    throw new Error(`rendered dashboard contains ${state.alertCount} alert element(s)`);
+  }
 }
 
 async function checkSoloPanel(page, dashboard, panel) {
-  await page.goto(panelUrl(dashboard, panel.id), { waitUntil: "domcontentloaded" });
-  await page.waitForTimeout(waitMs);
+  const { diagnostics } = await withPageDiagnostics(page, async () => {
+    await page.goto(panelUrl(dashboard, panel.id), { waitUntil: "domcontentloaded" });
+    await waitForDashboardSettled(page);
+  });
+  if (diagnostics.length > 0) {
+    throw new Error(`panel ${panel.id} '${panel.title}' data request error(s): ${diagnostics.slice(0, 3).join(" | ")}`);
+  }
   const state = await pageState(page);
   const errorHits = findTextHits(state.text, renderedErrorTexts);
   if (errorHits.length > 0) {
@@ -192,8 +273,17 @@ async function checkSoloPanel(page, dashboard, panel) {
   if (failNoData && emptyHits.length > 0) {
     throw new Error(`panel ${panel.id} '${panel.title}' rendered empty state(s): ${emptyHits.join(", ")}`);
   }
-  if (state.canvasCount + state.svgCount === 0 && state.text.length < 20) {
-    throw new Error(`panel ${panel.id} '${panel.title}' rendered without detectable content`);
+  if (state.alertCount > 0) {
+    throw new Error(`panel ${panel.id} '${panel.title}' contains ${state.alertCount} alert element(s)`);
+  }
+  if (state.loadingCount > 0) {
+    throw new Error(`panel ${panel.id} '${panel.title}' still shows loading text after ${waitMs}ms`);
+  }
+  if (state.canvasCount + state.svgCount + state.tableRowCount === 0 && state.numericTextCount === 0) {
+    throw new Error(
+      `panel ${panel.id} '${panel.title}' rendered without visual/table/numeric content ` +
+      `(canvas=${state.canvasCount}, svg=${state.svgCount}, rows=${state.tableRowCount}, numbers=${state.numericTextCount})`,
+    );
   }
 }
 
@@ -213,6 +303,9 @@ async function main() {
       const fileName = sourceFileName(dashboard);
       const criticalPanels = criticalPanelsByFile[fileName] || [];
       try {
+        if (requireCriticalPanels && criticalPanels.length === 0) {
+          throw new Error(`no critical panel rules configured for source file '${fileName}'`);
+        }
         await checkFullDashboard(page, dashboard);
         for (const panel of criticalPanels) {
           await checkSoloPanel(page, dashboard, panel);

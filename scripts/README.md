@@ -164,6 +164,14 @@ npm run test:query-readback
 npm run test:rollup-e2e
 ```
 
+For browser-level Grafana rendering, run the suite with render smoke enabled after importing dashboards:
+
+```bash
+node scripts/test/run-suite.mjs --family=vm --env=.env.local --render-smoke=true
+```
+
+`render-smoke-check.mjs` fails on Grafana datasource/query HTTP errors, known panel error texts, empty critical panels, stuck loading states, and critical panels that render without visual, table, or numeric content. Use `--fail-no-data=false` only when intentionally checking layout/rendering against incomplete test data.
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.
