@@ -156,6 +156,14 @@ npm run test:query-readback
 
 The default command starts a disposable empty VictoriaMetrics container. Empty data is intentional here: the check verifies query syntax, dashboard macros, and unsupported Influx/Grafana leftovers. Use `node scripts/test/dashboard-query-readback.mjs --base-url http://127.0.0.1:8428` to run against an existing VM instead.
 
+The Forgejo CI workflow runs the deterministic checks plus both Docker-backed VM checks:
+
+```bash
+npm run test:ci
+npm run test:query-readback
+npm run test:rollup-e2e
+```
+
 ## Configuration
 
 The example config uses INI format so it works with Python standard library only.

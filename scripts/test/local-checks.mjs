@@ -1,7 +1,7 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.14.4
+ * Version: 2026.04.15.1
  * Last modified: 2026-04-14
  */
 import fs from "node:fs";
@@ -22,7 +22,7 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.14.4 (last modified 2026-04-14)");
+  console.log("local-checks.mjs v2026.04.15.1 (last modified 2026-04-15)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -158,6 +158,13 @@ function runOptionalBashSyntaxChecks() {
 function main() {
   logHeader();
   const jsOnly = process.argv.includes("--js-only");
+  const rollupE2eOnly = process.argv.includes("--rollup-e2e");
+  if (rollupE2eOnly) {
+    const python = findPython();
+    run(python, ["scripts/test/rollup-e2e.py", "--docker"]);
+    console.log("\nRollup E2E check passed.");
+    return;
+  }
   if (jsOnly) {
     runNodeSyntaxChecks();
     validateDashboardJson();

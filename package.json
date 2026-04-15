@@ -9,7 +9,9 @@
   },
   "scripts": {
     "test": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test/local-checks.ps1",
-    "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker"
+    "test:ci": "node scripts/test/local-checks.mjs",
+    "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker",
+    "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e"
   },
   "repository": {
     "type": "git",
