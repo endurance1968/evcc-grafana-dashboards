@@ -1,7 +1,7 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.04.15.2
+ * Version: 2026.04.15.4
  * Last modified: 2026-04-15
  */
 import { spawnSync } from "node:child_process";
@@ -160,11 +160,15 @@ function localLabels(date) {
 
 function uniqueDays(now) {
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  const yearStart = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
   const allTimeStart = new Date(Date.UTC(Math.max(2025, now.getUTCFullYear() - 1), 0, 1));
-  const yesterday = new Date(today.getTime() - 86400000);
-  const days = [allTimeStart, yearStart, monthStart, yesterday, today];
+  const days = [];
+  for (let day = allTimeStart; day <= today; day = new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth() + 1, 1))) {
+    days.push(new Date(day));
+  }
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+  for (let day = monthStart; day <= today; day = new Date(day.getTime() + 86400000)) {
+    days.push(new Date(day));
+  }
   return [...new Map(days.map((day) => [day.toISOString().slice(0, 10), day])).values()].sort((a, b) => a - b);
 }
 
@@ -177,6 +181,30 @@ function addSeries(series, metric, labels, values) {
     values: values.map((item) => item.value),
     timestamps: values.map((item) => item.timestamp),
   });
+}
+
+function addDailyRollupSeries(series, metric, labels, days, valueForDay) {
+  const groups = new Map();
+  for (const [index, day] of days.entries()) {
+    const groupLabels = { ...labels, ...localLabels(day) };
+    const key = JSON.stringify(groupLabels);
+    if (!groups.has(key)) {
+      groups.set(key, { labels: groupLabels, values: [] });
+    }
+    groups.get(key).values.push({
+      timestamp: toMs(day),
+      value: valueForDay(day, index),
+    });
+  }
+  for (const group of groups.values()) {
+    addSeries(series, metric, group.labels, group.values);
+  }
+}
+
+function dailyShape(base, day, index) {
+  const monthFactor = 1 + (day.getUTCMonth() % 4) * 0.04;
+  const dayFactor = 1 + (index % 7) * 0.01;
+  return Math.round(base * monthFactor * dayFactor * 1000) / 1000;
 }
 
 function fixtureSeries(now) {
@@ -194,23 +222,36 @@ function fixtureSeries(now) {
     ["evcc_aux_energy_daily_wh", { title: "Aux" }, 500],
     ["evcc_battery_charge_daily_wh", {}, 1800],
     ["evcc_battery_discharge_daily_wh", {}, 900],
+    ["evcc_battery_soc_daily_min_pct", {}, 35],
+    ["evcc_battery_soc_daily_max_pct", {}, 95],
+    ["evcc_grid_import_price_avg_daily_ct_per_kwh", {}, 30],
+    ["evcc_grid_import_price_effective_daily_ct_per_kwh", {}, 31],
+    ["evcc_grid_import_price_min_daily_ct_per_kwh", {}, 22],
+    ["evcc_grid_import_price_max_daily_ct_per_kwh", {}, 42],
+    ["evcc_loadpoint_energy_from_pv_daily_wh", { loadpoint: "LP1" }, 1400],
+    ["evcc_loadpoint_energy_from_battery_daily_wh", { loadpoint: "LP1" }, 400],
+    ["evcc_loadpoint_energy_from_grid_daily_wh", { loadpoint: "LP1" }, 600],
+    ["evcc_loadpoint_energy_from_pv_daily_wh", { loadpoint: "Heat pump" }, 700],
+    ["evcc_loadpoint_energy_from_battery_daily_wh", { loadpoint: "Heat pump" }, 200],
+    ["evcc_loadpoint_energy_from_grid_daily_wh", { loadpoint: "Heat pump" }, 1100],
+    ["evcc_vehicle_energy_daily_wh", { vehicle: "EV1" }, 9000],
+    ["evcc_vehicle_distance_daily_km", { vehicle: "EV1" }, 45],
+    ["evcc_vehicle_charge_cost_daily_eur", { vehicle: "EV1" }, 2.1],
+    ["evcc_potential_vehicle_charge_cost_daily_eur", { vehicle: "EV1" }, 4.5],
+    ["evcc_potential_home_cost_daily_eur", {}, 3.6],
+    ["evcc_potential_loadpoint_cost_daily_eur", {}, 1.2],
+    ["evcc_battery_discharge_value_daily_eur", {}, 0.27],
+    ["evcc_battery_charge_feedin_cost_daily_eur", {}, 0.14],
   ];
 
   for (const [metric, labels, value] of dailyValues) {
-    addSeries(
-      series,
-      metric,
-      labels,
-      days.map((day) => ({
-        timestamp: toMs(day),
-        value,
-      })).map((item, index) => ({
-        timestamp: item.timestamp,
-        value: index % 2 === 0 ? value : value * 1.1,
-      })),
-    );
-    Object.assign(series[series.length - 1].metric, localLabels(days[days.length - 1]));
+    addDailyRollupSeries(series, metric, labels, days, (day, index) => dailyShape(value, day, index));
   }
+
+  const yearlyDays = [...new Map(days.map((day) => [day.getUTCFullYear(), new Date(Date.UTC(day.getUTCFullYear(), 0, 1))])).values()];
+  addDailyRollupSeries(series, "evcc_pv_top30_mean_yearly_wh", {}, yearlyDays, (day, index) => dailyShape(28000, day, index));
+  const monthStartDays = [...new Map(days.map((day) => [`${day.getUTCFullYear()}-${day.getUTCMonth()}`, new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), 1))])).values()];
+  addDailyRollupSeries(series, "evcc_pv_top5_mean_monthly_wh", {}, monthStartDays, (day, index) => dailyShape(30000, day, index));
 
   const rawStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   const rawStepMs = 5 * 60 * 1000;
@@ -225,14 +266,32 @@ function fixtureSeries(now) {
   addSeries(series, "pvPower_value", { id: "", title: "Gesamt" }, rawValues(5000));
   addSeries(series, "pvPower_value", { id: "pv1", title: "PV 1" }, rawValues(2200));
   addSeries(series, "pvPower_value", { id: "pv2", title: "PV 2" }, rawValues(1800));
+  addSeries(series, "pvPower_value", { id: "pv3", title: "" }, rawValues(900));
   addSeries(series, "gridPower_value", {}, rawValues(800));
   addSeries(series, "homePower_value", {}, rawValues(-1600));
   addSeries(series, "batteryPower_value", { id: "" }, rawValues(400));
+  addSeries(series, "batterySoc_value", { id: "", title: "Total" }, rawValues(76));
+  addSeries(series, "batterySoc_value", { id: "bat1", title: "Battery" }, rawValues(80));
   addSeries(series, "chargePower_value", { loadpoint: "LP1" }, rawValues(-700));
   addSeries(series, "tariffSolar_value", {}, rawValues(6500));
+  addSeries(series, "tariffGrid_value", {}, rawValues(0.3));
+  addSeries(series, "tariffFeedIn_value", {}, rawValues(0.08));
+  addSeries(series, "tariffCo2_value", {}, rawValues(320));
+  addSeries(series, "extPower_value", { title: "Server" }, rawValues(350));
+  addSeries(series, "extPower_value", { title: "KWL" }, rawValues(180));
+  addSeries(series, "auxPower_value", { title: "Aux" }, rawValues(90));
+  addSeries(series, "gridCurrents_l1", {}, rawValues(2));
+  addSeries(series, "gridCurrents_l2", {}, rawValues(3));
+  addSeries(series, "gridCurrents_l3", {}, rawValues(4));
+  addSeries(series, "gridPowers_l1", {}, rawValues(250));
+  addSeries(series, "gridPowers_l2", {}, rawValues(270));
+  addSeries(series, "gridPowers_l3", {}, rawValues(280));
   addSeries(series, "chargeCurrents_l1", { loadpoint: "LP1" }, rawValues(6));
   addSeries(series, "chargeCurrents_l2", { loadpoint: "LP1" }, rawValues(6));
   addSeries(series, "chargeCurrents_l3", { loadpoint: "LP1" }, rawValues(6));
+  addSeries(series, "vehicleOdometer_value", { vehicle: "EV1" }, rawValues(12345));
+  addSeries(series, "sessionPricePerKWh_value", { vehicle: "EV1" }, rawValues(0.25));
+  addSeries(series, "sessionSolarPercentage_value", { vehicle: "EV1" }, rawValues(65));
   return series;
 }
 
@@ -368,7 +427,7 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.04.15.2");
+    console.log("Version:       2026.04.15.4");
     console.log("Last modified: 2026-04-15");
     console.log("");
     console.log("Result");

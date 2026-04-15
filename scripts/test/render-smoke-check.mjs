@@ -1,7 +1,7 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.04.15.4
+ * Version: 2026.04.15.7
  * Last modified: 2026-04-15
  */
 import path from "node:path";
@@ -54,29 +54,58 @@ const emptyPanelTexts = [
 const criticalPanelsByFile = {
   "VM_ EVCC_ All-time.json": [
     { id: 12, title: "Energy totals" },
+    { id: 19, title: "Yearly yield" },
+    { id: 55, title: "Average yearly specific yield" },
     { id: 24, title: "Metric gauges" },
+    { id: 16, title: "Battery summary" },
     { id: 28, title: "Monthly costs" },
+    { id: 47, title: "Power balance" },
     { id: 38, title: "Days with highest yield" },
   ],
   "VM_ EVCC_ Jahr.json": [
     { id: 41, title: "Energy totals" },
     { id: 44, title: "Metric gauges" },
     { id: 47, title: "Energy" },
+    { id: 67, title: "Home: Energy distribution" },
     { id: 66, title: "Home: Energy consumption" },
     { id: 70, title: "Home: Energy distribution" },
+    { id: 65, title: "Power balance" },
+    { id: 54, title: "Dynamic electricity price" },
+    { id: 37, title: "Battery summary" },
+    { id: 50, title: "Battery charge" },
+    { id: 72, title: "Heat pump total" },
+    { id: 74, title: "Charging stations total" },
+    { id: 59, title: "Vehicles" },
   ],
   "VM_ EVCC_ Monat.json": [
     { id: 19, title: "Monthly energy totals" },
     { id: 24, title: "Metric gauges" },
     { id: 25, title: "Energy" },
+    { id: 32, title: "Home: Energy distribution" },
     { id: 31, title: "Home: Energy consumption" },
     { id: 37, title: "Total: Energy distribution" },
+    { id: 30, title: "Power balance" },
+    { id: 26, title: "Dynamic electricity price (ct/kWh)" },
+    { id: 16, title: "Battery summary" },
+    { id: 11, title: "Home battery levels" },
+    { id: 39, title: "Heat pump total" },
+    { id: 41, title: "Charging stations total" },
   ],
   "VM_ EVCC_ Today - Details.json": [
     { id: 2, title: "PV energy" },
+    { id: 12, title: "Battery level" },
+    { id: 13, title: "Battery power" },
     { id: 35, title: "Forecast" },
+    { id: 31, title: "Home: Current power" },
+    { id: 36, title: "Home: Power" },
+    { id: 20, title: "Strompreis" },
+    { id: 24, title: "Costs" },
+    { id: 22, title: "CO2" },
+    { id: 3, title: "Ströme/Phase" },
+    { id: 41, title: "Power/phase" },
     { id: 11, title: "Charge currents/phase", vars: { loadpoint: "LP1" } },
     { id: 15, title: "Phases", vars: { loadpoint: "LP1" } },
+    { id: 14, title: "Charge power", vars: { loadpoint: "LP1" } },
   ],
   "VM_ EVCC_ Today - Mobile.json": [
     { id: 74, title: "Power" },
