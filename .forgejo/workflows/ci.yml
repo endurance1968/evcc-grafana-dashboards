@@ -36,6 +36,11 @@ jobs:
       - name: Static and unit checks
         run: npm run test:ci
 
+      - name: Runner Docker readiness
+        run: |
+          docker version
+          docker info
+
       - name: External energy validation
         shell: bash
         run: |
