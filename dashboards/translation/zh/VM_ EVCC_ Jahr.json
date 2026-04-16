@@ -312,6 +312,19 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
+          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
+          "format": "time_series",
+          "legendFormat": "家庭",
+          "refId": "homeYearly",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "time_series",
           "legendFormat": "光伏发电",
@@ -338,10 +351,10 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "家庭",
-          "refId": "homeYearly",
+          "legendFormat": "馈电",
+          "refId": "feedInYearly",
           "instant": true,
           "range": false
         },
@@ -355,19 +368,6 @@
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "refId": "loadpointYearly",
-          "instant": true,
-          "range": false
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-          "format": "time_series",
-          "legendFormat": "馈电",
-          "refId": "feedInYearly",
           "instant": true,
           "range": false
         }
@@ -2346,7 +2346,7 @@
           "instant": true,
           "range": false,
           "refId": "A",
-          "expr": "WITH (\n  batteryNet = ((sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000,\n  batteryCharge = label_set((batteryNet > 0), \"series\", \"Battery charge\"),\n  batteryDischarge = label_set((batteryNet < 0), \"series\", \"Battery discharge\"),\n  home = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) / 1000, \"loadpoint\", \"series\")\n)\nbatteryCharge or batteryDischarge or home or loadpoints"
+          "expr": "WITH (\n  batteryNet = ((sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) - (sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month))) / 1000,\n  batteryCharge = label_set((batteryNet > 0), \"series\", \"Battery charge\"),\n  batteryDischarge = label_set((batteryNet < 0), \"series\", \"Battery discharge\"),\n  home = label_set((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) / 1000, \"series\", \"Home\"),\n  loadpoints = label_copy((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) / 1000, \"loadpoint\", \"series\")\n)\nhome or sort_by_label(loadpoints, \"series\") or batteryCharge or batteryDischarge"
         }
       ],
       "transformations": [

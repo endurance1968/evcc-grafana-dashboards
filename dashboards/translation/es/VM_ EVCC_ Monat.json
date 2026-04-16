@@ -356,6 +356,20 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "format": "time_series",
+          "legendFormat": "Casa",
+          "range": true,
+          "refId": "homeMonthlyDaily",
+          "hide": true,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
           "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "fotovoltaica",
@@ -384,11 +398,11 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
+          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
-          "legendFormat": "Casa",
+          "legendFormat": "Vertido",
           "range": true,
-          "refId": "homeMonthlyDaily",
+          "refId": "feedInMonthlyDaily",
           "hide": true,
           "interval": "1d"
         },
@@ -408,17 +422,18 @@
         },
         {
           "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
           },
-          "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
-          "format": "time_series",
-          "legendFormat": "Vertido",
-          "range": true,
-          "refId": "feedInMonthlyDaily",
-          "hide": true,
-          "interval": "1d"
+          "expression": "homeMonthlyDaily",
+          "hide": false,
+          "reducer": "sum",
+          "refId": "homeMonthly",
+          "settings": {
+            "mode": "dropNN"
+          },
+          "type": "reduce"
         },
         {
           "datasource": {
@@ -456,10 +471,10 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "homeMonthlyDaily",
+          "expression": "feedInMonthlyDaily",
           "hide": false,
           "reducer": "sum",
-          "refId": "homeMonthly",
+          "refId": "feedInMonthly",
           "settings": {
             "mode": "dropNN"
           },
@@ -475,21 +490,6 @@
           "hide": false,
           "reducer": "sum",
           "refId": "loadpointMonthly",
-          "settings": {
-            "mode": "dropNN"
-          },
-          "type": "reduce"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "feedInMonthlyDaily",
-          "hide": false,
-          "reducer": "sum",
-          "refId": "feedInMonthly",
           "settings": {
             "mode": "dropNN"
           },
@@ -706,6 +706,20 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
+          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
+          "format": "time_series",
+          "legendFormat": "Casa",
+          "range": true,
+          "refId": "homeEnergy",
+          "hide": false,
+          "interval": "1d"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
           "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
           "format": "time_series",
           "legendFormat": "fotovoltaica",
@@ -734,11 +748,11 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
+          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
           "format": "time_series",
-          "legendFormat": "Casa",
+          "legendFormat": "Vertido",
           "range": true,
-          "refId": "homeEnergy",
+          "refId": "feedInEnergy",
           "hide": false,
           "interval": "1d"
         },
@@ -753,20 +767,6 @@
           "legendFormat": "{{loadpoint}}",
           "range": true,
           "refId": "loadpointEnergy",
-          "hide": false,
-          "interval": "1d"
-        },
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
-          "format": "time_series",
-          "legendFormat": "Vertido",
-          "range": true,
-          "refId": "feedInEnergy",
           "hide": false,
           "interval": "1d"
         }

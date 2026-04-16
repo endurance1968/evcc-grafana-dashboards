@@ -295,14 +295,14 @@
       },
       "targets": [
         {
-          "refId": "gridTotal",
+          "refId": "homeTotal",
           "datasource": {
             "type": "victoriametrics-metrics-datasource",
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "电网输入",
+          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
+          "legendFormat": "家庭",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -321,27 +321,14 @@
           "range": false
         },
         {
-          "refId": "homeTotal",
+          "refId": "gridTotal",
           "datasource": {
             "type": "victoriametrics-metrics-datasource",
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "家庭",
-          "format": "time_series",
-          "instant": true,
-          "range": false
-        },
-        {
-          "refId": "loadpointTotals",
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sort_by_label(sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
-          "legendFormat": "{{loadpoint}}",
+          "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
+          "legendFormat": "电网输入",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -355,6 +342,19 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
           "legendFormat": "馈电",
+          "format": "time_series",
+          "instant": true,
+          "range": false
+        },
+        {
+          "refId": "loadpointTotals",
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (loadpoint) / 1000, \"loadpoint\")",
+          "legendFormat": "{{loadpoint}}",
           "format": "time_series",
           "instant": true,
           "range": false
