@@ -17,7 +17,9 @@ Default family:
 - `rollup-e2e.py`: optional disposable VictoriaMetrics rollup read/write/replace end-to-end test
 - `capture-screenshots.mjs`: browser-based screenshot capture
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
-- `local-checks.ps1` / `local-checks.mjs`: local deterministic check runners used by `npm test`
+- `local-checks.mjs`: portable deterministic check runner used by `npm test` and CI
+- `cross-platform-audit.mjs`: guard against Windows-only npm entrypoints and unsafe child-process shell usage
+- `local-checks.ps1`: optional Windows compatibility wrapper; not used by the portable npm entrypoints
 - `cleanup-grafana.mjs`: full cleanup of dashboards and library panels in the Grafana test folder
 - `_lib.mjs`: shared helpers
 
@@ -25,6 +27,27 @@ Localization preparation scripts used before test runs:
 
 - `../localization/generate-localized-dashboards.mjs`
 - `../localization/apply-safe-display-translations.mjs`
+
+## Cross-platform test entrypoints
+
+Use these commands on Windows, Linux, and Forgejo runners:
+
+```bash
+npm test
+npm run test:ci
+npm run test:cross-platform
+npm run test:rollup-path
+```
+
+`npm test` and `npm run test:ci` both use the Node-based runner. They do not require PowerShell. The PowerShell wrapper remains available only for users who intentionally want a Windows-native entrypoint.
+
+Required local tooling for the full validation surface:
+
+- Node.js 22 or newer for the script-based test runners.
+- Python 3.12 or newer, or `PYTHON=/path/to/python`, for helper compile checks and rollup tests.
+- Docker with local port publishing for query readback, render E2E, and rollup E2E.
+- Playwright Chromium browser dependencies for render smoke checks; `npx playwright install --with-deps chromium` is used in Linux CI.
+- Bash or Git Bash for deploy shell syntax checks. On Windows this check is skipped if Bash is not available.
 
 ## Required environment
 

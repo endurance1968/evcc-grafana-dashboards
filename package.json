@@ -8,7 +8,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/test/local-checks.ps1",
+    "test": "node scripts/test/local-checks.mjs",
     "test:ci": "node scripts/test/local-checks.mjs",
     "test:energy-validation": "node scripts/test/energy-validation.mjs",
     "test:forgejo-actions": "node scripts/test/forgejo-actions-check.mjs",
@@ -16,7 +16,8 @@
     "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker",
     "test:render-e2e": "node scripts/test/render-e2e.mjs",
     "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e",
-    "test:rollup-path": "node scripts/test/rollup-path-check.mjs"
+    "test:rollup-path": "node scripts/test/rollup-path-check.mjs",
+    "test:cross-platform": "node scripts/test/cross-platform-audit.mjs"
   },
   "repository": {
     "type": "git",

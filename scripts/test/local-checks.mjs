@@ -1,8 +1,8 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.15.2
- * Last modified: 2026-04-15
+ * Version: 2026.04.16.2
+ * Last modified: 2026-04-16
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,11 +22,20 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.15.2 (last modified 2026-04-15)");
+  console.log("local-checks.mjs v2026.04.16.2 (last modified 2026-04-16)");
 }
 
 function commandExists(command, args = ["--version"]) {
   const result = spawnSync(command, args, { encoding: "utf8", stdio: "pipe" });
+  return result.status === 0;
+}
+
+function pythonMeetsMinimumVersion(command) {
+  const result = spawnSync(
+    command,
+    ["-c", "import sys; raise SystemExit(0 if sys.version_info >= (3, 12) else 1)"],
+    { encoding: "utf8", stdio: "pipe" },
+  );
   return result.status === 0;
 }
 
@@ -40,11 +49,11 @@ function findPython() {
   ].filter(Boolean);
 
   for (const candidate of candidates) {
-    if (commandExists(candidate)) {
+    if (commandExists(candidate) && pythonMeetsMinimumVersion(candidate)) {
       return candidate;
     }
   }
-  throw new Error("No working Python interpreter found. Set PYTHON to the intended interpreter.");
+  throw new Error("No Python >= 3.12 interpreter found. Set PYTHON to the intended interpreter.");
 }
 
 function run(command, args, options = {}) {
@@ -143,20 +152,36 @@ function runLocalizationIdempotencyCheck() {
   run(process.execPath, ["scripts/test/localization-idempotency-check.mjs", "--family=vm"]);
 }
 
-function runOptionalBashSyntaxChecks() {
-  if (process.platform !== "win32") {
-    run("bash", ["-n", "scripts/deploy-bash.sh"]);
-    run("bash", ["-n", "scripts/deploy-python.sh"]);
-    return;
-  }
+function runCrossPlatformAudit() {
+  run(process.execPath, ["scripts/test/cross-platform-audit.mjs"]);
+}
 
-  const gitBash = "C:\\Program Files\\Git\\bin\\bash.exe";
-  if (!fs.existsSync(gitBash)) {
-    console.log("Skipping bash syntax checks: Git Bash not found.");
+function findBashForSyntaxChecks() {
+  const candidates = [
+    process.env.BASH,
+    "bash",
+    process.platform === "win32" ? "C:\\Program Files\\Git\\bin\\bash.exe" : "",
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (commandExists(candidate)) {
+      return candidate;
+    }
+  }
+  if (process.platform === "win32") {
+    return "";
+  }
+  throw new Error("bash is required for deploy shell syntax checks on non-Windows systems.");
+}
+
+function runOptionalBashSyntaxChecks() {
+  const bash = findBashForSyntaxChecks();
+  if (!bash) {
+    console.log("Skipping bash syntax checks: bash/Git Bash not found.");
     return;
   }
-  run(gitBash, ["-n", "scripts/deploy-bash.sh"]);
-  run(gitBash, ["-n", "scripts/deploy-python.sh"]);
+  run(bash, ["-n", "scripts/deploy-bash.sh"]);
+  run(bash, ["-n", "scripts/deploy-python.sh"]);
 }
 
 function main() {
@@ -174,6 +199,7 @@ function main() {
     validateDashboardJson();
     auditOriginalQueries();
     run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
+    runCrossPlatformAudit();
     runLocalizationIdempotencyCheck();
     console.log("\nLocal JS checks passed.");
     return;
@@ -186,6 +212,7 @@ function main() {
   validateDashboardJson();
   auditOriginalQueries();
   run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
+  runCrossPlatformAudit();
   runLocalizationIdempotencyCheck();
   runOptionalBashSyntaxChecks();
   console.log("\nLocal checks passed.");

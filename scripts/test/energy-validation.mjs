@@ -1,8 +1,8 @@
 /**
  * Script: energy-validation.mjs
  * Purpose: Run the external energy comparison validator with a portable Python interpreter lookup.
- * Version: 2026.04.15.1
- * Last modified: 2026-04-15
+ * Version: 2026.04.16.1
+ * Last modified: 2026-04-16
  */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -11,6 +11,15 @@ const repoRoot = process.cwd();
 
 function commandExists(command, args = ["--version"]) {
   const result = spawnSync(command, args, { encoding: "utf8", stdio: "pipe" });
+  return result.status === 0;
+}
+
+function pythonMeetsMinimumVersion(command) {
+  const result = spawnSync(
+    command,
+    ["-c", "import sys; raise SystemExit(0 if sys.version_info >= (3, 12) else 1)"],
+    { encoding: "utf8", stdio: "pipe" },
+  );
   return result.status === 0;
 }
 
@@ -24,11 +33,11 @@ function findPython() {
   ].filter(Boolean);
 
   for (const candidate of candidates) {
-    if (commandExists(candidate)) {
+    if (commandExists(candidate) && pythonMeetsMinimumVersion(candidate)) {
       return candidate;
     }
   }
-  throw new Error("No working Python interpreter found. Set PYTHON to the intended interpreter.");
+  throw new Error("No Python >= 3.12 interpreter found. Set PYTHON to the intended interpreter.");
 }
 
 function main() {
