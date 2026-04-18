@@ -80,6 +80,10 @@ In Grafana:
 
 For a simple local installation, `Admin` in the current organization is usually enough.
 
+Grafana 12 and 13 both support service-account tokens for the HTTP API. The deployers still use Grafana's `/api` routes because Grafana 13 keeps those routes working; Grafana only marks them as deprecated for a future major release.
+
+If you upgraded from an older Grafana version and deployment fails with `Invalid API key`, create a new service-account token and put that value into `GRAFANA_API_TOKEN`. Old API keys are deprecated and may not survive/migrate the way a service-account token does.
+
 ## 4. Quick start
 
 For a first run, URL and token are normally enough. `purge` controls whether existing EVCC dashboards are deleted before import.
@@ -119,6 +123,24 @@ GRAFANA_URL=http://<your-grafana-ip>:3000
 GRAFANA_API_TOKEN=<your_token>
 ```
 
+Optional authentication settings:
+
+```env
+# default: auto, prefers GRAFANA_API_TOKEN when set
+GRAFANA_AUTH_MODE=auto
+
+# preferred for Grafana 12/13
+GRAFANA_API_TOKEN=<service_account_token>
+
+# optional alias; used if GRAFANA_API_TOKEN is empty
+GRAFANA_SERVICE_ACCOUNT_TOKEN=<service_account_token>
+
+# fallback for local/admin recovery when basic auth is enabled
+# GRAFANA_AUTH_MODE=basic
+# GRAFANA_USER=admin
+# GRAFANA_PASSWORD=<admin_password>
+```
+
 Optional dashboard variable overrides in `vm-dashboard-install.env`:
 
 ```env
@@ -146,6 +168,8 @@ PURGE=true
 ```
 
 Then you can simply run:
+
+With `PURGE=true`, the deployer deletes the known EVCC dashboards first. Referenced library panels are then upserted from the embedded `__elements` definitions before the dashboards are imported again.
 
 ### Linux / Raspberry Pi with the Python deployer
 
@@ -195,6 +219,27 @@ Check:
 - the service account still exists
 - the token is still valid
 - the account can manage dashboards and library panels
+
+### 401 / `Invalid API key`
+
+The deployer reached Grafana, but Grafana rejected the authentication header.
+
+For Grafana 12/13, prefer a fresh service-account token:
+
+1. Open `Administration`
+2. Open `Users and access`
+3. Open `Service accounts`
+4. Create/open a deployer service account
+5. Add a new token
+6. Set `GRAFANA_API_TOKEN=<new_token>`
+
+As a local recovery fallback, if Grafana basic auth is enabled, set:
+
+```env
+GRAFANA_AUTH_MODE=basic
+GRAFANA_USER=admin
+GRAFANA_PASSWORD=<admin_password>
+```
 
 ## More details
 

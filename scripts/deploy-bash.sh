@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 
-SCRIPT_VERSION="2026.04.12.1"
-SCRIPT_LAST_MODIFIED="2026-04-12"
+SCRIPT_VERSION="2026.04.18.3"
+SCRIPT_LAST_MODIFIED="2026-04-18"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -62,7 +62,11 @@ require_cmd curl
 require_cmd jq
 
 GRAFANA_URL="http://localhost:3000"
+GRAFANA_AUTH_MODE="auto"
 GRAFANA_API_TOKEN=""
+GRAFANA_SERVICE_ACCOUNT_TOKEN=""
+GRAFANA_USER=""
+GRAFANA_PASSWORD=""
 GRAFANA_DS_VM_EVCC_UID="vm-evcc"
 GRAFANA_FOLDER_UID="evcc"
 GRAFANA_FOLDER_TITLE="EVCC"
@@ -100,6 +104,9 @@ fi
 if [[ -n "$CLI_TOKEN" ]]; then
   GRAFANA_API_TOKEN="$CLI_TOKEN"
 fi
+if [[ -z "$GRAFANA_API_TOKEN" && -n "${GRAFANA_SERVICE_ACCOUNT_TOKEN:-}" ]]; then
+  GRAFANA_API_TOKEN="$GRAFANA_SERVICE_ACCOUNT_TOKEN"
+fi
 if [[ -n "$CLI_PURGE" ]]; then
   PURGE="$CLI_PURGE"
 fi
@@ -107,14 +114,41 @@ if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
   PURGE="$DEPLOY_PURGE"
 fi
 
-if [[ -z "$GRAFANA_API_TOKEN" ]]; then
-  echo "Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or --token." >&2
-  exit 1
-fi
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" && -z "$DASHBOARD_LOCAL_DIR" ]]; then
   echo "DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local." >&2
   exit 1
 fi
+
+auth_mode() {
+  local mode="${GRAFANA_AUTH_MODE,,}"
+  if [[ -z "$mode" || "$mode" == "auto" ]]; then
+    if [[ -n "$GRAFANA_API_TOKEN" ]]; then
+      printf 'token'
+    elif [[ -n "$GRAFANA_USER" && -n "$GRAFANA_PASSWORD" ]]; then
+      printf 'basic'
+    else
+      printf 'token'
+    fi
+    return
+  fi
+  case "$mode" in
+    token|bearer|service-account|service_account) printf 'token' ;;
+    basic|userpass|user-password) printf 'basic' ;;
+    *)
+      echo "Unsupported GRAFANA_AUTH_MODE '$GRAFANA_AUTH_MODE'. Use auto, token, or basic." >&2
+      exit 1
+      ;;
+  esac
+}
+
+grafana_version() {
+  local out_file="$TMP_DIR/health-version.json"
+  if curl -fsS "${GRAFANA_URL%/}/api/health" -o "$out_file" >/dev/null 2>&1; then
+    jq -r '.version // "unknown"' "$out_file" 2>/dev/null || printf 'unknown'
+  else
+    printf 'unknown'
+  fi
+}
 
 api() {
   local method="$1"
@@ -123,16 +157,33 @@ api() {
   local out_file="$4"
   local status
   local url="${GRAFANA_URL%/}${path}"
+  local auth=()
+  case "$(auth_mode)" in
+    basic)
+      if [[ -z "$GRAFANA_USER" || -z "$GRAFANA_PASSWORD" ]]; then
+        echo "Missing GRAFANA_USER or GRAFANA_PASSWORD for GRAFANA_AUTH_MODE=basic." >&2
+        exit 1
+      fi
+      auth=(-u "$GRAFANA_USER:$GRAFANA_PASSWORD")
+      ;;
+    token)
+      if [[ -z "$GRAFANA_API_TOKEN" ]]; then
+        echo "Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD." >&2
+        exit 1
+      fi
+      auth=(-H "Authorization: Bearer $GRAFANA_API_TOKEN")
+      ;;
+  esac
   if [[ -n "$body_file" ]]; then
     status=$(curl -sS -o "$out_file" -w "%{http_code}" -X "$method" \
-      -H "Authorization: Bearer $GRAFANA_API_TOKEN" \
+      "${auth[@]}" \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       --data-binary "@$body_file" \
       "$url")
   else
     status=$(curl -sS -o "$out_file" -w "%{http_code}" -X "$method" \
-      -H "Authorization: Bearer $GRAFANA_API_TOKEN" \
+      "${auth[@]}" \
       -H "Accept: application/json" \
       "$url")
   fi
@@ -295,12 +346,19 @@ done
 health_out="$TMP_DIR/health.json"
 health_status=$(api GET "/api/search?limit=1" "" "$health_out")
 if [[ "$health_status" -lt 200 || "$health_status" -ge 300 ]]; then
+  if [[ "$health_status" == "401" ]]; then
+    echo "Grafana authentication failed for GET /api/search?limit=1 (401): $(cat "$health_out")" >&2
+    echo "Grafana 13 still supports the legacy /api routes, but API keys are deprecated. Create a Grafana service-account token and set GRAFANA_API_TOKEN, or set GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD." >&2
+    exit 1
+  fi
   echo "Grafana check failed: $(cat "$health_out")" >&2
   exit 1
 fi
 
 echo "Grafana check: OK"
 echo "URL: $GRAFANA_URL"
+echo "Grafana version: $(grafana_version)"
+echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
@@ -370,7 +428,7 @@ if [[ "${PURGE,,}" == "true" ]]; then
   [[ "$found" -eq 1 ]] || echo "- none"
 
   echo
-  echo "Will delete existing library panels before import:"
+  echo "Will ensure referenced library panels before import:"
   found=0
   for lib_file in "$LIB_DIR"/*.json; do
     [[ -e "$lib_file" ]] || continue
@@ -385,7 +443,7 @@ if [[ "${PURGE,,}" == "true" ]]; then
       exit 1
     fi
   done
-  [[ "$found" -eq 1 ]] || echo "- none"
+  [[ "$found" -eq 1 ]] || echo "- none found yet; missing panels will be created"
 fi
 
 echo
@@ -455,52 +513,65 @@ if [[ "${PURGE,,}" == "true" ]]; then
       fi
     fi
   done
-  for lib_file in "$LIB_DIR"/*.json; do
-    [[ -e "$lib_file" ]] || continue
-    uid=$(jq -r '.uid' "$lib_file")
-    purge_out="$TMP_DIR/purge-library.json"
-    status=$(api DELETE "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
-    if [[ "$status" == "404" ]]; then
-      echo "Skipping library panel delete (not found): $(jq -r '.name' "$lib_file") [$uid]"
-    elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
-      echo "Failed to purge library panel $uid: $(cat "$purge_out")" >&2
-      exit 1
-    else
-      echo "Deleted library panel: $(jq -r '.name' "$lib_file") [$uid]"
-    fi
-  done
 fi
 
-if [[ "${PURGE,,}" != "true" ]]; then
-  for lib_file in "$LIB_DIR"/*.json; do
-    [[ -e "$lib_file" ]] || continue
-    uid=$(jq -r '.uid' "$lib_file")
-    existing_out="$TMP_DIR/update-library-existing-$uid.json"
-    status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$existing_out")
-    if [[ "$status" == "200" ]]; then
-      body_file="$TMP_DIR/update-library-$uid.json"
-      jq -n --slurpfile entry "$lib_file" --slurpfile existing "$existing_out" '
-        {
-          name: $entry[0].name,
-          kind: ($entry[0].kind // $existing[0].result.kind // 1),
-          model: $entry[0].model,
-          version: $existing[0].result.version
-        }
-        + (if (($existing[0].result.folderUid // "") != "") then {folderUid: $existing[0].result.folderUid} else {} end)
-      ' > "$body_file"
-      update_out="$TMP_DIR/update-library-$uid.out.json"
-      update_status=$(api PATCH "/api/library-elements/$(urlencode "$uid")" "$body_file" "$update_out")
-      if [[ "$update_status" -lt 200 || "$update_status" -ge 300 ]]; then
-        echo "Failed to update library panel $uid: $(cat "$update_out")" >&2
-        exit 1
-      fi
-      echo "Updated library panel: $(jq -r '.name' "$lib_file") [$uid]"
-    elif [[ "$status" != "404" ]]; then
-      echo "Failed to inspect library panel $uid: $(cat "$existing_out")" >&2
+for lib_file in "$LIB_DIR"/*.json; do
+  [[ -e "$lib_file" ]] || continue
+  uid=$(jq -r '.uid' "$lib_file")
+  existing_out="$TMP_DIR/update-library-existing-$uid.json"
+  status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$existing_out")
+  if [[ "$status" == "200" ]]; then
+    body_file="$TMP_DIR/update-library-$uid.json"
+    jq -n --slurpfile entry "$lib_file" --slurpfile existing "$existing_out" '
+      {
+        name: $entry[0].name,
+        kind: ($entry[0].kind // $existing[0].result.kind // 1),
+        model: $entry[0].model,
+        version: $existing[0].result.version
+      }
+      + (if (($existing[0].result.folderUid // "") != "") then {folderUid: $existing[0].result.folderUid} else {} end)
+    ' > "$body_file"
+    update_out="$TMP_DIR/update-library-$uid.out.json"
+    update_status=$(api PATCH "/api/library-elements/$(urlencode "$uid")" "$body_file" "$update_out")
+    if [[ "$update_status" -lt 200 || "$update_status" -ge 300 ]]; then
+      echo "Failed to update library panel $uid: $(cat "$update_out")" >&2
       exit 1
     fi
-  done
-fi
+    echo "Updated library panel: $(jq -r '.name' "$lib_file") [$uid]"
+  elif [[ "$status" != "404" ]]; then
+    echo "Failed to inspect library panel $uid: $(cat "$existing_out")" >&2
+    exit 1
+  fi
+done
+
+for lib_file in "$LIB_DIR"/*.json; do
+  [[ -e "$lib_file" ]] || continue
+  uid=$(jq -r '.uid' "$lib_file")
+  existing_out="$TMP_DIR/create-library-existing-$uid.json"
+  status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$existing_out")
+  if [[ "$status" == "404" ]]; then
+    body_file="$TMP_DIR/create-library-$uid.json"
+    jq -n --slurpfile entry "$lib_file" --arg folderUid "$GRAFANA_FOLDER_UID" '
+      {
+        uid: $entry[0].uid,
+        name: $entry[0].name,
+        kind: ($entry[0].kind // 1),
+        folderUid: $folderUid,
+        model: $entry[0].model
+      }
+    ' > "$body_file"
+    create_out="$TMP_DIR/create-library-$uid.out.json"
+    create_status=$(api POST "/api/library-elements" "$body_file" "$create_out")
+    if [[ "$create_status" -lt 200 || "$create_status" -ge 300 ]]; then
+      echo "Failed to create library panel $uid: $(cat "$create_out")" >&2
+      exit 1
+    fi
+    echo "Created library panel: $(jq -r '.name' "$lib_file") [$uid]"
+  elif [[ "$status" != "200" ]]; then
+    echo "Failed to inspect library panel $uid: $(cat "$existing_out")" >&2
+    exit 1
+  fi
+done
 
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"

@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
 
-SCRIPT_VERSION="2026.04.12.1"
-SCRIPT_LAST_MODIFIED="2026-04-12"
+SCRIPT_VERSION="2026.04.18.3"
+SCRIPT_LAST_MODIFIED="2026-04-18"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -72,7 +72,11 @@ config_path = Path(sys.argv[1])
 
 settings = {
     "GRAFANA_URL": "http://localhost:3000",
+    "GRAFANA_AUTH_MODE": "auto",
     "GRAFANA_API_TOKEN": "",
+    "GRAFANA_SERVICE_ACCOUNT_TOKEN": "",
+    "GRAFANA_USER": "",
+    "GRAFANA_PASSWORD": "",
     "GRAFANA_DS_VM_EVCC_UID": "vm-evcc",
     "GRAFANA_FOLDER_UID": "evcc",
     "GRAFANA_FOLDER_TITLE": "EVCC",
@@ -121,8 +125,8 @@ if os.environ.get("CLI_YES"):
 if "DEPLOY_PURGE" in settings and "PURGE" not in settings:
     settings["PURGE"] = settings["DEPLOY_PURGE"]
 
-if not settings["GRAFANA_API_TOKEN"]:
-    raise SystemExit("Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or --token.")
+if not settings["GRAFANA_API_TOKEN"] and settings.get("GRAFANA_SERVICE_ACCOUNT_TOKEN"):
+    settings["GRAFANA_API_TOKEN"] = settings["GRAFANA_SERVICE_ACCOUNT_TOKEN"]
 if settings["DASHBOARD_SOURCE_MODE"] == "local" and not settings["DASHBOARD_LOCAL_DIR"]:
     raise SystemExit("DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.")
 
@@ -136,10 +140,46 @@ DASHBOARD_FILES = [
     "VM_ EVCC_ Today - Mobile.json",
 ]
 
+def auth_mode():
+    mode = (settings.get("GRAFANA_AUTH_MODE") or "auto").strip().lower()
+    if mode in ("", "auto"):
+        if settings.get("GRAFANA_API_TOKEN"):
+            return "token"
+        if settings.get("GRAFANA_USER") and settings.get("GRAFANA_PASSWORD"):
+            return "basic"
+        return "token"
+    if mode in ("token", "bearer", "service-account", "service_account"):
+        return "token"
+    if mode in ("basic", "userpass", "user-password"):
+        return "basic"
+    raise SystemExit(f"Unsupported GRAFANA_AUTH_MODE '{settings.get('GRAFANA_AUTH_MODE')}'. Use auto, token, or basic.")
+
+def add_auth_headers(req):
+    mode = auth_mode()
+    if mode == "basic":
+        if not settings.get("GRAFANA_USER") or not settings.get("GRAFANA_PASSWORD"):
+            raise SystemExit("Missing GRAFANA_USER or GRAFANA_PASSWORD for GRAFANA_AUTH_MODE=basic.")
+        import base64
+        raw = f"{settings['GRAFANA_USER']}:{settings['GRAFANA_PASSWORD']}".encode("utf-8")
+        req.add_header("Authorization", f"Basic {base64.b64encode(raw).decode('ascii')}")
+        return
+    if not settings.get("GRAFANA_API_TOKEN"):
+        raise SystemExit("Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.")
+    req.add_header("Authorization", f"Bearer {settings['GRAFANA_API_TOKEN']}")
+
+def grafana_version():
+    url = settings["GRAFANA_URL"].rstrip("/") + "/api/health"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, method="GET"), timeout=10) as resp:
+            payload = json.loads(resp.read().decode("utf-8") or "{}")
+            return payload.get("version") or "unknown"
+    except Exception:
+        return "unknown"
+
 def api(method, path, body=None, allow_404=False):
     url = settings["GRAFANA_URL"].rstrip("/") + path
     req = urllib.request.Request(url, method=method)
-    req.add_header("Authorization", f"Bearer {settings['GRAFANA_API_TOKEN']}")
+    add_auth_headers(req)
     req.add_header("Accept", "application/json")
     data = None
     if body is not None:
@@ -152,7 +192,15 @@ def api(method, path, body=None, allow_404=False):
     except urllib.error.HTTPError as exc:
         if allow_404 and exc.code == 404:
             return None
-        raise RuntimeError(f"{method} {path} failed ({exc.code}): {exc.read().decode('utf-8')}")
+        response = exc.read().decode("utf-8", errors="replace")
+        if exc.code == 401:
+            raise RuntimeError(
+                f"Grafana authentication failed for {method} {path} (401). Response: {response}\n"
+                "Grafana 13 still supports the legacy /api routes, but API keys are deprecated. "
+                "Create a Grafana service-account token and set GRAFANA_API_TOKEN, or set "
+                "GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD."
+            )
+        raise RuntimeError(f"{method} {path} failed ({exc.code}): {response}")
 
 def get_source_text(filename):
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
@@ -283,6 +331,20 @@ def update_library_panel(element, existing):
         body["folderUid"] = folder_uid
     api("PATCH", f"/api/library-elements/{urllib.parse.quote(uid)}", body)
     print(f"Updated library panel: {body['name']} [{uid}]")
+
+def create_library_panel(element):
+    uid = element.get("uid")
+    if not uid:
+        return
+    body = {
+        "uid": uid,
+        "name": element.get("name"),
+        "kind": element.get("kind") or 1,
+        "folderUid": settings["GRAFANA_FOLDER_UID"],
+        "model": replace_ds(element.get("model") or {}),
+    }
+    api("POST", "/api/library-elements", body)
+    print(f"Created library panel: {body['name']} [{uid}]")
 dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
 
@@ -300,6 +362,8 @@ for filename in DASHBOARD_FILES:
 api("GET", "/api/search?limit=1")
 print("Grafana check: OK")
 print(f"URL: {settings['GRAFANA_URL']}")
+print(f"Grafana version: {grafana_version()}")
+print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
 if settings["DASHBOARD_SOURCE_MODE"] == "local":
@@ -360,9 +424,9 @@ if settings["PURGE"].lower() == "true":
             print(f"- {item.get('title')} [{item.get('uid')}]")
 
     print()
-    print("Will delete existing library panels before import:")
+    print("Will ensure referenced library panels before import:")
     if not existing_library:
-        print("- none")
+        print("- none found yet; missing panels will be created")
     else:
         for item in existing_library.values():
             print(f"- {item.get('name')} [{item.get('uid')}]")
@@ -381,11 +445,13 @@ if settings["PURGE"].lower() == "true":
         uid = dashboard["raw"].get("uid")
         if uid:
             delete_and_report("dashboard", dashboard["raw"].get("title"), uid, f"/api/dashboards/uid/{urllib.parse.quote(uid)}")
-    for uid, item in existing_library.items():
-        delete_and_report("library panel", item.get("name"), uid, f"/api/library-elements/{urllib.parse.quote(uid)}")
-else:
-    for uid, item in existing_library.items():
-        update_library_panel(library[uid], item)
+
+for uid, element in sorted(library.items()):
+    if uid in existing_library:
+        update_library_panel(element, existing_library[uid])
+        continue
+    create_library_panel(element)
+
 for dashboard in dashboards:
     body = {
         "dashboard": dashboard["raw"],

@@ -19,14 +19,17 @@ param(
   [string]$githubref,
   [string]$localdir,
   [string]$folderuid,
-  [string]$foldertitle
+  [string]$foldertitle,
+  [string]$authmode,
+  [string]$user,
+  [string]$password
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.04.12.1'
-$ScriptLastModified = '2026-04-12'
+$ScriptVersion = '2026.04.18.6'
+$ScriptLastModified = '2026-04-18'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -53,9 +56,65 @@ function Merge-Setting([hashtable]$Settings, [string]$Key, [object]$Value) {
   $Settings[$Key] = $Value
 }
 
+function Resolve-GrafanaAuthMode {
+  $mode = ([string]$settings.GRAFANA_AUTH_MODE).Trim().ToLowerInvariant()
+  if ([string]::IsNullOrWhiteSpace($mode) -or $mode -eq 'auto') {
+    if (-not [string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_API_TOKEN)) { return 'token' }
+    if (-not [string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_USER) -and -not [string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_PASSWORD)) { return 'basic' }
+    return 'token'
+  }
+  if ($mode -in @('token','bearer','service-account','service_account')) { return 'token' }
+  if ($mode -in @('basic','userpass','user-password')) { return 'basic' }
+  throw "Unsupported GRAFANA_AUTH_MODE '$($settings.GRAFANA_AUTH_MODE)'. Use auto, token, or basic."
+}
+
+function Get-GrafanaHeaders {
+  $headers = @{ Accept = 'application/json' }
+  $mode = Resolve-GrafanaAuthMode
+  if ($mode -eq 'basic') {
+    if ([string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_USER) -or [string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_PASSWORD)) {
+      throw 'Missing GRAFANA_USER or GRAFANA_PASSWORD for GRAFANA_AUTH_MODE=basic.'
+    }
+    $raw = "$($settings.GRAFANA_USER):$($settings.GRAFANA_PASSWORD)"
+    $headers.Authorization = "Basic $([Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($raw)))"
+    return $headers
+  }
+  if ([string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_API_TOKEN)) {
+    throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 use a service-account token, or set GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.'
+  }
+  $headers.Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"
+  return $headers
+}
+
+function Get-ErrorResponseText($ErrorRecord) {
+  try {
+    $response = $ErrorRecord.Exception.Response
+    if ($null -eq $response) { return '' }
+    $stream = $response.GetResponseStream()
+    if ($null -eq $stream) { return '' }
+    $reader = New-Object System.IO.StreamReader($stream)
+    try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+  } catch {
+    return ''
+  }
+}
+
+function Get-GrafanaVersion {
+  $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + '/api/health'
+  try {
+    $response = Invoke-WebRequest -UseBasicParsing -Method Get -Uri $uri
+    if (-not $response.Content) { return 'unknown' }
+    $health = $response.Content | ConvertFrom-Json
+    if ($health.version) { return [string]$health.version }
+  } catch {
+    return 'unknown'
+  }
+  return 'unknown'
+}
+
 function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switch]$Allow404) {
   $uri = ($settings.GRAFANA_URL.TrimEnd('/') ) + $Path
-  $headers = @{ Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"; Accept = 'application/json' }
+  $headers = Get-GrafanaHeaders
   $jsonBody = $null
   $jsonBytes = $null
   if ($null -ne $Body) {
@@ -73,6 +132,10 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
   } catch {
     if ($Allow404 -and $_.Exception.Response -and $_.Exception.Response.StatusCode.value__ -eq 404) {
       return $null
+    }
+    if ($_.Exception.Response -and $_.Exception.Response.StatusCode.value__ -eq 401) {
+      $responseText = Get-ErrorResponseText $_
+      throw "Grafana authentication failed for $Method $Path (401). Response: $responseText`nGrafana 13 still supports the legacy /api routes, but API keys are deprecated. Create a Grafana service-account token and set GRAFANA_API_TOKEN, or set GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD."
     }
     throw
   }
@@ -101,6 +164,39 @@ function Get-SourceFileContent([string]$FileName) {
   return $response.Content
 }
 
+function Convert-JsonNode($Node) {
+  if ($null -eq $Node) { return $null }
+  if ($Node -is [string]) { return $Node }
+  if ($Node -is [System.Collections.IDictionary]) {
+    $out = [ordered]@{}
+    foreach ($key in $Node.Keys) {
+      $out[$key] = Convert-JsonNode $Node[$key]
+    }
+    return [pscustomobject]$out
+  }
+  if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [hashtable]) -and -not ($Node -is [pscustomobject])) {
+    $items = New-Object System.Collections.Generic.List[object]
+    foreach ($item in $Node) {
+      $items.Add((Convert-JsonNode $item))
+    }
+    return ,($items.ToArray())
+  }
+  return $Node
+}
+
+function Parse-JsonDocument([string]$Json) {
+  $command = Get-Command ConvertFrom-Json -ErrorAction Stop
+  if ($command.Parameters.ContainsKey('AsHashtable')) {
+    return Convert-JsonNode ($Json | ConvertFrom-Json -AsHashtable)
+  }
+
+  Add-Type -AssemblyName System.Web.Extensions
+  $serializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+  $serializer.MaxJsonLength = [int]::MaxValue
+  $serializer.RecursionLimit = 512
+  return Convert-JsonNode ($serializer.DeserializeObject($Json))
+}
+
 function Replace-DatasourcePlaceholders($Node) {
   if ($null -eq $Node) { return $Node }
   if ($Node -is [string]) {
@@ -110,7 +206,7 @@ function Replace-DatasourcePlaceholders($Node) {
   if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [hashtable]) -and -not ($Node -is [pscustomobject])) {
     $list = @()
     foreach ($item in $Node) { $list += ,(Replace-DatasourcePlaceholders $item) }
-    return $list
+    return ,$list
   }
   if ($Node -is [hashtable] -or $Node -is [pscustomobject]) {
     $out = @{}
@@ -241,6 +337,19 @@ function Update-LibraryPanel($Element, $Existing) {
   Invoke-GrafanaApi PATCH "/api/library-elements/$([Uri]::EscapeDataString($Element.uid))" $body | Out-Null
   Write-Host "Updated library panel: $($body.name) [$($Element.uid)]" -ForegroundColor Green
 }
+
+function Create-LibraryPanel($Element) {
+  if ($null -eq $Element -or -not $Element.uid) { return }
+  $body = @{
+    uid = $Element.uid
+    name = $Element.name
+    kind = $(if ($Element.kind) { $Element.kind } else { 1 })
+    folderUid = $settings.GRAFANA_FOLDER_UID
+    model = (Replace-DatasourcePlaceholders $Element.model)
+  }
+  Invoke-GrafanaApi POST '/api/library-elements' $body | Out-Null
+  Write-Host "Created library panel: $($body.name) [$($Element.uid)]" -ForegroundColor Green
+}
 function Confirm-Apply() {
   $answer = Read-Host 'Proceed with dashboard deployment? [y/N]'
   return $answer -match '^(y|yes)$'
@@ -248,7 +357,11 @@ function Confirm-Apply() {
 
 $settings = @{
   GRAFANA_URL = 'http://localhost:3000'
+  GRAFANA_AUTH_MODE = 'auto'
   GRAFANA_API_TOKEN = ''
+  GRAFANA_SERVICE_ACCOUNT_TOKEN = ''
+  GRAFANA_USER = ''
+  GRAFANA_PASSWORD = ''
   GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'
   GRAFANA_FOLDER_UID = 'evcc'
   GRAFANA_FOLDER_TITLE = 'EVCC'
@@ -276,13 +389,16 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_API_TOKEN','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
 
 Merge-Setting $settings 'GRAFANA_URL' $url
+Merge-Setting $settings 'GRAFANA_AUTH_MODE' $authmode
 Merge-Setting $settings 'GRAFANA_API_TOKEN' $token
+Merge-Setting $settings 'GRAFANA_USER' $user
+Merge-Setting $settings 'GRAFANA_PASSWORD' $password
 Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_UID' $datasourceuid
 Merge-Setting $settings 'DASHBOARD_LANGUAGE' $language
 Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
@@ -294,10 +410,11 @@ Merge-Setting $settings 'GRAFANA_FOLDER_UID' $folderuid
 Merge-Setting $settings 'GRAFANA_FOLDER_TITLE' $foldertitle
 if ($settings.ContainsKey('DEPLOY_PURGE') -and -not $settings.ContainsKey('PURGE')) { $settings['PURGE'] = $settings['DEPLOY_PURGE'] }
 if (-not [string]::IsNullOrWhiteSpace($purge)) { $settings['PURGE'] = if ($purge -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
+if (-not $settings.GRAFANA_API_TOKEN -and $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN) { $settings.GRAFANA_API_TOKEN = $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN }
 $dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
 
-if (-not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. Set it in the config file, environment, or -token.' }
+if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
 
 $dashboardFiles = @(
@@ -312,7 +429,7 @@ $dashboardFiles = @(
 $dashboards = @()
 $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
-  $raw = (Get-SourceFileContent $fileName) | ConvertFrom-Json
+  $raw = Parse-JsonDocument (Get-SourceFileContent $fileName)
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
   $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
   $raw = Replace-DatasourcePlaceholders $raw
@@ -322,9 +439,12 @@ foreach ($fileName in $dashboardFiles) {
   }
 }
 
+$grafanaVersion = Get-GrafanaVersion
 $null = Invoke-GrafanaApi GET '/api/search?limit=1'
 Write-Host 'Grafana check: OK' -ForegroundColor Green
 Write-Host "URL: $($settings.GRAFANA_URL)"
+Write-Host "Grafana version: $grafanaVersion"
+Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') { Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)" } else { Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)" }
@@ -371,7 +491,7 @@ if ($settings.PURGE -eq 'true') {
   Write-Host 'Will delete existing dashboards before import:'
   if ($existingDashboards.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingDashboards) { Write-Host "- $($item.title) [$($item.uid)]" } }
   Write-Host ''
-  Write-Host 'Will delete existing library panels before import:'
+  Write-Host 'Will ensure referenced library panels before import:'
   if ($existingLibrary.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
 }
 
@@ -388,29 +508,23 @@ if ($settings.PURGE -eq 'true') {
       Remove-And-Report 'dashboard' $dashboard.raw.title $dashboard.raw.uid "/api/dashboards/uid/$([Uri]::EscapeDataString($dashboard.raw.uid))"
     }
   }
-  foreach ($uid in $existingLibrary.Keys) {
-    $item = $existingLibrary[$uid]
-    Remove-And-Report 'library panel' $item.name $uid "/api/library-elements/$([Uri]::EscapeDataString($uid))"
-  }
-} else {
-  foreach ($uid in $existingLibrary.Keys) {
+}
+
+foreach ($uid in ($libraryElements.Keys | Sort-Object)) {
+  if ($existingLibrary.ContainsKey($uid)) {
     Update-LibraryPanel $libraryElements[$uid] $existingLibrary[$uid]
+    continue
   }
+  Create-LibraryPanel $libraryElements[$uid]
 }
 
 foreach ($dashboard in $dashboards) {
   $body = @{ dashboard = $dashboard.raw; folderUid = $settings.GRAFANA_FOLDER_UID; overwrite = $true; message = 'EVCC VM dashboard install'; inputs = [object[]]@($dashboard.inputs) }
-  $headers = @{ Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"; Accept = 'application/json' }
-  $uri = ($settings.GRAFANA_URL.TrimEnd('/')) + '/api/dashboards/import'
-  $jsonBody = $body | ConvertTo-Json -Depth 100
-  $jsonBytes = [System.Text.Encoding]::UTF8.GetBytes($jsonBody)
   Write-Host "Importing dashboard: $($dashboard.raw.title) [$($dashboard.raw.uid)]"
-  Invoke-WebRequest -UseBasicParsing -Method Post -Uri $uri -Headers $headers -ContentType 'application/json; charset=utf-8' -Body $jsonBytes | Out-Null
+  Invoke-GrafanaApi POST '/api/dashboards/import' $body | Out-Null
   Write-Host "Imported dashboard: $($dashboard.raw.title)"
 }
 
 Write-Host ''
 Write-Host 'Install finished.' -ForegroundColor Green
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
-
-

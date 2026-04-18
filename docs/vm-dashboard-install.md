@@ -14,14 +14,14 @@ This document describes the end-user deployment path for the VictoriaMetrics das
 
 ## Recommended Grafana access
 
-Use a Grafana API token or service-account token with permissions to:
+Use a Grafana service-account token with permissions to:
 
 - create and update folders
 - create and update dashboards
 - create and update library panels
-- delete dashboards and library panels when `PURGE=true`
+- delete dashboards when `PURGE=true`
 
-This is simpler and safer than automating a username and password.
+This is simpler and safer than automating a username and password. Grafana 12 and 13 both support service-account tokens via the `Authorization: Bearer ...` HTTP header. Grafana 13 deprecates the old `/api` route family for a future major release, but does not remove it, so the deployers continue to work with Grafana 12 and 13.
 
 ## Default behavior
 
@@ -35,12 +35,13 @@ The deployer defaults to the generated dashboard set:
 - datasource UID: `vm-evcc`
 - purge before import: `false`
 
-Default is `PURGE=false`, so existing dashboards are overwritten by UID and matching library panels are updated in place. Use `PURGE=true` only when you explicitly want to delete and recreate the known dashboard/library UIDs first.
+Default is `PURGE=false`, so existing dashboards are overwritten by UID and matching library panels are updated in place. Use `PURGE=true` only when you explicitly want to delete the known dashboards first and then rebuild the matching library-panel state from the embedded `__elements` definitions.
 
 When `PURGE=true`, the deployer deletes only:
 
 - the dashboards whose `uid` is present in the six VM dashboard JSON files
-- the library panels whose `uid` is referenced under `__elements` in those same files
+
+After that, the deployer upserts the referenced library panels from the embedded `__elements` definitions and only then imports the dashboards. This mirrors the tested raw import path used in the Grafana render E2E validation.
 
 For most first deployments you only need to set:
 
@@ -73,6 +74,10 @@ and set at least:
 Optional values:
 
 - `GRAFANA_DS_VM_EVCC_UID`
+- `GRAFANA_AUTH_MODE=auto|token|basic`
+- `GRAFANA_SERVICE_ACCOUNT_TOKEN`
+- `GRAFANA_USER`
+- `GRAFANA_PASSWORD`
 - `GRAFANA_FOLDER_UID`
 - `GRAFANA_FOLDER_TITLE`
 - `DASHBOARD_LANGUAGE`
@@ -100,6 +105,8 @@ Optional dashboard variable overrides:
 Example:
 
 ```env
+GRAFANA_AUTH_MODE=auto
+GRAFANA_API_TOKEN=<service_account_token>
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
 DASHBOARD_TARIFF_PRICE_INTERVAL=15m
@@ -111,6 +118,16 @@ DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_EVCC_URL=http://home:7070/#/
 DASHBOARD_PORTAL_TITLE=Solarman
 DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+```
+
+`GRAFANA_API_TOKEN` is the preferred setting for Grafana 12/13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty. If a migrated/old API key fails with `Invalid API key`, generate a new service-account token in Grafana and replace the value.
+
+For local recovery when token auth is unavailable and Grafana basic auth is enabled, you can use:
+
+```env
+GRAFANA_AUTH_MODE=basic
+GRAFANA_USER=admin
+GRAFANA_PASSWORD=<admin_password>
 ```
 
 All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
@@ -202,19 +219,19 @@ sudo apt install jq
 Run:
 
 ```bash
-sh ./deploy-bash.sh
+./deploy-bash.sh
 ```
 
 With an explicit config file:
 
 ```bash
-sh ./deploy-bash.sh --config ./vm-dashboard-install.env
+./deploy-bash.sh --config ./vm-dashboard-install.env
 ```
 
 Or directly with the key values:
 
 ```bash
-sh ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
+./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
 ```
 
 ## Maintainer note
@@ -227,10 +244,3 @@ The Node.js scripts under `scripts/test` remain the maintainer workflow for:
 - smoke checks
 
 End users should prefer the deploy scripts above.
-
-
-
-
-
-
-

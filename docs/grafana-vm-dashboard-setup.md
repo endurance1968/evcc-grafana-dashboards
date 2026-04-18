@@ -104,6 +104,8 @@ In Grafana:
 
 For normal local deployments, `Admin` in the current organization is usually enough.
 
+Grafana 12 and 13 both support service-account tokens for the HTTP API. Grafana 13 marks the old `/api` route family as deprecated for a future major release, but it does not remove those routes. If an upgraded instance reports `Invalid API key`, generate a new service-account token and use that as `GRAFANA_API_TOKEN`.
+
 ## 3. Download the deployer
 
 ### Windows / PowerShell
@@ -149,9 +151,18 @@ Minimal settings:
 
 ```env
 GRAFANA_URL=http://<your-grafana-ip>:3000
+GRAFANA_AUTH_MODE=auto
 GRAFANA_API_TOKEN=<your_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 PURGE=false
+```
+
+Optional authentication fallback for local/admin recovery:
+
+```env
+GRAFANA_AUTH_MODE=basic
+GRAFANA_USER=admin
+GRAFANA_PASSWORD=<admin_password>
 ```
 
 Default values also used by the deployer:
@@ -225,7 +236,8 @@ With `purge=false`:
 
 With `purge=true`:
 
-- known EVCC dashboards and their library panels are deleted first
+- known EVCC dashboards are deleted first
+- then the referenced library panels are upserted from the embedded dashboard definitions
 - then the full set is imported again
 
 ## 6. Verify the result
@@ -340,6 +352,17 @@ Check:
 - the service account still exists
 - the token is still valid
 - the account can manage dashboards, folders, and library panels
+
+### 401 / `Invalid API key`
+
+Grafana rejected the authentication header. After a Grafana upgrade, old API keys can be the problem. Create a new service-account token and set:
+
+```env
+GRAFANA_AUTH_MODE=auto
+GRAFANA_API_TOKEN=<new_service_account_token>
+```
+
+If you need to recover locally and basic auth is enabled, use `GRAFANA_AUTH_MODE=basic` with `GRAFANA_USER` and `GRAFANA_PASSWORD`.
 
 ### Dashboards imported, but empty
 
