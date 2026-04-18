@@ -19,6 +19,7 @@ Default family:
 - `run-suite.mjs`: batch import/smoke/screenshot workflow across all configured sets
 - `local-checks.mjs`: portable deterministic check runner used by `npm test` and CI
 - `cross-platform-audit.mjs`: guard against Windows-only npm entrypoints and unsafe child-process shell usage
+- `powershell-deployer-compat.mjs`: Windows PowerShell 5.1 deployer regression check for JSON parsing, datasource replacement, and single-item-array preservation
 - `local-checks.ps1`: optional Windows compatibility wrapper; not used by the portable npm entrypoints
 - `cleanup-grafana.mjs`: full cleanup of dashboards and library panels in the Grafana test folder
 - `_lib.mjs`: shared helpers
@@ -36,10 +37,11 @@ Use these commands on Windows, Linux, and Forgejo runners:
 npm test
 npm run test:ci
 npm run test:cross-platform
+npm run test:powershell-compat
 npm run test:rollup-path
 ```
 
-`npm test` and `npm run test:ci` both use the Node-based runner. They do not require PowerShell. The PowerShell wrapper remains available only for users who intentionally want a Windows-native entrypoint.
+`npm test` and `npm run test:ci` both use the Node-based runner. They do not require PowerShell as an entrypoint, but on Windows they now execute an internal compatibility check against `powershell.exe` so the native deployer stays compatible with Windows PowerShell 5.1. The PowerShell wrapper remains available only for users who intentionally want a Windows-native entrypoint.
 
 Required local tooling for the full validation surface:
 

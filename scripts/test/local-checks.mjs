@@ -1,8 +1,8 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.16.2
- * Last modified: 2026-04-16
+ * Version: 2026.04.18.1
+ * Last modified: 2026-04-18
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,7 +22,7 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.16.2 (last modified 2026-04-16)");
+  console.log("local-checks.mjs v2026.04.18.1 (last modified 2026-04-18)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -156,6 +156,10 @@ function runCrossPlatformAudit() {
   run(process.execPath, ["scripts/test/cross-platform-audit.mjs"]);
 }
 
+function runPowerShellDeployerCompatCheck() {
+  run(process.execPath, ["scripts/test/powershell-deployer-compat.mjs"]);
+}
+
 function findBashForSyntaxChecks() {
   const candidates = [
     process.env.BASH,
@@ -200,6 +204,7 @@ function main() {
     auditOriginalQueries();
     run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
     runCrossPlatformAudit();
+    runPowerShellDeployerCompatCheck();
     runLocalizationIdempotencyCheck();
     console.log("\nLocal JS checks passed.");
     return;
@@ -213,6 +218,7 @@ function main() {
   auditOriginalQueries();
   run(process.execPath, ["scripts/test/dashboard-semantic-check.mjs"]);
   runCrossPlatformAudit();
+  runPowerShellDeployerCompatCheck();
   runLocalizationIdempotencyCheck();
   runOptionalBashSyntaxChecks();
   console.log("\nLocal checks passed.");
