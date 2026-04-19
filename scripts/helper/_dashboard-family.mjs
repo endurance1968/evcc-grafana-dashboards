@@ -1,41 +1,27 @@
 /**
  * Script: _dashboard-family.mjs
  * Purpose: Shared helper for resolving dashboard family paths, language config, and workflow directories.
- * Version: 2026.04.11.1
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
 
-function normalizeFamilyName(rawFamily = "") {
-  const normalized = String(rawFamily || "").trim().toLowerCase();
-  if (!normalized) {
-    return "";
+function ensureNoLegacyFamilyArg(argv = process.argv) {
+  const legacyArg = argv.find((entry) => entry === "--family" || entry.startsWith("--family="));
+  if (legacyArg) {
+    throw new Error("The --family option was removed. The localization workflow always uses the VM dashboards.");
   }
-  if (normalized === "vm") {
-    return normalized;
-  }
-  throw new Error(`Unknown dashboard family '${rawFamily}'. Use vm.`);
 }
 
-function detectDefaultFamily() {
-  return "vm";
-}
-
-export function parseFamilyArg(argv = process.argv) {
-  const prefix = "--family=";
-  const hit = argv.find((entry) => entry.startsWith(prefix));
-  return hit ? normalizeFamilyName(hit.slice(prefix.length)) : "";
-}
-
-export function resolveDashboardFamily(rawFamily = "") {
-  const familyName = normalizeFamilyName(rawFamily) || detectDefaultFamily();
+export function resolveDashboardFamily() {
+  ensureNoLegacyFamilyArg();
   const dashboardsRoot = path.join(repoRoot, "dashboards");
 
   return {
-    name: familyName,
+    name: "vm",
     tagPrefix: "vm",
     dashboardsRoot,
     sourceRoot: path.join(dashboardsRoot, "src"),

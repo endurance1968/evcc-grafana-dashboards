@@ -71,7 +71,7 @@ Use this flow when the English source dashboards already look correct and you on
 
 ```bash
 git status
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/audit-localization.mjs
 ```
 
 2. Edit the relevant mapping file, for example:
@@ -86,9 +86,9 @@ dashboards/localization/en_to_fr.json
 4. Regenerate and audit:
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs --family=vm
-node scripts/localization/apply-safe-display-translations.mjs --family=vm
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/generate-localized-dashboards.mjs
+node scripts/localization/apply-safe-display-translations.mjs
+node scripts/localization/audit-localization.mjs
 ```
 
 5. Review the diff:
@@ -107,13 +107,13 @@ When source dashboards add new text, the audit writes candidates to `missing-en_
 Preview what would be copied into mapping files:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all
 ```
 
 Write placeholder mappings only when that is intentional:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all --write
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all --write
 ```
 
 This copies candidates as `source -> source`. It is not a translation step. Replace those placeholder values with real target-language text before expecting localized output.
@@ -142,13 +142,13 @@ git diff --check
 Preview stale entries first:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm
+node scripts/localization/prune-mappings-to-source.mjs
 ```
 
 Write the pruned mappings only when intended:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm --write
+node scripts/localization/prune-mappings-to-source.mjs --write
 ```
 
 Pruning is useful after source dashboards have changed and mappings should be aligned to the current source text set.

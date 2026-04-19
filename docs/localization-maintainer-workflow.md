@@ -20,8 +20,8 @@ For translation-only contributor setup, see `docs/translation-contributor-setup.
 2. Rebuild mapping files against the current source set:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm
-node scripts/localization/prune-mappings-to-source.mjs --family=vm --write
+node scripts/localization/prune-mappings-to-source.mjs
+node scripts/localization/prune-mappings-to-source.mjs --write
 ```
 
 The first command is a dry-run. With `--write`, this keeps the mapping files trimmed to the strings that still exist in `src/en` and removes verbose source-tracking metadata from the mapping files so they stay readable.
@@ -38,8 +38,8 @@ Manual path:
 Bulk-accept path:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all --write
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all --write
 ```
 
 The first command is a dry-run. With `--write`, this bulk step only marks current source strings as accepted by copying them into `exact` with the same value. It is useful when you intentionally want full audit coverage first and translation quality refinement later. A human or AI still has to replace those placeholder values with real target-language translations.
@@ -47,19 +47,19 @@ The first command is a dry-run. With `--write`, this bulk step only marks curren
 4. Generate translated dashboards:
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs --family=vm
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 5. Apply the safe display-only pass:
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs --family=vm
+node scripts/localization/apply-safe-display-translations.mjs
 ```
 
 6. Audit remaining untranslated strings:
 
 ```bash
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/audit-localization.mjs
 ```
 
 The audit report includes `exactSources` so you can see which `src/en` dashboard file names still need manual translation work. The audit only finds untranslated places; it does not translate them.

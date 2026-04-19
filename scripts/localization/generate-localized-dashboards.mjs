@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/src/en by using the language mappings.
- * Version: 2026.04.11.2
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,13 +10,12 @@ import {
   familyMappingPath,
   familySourceDir,
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 const translatableKeys = new Set([
   "title",
@@ -149,7 +148,7 @@ function main() {
       count += 1;
     }
 
-    console.log(`Generated ${count} dashboard files for '${targetLanguage}' in family '${family.name}'.`);
+    console.log(`Generated ${count} dashboard files for '${targetLanguage}'.`);
     console.log(`Output: ${path.relative(repoRoot, outDir)}`);
     if (targetLanguage !== sourceLanguage) {
       console.log(

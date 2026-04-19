@@ -18,15 +18,15 @@ Important:
 Rebuild mapping files against the current source dashboards. The first command is a dry-run; add `--write` to modify mapping files:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm
-node scripts/localization/prune-mappings-to-source.mjs --family=vm --write
+node scripts/localization/prune-mappings-to-source.mjs
+node scripts/localization/prune-mappings-to-source.mjs --write
 ```
 
 If you intentionally want to accept every current audit candidate as-is, copy all `missing-*.exact.json` keys into the real mapping files automatically. The first command is a dry-run; add `--write` to modify mapping files:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all --write
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all --write
 ```
 
 This does not translate text. With `--write`, it copies each missing source string into `exact` with the same value so the current source string is treated as accepted coverage. The final wording still has to be written by a human or AI in the target language.
@@ -34,25 +34,25 @@ This does not translate text. With `--write`, it copies each missing source stri
 Generate localized dashboard files for all configured target languages:
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs --family=vm
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 Apply safe display-only translations on generated dashboard files:
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs --family=vm
+node scripts/localization/apply-safe-display-translations.mjs
 ```
 
 Audit missing source-to-target mappings for all configured targets:
 
 ```bash
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/audit-localization.mjs
 ```
 
 Audit one specific target language:
 
 ```bash
-node scripts/localization/audit-localization.mjs --family=vm --target=de
+node scripts/localization/audit-localization.mjs --target=de
 ```
 
 The audit writes `missing-<source>_to_<target>.exact.json` with candidate keys that still need translations and an `exactSources` section that lists the `src/en` dashboard file names where each candidate appears. The audit does not translate them; it only reports what still needs translation.
