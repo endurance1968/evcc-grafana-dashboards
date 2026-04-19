@@ -28,8 +28,8 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.04.18.6'
-$ScriptLastModified = '2026-04-18'
+$ScriptVersion = '2026.04.19.1'
+$ScriptLastModified = '2026-04-19'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -243,6 +243,9 @@ function Get-DashboardBuildMarker() {
   } else {
     "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
   }
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+    return "deployed $timestamp | $source"
+  }
   return "deployed $timestamp | $($settings.DASHBOARD_LANGUAGE)/$($settings.DASHBOARD_VARIANT) | $source"
 }
 
@@ -447,9 +450,13 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
-if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') { Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)" } else { Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)" }
-Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
-Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
+if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+  Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)"
+} else {
+  Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)"
+  Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
+  Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
+}
 Write-Host "Build marker: $dashboardBuildMarker"
 Write-Host "Purge: $($settings.PURGE)"
 $activeDashboardOverrides = @($dashboardOverrides.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) })

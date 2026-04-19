@@ -2,9 +2,8 @@
 # Deploy dashboards to Grafana with the bash installer flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
-
-SCRIPT_VERSION="2026.04.18.3"
-SCRIPT_LAST_MODIFIED="2026-04-18"
+SCRIPT_VERSION="2026.04.19.1"
+SCRIPT_LAST_MODIFIED="2026-04-19"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -234,9 +233,10 @@ dashboard_build_marker() {
   local source
   if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
     source="local:$DASHBOARD_LOCAL_DIR"
-  else
-    source="github:$GITHUB_REPO@$GITHUB_REF"
+    printf 'deployed %s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$source"
+    return
   fi
+  source="github:$GITHUB_REPO@$GITHUB_REF"
   printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$DASHBOARD_LANGUAGE" "$DASHBOARD_VARIANT" "$source"
 }
 
@@ -365,9 +365,9 @@ if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
   echo "Source: local / $DASHBOARD_LOCAL_DIR"
 else
   echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+  echo "Language: $DASHBOARD_LANGUAGE"
+  echo "Variant: $DASHBOARD_VARIANT"
 fi
-echo "Language: $DASHBOARD_LANGUAGE"
-echo "Variant: $DASHBOARD_VARIANT"
 echo "Build marker: $DASHBOARD_BUILD_MARKER"
 echo "Purge: $PURGE"
 print_dashboard_overrides

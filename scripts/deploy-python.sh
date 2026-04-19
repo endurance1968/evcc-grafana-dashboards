@@ -2,9 +2,8 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-
-SCRIPT_VERSION="2026.04.18.3"
-SCRIPT_LAST_MODIFIED="2026-04-18"
+SCRIPT_VERSION="2026.04.19.1"
+SCRIPT_LAST_MODIFIED="2026-04-19"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -244,9 +243,10 @@ def build_dashboard_marker(settings):
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
         source = f"local:{settings['DASHBOARD_LOCAL_DIR']}"
-    else:
-        source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
+        return f"deployed {timestamp} | {source}"
+    source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
     return f"deployed {timestamp} | {settings['DASHBOARD_LANGUAGE']}/{settings['DASHBOARD_VARIANT']} | {source}"
+
 
 
 def build_dashboard_overrides(settings):
@@ -370,8 +370,8 @@ if settings["DASHBOARD_SOURCE_MODE"] == "local":
     print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
 else:
     print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
-print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
-print(f"Variant: {settings['DASHBOARD_VARIANT']}")
+    print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
+    print(f"Variant: {settings['DASHBOARD_VARIANT']}")
 print(f"Build marker: {dashboard_build_marker}")
 print(f"Purge: {settings['PURGE']}")
 active_dashboard_overrides = {k: v for k, v in dashboard_overrides.items() if str(v).strip()}
