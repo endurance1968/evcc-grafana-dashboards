@@ -2,10 +2,6 @@
 
 This folder contains the script-based Grafana validation workflow used to import dashboards, run smoke checks, and create review screenshots.
 
-Default family:
-
-- `vm`
-
 ## Script overview
 
 - `deploy-dashboards.mjs`: high-level deploy workflow for a single language or variant
@@ -100,6 +96,7 @@ Example:
 
 ```bash
 node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/translation/fr --tag=vm-fr-gen --manifest=tests/artifacts/import-manifest-vm-fr-gen.json
+node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/original/en --dashboard-set=tabs --tag=vm-en-tabs --manifest=tests/artifacts/import-manifest-vm-en-tabs.json
 ```
 
 ## smoke-check.mjs
@@ -173,9 +170,9 @@ Useful options:
 Behavior:
 
 - runs localization preparation by default
-- reads the active family's `languages.json`
-- includes the source reference set as `<familyTagPrefix>-original-<sourceLanguage>`
-- includes each generated target folder as `<familyTagPrefix>-<language>-gen`
+- reads the VM `languages.json`
+- includes the source reference set as `<vmTagPrefix>-original-<sourceLanguage>`
+- includes each generated target folder as `<vmTagPrefix>-<language>-gen`
 - when `--screenshots=true`, runs `cleanup-grafana.mjs` before each set
 - by default, runs `cleanup-grafana.mjs` before each set even without screenshots so library panel UIDs cannot collide across languages; pass `--cleanup-between=false` only when you intentionally want all imported sets to remain side by side
 - imports the set
@@ -215,6 +212,7 @@ Supported arguments:
 - `--github-ref=<branch-or-tag>`
 - `--language=<code>`
 - `--variant=orig|generated`
+- `--dashboard-set=default|tabs`
 
 Example local deploy:
 

@@ -2,8 +2,8 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.04.19.1"
-SCRIPT_LAST_MODIFIED="2026-04-19"
+SCRIPT_VERSION="2026.04.20.2"
+SCRIPT_LAST_MODIFIED="2026-04-20"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -11,6 +11,7 @@ CONFIG_PATH="$SCRIPT_DIR/vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
+CLI_DASHBOARD_SET=""
 CLI_YES="false"
 
 while [ "$#" -gt 0 ]; do
@@ -31,13 +32,17 @@ while [ "$#" -gt 0 ]; do
       CLI_PURGE="$2"
       shift 2
       ;;
+    --dashboard-set)
+      CLI_DASHBOARD_SET="$2"
+      shift 2
+      ;;
     --yes|-y)
       CLI_YES="true"
       shift 1
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--yes]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--dashboard-set <name>] [--yes]
 EOF
       exit 0
       ;;
@@ -55,7 +60,7 @@ done
 
 printf '%s v%s (last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_YES
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_DASHBOARD_SET CLI_YES SCRIPT_DIR
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -84,6 +89,7 @@ settings = {
     "GITHUB_REF": "main",
     "DASHBOARD_LANGUAGE": "en",
     "DASHBOARD_VARIANT": "gen",
+    "DASHBOARD_SET": "default",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
     "DASHBOARD_FILTER_PEAK_POWER_LIMIT": "",
@@ -119,6 +125,8 @@ if os.environ.get("CLI_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = os.environ["CLI_TOKEN"]
 if os.environ.get("CLI_PURGE"):
     settings["PURGE"] = os.environ["CLI_PURGE"]
+if os.environ.get("CLI_DASHBOARD_SET"):
+    settings["DASHBOARD_SET"] = os.environ["CLI_DASHBOARD_SET"]
 if os.environ.get("CLI_YES"):
     settings["CLI_YES"] = os.environ["CLI_YES"]
 if "DEPLOY_PURGE" in settings and "PURGE" not in settings:
@@ -130,14 +138,23 @@ if settings["DASHBOARD_SOURCE_MODE"] == "local" and not settings["DASHBOARD_LOCA
     raise SystemExit("DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.")
 
 
-DASHBOARD_FILES = [
-    "VM_ EVCC_ All-time.json",
-    "VM_ EVCC_ Jahr.json",
-    "VM_ EVCC_ Monat.json",
-    "VM_ EVCC_ Today - Details.json",
-    "VM_ EVCC_ Today.json",
-    "VM_ EVCC_ Today - Mobile.json",
-]
+def repo_file_text(relative_path):
+    if settings["DASHBOARD_SOURCE_MODE"] == "local":
+        repo_root = Path(os.environ["SCRIPT_DIR"]).resolve().parent
+        return (repo_root / Path(relative_path)).read_text(encoding="utf-8")
+    url = f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{relative_path}"
+    with urllib.request.urlopen(url) as resp:
+        return resp.read().decode("utf-8")
+
+
+def load_dashboard_files():
+    manifest = json.loads(repo_file_text("dashboards/deploy-manifest.json"))
+    set_name = str(settings.get("DASHBOARD_SET") or manifest.get("defaultSet") or "default").strip() or "default"
+    files = manifest.get("sets", {}).get(set_name) or []
+    if not isinstance(files, list) or not files:
+        raise RuntimeError(f"Dashboard set '{set_name}' not found or empty in dashboards/deploy-manifest.json.")
+    settings["DASHBOARD_SET"] = set_name
+    return [str(file) for file in files]
 
 def auth_mode():
     mode = (settings.get("GRAFANA_AUTH_MODE") or "auto").strip().lower()
@@ -201,12 +218,17 @@ def api(method, path, body=None, allow_404=False):
             )
         raise RuntimeError(f"{method} {path} failed ({exc.code}): {response}")
 
+def get_source_subdir():
+    if settings["DASHBOARD_VARIANT"] == "orig":
+        return f"dashboards/original/{settings['DASHBOARD_LANGUAGE']}"
+    return f"dashboards/translation/{settings['DASHBOARD_LANGUAGE']}"
+
+
 def get_source_text(filename):
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
         return (Path(settings["DASHBOARD_LOCAL_DIR"]) / filename).read_text(encoding="utf-8")
-    subdir = f"dashboards/original/{settings['DASHBOARD_LANGUAGE']}" if settings["DASHBOARD_VARIANT"] == "orig" else f"dashboards/translation/{settings['DASHBOARD_LANGUAGE']}"
     quoted = "/".join(urllib.parse.quote(part) for part in filename.split("/"))
-    url = f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{subdir}/{quoted}"
+    url = f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{get_source_subdir()}/{quoted}"
     with urllib.request.urlopen(url) as resp:
         return resp.read().decode("utf-8")
 
@@ -345,6 +367,8 @@ def create_library_panel(element):
     }
     api("POST", "/api/library-elements", body)
     print(f"Created library panel: {body['name']} [{uid}]")
+DASHBOARD_FILES = load_dashboard_files()
+
 dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
 
@@ -366,6 +390,7 @@ print(f"Grafana version: {grafana_version()}")
 print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
+print(f"Dashboard set: {settings['DASHBOARD_SET']}")
 if settings["DASHBOARD_SOURCE_MODE"] == "local":
     print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
 else:

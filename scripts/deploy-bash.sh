@@ -2,14 +2,16 @@
 # Deploy dashboards to Grafana with the bash installer flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
-SCRIPT_VERSION="2026.04.19.1"
-SCRIPT_LAST_MODIFIED="2026-04-19"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_VERSION="2026.04.20.2"
+SCRIPT_LAST_MODIFIED="2026-04-20"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
+CLI_DASHBOARD_SET=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -29,9 +31,13 @@ while [[ $# -gt 0 ]]; do
       CLI_PURGE="$2"
       shift 2
       ;;
+    --dashboard-set)
+      CLI_DASHBOARD_SET="$2"
+      shift 2
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false]
+Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--dashboard-set <name>]
 Requires: bash, curl, jq
 EOF
       exit 0
@@ -74,6 +80,7 @@ GITHUB_REPO="endurance1968/evcc-grafana-dashboards"
 GITHUB_REF="main"
 DASHBOARD_LANGUAGE="en"
 DASHBOARD_VARIANT="gen"
+DASHBOARD_SET="default"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=""
@@ -108,6 +115,9 @@ if [[ -z "$GRAFANA_API_TOKEN" && -n "${GRAFANA_SERVICE_ACCOUNT_TOKEN:-}" ]]; the
 fi
 if [[ -n "$CLI_PURGE" ]]; then
   PURGE="$CLI_PURGE"
+fi
+if [[ -n "$CLI_DASHBOARD_SET" ]]; then
+  DASHBOARD_SET="$CLI_DASHBOARD_SET"
 fi
 if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
   PURGE="$DEPLOY_PURGE"
@@ -193,6 +203,32 @@ urlencode() {
   jq -rn --arg v "$1" '$v|@uri'
 }
 
+repo_file_content() {
+  local relative_path="$1"
+  if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
+    cat "$SCRIPT_DIR/../$relative_path"
+    return
+  fi
+  curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_REF/$relative_path"
+}
+
+load_dashboard_files() {
+  local manifest_file="$TMP_DIR/deploy-manifest.json"
+  repo_file_content "dashboards/deploy-manifest.json" > "$manifest_file"
+  local set_name="${DASHBOARD_SET:-}"
+  if [[ -z "$set_name" ]]; then
+    set_name="$(jq -r '.defaultSet // "default"' "$manifest_file")"
+  fi
+  if [[ -z "$set_name" || "$set_name" == "null" ]]; then
+    set_name="default"
+  fi
+  mapfile -t DASHBOARD_FILES < <(jq -r --arg set "$set_name" '.sets[$set][]?' "$manifest_file")
+  if [[ ${#DASHBOARD_FILES[@]} -eq 0 ]]; then
+    echo "Dashboard set '$set_name' not found or empty in dashboards/deploy-manifest.json." >&2
+    exit 1
+  fi
+  DASHBOARD_SET="$set_name"
+}
 fetch_source() {
   local filename="$1"
   local out_file="$2"
@@ -285,19 +321,11 @@ print_dashboard_overrides() {
 
 replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end)'
 
-DASHBOARD_FILES=(
-  "VM_ EVCC_ All-time.json"
-  "VM_ EVCC_ Jahr.json"
-  "VM_ EVCC_ Monat.json"
-  "VM_ EVCC_ Today - Details.json"
-  "VM_ EVCC_ Today.json"
-  "VM_ EVCC_ Today - Mobile.json"
-)
-
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 LIB_DIR="$TMP_DIR/library"
 mkdir -p "$LIB_DIR"
+load_dashboard_files
 DASHBOARD_BUILD_MARKER="$(dashboard_build_marker)"
 
 for file_name in "${DASHBOARD_FILES[@]}"; do
@@ -361,6 +389,7 @@ echo "Grafana version: $(grafana_version)"
 echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
+echo "Dashboard set: $DASHBOARD_SET"
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
   echo "Source: local / $DASHBOARD_LOCAL_DIR"
 else

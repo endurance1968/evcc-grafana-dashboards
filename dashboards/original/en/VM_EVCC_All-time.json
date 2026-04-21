@@ -11,21 +11,21 @@
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "URL de EVCC",
+      "label": "EVCC URL",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Nombre del portal del inversor",
+      "label": "Inverter portal name",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL del portal del inversor",
+      "label": "Inverter portal URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     }
@@ -44,7 +44,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Año",
+      "title": "Year",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
@@ -56,7 +56,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Mes",
+      "title": "Month",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
@@ -70,7 +70,7 @@
         "EVCC"
       ],
       "targetBlank": false,
-      "title": "Paneles de control",
+      "title": "Dashboards",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -104,7 +104,7 @@
   "panels": [
     {
       "id": 33,
-      "title": "Energía",
+      "title": "Energy",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -117,7 +117,7 @@
     },
     {
       "id": 12,
-      "title": "Totales de energía",
+      "title": "Energy totals",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -156,12 +156,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "fotovoltaica"
+              "options": "PV"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "fotovoltaica"
+                "value": "PV"
               },
               {
                 "id": "color",
@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Importación de red"
+              "options": "Grid import"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Importación de red"
+                "value": "Grid import"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Casa"
+              "options": "Home"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Casa"
+                "value": "Home"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Vertido"
+              "options": "Feed-in"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Vertido"
+                "value": "Feed-in"
               },
               {
                 "id": "color",
@@ -302,7 +302,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Casa",
+          "legendFormat": "Home",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -315,7 +315,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "fotovoltaica",
+          "legendFormat": "PV",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -328,7 +328,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Importación de red",
+          "legendFormat": "Grid import",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -341,7 +341,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Vertido",
+          "legendFormat": "Feed-in",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -365,7 +365,7 @@
     },
     {
       "id": 19,
-      "title": "Rendimiento anual",
+      "title": "Yearly yield",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -512,7 +512,7 @@
     },
     {
       "id": 25,
-      "title": "Rendimiento mensual/año",
+      "title": "Monthly yield/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -769,7 +769,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Producción FV total registrada, normalizada por kWp instalado y años de datos cubiertos. Los años incompletos y las lagunas de datos afectan a este valor.",
+      "description": "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -830,17 +830,17 @@
           "expr": "WITH (pvEnergyKwh = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000, coveredYears = count_over_time((sum(last_over_time(evcc_pv_energy_daily_wh[1d])))[$__range:1d]) / 365.25) pvEnergyKwh / $installedWattPeak / clamp_min(coveredYears, 1 / 365.25)",
           "format": "table",
           "instant": true,
-          "legendFormat": "Rendimiento específico anual medio",
+          "legendFormat": "Average yearly specific yield",
           "range": false,
           "refId": "averageYearlySpecificYield"
         }
       ],
-      "title": "Rendimiento específico anual medio",
+      "title": "Average yearly specific yield",
       "type": "stat"
     },
     {
       "id": 24,
-      "title": "Indicadores",
+      "title": "Metric gauges",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -878,7 +878,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autosuficiencia"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -899,14 +899,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Autosuficiencia"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Autoconsumo"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -927,7 +927,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Autoconsumo"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -960,7 +960,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "fotovoltaica",
+          "legendFormat": "PV",
           "refId": "pvEnergy",
           "instant": true,
           "range": false
@@ -973,7 +973,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Importación de red",
+          "legendFormat": "Grid import",
           "refId": "gridEnergyIn",
           "instant": true,
           "range": false
@@ -986,7 +986,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Vertido",
+          "legendFormat": "Feed-in",
           "refId": "gridEnergyOut",
           "instant": true,
           "range": false
@@ -999,7 +999,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Casa",
+          "legendFormat": "Home",
           "refId": "homeEnergy",
           "instant": true,
           "range": false
@@ -1012,7 +1012,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Puntos de carga",
+          "legendFormat": "Loadpoints",
           "refId": "loadpointEnergy",
           "instant": true,
           "range": false
@@ -1043,7 +1043,7 @@
     },
     {
       "id": 29,
-      "title": "Consumo anual de la casa",
+      "title": "Yearly home consumption",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1190,7 +1190,7 @@
     },
     {
       "id": 14,
-      "title": "Consumo de la casa mensual/año",
+      "title": "Monthly home consumption/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1260,7 +1260,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -1476,7 +1476,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Carga de batería"
+                "value": "Battery charge"
               },
               {
                 "id": "decimals",
@@ -1496,7 +1496,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Descarga de batería"
+                "value": "Battery discharge"
               },
               {
                 "id": "decimals",
@@ -1516,7 +1516,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Eficiencia de batería"
+                "value": "Battery efficiency"
               },
               {
                 "id": "decimals",
@@ -1543,7 +1543,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC máx medio"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -1563,7 +1563,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "SOC mín medio"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -1667,12 +1667,12 @@
           "range": false
         }
       ],
-      "title": "Batería",
+      "title": "Battery summary",
       "type": "stat"
     },
     {
       "id": 27,
-      "title": "Importación de red anual",
+      "title": "Yearly grid import",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1819,7 +1819,7 @@
     },
     {
       "id": 15,
-      "title": "Importación de red mensual/año",
+      "title": "Monthly grid import/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1889,7 +1889,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -2074,7 +2074,7 @@
     },
     {
       "id": 17,
-      "title": "Vertido anual",
+      "title": "Yearly feed-in",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2221,7 +2221,7 @@
     },
     {
       "id": 18,
-      "title": "Vertido mensual/año",
+      "title": "Monthly feed-in/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2291,7 +2291,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -2476,7 +2476,7 @@
     },
     {
       "id": 38,
-      "title": "Días con mayor rendimiento",
+      "title": "Days with highest yield",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2552,7 +2552,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Energía FV"
+                "value": "PV energy"
               },
               {
                 "id": "custom.cellOptions",
@@ -2578,7 +2578,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Energía FV"
+            "displayName": "PV energy"
           }
         ]
       },
@@ -2601,7 +2601,7 @@
     },
     {
       "id": 39,
-      "title": "Mayores vertidos",
+      "title": "Highest feed-in",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2677,7 +2677,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Vertido"
+                "value": "Feed-in"
               },
               {
                 "id": "custom.cellOptions",
@@ -2703,7 +2703,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Vertido"
+            "displayName": "Feed-in"
           }
         ]
       },
@@ -2726,7 +2726,7 @@
     },
     {
       "id": 40,
-      "title": "Mayores consumos de la casa",
+      "title": "Highest home consumption",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2802,7 +2802,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consumo de la casa"
+                "value": "Home consumption"
               },
               {
                 "id": "custom.cellOptions",
@@ -2828,7 +2828,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Consumo de la casa"
+            "displayName": "Home consumption"
           }
         ]
       },
@@ -2851,7 +2851,7 @@
     },
     {
       "id": 52,
-      "title": "Salud de la instalación",
+      "title": "Plant health",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2864,7 +2864,7 @@
     },
     {
       "id": 53,
-      "title": "Promedio de los 30 mejores días/año",
+      "title": "Average top 30 days/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2877,7 +2877,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "Usa el rendimiento medio de los 30 mejores días por año. Esto puede ayudar a identificar una posible degradación, pero debe interpretarse en contexto. Los años individuales por sí solos no son concluyentes.",
+      "description": "Uses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3011,7 +3011,7 @@
     },
     {
       "id": 54,
-      "title": "Promedio de los 5 mejores días/mes",
+      "title": "Average top 5 days/month",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3080,7 +3080,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -3262,11 +3262,11 @@
           }
         }
       ],
-      "description": "Usa el rendimiento medio de los 5 mejores días por mes. Esto puede ayudar a identificar una posible degradación, pero debe interpretarse en contexto. Los meses individuales por sí solos no son concluyentes."
+      "description": "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
     },
     {
       "id": 41,
-      "title": "Finanzas",
+      "title": "Finances",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3279,7 +3279,7 @@
     },
     {
       "id": 28,
-      "title": "Costes mensuales",
+      "title": "Monthly costs",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3348,7 +3348,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Mes"
+                "value": "Month"
               }
             ]
           },
@@ -3529,7 +3529,7 @@
     },
     {
       "id": 47,
-      "title": "Balance eléctrico",
+      "title": "Power balance",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3574,7 +3574,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Precio de la electricidad: media aritmética"
+                "value": "Electricity price: arithmetic mean"
               },
               {
                 "id": "color",
@@ -3597,7 +3597,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Precio efectivo de la electricidad, dinámico"
+                "value": "Effective electricity price, dynamic"
               },
               {
                 "id": "color",
@@ -3620,7 +3620,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Precio ahorrado gracias a la tarifa dinámica"
+                "value": "Saved electricity price through dynamic tariff"
               },
               {
                 "id": "unit",
@@ -3636,19 +3636,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Compra potencial al precio aritmético"
+                "value": "Potential purchase at arithmetic price"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Comprado"
+              "options": "purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Comprado, dinámico"
+                "value": "Purchased, dynamic"
               }
             ]
           },
@@ -3660,19 +3660,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ahorro mediante tarifa dinámica"
+                "value": "Savings through dynamic tariff"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Vendido"
+              "options": "sold"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Vendido (vertido)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "color",
@@ -3751,7 +3751,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) * -1",
-          "legendFormat": "Comprado",
+          "legendFormat": "purchased",
           "instant": true,
           "range": false
         },
@@ -3807,7 +3807,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d]))",
-          "legendFormat": "Vendido",
+          "legendFormat": "sold",
           "instant": true,
           "range": false
         },
@@ -3826,13 +3826,13 @@
     },
     {
       "id": 50,
-      "title": "Amortización instalación FV",
+      "title": "PV system amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Con menos de 365 días de datos, los valores se extrapolan a un año completo con la inexactitud correspondiente según el período capturado.",
+      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -3868,7 +3868,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de energía hasta ahora sin FV"
+                "value": "Energy costs so far without PV"
               },
               {
                 "id": "color",
@@ -3887,7 +3887,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de energía comprada hasta ahora"
+                "value": "Purchased energy costs so far"
               },
               {
                 "id": "color",
@@ -3906,7 +3906,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Compensación por vertido hasta ahora"
+                "value": "Feed-in compensation so far"
               },
               {
                 "id": "color",
@@ -3925,7 +3925,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de energía hasta ahora"
+                "value": "Energy costs so far"
               },
               {
                 "id": "thresholds",
@@ -3953,7 +3953,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Retorno de capital hasta ahora"
+                "value": "Capital backflow so far"
               },
               {
                 "id": "color",
@@ -3972,7 +3972,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pronóstico basado en"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -3999,7 +3999,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Retorno de capital anual"
+                "value": "Yearly capital backflow"
               }
             ]
           },
@@ -4011,7 +4011,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Periodo de amortización"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -4027,7 +4027,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Tasa de amortización anual"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4192,13 +4192,13 @@
     },
     {
       "id": 51,
-      "title": "Amortización batería",
+      "title": "Battery amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Con menos de 365 días de datos, los valores se extrapolan a un año completo con la inexactitud correspondiente según el período capturado.",
+      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4234,7 +4234,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energía cargada"
+                "value": "Charged energy"
               },
               {
                 "id": "unit",
@@ -4257,7 +4257,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energía descargada"
+                "value": "Discharged energy"
               },
               {
                 "id": "unit",
@@ -4280,7 +4280,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pérdidas de almacenamiento"
+                "value": "Storage losses"
               },
               {
                 "id": "unit",
@@ -4303,7 +4303,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ciclos completos"
+                "value": "Full cycles"
               },
               {
                 "id": "unit",
@@ -4323,7 +4323,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Pronóstico basado en"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -4350,7 +4350,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Amortización anual"
+                "value": "Yearly payback"
               }
             ]
           },
@@ -4362,7 +4362,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Periodo de amortización"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -4378,7 +4378,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Tasa de amortización anual"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4532,7 +4532,7 @@
     },
     {
       "id": 48,
-      "title": "Vehículos",
+      "title": "Vehicles",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4545,13 +4545,13 @@
     },
     {
       "id": 49,
-      "title": "Costes de conducción $vehicle",
+      "title": "Driving costs $vehicle",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Los valores son estimaciones aproximadas basadas en promedios. Las sesiones de carga externas no están incluidas.",
+      "description": "Values are rough estimates based on averages. External charging sessions are not included.",
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -4601,7 +4601,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Kilómetros recorridos"
+                "value": "Driven kilometers"
               },
               {
                 "id": "color",
@@ -4624,7 +4624,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Consumo estimado"
+                "value": "Estimated consumption"
               },
               {
                 "id": "decimals",
@@ -4655,7 +4655,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Cuota solar"
+                "value": "Solar share"
               },
               {
                 "id": "color",
@@ -4682,7 +4682,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Precio efectivo de carga/kWh"
+                "value": "Effective charging price/kWh"
               },
               {
                 "id": "color",
@@ -4701,7 +4701,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de conducción $vehicle sin FV"
+                "value": "Driving costs $vehicle without PV"
               },
               {
                 "id": "color",
@@ -4720,7 +4720,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de conducción $vehicle con FV"
+                "value": "Driving costs $vehicle with PV"
               },
               {
                 "id": "color",
@@ -4739,7 +4739,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ahorro de costes de conducción gracias a FV"
+                "value": "Driving cost savings thanks to PV"
               },
               {
                 "id": "thresholds",
@@ -4767,7 +4767,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Costes de conducción motor térmico"
+                "value": "Combustion engine driving costs"
               }
             ]
           },
@@ -4779,7 +4779,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ahorro frente a motor térmico"
+                "value": "Driving cost savings vs combustion engine"
               },
               {
                 "id": "thresholds",
@@ -4974,7 +4974,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Lista de bloqueo punto de carga",
+        "label": "Loadpoint Blocklist",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4991,7 +4991,7 @@
       {
         "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
         "hide": 2,
-        "label": "Lista de bloqueo de vehículos",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -5011,7 +5011,7 @@
       {
         "current": {
           "selected": true,
-          "text": "Todos",
+          "text": "All",
           "value": "$__all"
         },
         "datasource": {
@@ -5021,7 +5021,7 @@
         "definition": "label_values(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
         "hide": 0,
         "includeAll": true,
-        "label": "Vehículo",
+        "label": "Vehicle",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -5044,7 +5044,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "Consumo térmico l/100km",
+        "label": "ICE consumption l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -5063,7 +5063,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "Precio combustible/l",
+        "label": "Fuel price/l",
         "name": "spritKosten",
         "options": [
           {
@@ -5082,7 +5082,7 @@
           "value": "24884"
         },
         "includeAll": false,
-        "label": "Precio de compra FV",
+        "label": "PV purchase price",
         "name": "purchasePricePv",
         "options": [
           {
@@ -5093,7 +5093,7 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "Coste de inversión FV",
+        "description": "PV system investment cost",
         "hide": 2
       },
       {
@@ -5102,7 +5102,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "Precio de compra batería",
+        "label": "Battery purchase price",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -5113,7 +5113,7 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "Coste de inversión batería",
+        "description": "Battery investment cost",
         "hide": 2
       },
       {
@@ -5122,7 +5122,7 @@
           "value": "100"
         },
         "includeAll": false,
-        "label": "Costes corrientes",
+        "label": "Running costs",
         "name": "runningCosts",
         "options": [
           {
@@ -5133,7 +5133,7 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "Costes recurrentes anuales del sistema",
+        "description": "Yearly recurring system costs",
         "hide": 2
       },
       {
@@ -5142,7 +5142,7 @@
           "value": "9500"
         },
         "includeAll": false,
-        "label": "Capacidad de batería / Wh",
+        "label": "Battery capacity / Wh",
         "name": "speicherkapazitaet",
         "options": [
           {
@@ -5153,7 +5153,7 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "Capacidad útil de batería doméstica en Wh",
+        "description": "Usable home battery capacity in Wh",
         "hide": 2
       },
       {
@@ -5162,7 +5162,7 @@
           "text": "20",
           "value": "20"
         },
-        "description": "Potencia pico FV instalada en kWp. Se utiliza para los paneles de rendimiento específico.",
+        "description": "Installed PV peak in kWp. Used for specific-yield panels.",
         "hide": 2,
         "label": "installedWattPeak",
         "name": "installedWattPeak",
@@ -5178,9 +5178,9 @@
         "type": "constant"
       },
       {
-        "description": "URL utilizada para abrir EVCC.",
+        "description": "URL used to open EVCC.",
         "hide": 2,
-        "label": "URL de EVCC",
+        "label": "EVCC URL",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -5199,9 +5199,9 @@
         ]
       },
       {
-        "description": "Nombre del portal del inversor para el enlace al portal.",
+        "description": "Name of the inverter portal for the portal link.",
         "hide": 2,
-        "label": "Nombre del portal del inversor",
+        "label": "Inverter portal name",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -5220,9 +5220,9 @@
         ]
       },
       {
-        "description": "URL utilizada para abrir el portal del inversor.",
+        "description": "URL used to open the inverter portal.",
         "hide": 2,
-        "label": "URL del portal del inversor",
+        "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -5248,7 +5248,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Todo el tiempo",
+  "title": "VM: EVCC: All-time",
   "uid": "vm-alltime-en-orig",
   "version": 6,
   "weekStart": ""

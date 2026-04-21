@@ -286,9 +286,9 @@ Price and cost rollups use:
 
 These dashboards query raw metrics directly:
 
-- `VM_ EVCC_ Today.json`
-- `VM_ EVCC_ Today - Details.json`
-- `VM_ EVCC_ Today - Mobile.json`
+- `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Details.json`
+- `VM_EVCC_Today-Mobile.json`
 
 Special note:
 
@@ -299,9 +299,9 @@ Special note:
 
 These dashboards query the `evcc_*` rollups:
 
-- `VM_ EVCC_ Monat.json`
-- `VM_ EVCC_ Jahr.json`
-- `VM_ EVCC_ All-time.json`
+- `VM_EVCC_Monat.json`
+- `VM_EVCC_Jahr.json`
+- `VM_EVCC_All-time.json`
 
 These dashboards rely heavily on:
 

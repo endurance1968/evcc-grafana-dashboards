@@ -1,6 +1,6 @@
 # Grafana Localization Testing
 
-This document describes the current end-to-end workflow for validating the default VictoriaMetrics dashboard family against a real Grafana test instance.
+This document describes the current end-to-end workflow for validating the VictoriaMetrics dashboards against a real Grafana test instance.
 
 ## Scope
 
@@ -74,7 +74,7 @@ Current manifest naming:
 ## Step 1: Generate localized dashboards
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs --family=vm
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 This copies `dashboards/original/<sourceLanguage>` into every configured target folder under `dashboards/translation/` and applies mapping-based translation for safe text keys.
@@ -82,7 +82,7 @@ This copies `dashboards/original/<sourceLanguage>` into every configured target 
 ## Step 2: Apply safe display-only translations
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs --family=vm
+node scripts/localization/apply-safe-display-translations.mjs
 ```
 
 Important: run Step 1 and Step 2 strictly in sequence. Do not run them in parallel.
@@ -105,7 +105,7 @@ Typical unsafe cases that must not be translated blindly:
 ## Step 3: Audit translation coverage
 
 ```bash
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/audit-localization.mjs
 ```
 
 This creates per-language candidate files under `dashboards/localization/missing-*.exact.json`. Each report includes `exactSources` with the source dashboard file names for every missing candidate.
@@ -142,25 +142,25 @@ Outputs:
 Without screenshots:
 
 ```bash
-node scripts/test/run-suite.mjs --family=vm --env=.env.local
+node scripts/test/run-suite.mjs --env=.env.local
 ```
 
 With screenshots:
 
 ```bash
-node scripts/test/run-suite.mjs --family=vm --env=.env.local --screenshots=true
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true
 ```
 
 To test the current generated files without rerunning preparation first:
 
 ```bash
-node scripts/test/run-suite.mjs --family=vm --env=.env.local --screenshots=true --prepare=false
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --prepare=false
 ```
 
 To finish with an empty Grafana test folder after the run:
 
 ```bash
-node scripts/test/run-suite.mjs --family=vm --env=.env.local --screenshots=true --cleanup-final=true
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
 ```
 
 ### Full-suite behavior

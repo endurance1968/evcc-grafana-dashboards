@@ -1,12 +1,15 @@
 /**
- * Import raw dashboard JSON files into Grafana and emit an import manifest.
+ * Script: import-dashboards-raw.mjs
+ * Purpose: Import raw dashboard JSON files into Grafana and emit an import manifest.
+ * Version: 2026.04.20.2
+ * Last modified: 2026-04-20
  */
+import fs from "node:fs";
 import path from "node:path";
 import {
   buildUid,
   deepReplaceDataSourcePlaceholders,
   grafanaApi,
-  listJsonFiles,
   loadEnvFile,
   optionalEnv,
   parseArg,
@@ -17,13 +20,21 @@ import {
 } from "./_lib.mjs";
 import {
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
+import {
+  readDeployManifest,
+  resolveDashboardSet,
+} from "../helper/deploy-manifest.mjs";
+import {
+  dashboardTitle,
+  dashboardUid,
+  isV2Dashboard,
+} from "../helper/dashboard-schema.mjs";
 
 loadEnvFile(parseArg("env", ".env"));
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 function defaultSourceFromConfig() {
   const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
@@ -34,6 +45,7 @@ function defaultSourceFromConfig() {
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
 const source = parseArg("source", defaultSourceFromConfig());
+const dashboardSetArg = parseArg("dashboard-set", optionalEnv("DASHBOARD_SET", "")).trim();
 const tag = sanitizeTag(parseArg("tag", path.basename(path.resolve(source))));
 const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Test");
@@ -45,6 +57,10 @@ const dsMap = {
 };
 
 function buildInputs(raw) {
+  if (isV2Dashboard(raw)) {
+    return [];
+  }
+
   const list = Array.isArray(raw.__inputs) ? raw.__inputs : [];
   const out = [];
 
@@ -77,12 +93,35 @@ function buildInputs(raw) {
   return out;
 }
 
+function resolveSourceFiles(inputPath) {
+  const resolved = path.resolve(inputPath);
+  const stat = fs.statSync(resolved);
+  if (stat.isFile()) {
+    return {
+      dashboardSet: "single-file",
+      files: [resolved],
+    };
+  }
+
+  const { setName, files } = resolveDashboardSet(readDeployManifest(process.cwd()), dashboardSetArg);
+  const resolvedFiles = files.map((fileName) => path.join(resolved, fileName));
+  const missing = resolvedFiles.filter((file) => !fs.existsSync(file));
+  if (missing.length > 0) {
+    throw new Error(
+      `Dashboard set '${setName}' is missing file(s) in ${inputPath}: ${missing.map((file) => path.basename(file)).join(", ")}`,
+    );
+  }
+
+  return {
+    dashboardSet: setName,
+    files: resolvedFiles,
+  };
+}
+
 async function ensureFolder() {
-  try {
-    await grafanaApi(`/api/folders/${folderUid}`, { token, baseUrl });
+  const existing = await grafanaApi(`/api/folders/${folderUid}`, { token, baseUrl, allow404: true });
+  if (existing) {
     return;
-  } catch {
-    // create below
   }
 
   await grafanaApi("/api/folders", {
@@ -96,17 +135,6 @@ async function ensureFolder() {
   });
 }
 
-function prepareDashboard(raw, filePath) {
-  const dashboard = JSON.parse(JSON.stringify(raw));
-  const sourceUid = dashboard.uid || path.basename(filePath, ".json");
-  dashboard.uid = buildUid(tag, sourceUid, path.basename(filePath, ".json"));
-
-  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
-  dashboard.title = `${prefix}${dashboard.title || path.basename(filePath, ".json")}`;
-  namespaceLibraryRefs(dashboard, prefix);
-  return dashboard;
-}
-
 function namespaceLibraryUid(uid, name = "") {
   return buildUid(tag, uid || name || "library");
 }
@@ -116,10 +144,10 @@ function namespaceLibraryName(name = "", uid = "") {
   return `${prefix}${name || uid || "Library panel"}`;
 }
 
-function namespaceLibraryRefs(node, prefix) {
+function namespaceLibraryRefs(node) {
   if (Array.isArray(node)) {
     for (const item of node) {
-      namespaceLibraryRefs(item, prefix);
+      namespaceLibraryRefs(item);
     }
     return;
   }
@@ -137,14 +165,48 @@ function namespaceLibraryRefs(node, prefix) {
   }
 
   for (const value of Object.values(node)) {
-    namespaceLibraryRefs(value, prefix);
+    namespaceLibraryRefs(value);
   }
+}
+
+function prepareClassicDashboard(raw, filePath) {
+  const dashboard = JSON.parse(JSON.stringify(raw));
+  const sourceUid = dashboard.uid || path.basename(filePath, ".json");
+  dashboard.uid = buildUid(tag, sourceUid, path.basename(filePath, ".json"));
+
+  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
+  dashboard.title = `${prefix}${dashboard.title || path.basename(filePath, ".json")}`;
+  namespaceLibraryRefs(dashboard);
+  return dashboard;
+}
+
+function prepareV2Dashboard(raw, filePath) {
+  const dashboard = JSON.parse(JSON.stringify(raw));
+  const sourceUid = dashboardUid(dashboard) || path.basename(filePath, ".json");
+  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
+
+  dashboard.metadata ||= {};
+  dashboard.metadata.name = buildUid(tag, sourceUid, path.basename(filePath, ".json"));
+  dashboard.metadata.annotations = {
+    ...(dashboard.metadata.annotations || {}),
+    "grafana.app/folder": folderUid,
+  };
+  dashboard.spec ||= {};
+  dashboard.spec.title = `${prefix}${dashboardTitle(dashboard) || path.basename(filePath, ".json")}`;
+  return dashboard;
+}
+
+function prepareDashboard(raw, filePath) {
+  return isV2Dashboard(raw) ? prepareV2Dashboard(raw, filePath) : prepareClassicDashboard(raw, filePath);
 }
 
 function collectLibraryElements(rawDashboards) {
   const byUid = new Map();
 
   for (const raw of rawDashboards) {
+    if (isV2Dashboard(raw)) {
+      continue;
+    }
     const elements = raw?.__elements;
     if (!elements || typeof elements !== "object") {
       continue;
@@ -191,8 +253,63 @@ async function ensureLibraryElements(rawDashboards) {
   }
 }
 
+async function importClassicDashboard(dashboard, inputs) {
+  const result = await grafanaApi("/api/dashboards/import", {
+    method: "POST",
+    token,
+    baseUrl,
+    body: {
+      dashboard,
+      folderUid,
+      overwrite: true,
+      message: `Dashboard test import (${tag})`,
+      inputs,
+    },
+  });
+
+  return {
+    uid: result.uid || dashboard.uid,
+    url: result.importedUrl || result.url || "",
+    status: result.status,
+    title: dashboard.title,
+  };
+}
+
+async function importV2Dashboard(dashboard) {
+  const uid = dashboardUid(dashboard);
+  const pathV2 = `/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/${encodeURIComponent(uid)}`;
+  const existing = await grafanaApi(pathV2, { token, baseUrl, allow404: true });
+  if (existing?.metadata?.resourceVersion) {
+    dashboard.metadata = {
+      ...(dashboard.metadata || {}),
+      resourceVersion: existing.metadata.resourceVersion,
+    };
+  }
+
+  const result = existing
+    ? await grafanaApi(pathV2, {
+        method: "PUT",
+        token,
+        baseUrl,
+        body: dashboard,
+      })
+    : await grafanaApi("/apis/dashboard.grafana.app/v2/namespaces/default/dashboards", {
+        method: "POST",
+        token,
+        baseUrl,
+        body: dashboard,
+      });
+
+  return {
+    uid,
+    url: result?.metadata?.name || uid,
+    status: existing ? "updated" : "created",
+    title: dashboardTitle(dashboard),
+  };
+}
+
 async function main() {
-  const files = listJsonFiles(source);
+  const { dashboardSet, files } = resolveSourceFiles(source);
   if (!files.length) throw new Error(`No JSON files found in ${source}`);
 
   await ensureFolder();
@@ -207,29 +324,19 @@ async function main() {
   for (const { file, raw } of rawDashboards) {
     const dashboard = prepareDashboard(raw, file);
     const inputs = buildInputs(raw);
-
-    const result = await grafanaApi("/api/dashboards/import", {
-      method: "POST",
-      token,
-      baseUrl,
-      body: {
-        dashboard,
-        folderUid,
-        overwrite: true,
-        message: `Dashboard test import (${tag})`,
-        inputs,
-      },
-    });
+    const result = isV2Dashboard(dashboard)
+      ? await importV2Dashboard(dashboard)
+      : await importClassicDashboard(dashboard, inputs);
 
     imported.push({
       sourceFile: path.relative(process.cwd(), file),
-      uid: result.uid || dashboard.uid,
-      url: result.importedUrl || result.url || "",
+      uid: result.uid,
+      url: result.url,
       status: result.status,
-      title: dashboard.title,
+      title: result.title,
     });
 
-    console.log(`Imported: ${path.basename(file)} -> ${dashboard.uid}`);
+    console.log(`Imported: ${path.basename(file)} -> ${result.uid}`);
   }
 
   const manifest = {
@@ -237,6 +344,7 @@ async function main() {
     family: family.name,
     tag,
     source: path.relative(process.cwd(), path.resolve(source)),
+    dashboardSet,
     grafanaUrl: baseUrl,
     folderUid,
     dashboards: imported,
@@ -249,7 +357,3 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
-
-
-
-

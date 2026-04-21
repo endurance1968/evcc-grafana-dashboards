@@ -1,8 +1,8 @@
 /**
  * Script: sync-displayname-mappings.mjs
  * Purpose: Syncs missing displayName-related exact mappings from the current source and generated dashboards.
- * Version: 2026.04.11.1
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,12 +10,11 @@ import {
   familyMappingPath,
   familySourceDir,
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));

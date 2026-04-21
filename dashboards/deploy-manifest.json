@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "defaultSet": "default",
+  "sets": {
+    "default": [
+      "VM_EVCC_All-time.json",
+      "VM_EVCC_Jahr.json",
+      "VM_EVCC_Monat.json",
+      "VM_EVCC_Today-Details.json",
+      "VM_EVCC_Today.json",
+      "VM_EVCC_Today-Mobile.json"
+    ],
+    "tabs": [
+      "VM_EVCC_TAB_All-time.json",
+      "VM_EVCC_TAB_Jahr.json",
+      "VM_EVCC_TAB_Monat.json",
+      "VM_EVCC_TAB_Today-Details.json",
+      "VM_EVCC_Today.json",
+      "VM_EVCC_Today-Mobile.json"
+    ]
+  }
+}

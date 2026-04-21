@@ -1,15 +1,14 @@
 /**
  * Script: adopt-missing-into-mappings.mjs
  * Purpose: Copies open audit findings from missing reports into the real mapping files as exact entries.
- * Version: 2026.04.11.3
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
   familyReportPath,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
@@ -21,12 +20,11 @@ function hasFlag(name) {
 }
 
 function printUsage() {
-  console.log(`Usage: node scripts/localization/adopt-missing-into-mappings.mjs [--family=vm] [--target=all|de,fr] [--write]
+  console.log(`Usage: node scripts/localization/adopt-missing-into-mappings.mjs [--target=all|de,fr] [--write]
 
 Copies open audit findings from missing reports into real mapping files as source -> source placeholders.
 
 Options:
-  --family=vm        Dashboard family to process. Defaults to vm.
   --target=all|list  Target languages to process. Defaults to all configured target languages.
   --write            Write the adopted mapping entries. Without this flag the script runs in dry-run mode.
   --help             Show this help text and exit without reading or writing mappings.`);
@@ -38,7 +36,7 @@ if (hasFlag("help")) {
 }
 
 const writeMode = hasFlag("write");
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 function parseArg(name, fallback = "") {
   const prefix = `--${name}=`;

@@ -1,20 +1,31 @@
 /**
  * Script: powershell-deployer-compat.mjs
- * Purpose: Validate deploy.ps1 JSON handling under Windows PowerShell 5.1 so single-item arrays survive the deployer roundtrip.
- * Version: 2026.04.18.1
- * Last modified: 2026-04-18
+ * Purpose: Validate deploy.ps1 JSON handling and local manifest resolution under Windows PowerShell 5.1 so copied deployers behave like the repo version.
+ * Version: 2026.04.20.4
+ * Last modified: 2026-04-20
  */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { readDeployManifest, resolveDashboardSet } from "../helper/deploy-manifest.mjs";
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.04.18.1";
-const lastModified = "2026-04-18";
+const version = "2026.04.20.4";
+const lastModified = "2026-04-20";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
-const dashboardPath = path.join(repoRoot, "dashboards", "original", "en", "VM_ EVCC_ All-time.json");
+const manifest = readDeployManifest(repoRoot);
+const { files: defaultDashboardFiles } = resolveDashboardSet(manifest);
+const dashboardPath = path.join(
+  repoRoot,
+  "dashboards",
+  "original",
+  "en",
+  defaultDashboardFiles.find((file) => file.includes("All-time")) || defaultDashboardFiles[0],
+);
+const localDashboardDir = path.join(repoRoot, "dashboards", "original", "en");
+const manifestPath = path.join(repoRoot, "dashboards", "deploy-manifest.json");
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -43,12 +54,67 @@ function ensureWindowsPowerShell() {
 }
 
 function extractFunctionSource(text, name) {
-  const pattern = new RegExp(`function\\s+${name}\\b[\\s\\S]*?^}`, "m");
-  const match = text.match(pattern);
-  if (!match) {
+  const startPattern = new RegExp(`function\\s+${name}\\b`, "m");
+  const startMatch = startPattern.exec(text);
+  if (!startMatch) {
     throw new Error(`Unable to locate function ${name} in scripts/deploy.ps1`);
   }
-  return match[0];
+
+  const braceStart = text.indexOf("{", startMatch.index);
+  if (braceStart < 0) {
+    throw new Error(`Unable to locate opening brace for function ${name}`);
+  }
+
+  let depth = 0;
+  let inSingle = false;
+  let inDouble = false;
+  let inComment = false;
+  let prev = "";
+  for (let i = braceStart; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1] || "";
+
+    if (inComment) {
+      if (char === "\n") {
+        inComment = false;
+      }
+      prev = char;
+      continue;
+    }
+
+    if (!inSingle && !inDouble && char === "#") {
+      inComment = true;
+      prev = char;
+      continue;
+    }
+
+    if (!inDouble && char === "'" && prev !== "`") {
+      inSingle = !inSingle;
+      prev = char;
+      continue;
+    }
+
+    if (!inSingle && char === '"' && prev !== "`") {
+      inDouble = !inDouble;
+      prev = char;
+      continue;
+    }
+
+    if (!inSingle && !inDouble) {
+      if (char === "{") {
+        depth += 1;
+      } else if (char === "}") {
+        depth -= 1;
+        if (depth === 0) {
+          return text.slice(startMatch.index, i + 1);
+        }
+      }
+    }
+
+    prev = char;
+  }
+
+  throw new Error(`Unable to locate closing brace for function ${name}`);
 }
 
 function buildHarness(functionSources) {
@@ -57,12 +123,16 @@ function buildHarness(functionSources) {
     "",
     ...functionSources,
     "",
-    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc' }",
-    `$deployerPath = '${deployerPath.replace(/'/g, "''")}'`,
+    `$repoRoot = '${repoRoot.replace(/'/g, "''")}'`,
     `$dashboardPath = '${dashboardPath.replace(/'/g, "''")}'`,
-    "[scriptblock]::Create((Get-Content -Raw -LiteralPath $deployerPath)) | Out-Null",
+    `$manifestPath = '${manifestPath.replace(/'/g, "''")}'`,
+    `$localDashboardDir = '${localDashboardDir.replace(/'/g, "''")}'`,
+    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'local'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
+    "$script:ResolvedLocalRepoRoot = $null",
     "$raw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $dashboardPath)",
     "$rewritten = Replace-DatasourcePlaceholders $raw",
+    "$resolvedRepoRoot = Resolve-LocalRepoRoot",
+    "$manifestText = Get-RepoFileContent 'dashboards/deploy-manifest.json'",
     "",
     "function Assert-Array([object]$Value, [string]$Name, [int]$ExpectedCount = -1) {",
     "  if ($null -eq $Value) { throw \"$Name is null\" }",
@@ -88,6 +158,10 @@ function buildHarness(functionSources) {
     "Assert-Array $metric.options.reduceOptions.calcs 'metric.options.reduceOptions.calcs' 1",
     "if ($metric.targets[0].datasource.uid -ne 'vm-evcc') { throw \"metric.targets[0].datasource.uid is $($metric.targets[0].datasource.uid), expected vm-evcc\" }",
     "",
+    "if ($resolvedRepoRoot -ne $repoRoot) { throw \"Resolve-LocalRepoRoot returned $resolvedRepoRoot, expected $repoRoot\" }",
+    "if (-not $manifestText.Contains('defaultSet')) { throw 'Manifest text did not contain defaultSet' }",
+    "if ($manifestText -ne (Get-Content -Raw -LiteralPath $manifestPath)) { throw 'Get-RepoFileContent returned unexpected manifest content' }",
+    "",
     "Write-Output 'Windows PowerShell deployer compatibility check passed.'",
     "",
   ].join("\r\n");
@@ -105,6 +179,8 @@ function main() {
     extractFunctionSource(deployerText, "Convert-JsonNode"),
     extractFunctionSource(deployerText, "Parse-JsonDocument"),
     extractFunctionSource(deployerText, "Replace-DatasourcePlaceholders"),
+    extractFunctionSource(deployerText, "Resolve-LocalRepoRoot"),
+    extractFunctionSource(deployerText, "Get-RepoFileContent"),
   ];
 
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "evcc-ps-compat-"));
@@ -112,7 +188,7 @@ function main() {
   fs.writeFileSync(harnessPath, buildHarness(functionSources), "utf8");
 
   try {
-    const result = run(powershell, ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", harnessPath]);
+    const result = run(powershell, ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", harnessPath], { cwd: tempDir });
     if (result.status !== 0) {
       throw new Error((result.stderr || result.stdout || `exit ${result.status}`).trim());
     }
@@ -128,3 +204,4 @@ try {
   console.error(`\n${scriptName} failed: ${error.message || error}`);
   process.exit(1);
 }
+

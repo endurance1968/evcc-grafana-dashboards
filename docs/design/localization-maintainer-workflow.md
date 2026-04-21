@@ -1,12 +1,6 @@
 # Maintainer Workflow for Localization
 
-This document describes the current maintainer-facing workflow for the default VictoriaMetrics dashboard family.
-
-Default family:
-
-- `vm`
-
-The VM flow uses the short default paths under `dashboards/`.
+This document describes the current maintainer-facing workflow for the VictoriaMetrics dashboards under `dashboards`.
 
 ## Mental model
 
@@ -46,14 +40,14 @@ Do not apply it to `dashboards/original` unless you are intentionally refactorin
 
 Current upstream VM source set:
 
-- `dashboards/original/en/VM_ EVCC_ Today.json`
-- `dashboards/original/en/VM_ EVCC_ Today - Mobile.json`
-- `dashboards/original/en/VM_ EVCC_ Today - Details.json`
+- `dashboards/original/en/VM_EVCC_Today.json`
+- `dashboards/original/en/VM_EVCC_Today-Mobile.json`
+- `dashboards/original/en/VM_EVCC_Today-Details.json`
 
 Important note:
 
 - the imported upstream snapshot is mixed-language
-- several visible labels are still German even though the source family is treated as `en`
+- several visible labels are still German even though the VM source dashboard set is treated as `en`
 
 ## Repository scope
 
@@ -83,13 +77,13 @@ Only do this for real source changes or structural panel refactors.
 Run this when the source dashboards changed and you want mapping files to reflect only current source texts:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm
+node scripts/localization/prune-mappings-to-source.mjs
 ```
 
 The command is a dry-run by default. If the reported removals are expected, write the pruned mapping files explicitly:
 
 ```bash
-node scripts/localization/prune-mappings-to-source.mjs --family=vm --write
+node scripts/localization/prune-mappings-to-source.mjs --write
 ```
 
 This removes `exact` and `contains` entries that no longer match any current source-dashboard text only when `--write` is set.
@@ -97,7 +91,7 @@ This removes `exact` and `contains` entries that no longer match any current sou
 ### 3. Audit missing mapping coverage
 
 ```bash
-node scripts/localization/audit-localization.mjs --family=vm
+node scripts/localization/audit-localization.mjs
 ```
 
 Review generated candidate files:
@@ -121,13 +115,13 @@ Use `contains` only for very stable token replacements that are safe across cont
 If all missing candidates should first be accepted as intentional placeholders, run:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all
 ```
 
 The command is a dry-run by default. If the reported placeholder additions are expected, write them explicitly:
 
 ```bash
-node scripts/localization/adopt-missing-into-mappings.mjs --family=vm --target=all --write
+node scripts/localization/adopt-missing-into-mappings.mjs --target=all --write
 ```
 
 This copies candidates from `missing-*.exact.json` into the real mapping files as `source -> source` only when `--write` is set. It is not a translation step; replace those placeholder values with real translations before expecting localized output.
@@ -135,7 +129,7 @@ This copies candidates from `missing-*.exact.json` into the real mapping files a
 ### 5. Generate localized dashboards
 
 ```bash
-node scripts/localization/generate-localized-dashboards.mjs --family=vm
+node scripts/localization/generate-localized-dashboards.mjs
 ```
 
 ### 6. Apply safe display-only translations
@@ -143,7 +137,7 @@ node scripts/localization/generate-localized-dashboards.mjs --family=vm
 Important: run this step only after step 5 has fully finished. Do not run both scripts in parallel.
 
 ```bash
-node scripts/localization/apply-safe-display-translations.mjs --family=vm
+node scripts/localization/apply-safe-display-translations.mjs
 ```
 
 This step only touches user-visible fields in generated dashboards, for example:
@@ -209,7 +203,7 @@ This is the main structural improvement maintainers should aim for in VM source 
 
 As of 2026-03-21:
 
-- default family config is in place
+- fixed VM configuration is in place
 - target languages are `de`, `fr`, `nl`, `es`, `it`, `zh`, `hi`
 - the current three-dashboards VM source set generates cleanly
 - localization audit is clean for the current scripted key set

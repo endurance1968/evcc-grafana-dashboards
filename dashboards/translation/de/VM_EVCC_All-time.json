@@ -11,21 +11,21 @@
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "EVCC 网址",
+      "label": "EVCC URL",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "逆变器门户名称",
+      "label": "Name, Wechselrichterportal",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "逆变器门户网址",
+      "label": "URL, Wechselrichterportal",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     }
@@ -44,7 +44,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "年",
+      "title": "Jahr",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
@@ -56,7 +56,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "月份",
+      "title": "Monat",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
@@ -70,7 +70,7 @@
         "EVCC"
       ],
       "targetBlank": false,
-      "title": "仪表板",
+      "title": "Dashboards",
       "tooltip": "",
       "type": "dashboards",
       "url": ""
@@ -82,7 +82,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": true,
-      "title": "电动汽车控制中心",
+      "title": "EVCC",
       "tooltip": "",
       "type": "link",
       "url": "$evccUrl"
@@ -104,7 +104,7 @@
   "panels": [
     {
       "id": 33,
-      "title": "能源",
+      "title": "Energie",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -117,7 +117,7 @@
     },
     {
       "id": 12,
-      "title": "能源总计",
+      "title": "Gesamt Energie",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -156,12 +156,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "光伏发电"
+              "options": "PV"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "光伏发电"
+                "value": "PV"
               },
               {
                 "id": "color",
@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "电网输入"
+              "options": "Netzbezug"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "电网输入"
+                "value": "Netzbezug"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "家庭"
+              "options": "Haus"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "家庭"
+                "value": "Haus"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "馈电"
+              "options": "Einspeisung"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "馈电"
+                "value": "Einspeisung"
               },
               {
                 "id": "color",
@@ -302,7 +302,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "家庭",
+          "legendFormat": "Haus",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -315,7 +315,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "光伏发电",
+          "legendFormat": "PV",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -328,7 +328,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "电网输入",
+          "legendFormat": "Netzbezug",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -341,7 +341,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "馈电",
+          "legendFormat": "Einspeisung",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -365,7 +365,7 @@
     },
     {
       "id": 19,
-      "title": "年度收益",
+      "title": "Jährlicher Ertrag",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -512,7 +512,7 @@
     },
     {
       "id": 25,
-      "title": "每月收益/年",
+      "title": "Monatlicher Ertrag/Jahr",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -769,7 +769,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "按已安装 kWp 和覆盖数据年数归一化的总光伏发电量。不完整年份和数据缺口会影响该值。",
+      "description": "Gesamter erfasster PV-Ertrag, normiert auf installierte kWp und erfasste Datenjahre. Unvollständige Jahre und Datenlücken beeinflussen diesen Wert.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -830,17 +830,17 @@
           "expr": "WITH (pvEnergyKwh = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000, coveredYears = count_over_time((sum(last_over_time(evcc_pv_energy_daily_wh[1d])))[$__range:1d]) / 365.25) pvEnergyKwh / $installedWattPeak / clamp_min(coveredYears, 1 / 365.25)",
           "format": "table",
           "instant": true,
-          "legendFormat": "平均年度单位收益",
+          "legendFormat": "Ø spezifischer Jahresertrag",
           "range": false,
           "refId": "averageYearlySpecificYield"
         }
       ],
-      "title": "平均年度单位收益",
+      "title": "Ø spezifischer Jahresertrag",
       "type": "stat"
     },
     {
       "id": 24,
-      "title": "指标仪表",
+      "title": "Kennzahlen Gauges",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -878,7 +878,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "自给率"
+              "options": "Autarkie"
             },
             "properties": [
               {
@@ -899,14 +899,14 @@
               },
               {
                 "id": "displayName",
-                "value": "自给率"
+                "value": "Autarkie"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "自耗"
+              "options": "Eigenverbrauch"
             },
             "properties": [
               {
@@ -927,7 +927,7 @@
               },
               {
                 "id": "displayName",
-                "value": "自耗"
+                "value": "Eigenverbrauch"
               }
             ]
           }
@@ -960,7 +960,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "光伏发电",
+          "legendFormat": "PV",
           "refId": "pvEnergy",
           "instant": true,
           "range": false
@@ -973,7 +973,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "电网输入",
+          "legendFormat": "Netzbezug",
           "refId": "gridEnergyIn",
           "instant": true,
           "range": false
@@ -986,7 +986,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "馈电",
+          "legendFormat": "Einspeisung",
           "refId": "gridEnergyOut",
           "instant": true,
           "range": false
@@ -999,7 +999,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "家庭",
+          "legendFormat": "Haus",
           "refId": "homeEnergy",
           "instant": true,
           "range": false
@@ -1012,7 +1012,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "充电点",
+          "legendFormat": "Ladepunkte",
           "refId": "loadpointEnergy",
           "instant": true,
           "range": false
@@ -1043,7 +1043,7 @@
     },
     {
       "id": 29,
-      "title": "年度家庭消耗",
+      "title": "Jährlicher Hausverbrauch",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1190,7 +1190,7 @@
     },
     {
       "id": 14,
-      "title": "每月家庭消耗/年",
+      "title": "Monatlicher Hausverbrauch/Jahr",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1260,7 +1260,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -1476,7 +1476,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池充电"
+                "value": "Speicher laden"
               },
               {
                 "id": "decimals",
@@ -1496,7 +1496,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池放电"
+                "value": "Speicher entladen"
               },
               {
                 "id": "decimals",
@@ -1516,7 +1516,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电池效率"
+                "value": "Speicher Effizienz"
               },
               {
                 "id": "decimals",
@@ -1543,7 +1543,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平均最高 SOC"
+                "value": "Durchschnitt Max SOC"
               },
               {
                 "id": "unit",
@@ -1563,7 +1563,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平均最低 SOC"
+                "value": "Durchschnitt Min SOC"
               },
               {
                 "id": "unit",
@@ -1667,12 +1667,12 @@
           "range": false
         }
       ],
-      "title": "电池摘要",
+      "title": "Speicher",
       "type": "stat"
     },
     {
       "id": 27,
-      "title": "年度电网输入",
+      "title": "Jährlicher Netzbezug",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1819,7 +1819,7 @@
     },
     {
       "id": 15,
-      "title": "每月电网输入/年",
+      "title": "Monatlicher Netzbezug/Jahr",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1889,7 +1889,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -2074,7 +2074,7 @@
     },
     {
       "id": 17,
-      "title": "年度馈电",
+      "title": "Jährliche Einspeisung",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2221,7 +2221,7 @@
     },
     {
       "id": 18,
-      "title": "每月馈电/年",
+      "title": "Monatliche Einspeisung/Jahr",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2291,7 +2291,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -2476,7 +2476,7 @@
     },
     {
       "id": 38,
-      "title": "最高收益日",
+      "title": "Ertragsreichste Tage",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2552,7 +2552,7 @@
               },
               {
                 "id": "displayName",
-                "value": "光伏能量"
+                "value": "PV Energie"
               },
               {
                 "id": "custom.cellOptions",
@@ -2578,7 +2578,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "光伏能量"
+            "displayName": "PV Energie"
           }
         ]
       },
@@ -2601,7 +2601,7 @@
     },
     {
       "id": 39,
-      "title": "最高馈电",
+      "title": "Höchste Einspeisungen",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2677,7 +2677,7 @@
               },
               {
                 "id": "displayName",
-                "value": "馈电"
+                "value": "Einspeisung"
               },
               {
                 "id": "custom.cellOptions",
@@ -2703,7 +2703,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "馈电"
+            "displayName": "Einspeisung"
           }
         ]
       },
@@ -2726,7 +2726,7 @@
     },
     {
       "id": 40,
-      "title": "最高家庭消耗",
+      "title": "Höchste Hausverbräuche",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2802,7 +2802,7 @@
               },
               {
                 "id": "displayName",
-                "value": "家庭消耗"
+                "value": "Hausverbrauch"
               },
               {
                 "id": "custom.cellOptions",
@@ -2828,7 +2828,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "家庭消耗"
+            "displayName": "Hausverbrauch"
           }
         ]
       },
@@ -2851,7 +2851,7 @@
     },
     {
       "id": 52,
-      "title": "系统健康度",
+      "title": "Anlagengesundheit",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2864,7 +2864,7 @@
     },
     {
       "id": 53,
-      "title": "每年前 30 天平均值",
+      "title": "Durchschnitt Top 30 Tage/Jahr",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2877,7 +2877,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "使用每年最佳30天的平均发电量。这有助于识别可能的衰减，但必须结合上下文解读。单独某一年并不能得出结论。",
+      "description": "Verwendet den durchschnittlichen Ertrag der 30 besten Tage pro Jahr. Das kann helfen, mögliche Degradation zu erkennen, muss aber im Kontext interpretiert werden. Einzelne Jahre sind für sich nicht aussagekräftig.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3011,7 +3011,7 @@
     },
     {
       "id": 54,
-      "title": "每月前 5 天平均值",
+      "title": "Durchschnitt Top 5 Tage/Monat",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3080,7 +3080,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               },
               {
                 "id": "decimals",
@@ -3262,11 +3262,11 @@
           }
         }
       ],
-      "description": "使用每月最佳5天的平均发电量。这有助于识别可能的衰减，但必须结合上下文解读。单独某个月并不能得出结论。"
+      "description": "Verwendet den durchschnittlichen Ertrag der 5 besten Tage pro Monat. Das kann helfen, mögliche Degradation zu erkennen, muss aber im Kontext interpretiert werden. Einzelne Monate sind für sich nicht aussagekräftig."
     },
     {
       "id": 41,
-      "title": "财务",
+      "title": "Finanzen",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3279,7 +3279,7 @@
     },
     {
       "id": 28,
-      "title": "每月成本",
+      "title": "Monatliche Kosten",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3348,7 +3348,7 @@
               },
               {
                 "id": "displayName",
-                "value": "月份"
+                "value": "Monat"
               }
             ]
           },
@@ -3516,7 +3516,7 @@
     },
     {
       "id": 46,
-      "title": "平衡",
+      "title": "Bilanz",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3529,7 +3529,7 @@
     },
     {
       "id": 47,
-      "title": "功率平衡",
+      "title": "Strombilanz",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3574,7 +3574,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "电价：算术平均值"
+                "value": "Strompreis: Arithmetisches Mittel"
               },
               {
                 "id": "color",
@@ -3597,7 +3597,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "实际电价（动态）"
+                "value": "Effektiver Strompreis, dynamisch"
               },
               {
                 "id": "color",
@@ -3620,7 +3620,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "通过动态电价节省的电价"
+                "value": "Eingesparter Strompreis durch dynamischen Tarif"
               },
               {
                 "id": "unit",
@@ -3636,19 +3636,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "按算术价格的潜在购电"
+                "value": "Potentieller Einkauf nach arithmetischem Preis"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "购电"
+              "options": "Einkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "购入，动态"
+                "value": "Einkauf, dynamisch"
               }
             ]
           },
@@ -3660,19 +3660,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "动态电价节省"
+                "value": "Einsparung durch dynamischen Tarif"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "售电"
+              "options": "Verkauf"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "售出（馈电）"
+                "value": "Verkauf (Einspeisung)"
               },
               {
                 "id": "color",
@@ -3691,7 +3691,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "平衡"
+                "value": "Bilanz"
               }
             ]
           }
@@ -3751,7 +3751,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) * -1",
-          "legendFormat": "购电",
+          "legendFormat": "Einkauf",
           "instant": true,
           "range": false
         },
@@ -3807,7 +3807,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d]))",
-          "legendFormat": "售电",
+          "legendFormat": "Verkauf",
           "instant": true,
           "range": false
         },
@@ -3826,13 +3826,13 @@
     },
     {
       "id": 50,
-      "title": "光伏系统摊销",
+      "title": "PV system amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "当数据少于365天时，数值会外推到全年，误差取决于已覆盖的时间段。",
+      "description": "Bei weniger als 365 Tagen Daten werden die Werte auf ein volles Jahr extrapoliert. Die Genauigkeit hängt dabei vom erfassten Zeitraum ab.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -3868,7 +3868,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "截至目前无光伏能源成本"
+                "value": "Bisherige Energiekosten ohne PV"
               },
               {
                 "id": "color",
@@ -3887,7 +3887,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "截至目前购入能源成本"
+                "value": "Bisher zugekaufte Energiekosten"
               },
               {
                 "id": "color",
@@ -3906,7 +3906,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "截至目前馈电补偿"
+                "value": "Bisher erzielte Vergütung"
               },
               {
                 "id": "color",
@@ -3925,7 +3925,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "截至目前能源成本"
+                "value": "Bisherige Energiekosten"
               },
               {
                 "id": "thresholds",
@@ -3953,7 +3953,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "截至目前资本回流"
+                "value": "Bisheriger Kapitalrückfluss"
               },
               {
                 "id": "color",
@@ -3972,7 +3972,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "预测基于"
+                "value": "Prognose basiert auf"
               },
               {
                 "id": "unit",
@@ -3999,7 +3999,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "年度资本回流"
+                "value": "Jährliche Kapitalrückflüsse"
               }
             ]
           },
@@ -4011,7 +4011,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "回收期"
+                "value": "Amortisationsdauer"
               },
               {
                 "id": "unit",
@@ -4027,7 +4027,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "年度回收率"
+                "value": "Jährliche Amortisationsrate"
               },
               {
                 "id": "unit",
@@ -4192,13 +4192,13 @@
     },
     {
       "id": 51,
-      "title": "电池摊销",
+      "title": "Battery amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "当数据少于365天时，数值会外推到全年，误差取决于已覆盖的时间段。",
+      "description": "Bei weniger als 365 Tagen Daten werden die Werte auf ein volles Jahr extrapoliert. Die Genauigkeit hängt dabei vom erfassten Zeitraum ab.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4234,7 +4234,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "充电能量"
+                "value": "Ladeenergie"
               },
               {
                 "id": "unit",
@@ -4257,7 +4257,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "放电能量"
+                "value": "Entladeenergie"
               },
               {
                 "id": "unit",
@@ -4280,7 +4280,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "储能损耗"
+                "value": "Speicherverluste"
               },
               {
                 "id": "unit",
@@ -4303,7 +4303,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "完整循环"
+                "value": "Vollzyklen"
               },
               {
                 "id": "unit",
@@ -4323,7 +4323,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "预测基于"
+                "value": "Prognose basiert auf"
               },
               {
                 "id": "unit",
@@ -4350,7 +4350,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "年度回收"
+                "value": "Jährliche Amortisation"
               }
             ]
           },
@@ -4362,7 +4362,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "回收期"
+                "value": "Amortisationsdauer"
               },
               {
                 "id": "unit",
@@ -4378,7 +4378,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "年度回收率"
+                "value": "Jährliche Amortisationsrate"
               },
               {
                 "id": "unit",
@@ -4532,7 +4532,7 @@
     },
     {
       "id": 48,
-      "title": "车辆",
+      "title": "Fahrzeuge",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4545,13 +4545,13 @@
     },
     {
       "id": 49,
-      "title": "$vehicle 行驶成本",
+      "title": "Fahrtkosten $vehicle",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "这些值是基于平均值的粗略估算。不包含外部充电会话。",
+      "description": "Die Werte sind grobe Schätzungen auf Basis von Durchschnittswerten. Externe Ladevorgänge sind nicht enthalten.",
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -4601,7 +4601,7 @@
               },
               {
                 "id": "displayName",
-                "value": "行驶公里数"
+                "value": "Gefahrene Kilometer"
               },
               {
                 "id": "color",
@@ -4624,7 +4624,7 @@
               },
               {
                 "id": "displayName",
-                "value": "估算消耗"
+                "value": "Geschätzter Verbrauch"
               },
               {
                 "id": "decimals",
@@ -4655,7 +4655,7 @@
               },
               {
                 "id": "displayName",
-                "value": "太阳能占比"
+                "value": "Solaranteil"
               },
               {
                 "id": "color",
@@ -4682,7 +4682,7 @@
               },
               {
                 "id": "displayName",
-                "value": "实际充电价格/kWh"
+                "value": "Effektiver Ladepreis/kWh"
               },
               {
                 "id": "color",
@@ -4701,7 +4701,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "$vehicle 不含光伏行驶成本"
+                "value": "Fahrtkosten $vehicle ohne PV"
               },
               {
                 "id": "color",
@@ -4720,7 +4720,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "$vehicle 含光伏行驶成本"
+                "value": "Fahrtkosten $vehicle mit PV"
               },
               {
                 "id": "color",
@@ -4739,7 +4739,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "光伏带来的行驶成本节省"
+                "value": "Eingesparte Fahrtkosten dank PV"
               },
               {
                 "id": "thresholds",
@@ -4767,7 +4767,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "燃油车行驶成本"
+                "value": "Fahrtkosten Verbrenner"
               }
             ]
           },
@@ -4779,7 +4779,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "相对燃油车节省的行驶成本"
+                "value": "Eingesparte Fahrtkosten ggü Verbrenner"
               },
               {
                 "id": "thresholds",
@@ -4974,7 +4974,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "充电点屏蔽列表",
+        "label": "Loadpoint Blocklist",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4991,7 +4991,7 @@
       {
         "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
         "hide": 2,
-        "label": "车辆屏蔽列表",
+        "label": "Blocklist für Fahrzeuge",
         "name": "vehicleBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -5011,7 +5011,7 @@
       {
         "current": {
           "selected": true,
-          "text": "全部",
+          "text": "Alle",
           "value": "$__all"
         },
         "datasource": {
@@ -5021,7 +5021,7 @@
         "definition": "label_values(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
         "hide": 0,
         "includeAll": true,
-        "label": "车辆",
+        "label": "Fahrzeug",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -5044,7 +5044,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "燃油车油耗 l/100km",
+        "label": "Verbrenner Verbrauch l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -5063,7 +5063,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "燃油价格/升",
+        "label": "Kraftstoffpreis/l",
         "name": "spritKosten",
         "options": [
           {
@@ -5082,7 +5082,7 @@
           "value": "24884"
         },
         "includeAll": false,
-        "label": "光伏购置价格",
+        "label": "PV Anschaffungskosten",
         "name": "purchasePricePv",
         "options": [
           {
@@ -5093,7 +5093,7 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "光伏系统投资成本",
+        "description": "PV Anlageninvestition",
         "hide": 2
       },
       {
@@ -5102,7 +5102,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "电池购买价格",
+        "label": "Batterieanschaffungskosten",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -5113,7 +5113,7 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "电池投资成本",
+        "description": "Batterieinvestitionskosten",
         "hide": 2
       },
       {
@@ -5122,7 +5122,7 @@
           "value": "100"
         },
         "includeAll": false,
-        "label": "运行成本",
+        "label": "Laufende Kosten",
         "name": "runningCosts",
         "options": [
           {
@@ -5133,7 +5133,7 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "年度经常性系统成本",
+        "description": "Jährliche wiederkehrende Systemkosten",
         "hide": 2
       },
       {
@@ -5142,7 +5142,7 @@
           "value": "9500"
         },
         "includeAll": false,
-        "label": "电池容量 / Wh",
+        "label": "Batteriekapazität / Wh",
         "name": "speicherkapazitaet",
         "options": [
           {
@@ -5153,7 +5153,7 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "可用家庭电池容量（Wh）",
+        "description": "Nutzbare Heimspeicherkapazität in Wh",
         "hide": 2
       },
       {
@@ -5162,7 +5162,7 @@
           "text": "20",
           "value": "20"
         },
-        "description": "已安装光伏峰值功率，单位 kWp。用于单位收益面板。",
+        "description": "Installierte PV-Spitzenleistung in kWp. Wird für spezifische Ertrags-Panels verwendet.",
         "hide": 2,
         "label": "installedWattPeak",
         "name": "installedWattPeak",
@@ -5178,9 +5178,9 @@
         "type": "constant"
       },
       {
-        "description": "用于打开 EVCC 的 URL。",
+        "description": "URL, unter der EVCC geöffnet wird.",
         "hide": 2,
-        "label": "EVCC 网址",
+        "label": "EVCC URL",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -5199,9 +5199,9 @@
         ]
       },
       {
-        "description": "门户链接使用的逆变器门户名称。",
+        "description": "Name des Wechselrichterportals für den Portal-Link.",
         "hide": 2,
-        "label": "逆变器门户名称",
+        "label": "Name, Wechselrichterportal",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -5220,9 +5220,9 @@
         ]
       },
       {
-        "description": "用于打开逆变器门户的 URL。",
+        "description": "URL, unter der das Wechselrichterportal geöffnet wird.",
         "hide": 2,
-        "label": "逆变器门户网址",
+        "label": "URL, Wechselrichterportal",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -5248,7 +5248,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: 全部时间",
+  "title": "VM: EVCC: All-time",
   "uid": "vm-alltime-en-orig",
   "version": 6,
   "weekStart": ""

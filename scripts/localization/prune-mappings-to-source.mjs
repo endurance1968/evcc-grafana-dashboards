@@ -1,15 +1,14 @@
 /**
  * Script: prune-mappings-to-source.mjs
  * Purpose: Removes mapping entries that no longer occur in the current source dashboards.
- * Version: 2026.04.11.2
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
   familySourceDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
@@ -19,12 +18,11 @@ function hasFlag(name) {
 }
 
 function printUsage() {
-  console.log(`Usage: node scripts/localization/prune-mappings-to-source.mjs [--family=vm] [--write]
+  console.log(`Usage: node scripts/localization/prune-mappings-to-source.mjs [--write]
 
 Removes mapping entries that no longer occur in the current source dashboards.
 
 Options:
-  --family=vm  Dashboard family to process. Defaults to vm.
   --write      Write the pruned mapping files. Without this flag the script runs in dry-run mode.
   --help       Show this help text and exit without reading or writing mappings.`);
 }
@@ -35,7 +33,7 @@ if (hasFlag("help")) {
 }
 
 const writeMode = hasFlag("write");
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 const translatableKeys = new Set([
   "title",
   "description",

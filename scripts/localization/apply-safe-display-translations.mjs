@@ -1,21 +1,20 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.04.11.1
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 const safeStringKeys = new Set([
   "title",
@@ -301,7 +300,7 @@ function main() {
     }
 
     console.log(
-      `Applied safe display-only translations to ${files.length} dashboard files for '${targetLanguage}' in family '${family.name}'.`,
+      `Applied safe display-only translations to ${files.length} dashboard files for '${targetLanguage}'.`,
     );
   }
 

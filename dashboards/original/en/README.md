@@ -4,9 +4,10 @@ These files were imported from the maintainer branch `upstream/victoria-metrics`
 
 Imported files:
 
-- `VM_ EVCC_ Today.json`
-- `VM_ EVCC_ Today - Details.json`
-- `VM_ EVCC_ Today - Mobile.json`
+- `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Details.json`
+- `VM_EVCC_Today-Mobile.json`
+- `VM_EVCC_TAB_All-time.json`
 
 Important note:
 

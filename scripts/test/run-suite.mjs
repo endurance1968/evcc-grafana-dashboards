@@ -1,8 +1,8 @@
 /**
  * Script: run-suite.mjs
  * Purpose: Run the Grafana dashboard test workflow across source and translation variants.
- * Version: 2026.04.14.2
- * Last modified: 2026-04-14
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -10,7 +10,6 @@ import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
 import {
   familySourceDir,
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
@@ -23,7 +22,7 @@ const withPrepare = parseArg("prepare", "true") !== "false";
 const withFinalCleanup = parseArg("cleanup-final", "false") === "true";
 const withSetCleanup = parseArg("cleanup-between", "true") !== "false";
 const repoRoot = process.cwd();
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
 const familyTagPrefix = `${sanitizeTag(family.tagPrefix)}-`;
 const sets = [
@@ -45,8 +44,8 @@ function run(script, args = []) {
 }
 
 if (withPrepare) {
-  run("scripts/localization/generate-localized-dashboards.mjs", [`--family=${family.name}`]);
-  run("scripts/localization/apply-safe-display-translations.mjs", [`--family=${family.name}`]);
+  run("scripts/localization/generate-localized-dashboards.mjs");
+  run("scripts/localization/apply-safe-display-translations.mjs");
 }
 
 for (const set of sets) {
@@ -55,7 +54,6 @@ for (const set of sets) {
     run("scripts/test/cleanup-grafana.mjs");
   }
   run("scripts/test/import-dashboards-raw.mjs", [
-    `--family=${family.name}`,
     `--source=${set.source}`,
     `--tag=${set.tag}`,
     `--manifest=${manifest}`,
@@ -73,7 +71,7 @@ if (withFinalCleanup) {
   run("scripts/test/cleanup-grafana.mjs");
 }
 
-console.log(`\nGrafana dashboard test suite finished for family '${family.name}'.`);
+console.log('`nGrafana dashboard test suite finished.');
 
 
 

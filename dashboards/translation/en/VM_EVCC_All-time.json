@@ -11,21 +11,21 @@
     {
       "name": "VAR_EVCCURL",
       "type": "constant",
-      "label": "EVCC-URL",
+      "label": "EVCC URL",
       "value": "http://home:7070/#/",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
-      "label": "Naam omvormerportaal",
+      "label": "Inverter portal name",
       "value": "Solarman",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
-      "label": "URL omvormerportaal",
+      "label": "Inverter portal URL",
       "value": "https://globalhome.solarmanpv.com/plant/infos/data",
       "description": ""
     }
@@ -44,7 +44,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Jaar",
+      "title": "Year",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser"
@@ -56,7 +56,7 @@
       "keepTime": false,
       "tags": [],
       "targetBlank": false,
-      "title": "Maand",
+      "title": "Month",
       "tooltip": "",
       "type": "link",
       "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser"
@@ -104,7 +104,7 @@
   "panels": [
     {
       "id": 33,
-      "title": "Energie",
+      "title": "Energy",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -117,7 +117,7 @@
     },
     {
       "id": 12,
-      "title": "Energietotalen",
+      "title": "Energy totals",
       "type": "bargauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -175,12 +175,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netafname"
+              "options": "Grid import"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Netafname"
+                "value": "Grid import"
               },
               {
                 "id": "color",
@@ -194,12 +194,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Thuis"
+              "options": "Home"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Thuis"
+                "value": "Home"
               },
               {
                 "id": "color",
@@ -213,12 +213,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Teruglevering"
+              "options": "Feed-in"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Teruglevering"
+                "value": "Feed-in"
               },
               {
                 "id": "color",
@@ -302,7 +302,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Thuis",
+          "legendFormat": "Home",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -328,7 +328,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Netafname",
+          "legendFormat": "Grid import",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -341,7 +341,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
-          "legendFormat": "Teruglevering",
+          "legendFormat": "Feed-in",
           "format": "time_series",
           "instant": true,
           "range": false
@@ -365,7 +365,7 @@
     },
     {
       "id": 19,
-      "title": "Jaarlijkse opbrengst",
+      "title": "Yearly yield",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -512,7 +512,7 @@
     },
     {
       "id": 25,
-      "title": "Maandelijkse opbrengst/jaar",
+      "title": "Monthly yield/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -581,7 +581,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -769,7 +769,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Totale geregistreerde PV-opbrengst, genormaliseerd naar geïnstalleerde kWp en gedekte datajaren. Onvolledige jaren en datagaten beïnvloeden deze waarde.",
+      "description": "Total captured PV yield normalized to installed kWp and covered data years. Incomplete years and data gaps affect this value.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -830,17 +830,17 @@
           "expr": "WITH (pvEnergyKwh = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000, coveredYears = count_over_time((sum(last_over_time(evcc_pv_energy_daily_wh[1d])))[$__range:1d]) / 365.25) pvEnergyKwh / $installedWattPeak / clamp_min(coveredYears, 1 / 365.25)",
           "format": "table",
           "instant": true,
-          "legendFormat": "Gemiddelde jaarlijkse specifieke opbrengst",
+          "legendFormat": "Average yearly specific yield",
           "range": false,
           "refId": "averageYearlySpecificYield"
         }
       ],
-      "title": "Gemiddelde jaarlijkse specifieke opbrengst",
+      "title": "Average yearly specific yield",
       "type": "stat"
     },
     {
       "id": 24,
-      "title": "Kengetallen",
+      "title": "Metric gauges",
       "type": "gauge",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -878,7 +878,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Autarkie"
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -899,14 +899,14 @@
               },
               {
                 "id": "displayName",
-                "value": "Zelfvoorziening"
+                "value": "Autarky"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Eigenverbruik"
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -927,7 +927,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Eigenverbruik"
+                "value": "Self-consumption"
               }
             ]
           }
@@ -973,7 +973,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Netafname",
+          "legendFormat": "Grid import",
           "refId": "gridEnergyIn",
           "instant": true,
           "range": false
@@ -986,7 +986,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Teruglevering",
+          "legendFormat": "Feed-in",
           "refId": "gridEnergyOut",
           "instant": true,
           "range": false
@@ -999,7 +999,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Thuis",
+          "legendFormat": "Home",
           "refId": "homeEnergy",
           "instant": true,
           "range": false
@@ -1012,7 +1012,7 @@
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
           "hide": true,
-          "legendFormat": "Laadpunten",
+          "legendFormat": "Loadpoints",
           "refId": "loadpointEnergy",
           "instant": true,
           "range": false
@@ -1043,7 +1043,7 @@
     },
     {
       "id": 29,
-      "title": "Jaarlijks thuisverbruik",
+      "title": "Yearly home consumption",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1190,7 +1190,7 @@
     },
     {
       "id": 14,
-      "title": "Maandelijks thuisverbruik/jaar",
+      "title": "Monthly home consumption/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1260,7 +1260,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -1476,7 +1476,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij laden"
+                "value": "Battery charge"
               },
               {
                 "id": "decimals",
@@ -1496,7 +1496,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij ontladen"
+                "value": "Battery discharge"
               },
               {
                 "id": "decimals",
@@ -1516,7 +1516,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Batterij efficiëntie"
+                "value": "Battery efficiency"
               },
               {
                 "id": "decimals",
@@ -1543,7 +1543,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Gem. Max SOC"
+                "value": "Avg Max SOC"
               },
               {
                 "id": "unit",
@@ -1563,7 +1563,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Gem. Min SOC"
+                "value": "Avg Min SOC"
               },
               {
                 "id": "unit",
@@ -1667,12 +1667,12 @@
           "range": false
         }
       ],
-      "title": "Batterij",
+      "title": "Battery summary",
       "type": "stat"
     },
     {
       "id": 27,
-      "title": "Jaarlijkse netafname",
+      "title": "Yearly grid import",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1819,7 +1819,7 @@
     },
     {
       "id": 15,
-      "title": "Maandelijkse netafname/jaar",
+      "title": "Monthly grid import/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -1889,7 +1889,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -2074,7 +2074,7 @@
     },
     {
       "id": 17,
-      "title": "Jaarlijkse teruglevering",
+      "title": "Yearly feed-in",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2221,7 +2221,7 @@
     },
     {
       "id": 18,
-      "title": "Maandelijkse teruglevering/jaar",
+      "title": "Monthly feed-in/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2291,7 +2291,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -2476,7 +2476,7 @@
     },
     {
       "id": 38,
-      "title": "Dagen met hoogste opbrengst",
+      "title": "Days with highest yield",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2552,7 +2552,7 @@
               },
               {
                 "id": "displayName",
-                "value": "PV-energie"
+                "value": "PV energy"
               },
               {
                 "id": "custom.cellOptions",
@@ -2578,7 +2578,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "PV-energie"
+            "displayName": "PV energy"
           }
         ]
       },
@@ -2601,7 +2601,7 @@
     },
     {
       "id": 39,
-      "title": "Hoogste teruglevering",
+      "title": "Highest feed-in",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2677,7 +2677,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Teruglevering"
+                "value": "Feed-in"
               },
               {
                 "id": "custom.cellOptions",
@@ -2703,7 +2703,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Teruglevering"
+            "displayName": "Feed-in"
           }
         ]
       },
@@ -2726,7 +2726,7 @@
     },
     {
       "id": 40,
-      "title": "Hoogste thuisverbruik",
+      "title": "Highest home consumption",
       "type": "table",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2802,7 +2802,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Thuisverbruik"
+                "value": "Home consumption"
               },
               {
                 "id": "custom.cellOptions",
@@ -2828,7 +2828,7 @@
         "sortBy": [
           {
             "desc": true,
-            "displayName": "Thuisverbruik"
+            "displayName": "Home consumption"
           }
         ]
       },
@@ -2851,7 +2851,7 @@
     },
     {
       "id": 52,
-      "title": "Installatiegezondheid",
+      "title": "Plant health",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -2864,7 +2864,7 @@
     },
     {
       "id": 53,
-      "title": "Gemiddelde top 30 dagen/jaar",
+      "title": "Average top 30 days/year",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -2877,7 +2877,7 @@
         "y": 54
       },
       "pluginVersion": "12.3.3",
-      "description": "Gebruikt het gemiddelde rendement van de beste 30 dagen per jaar. Dit kan helpen mogelijke degradatie te herkennen, maar moet in context worden geïnterpreteerd. Afzonderlijke jaren zijn op zichzelf niet doorslaggevend.",
+      "description": "Uses the average yield of the best 30 days per year. This can help identify possible degradation, but must be interpreted in context. Individual years are not conclusive on their own.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -3011,7 +3011,7 @@
     },
     {
       "id": 54,
-      "title": "Gemiddelde top 5 dagen/maand",
+      "title": "Average top 5 days/month",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3080,7 +3080,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               },
               {
                 "id": "decimals",
@@ -3262,11 +3262,11 @@
           }
         }
       ],
-      "description": "Gebruikt het gemiddelde rendement van de beste 5 dagen per maand. Dit kan helpen mogelijke degradatie te herkennen, maar moet in context worden geïnterpreteerd. Afzonderlijke maanden zijn op zichzelf niet doorslaggevend."
+      "description": "Uses the average yield of the best 5 days per month. This can help identify possible degradation, but must be interpreted in context. Individual months are not conclusive on their own."
     },
     {
       "id": 41,
-      "title": "Financiën",
+      "title": "Finances",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3279,7 +3279,7 @@
     },
     {
       "id": 28,
-      "title": "Maandelijkse kosten",
+      "title": "Monthly costs",
       "type": "barchart",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3348,7 +3348,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Maand"
+                "value": "Month"
               }
             ]
           },
@@ -3516,7 +3516,7 @@
     },
     {
       "id": 46,
-      "title": "Balans",
+      "title": "Balance",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -3529,7 +3529,7 @@
     },
     {
       "id": 47,
-      "title": "Stroombalans",
+      "title": "Power balance",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -3574,7 +3574,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Elektriciteitsprijs: rekenkundig gemiddelde"
+                "value": "Electricity price: arithmetic mean"
               },
               {
                 "id": "color",
@@ -3597,7 +3597,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Effectieve elektriciteitsprijs, dynamisch"
+                "value": "Effective electricity price, dynamic"
               },
               {
                 "id": "color",
@@ -3620,7 +3620,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde elektriciteitsprijs via dynamisch tarief"
+                "value": "Saved electricity price through dynamic tariff"
               },
               {
                 "id": "unit",
@@ -3636,19 +3636,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Potentiële aankoop tegen rekenprijs"
+                "value": "Potential purchase at arithmetic price"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Ingekocht"
+              "options": "purchased"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Aangekocht, dynamisch"
+                "value": "Purchased, dynamic"
               }
             ]
           },
@@ -3660,19 +3660,19 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Besparing via dynamisch tarief"
+                "value": "Savings through dynamic tariff"
               }
             ]
           },
           {
             "matcher": {
               "id": "byName",
-              "options": "Verkocht"
+              "options": "sold"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Verkocht (teruglevering)"
+                "value": "Sold (feed-in)"
               },
               {
                 "id": "color",
@@ -3691,7 +3691,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Balans"
+                "value": "Balance"
               }
             ]
           }
@@ -3751,7 +3751,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) * -1",
-          "legendFormat": "Ingekocht",
+          "legendFormat": "purchased",
           "instant": true,
           "range": false
         },
@@ -3807,7 +3807,7 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d]))",
-          "legendFormat": "Verkocht",
+          "legendFormat": "sold",
           "instant": true,
           "range": false
         },
@@ -3826,13 +3826,13 @@
     },
     {
       "id": 50,
-      "title": "PV-installatie afschrijving",
+      "title": "PV system amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
+      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -3868,7 +3868,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energiekosten tot nu toe zonder PV"
+                "value": "Energy costs so far without PV"
               },
               {
                 "id": "color",
@@ -3887,7 +3887,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kosten aangekochte energie tot nu toe"
+                "value": "Purchased energy costs so far"
               },
               {
                 "id": "color",
@@ -3906,7 +3906,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugleververgoeding tot nu toe"
+                "value": "Feed-in compensation so far"
               },
               {
                 "id": "color",
@@ -3925,7 +3925,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Energiekosten tot nu toe"
+                "value": "Energy costs so far"
               },
               {
                 "id": "thresholds",
@@ -3953,7 +3953,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Kapitaalterugstroom tot nu toe"
+                "value": "Capital backflow so far"
               },
               {
                 "id": "color",
@@ -3972,7 +3972,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose gebaseerd op"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -3999,7 +3999,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse kapitaalterugstroom"
+                "value": "Yearly capital backflow"
               }
             ]
           },
@@ -4011,7 +4011,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugverdientijd"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -4027,7 +4027,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetalingsratio"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4192,13 +4192,13 @@
     },
     {
       "id": 51,
-      "title": "Batterij afschrijving",
+      "title": "Battery amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
+      "description": "For less than 365 days of data, values are extrapolated to a full year with corresponding inaccuracy depending on the captured period.",
       "gridPos": {
         "h": 10,
         "w": 8,
@@ -4234,7 +4234,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Geladen energie"
+                "value": "Charged energy"
               },
               {
                 "id": "unit",
@@ -4257,7 +4257,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Ontladen energie"
+                "value": "Discharged energy"
               },
               {
                 "id": "unit",
@@ -4280,7 +4280,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Opslagverliezen"
+                "value": "Storage losses"
               },
               {
                 "id": "unit",
@@ -4303,7 +4303,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Volledige cycli"
+                "value": "Full cycles"
               },
               {
                 "id": "unit",
@@ -4323,7 +4323,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Prognose gebaseerd op"
+                "value": "Forecast based on"
               },
               {
                 "id": "unit",
@@ -4350,7 +4350,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetaling"
+                "value": "Yearly payback"
               }
             ]
           },
@@ -4362,7 +4362,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Terugverdientijd"
+                "value": "Payback period"
               },
               {
                 "id": "unit",
@@ -4378,7 +4378,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Jaarlijkse terugbetalingsratio"
+                "value": "Yearly payback rate"
               },
               {
                 "id": "unit",
@@ -4532,7 +4532,7 @@
     },
     {
       "id": 48,
-      "title": "Voertuigen",
+      "title": "Vehicles",
       "type": "row",
       "collapsed": false,
       "gridPos": {
@@ -4545,13 +4545,13 @@
     },
     {
       "id": 49,
-      "title": "Rijkosten $vehicle",
+      "title": "Driving costs $vehicle",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "Waarden zijn grove schattingen op basis van gemiddelden. Externe laadsessies zijn niet inbegrepen.",
+      "description": "Values are rough estimates based on averages. External charging sessions are not included.",
       "gridPos": {
         "h": 10,
         "w": 12,
@@ -4601,7 +4601,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Gereden kilometers"
+                "value": "Driven kilometers"
               },
               {
                 "id": "color",
@@ -4624,7 +4624,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Geschat verbruik"
+                "value": "Estimated consumption"
               },
               {
                 "id": "decimals",
@@ -4655,7 +4655,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Zonne-aandeel"
+                "value": "Solar share"
               },
               {
                 "id": "color",
@@ -4682,7 +4682,7 @@
               },
               {
                 "id": "displayName",
-                "value": "Effectieve laadprijs/kWh"
+                "value": "Effective charging price/kWh"
               },
               {
                 "id": "color",
@@ -4701,7 +4701,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten $vehicle zonder PV"
+                "value": "Driving costs $vehicle without PV"
               },
               {
                 "id": "color",
@@ -4720,7 +4720,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten $vehicle met PV"
+                "value": "Driving costs $vehicle with PV"
               },
               {
                 "id": "color",
@@ -4739,7 +4739,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde rijkosten dankzij PV"
+                "value": "Driving cost savings thanks to PV"
               },
               {
                 "id": "thresholds",
@@ -4767,7 +4767,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Rijkosten verbrandingsmotor"
+                "value": "Combustion engine driving costs"
               }
             ]
           },
@@ -4779,7 +4779,7 @@
             "properties": [
               {
                 "id": "displayName",
-                "value": "Bespaarde rijkosten t.o.v. verbrandingsmotor"
+                "value": "Driving cost savings vs combustion engine"
               },
               {
                 "id": "thresholds",
@@ -4974,7 +4974,7 @@
         "name": "loadpointBlocklist",
         "type": "constant",
         "query": "^none$",
-        "label": "Laadpunt blokkeerlijst",
+        "label": "Loadpoint Blocklist",
         "current": {
           "text": "^none$",
           "value": "^none$"
@@ -4991,7 +4991,7 @@
       {
         "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
         "hide": 2,
-        "label": "Blokkeerlijst voertuigen",
+        "label": "Vehicle blocklist",
         "name": "vehicleBlocklist",
         "query": "^none$",
         "skipUrlSync": true,
@@ -5011,7 +5011,7 @@
       {
         "current": {
           "selected": true,
-          "text": "Alle",
+          "text": "All",
           "value": "$__all"
         },
         "datasource": {
@@ -5021,7 +5021,7 @@
         "definition": "label_values(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}, vehicle)",
         "hide": 0,
         "includeAll": true,
-        "label": "Voertuig",
+        "label": "Vehicle",
         "multi": true,
         "name": "vehicle",
         "options": [],
@@ -5044,7 +5044,7 @@
           "value": "6"
         },
         "includeAll": false,
-        "label": "Verbrandingsmotor verbruik l/100km",
+        "label": "ICE consumption l/100km",
         "name": "vVerbrauch",
         "options": [
           {
@@ -5063,7 +5063,7 @@
           "value": "1.75"
         },
         "includeAll": false,
-        "label": "Brandstofprijs/l",
+        "label": "Fuel price/l",
         "name": "spritKosten",
         "options": [
           {
@@ -5082,7 +5082,7 @@
           "value": "24884"
         },
         "includeAll": false,
-        "label": "PV-aankoopprijs",
+        "label": "PV purchase price",
         "name": "purchasePricePv",
         "options": [
           {
@@ -5093,7 +5093,7 @@
         ],
         "query": "24884",
         "type": "custom",
-        "description": "PV-systeem investeringskosten",
+        "description": "PV system investment cost",
         "hide": 2
       },
       {
@@ -5102,7 +5102,7 @@
           "value": "5500"
         },
         "includeAll": false,
-        "label": "Batterij aankoopprijs",
+        "label": "Battery purchase price",
         "name": "batteryPurchasePrice",
         "options": [
           {
@@ -5113,7 +5113,7 @@
         ],
         "query": "5500",
         "type": "custom",
-        "description": "Batterij investeringskosten",
+        "description": "Battery investment cost",
         "hide": 2
       },
       {
@@ -5122,7 +5122,7 @@
           "value": "100"
         },
         "includeAll": false,
-        "label": "Lopende kosten",
+        "label": "Running costs",
         "name": "runningCosts",
         "options": [
           {
@@ -5133,7 +5133,7 @@
         ],
         "query": "100",
         "type": "custom",
-        "description": "Jaarlijkse terugkerende systeemkosten",
+        "description": "Yearly recurring system costs",
         "hide": 2
       },
       {
@@ -5142,7 +5142,7 @@
           "value": "9500"
         },
         "includeAll": false,
-        "label": "Batterijcapaciteit / Wh",
+        "label": "Battery capacity / Wh",
         "name": "speicherkapazitaet",
         "options": [
           {
@@ -5153,7 +5153,7 @@
         ],
         "query": "9500",
         "type": "custom",
-        "description": "Bruikbare thuisbatterijcapaciteit in Wh",
+        "description": "Usable home battery capacity in Wh",
         "hide": 2
       },
       {
@@ -5162,7 +5162,7 @@
           "text": "20",
           "value": "20"
         },
-        "description": "Geïnstalleerd PV-piekvermogen in kWp. Gebruikt voor specifieke-opbrengstpanelen.",
+        "description": "Installed PV peak in kWp. Used for specific-yield panels.",
         "hide": 2,
         "label": "installedWattPeak",
         "name": "installedWattPeak",
@@ -5178,9 +5178,9 @@
         "type": "constant"
       },
       {
-        "description": "URL die wordt gebruikt om EVCC te openen.",
+        "description": "URL used to open EVCC.",
         "hide": 2,
-        "label": "EVCC-URL",
+        "label": "EVCC URL",
         "name": "evccUrl",
         "query": "${VAR_EVCCURL}",
         "skipUrlSync": true,
@@ -5199,9 +5199,9 @@
         ]
       },
       {
-        "description": "Naam van het omvormerportaal voor de portaallink.",
+        "description": "Name of the inverter portal for the portal link.",
         "hide": 2,
-        "label": "Naam omvormerportaal",
+        "label": "Inverter portal name",
         "name": "inverterPortalTitle",
         "query": "${VAR_INVERTERPORTALTITLE}",
         "skipUrlSync": true,
@@ -5220,9 +5220,9 @@
         ]
       },
       {
-        "description": "URL die wordt gebruikt om het omvormerportaal te openen.",
+        "description": "URL used to open the inverter portal.",
         "hide": 2,
-        "label": "URL omvormerportaal",
+        "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
         "query": "${VAR_INVERTERPORTALURL}",
         "skipUrlSync": true,
@@ -5248,7 +5248,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Hele periode",
+  "title": "VM: EVCC: All-time",
   "uid": "vm-alltime-en-orig",
   "version": 6,
   "weekStart": ""

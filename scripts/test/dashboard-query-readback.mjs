@@ -1,12 +1,18 @@
 /**
  * Script: dashboard-query-readback.mjs
  * Purpose: Execute original VM dashboard MetricsQL targets against VictoriaMetrics after Grafana macro substitution.
- * Version: 2026.04.14.1
- * Last modified: 2026-04-14
+ * Version: 2026.04.20.2
+ * Last modified: 2026-04-20
  */
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import {
+  collectDashboardPanels,
+  dashboardTimeSettings,
+  dashboardVariables,
+  isV2Dashboard,
+} from "../helper/dashboard-schema.mjs";
 
 const repoRoot = process.cwd();
 const defaultSourceDir = path.join(repoRoot, "dashboards", "original", "en");
@@ -26,7 +32,7 @@ const fallbackVariables = {
   dashboardBuild: "query-readback",
   energySampleInterval: "30s",
   extBlocklist: "^none$",
-  heatPumpLoadpointRegex: "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
+  heatPumpLoadpointRegex: "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*$",
   installedWattPeak: "20",
   loadpoint: "LP1",
   loadpointBlocklist: "^none$",
@@ -74,24 +80,12 @@ function collectFiles(dir, predicate) {
   return out.sort((a, b) => a.localeCompare(b));
 }
 
-function collectPanels(dashboard) {
-  const out = [];
-  function walk(panels) {
-    for (const panel of panels || []) {
-      out.push(panel);
-      walk(panel.panels);
-    }
-  }
-  walk(dashboard.panels);
-  return out;
-}
-
 function targetExpr(target) {
-  return String(target?.expr || "");
+  return String(target?.expr || target?.expression || target?.query || "");
 }
 
 function isVmTarget(target) {
-  return target?.datasource?.type === "victoriametrics-metrics-datasource" && targetExpr(target).trim() !== "";
+  return String(target?.group || "") === "victoriametrics-metrics-datasource" && targetExpr(target).trim() !== "";
 }
 
 function datePartsInBerlin(date) {
@@ -136,8 +130,6 @@ function parseDurationSeconds(value) {
 }
 
 function durationString(seconds) {
-  // Prometheus-style durations accepted by VictoriaMetrics do not include
-  // calendar units M/y. Keep calendar dashboard ranges as day-based windows.
   if (seconds % 604800 === 0) {
     return `${seconds / 604800}w`;
   }
@@ -231,30 +223,53 @@ function impliedRangeSeconds(fromExpr, toExpr, fromDate, toDate) {
 }
 
 function dashboardRange(dashboard, now) {
-  const fromExpr = dashboard.time?.from || "now-1d";
-  const toExpr = dashboard.time?.to || "now";
+  const timeSettings = dashboardTimeSettings(dashboard);
+  const fromExpr = timeSettings?.from || "now-1d";
+  const toExpr = timeSettings?.to || "now";
   const fromDate = resolveRelativeTime(fromExpr, now);
   const toDate = resolveRelativeTime(toExpr, now);
   const rangeSeconds = impliedRangeSeconds(fromExpr, toExpr, fromDate, toDate);
   return { fromExpr, toExpr, fromDate, toDate, rangeSeconds };
 }
 
-function variableValue(variable) {
-  const current = variable.current?.value;
+function variableQueryValue(variable) {
+  if (isV2Dashboard({ apiVersion: "dashboard.grafana.app/v2", kind: "Dashboard", spec: { variables: [variable] } })) {
+    // never reached; helper trick avoided below
+  }
+  return "";
+}
+
+function variableCurrentValue(variable, v2 = false) {
+  const current = v2 ? variable?.spec?.current?.value : variable?.current?.value;
   if (current && current !== "$__all" && !String(current).startsWith("${VAR_")) {
     return String(current);
   }
-  if (typeof variable.query === "string" && variable.query && !variable.query.startsWith("${VAR_")) {
-    return variable.query;
+  const query = v2 ? variable?.spec?.query : variable?.query;
+  if (typeof query === "string" && query && !query.startsWith("${VAR_")) {
+    return query;
   }
-  return fallbackVariables[variable.name] || ".*";
+  return "";
 }
 
-function dashboardVariables(dashboard) {
+function resolvedDashboardVariables(dashboard) {
   const values = { ...fallbackVariables };
-  for (const variable of dashboard.templating?.list || []) {
-    values[variable.name] = variableValue(variable);
+  for (const variable of dashboardVariables(dashboard)) {
+    if (isV2Dashboard(dashboard)) {
+      const name = variable?.spec?.name;
+      if (!name) {
+        continue;
+      }
+      values[name] = variableCurrentValue(variable, true) || values[name] || ".*";
+      continue;
+    }
+
+    const name = variable?.name;
+    if (!name) {
+      continue;
+    }
+    values[name] = variableCurrentValue(variable, false) || values[name] || ".*";
   }
+
   let changed = true;
   while (changed) {
     changed = false;
@@ -289,7 +304,7 @@ function replaceVariables(value, variables) {
 
 function substituteQuery(expr, dashboard, now) {
   const range = dashboardRange(dashboard, now);
-  const variables = dashboardVariables(dashboard);
+  const variables = resolvedDashboardVariables(dashboard);
   const rangeText = durationString(range.rangeSeconds);
   let out = String(expr);
   out = out.replace(/\$\{(__from|__to):date:([^}]+)\}/g, (match, source, format) => replaceDateMacro(match, source, format, range));
@@ -378,7 +393,7 @@ function readTargets(sourceDir) {
   const targets = [];
   for (const file of files) {
     const dashboard = JSON.parse(fs.readFileSync(file, "utf8"));
-    for (const panel of collectPanels(dashboard)) {
+    for (const panel of collectDashboardPanels(dashboard)) {
       for (const target of panel.targets || []) {
         if (!isVmTarget(target)) {
           continue;
@@ -458,8 +473,8 @@ async function main() {
     console.log("Dashboard query readback");
     console.log("========================");
     console.log("Script:        dashboard-query-readback.mjs");
-    console.log("Version:       2026.04.14.1");
-    console.log("Last modified: 2026-04-14");
+    console.log("Version:       2026.04.20.2");
+    console.log("Last modified: 2026-04-20");
     console.log(`VM base URL:   ${baseUrl}`);
     console.log(`Source dir:    ${sourceDir}`);
     console.log(`Query time:    ${now.toISOString().replace(".000Z", "Z")}`);

@@ -3826,7 +3826,7 @@
     },
     {
       "id": 50,
-      "title": "PV सिस्टम अमोर्टाइजेशन",
+      "title": "PV system amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4192,7 +4192,7 @@
     },
     {
       "id": 51,
-      "title": "बैटरी अमोर्टाइजेशन",
+      "title": "Battery amortization",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",

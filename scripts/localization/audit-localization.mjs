@@ -1,8 +1,8 @@
 /**
  * Script: audit-localization.mjs
  * Purpose: Scans source dashboards for untranslated texts and writes missing translation reports per language.
- * Version: 2026.04.11.1
- * Last modified: 2026-04-11
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,13 +10,12 @@ import {
   familyMappingPath,
   familyReportPath,
   familySourceDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 const translatableKeys = new Set([
   "title",
   "description",

@@ -86,6 +86,12 @@ export function deepReplaceDataSourcePlaceholders(node, map) {
   for (const [k, v] of Object.entries(node)) {
     out[k] = deepReplaceDataSourcePlaceholders(v, map);
   }
+  if (out.group === "victoriametrics-metrics-datasource" && out.datasource && typeof out.datasource === "object") {
+    out.datasource = { ...out.datasource, name: map["DS_VM-EVCC"] || out.datasource.name };
+    if ("uid" in out.datasource) {
+      out.datasource.uid = map["DS_VM-EVCC"] || out.datasource.uid;
+    }
+  }
   return out;
 }
 
@@ -96,7 +102,7 @@ function replaceIfPlaceholder(value, map) {
   return map[key] || value;
 }
 
-export async function grafanaApi(pathname, { method = "GET", body, token, baseUrl }) {
+export async function grafanaApi(pathname, { method = "GET", body, token, baseUrl, allow404 = false } = {}) {
   const url = `${baseUrl.replace(/\/$/, "")}${pathname}`;
   const headers = {
     "Accept": "application/json",
@@ -119,6 +125,9 @@ export async function grafanaApi(pathname, { method = "GET", body, token, baseUr
   }
 
   if (!res.ok) {
+    if (allow404 && res.status === 404) {
+      return null;
+    }
     throw new Error(`${method} ${pathname} failed (${res.status}): ${JSON.stringify(data)}`);
   }
 

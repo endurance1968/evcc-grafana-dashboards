@@ -1,8 +1,8 @@
 /**
  * Script: localization-idempotency-check.mjs
  * Purpose: Verify generated dashboard translations are reproducible from dashboards/original without creating diffs.
- * Version: 2026.04.15.1
- * Last modified: 2026-04-15
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -11,13 +11,12 @@ import { spawnSync } from "node:child_process";
 import {
   familySourceDir,
   familyTranslationDir,
-  parseFamilyArg,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
 const repoRoot = process.cwd();
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 
 function run(command, args) {
   console.log(`$ ${[command, ...args].join(" ")}`);
@@ -91,8 +90,8 @@ function assertSourceLanguageCopy() {
 
 function main() {
   const before = snapshotTranslationFiles();
-  run(process.execPath, ["scripts/localization/generate-localized-dashboards.mjs", `--family=${family.name}`]);
-  run(process.execPath, ["scripts/localization/apply-safe-display-translations.mjs", `--family=${family.name}`]);
+  run(process.execPath, ["scripts/localization/generate-localized-dashboards.mjs"]);
+  run(process.execPath, ["scripts/localization/apply-safe-display-translations.mjs"]);
   const after = snapshotTranslationFiles();
   const changed = changedFiles(before, after);
   assertSourceLanguageCopy();
@@ -106,8 +105,8 @@ function main() {
   console.log("Localization idempotency check");
   console.log("==============================");
   console.log("Script:        localization-idempotency-check.mjs");
-  console.log("Version:       2026.04.15.1");
-  console.log("Last modified: 2026-04-15");
+  console.log("Version:       2026.04.19.1");
+  console.log("Last modified: 2026-04-19");
   console.log("");
   console.log("Result");
   console.log("------");

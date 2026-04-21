@@ -1,8 +1,8 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.18.1
- * Last modified: 2026-04-18
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -22,7 +22,7 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.18.1 (last modified 2026-04-18)");
+  console.log("local-checks.mjs v2026.04.19.1 (last modified 2026-04-19)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -149,7 +149,7 @@ function runNodeSyntaxChecks() {
 }
 
 function runLocalizationIdempotencyCheck() {
-  run(process.execPath, ["scripts/test/localization-idempotency-check.mjs", "--family=vm"]);
+  run(process.execPath, ["scripts/test/localization-idempotency-check.mjs"]);
 }
 
 function runCrossPlatformAudit() {

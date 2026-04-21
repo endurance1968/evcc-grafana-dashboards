@@ -60,7 +60,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 ## 5. Localization
 
-- [ ] `node scripts/localization/audit-localization.mjs --family=vm` reports `0` missing candidates
+- [ ] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [ ] localized dashboards are regenerated from the current `orig/en` source
 - [ ] screenshots are regenerated from the current localized dashboards
 - [ ] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana

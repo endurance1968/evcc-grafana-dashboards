@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.04.18.1
- * Last modified: 2026-04-18
+ * Version: 2026.04.19.1
+ * Last modified: 2026-04-19
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
@@ -411,7 +411,6 @@ async function main() {
 
     run("node", [
       "scripts/test/import-dashboards-raw.mjs",
-      "--family=vm",
       `--source=${args.source}`,
       `--tag=${args.tag}`,
       `--manifest=${args.manifest}`,
@@ -427,8 +426,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.04.18.1");
-    console.log("Last modified: 2026-04-18");
+    console.log("Version:       2026.04.19.1");
+    console.log("Last modified: 2026-04-19");
     console.log("");
     console.log("Result");
     console.log("------");

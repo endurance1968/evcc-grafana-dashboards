@@ -15,18 +15,17 @@ import {
 import {
   familySourceDir,
   familyTranslationDir,
-  parseFamilyArg,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.04.11.4";
-const SCRIPT_LAST_MODIFIED = "2026-04-11";
+const SCRIPT_VERSION = "2026.04.20.1";
+const SCRIPT_LAST_MODIFIED = "2026-04-20";
 
 loadEnvFile(parseArg("env", ".env"));
 
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
-const family = resolveDashboardFamily(parseFamilyArg());
+const family = resolveDashboardFamily();
 const language = parseArg("language", "en").trim().toLowerCase();
 const variant = parseArg("variant", "orig").trim().toLowerCase();
 const sourceOverride = parseArg("source", "").trim();
@@ -38,6 +37,7 @@ const purgeLanguage = parseArg("purge", "true") === "true";
 const withSmoke = parseArg("smoke", "true") !== "false";
 const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const envArg = parseArg("env", ".env");
+const dashboardSet = parseArg("dashboard-set", optionalEnv("DASHBOARD_SET", "default")).trim() || "default";
 const repoRoot = process.cwd();
 
 if (!["orig", "generated"].includes(variant)) {
@@ -429,10 +429,10 @@ async function main() {
 
   run("scripts/test/import-dashboards-raw.mjs", [
     `--env=${envArg}`,
-    `--family=${family.name}`,
     `--source=${stagedSource}`,
     `--tag=${tag}`,
     `--manifest=${manifest}`,
+    `--dashboard-set=${dashboardSet}`,
   ]);
 
   if (withSmoke) {
@@ -443,7 +443,7 @@ async function main() {
   }
 
   console.log(
-    `\nDashboard deploy finished for family='${family.name}', language='${language}' (variant='${variant}', tag='${tag}', source='${sourceLabel}', overrides='${overridesPath || "none"}').`,
+    `\nDashboard deploy finished for language='${language}' (variant='${variant}', set='${dashboardSet}', tag='${tag}', source='${sourceLabel}', overrides='${overridesPath || "none"}').`,
   );
 }
 

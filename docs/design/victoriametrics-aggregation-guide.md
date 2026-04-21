@@ -168,7 +168,7 @@ After each write phase:
 1. Query the new `evcc_*` metrics directly in VictoriaMetrics.
 2. Open the corresponding Grafana dashboards.
 3. Compare representative periods against the legacy Influx reference dashboards.
-4. Capture screenshots if the dashboard family changed visibly.
+4. Capture screenshots if the dashboard set changed visibly.
 
 ## Troubleshooting
 

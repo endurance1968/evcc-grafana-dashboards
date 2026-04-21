@@ -22,14 +22,15 @@ param(
   [string]$foldertitle,
   [string]$authmode,
   [string]$user,
-  [string]$password
+  [string]$password,
+  [string]$dashboardset
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.04.19.1'
-$ScriptLastModified = '2026-04-19'
+$ScriptVersion = '2026.04.20.4'
+$ScriptLastModified = '2026-04-20'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -141,18 +142,78 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
   }
 }
 
-function Get-SourceFileContent([string]$FileName) {
-  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
-    return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $settings.DASHBOARD_LOCAL_DIR $FileName)
+function Get-SourceSubDir() {
+  if ($settings.DASHBOARD_VARIANT -eq 'orig') {
+    return "dashboards/original/$($settings.DASHBOARD_LANGUAGE)"
   }
-  $subDir = if ($settings.DASHBOARD_VARIANT -eq 'orig') { "dashboards/original/$($settings.DASHBOARD_LANGUAGE)" } else { "dashboards/translation/$($settings.DASHBOARD_LANGUAGE)" }
-  $sourceUrl = @(
-    'https://raw.githubusercontent.com',
-    $settings.GITHUB_REPO,
-    $settings.GITHUB_REF,
-    $subDir.Replace('\\','/').Trim('/'),
-    [Uri]::EscapeDataString($FileName)
-  ) -join '/'
+  return "dashboards/translation/$($settings.DASHBOARD_LANGUAGE)"
+}
+
+$script:ResolvedLocalRepoRoot = $null
+
+function Resolve-LocalRepoRoot() {
+  if ($script:ResolvedLocalRepoRoot) {
+    return $script:ResolvedLocalRepoRoot
+  }
+
+  $candidates = New-Object System.Collections.Generic.List[string]
+
+  if (-not [string]::IsNullOrWhiteSpace([string]$settings.DASHBOARD_LOCAL_DIR)) {
+    $localDir = [string]$settings.DASHBOARD_LOCAL_DIR
+    if (-not [System.IO.Path]::IsPathRooted($localDir)) {
+      $localDir = Join-Path (Get-Location) $localDir
+    }
+    $resolvedLocalDir = (Resolve-Path -LiteralPath $localDir).Path
+    $cursor = if (Test-Path -LiteralPath $resolvedLocalDir -PathType Leaf) {
+      Split-Path -Parent $resolvedLocalDir
+    } else {
+      $resolvedLocalDir
+    }
+    while (-not [string]::IsNullOrWhiteSpace($cursor)) {
+      $candidates.Add($cursor)
+      $parent = Split-Path -Parent $cursor
+      if ([string]::IsNullOrWhiteSpace($parent) -or $parent -eq $cursor) {
+        break
+      }
+      $cursor = $parent
+    }
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    $candidates.Add($PSScriptRoot)
+    $scriptParent = Split-Path -Parent $PSScriptRoot
+    if (-not [string]::IsNullOrWhiteSpace($scriptParent)) {
+      $candidates.Add($scriptParent)
+    }
+  }
+
+  foreach ($candidate in ($candidates | Select-Object -Unique)) {
+    if ([string]::IsNullOrWhiteSpace($candidate)) {
+      continue
+    }
+    $manifestPath = Join-Path (Join-Path $candidate 'dashboards') 'deploy-manifest.json'
+    if (Test-Path -LiteralPath $manifestPath) {
+      $script:ResolvedLocalRepoRoot = $candidate
+      return $script:ResolvedLocalRepoRoot
+    }
+  }
+
+  throw 'Unable to locate dashboards/deploy-manifest.json for DASHBOARD_SOURCE_MODE=local. Set DASHBOARD_LOCAL_DIR to a dashboard source directory inside the repository checkout.'
+}
+
+function Get-RepoFileContent([string]$RelativePath) {
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+    $repoRoot = Resolve-LocalRepoRoot
+    return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repoRoot $RelativePath)
+  }
+
+  $segments = @('https://raw.githubusercontent.com', $settings.GITHUB_REPO, $settings.GITHUB_REF)
+  foreach ($part in $RelativePath.Replace('\\','/').Split('/')) {
+    if (-not [string]::IsNullOrWhiteSpace($part)) {
+      $segments += [Uri]::EscapeDataString($part)
+    }
+  }
+  $sourceUrl = $segments -join '/'
   $response = Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl
   if ($null -ne $response.RawContentStream) {
     try {
@@ -162,6 +223,36 @@ function Get-SourceFileContent([string]$FileName) {
     } catch { }
   }
   return $response.Content
+}
+
+function Get-SourceFileContent([string]$FileName) {
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+    return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $settings.DASHBOARD_LOCAL_DIR $FileName)
+  }
+  return Get-RepoFileContent ((Get-SourceSubDir) + '/' + $FileName)
+}
+
+function Get-DashboardFilesFromManifest() {
+  $manifest = Parse-JsonDocument (Get-RepoFileContent 'dashboards/deploy-manifest.json')
+  $setName = [string]$settings.DASHBOARD_SET
+  if ([string]::IsNullOrWhiteSpace($setName)) {
+    $setName = if ($manifest.PSObject.Properties['defaultSet']) { [string]$manifest.defaultSet } else { 'default' }
+  }
+  if ([string]::IsNullOrWhiteSpace($setName)) { $setName = 'default' }
+
+  $sets = $manifest.PSObject.Properties['sets']
+  if ($null -eq $sets -or $null -eq $manifest.sets) {
+    throw 'dashboards/deploy-manifest.json is missing a sets object.'
+  }
+  $setProperty = $manifest.sets.PSObject.Properties | Where-Object { $_.Name -eq $setName } | Select-Object -First 1
+  if ($null -eq $setProperty) {
+    throw "Dashboard set '$setName' not found in dashboards/deploy-manifest.json."
+  }
+  $files = @($setProperty.Value | ForEach-Object { [string]$_ })
+  if ($files.Count -eq 0) {
+    throw "Dashboard set '$setName' is empty in dashboards/deploy-manifest.json."
+  }
+  return [pscustomobject]@{ Name = $setName; Files = $files }
 }
 
 function Convert-JsonNode($Node) {
@@ -211,6 +302,15 @@ function Replace-DatasourcePlaceholders($Node) {
   if ($Node -is [hashtable] -or $Node -is [pscustomobject]) {
     $out = @{}
     foreach ($prop in $Node.PSObject.Properties) { $out[$prop.Name] = Replace-DatasourcePlaceholders $prop.Value }
+    if ($out.ContainsKey('group') -and [string]$out['group'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('datasource') -and ($out['datasource'] -is [hashtable] -or $out['datasource'] -is [pscustomobject])) {
+      $datasource = @{}
+      foreach ($prop in $out['datasource'].PSObject.Properties) { $datasource[$prop.Name] = $prop.Value }
+      $datasource['name'] = $settings.GRAFANA_DS_VM_EVCC_UID
+      if ($datasource.ContainsKey('uid')) {
+        $datasource['uid'] = $settings.GRAFANA_DS_VM_EVCC_UID
+      }
+      $out['datasource'] = [pscustomobject]$datasource
+    }
     if ($out.ContainsKey('type') -and [string]$out['type'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('uid')) {
       $out['uid'] = $settings.GRAFANA_DS_VM_EVCC_UID
     }
@@ -219,7 +319,49 @@ function Replace-DatasourcePlaceholders($Node) {
   return $Node
 }
 
+function Is-V2Dashboard($Raw) {
+  return ($null -ne $Raw -and $null -ne $Raw.PSObject.Properties['kind'] -and [string]$Raw.kind -eq 'Dashboard' -and $null -ne $Raw.PSObject.Properties['apiVersion'] -and [string]$Raw.apiVersion -like 'dashboard.grafana.app/v2*')
+}
+
+function Get-DashboardTitle([object]$Raw) {
+  if (Is-V2Dashboard $Raw) { return [string]$Raw.spec.title }
+  return [string]$Raw.title
+}
+
+function Get-DashboardUid([object]$Raw) {
+  if (Is-V2Dashboard $Raw) { return [string]$Raw.metadata.name }
+  return [string]$Raw.uid
+}
+
+function Get-DashboardPath([object]$Raw) {
+  $uid = Get-DashboardUid $Raw
+  if ([string]::IsNullOrWhiteSpace($uid)) { return '' }
+  if (Is-V2Dashboard $Raw) {
+    return "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$([Uri]::EscapeDataString($uid))"
+  }
+  return "/api/dashboards/uid/$([Uri]::EscapeDataString($uid))"
+}
+
+function Ensure-V2DashboardMetadata($Raw) {
+  if (-not (Is-V2Dashboard $Raw)) { return $Raw }
+  if ($null -eq $Raw.PSObject.Properties['metadata'] -or $null -eq $Raw.metadata) {
+    $Raw | Add-Member -NotePropertyName metadata -NotePropertyValue ([pscustomobject]@{}) -Force
+  }
+  if ($null -eq $Raw.metadata.PSObject.Properties['annotations'] -or $null -eq $Raw.metadata.annotations) {
+    $Raw.metadata | Add-Member -NotePropertyName annotations -NotePropertyValue ([pscustomobject]@{}) -Force
+  }
+  return $Raw
+}
+
+function Ensure-V2FolderAnnotation($Raw) {
+  if (-not (Is-V2Dashboard $Raw)) { return $Raw }
+  $Raw = Ensure-V2DashboardMetadata $Raw
+  $Raw.metadata.annotations.'grafana.app/folder' = $settings.GRAFANA_FOLDER_UID
+  return $Raw
+}
+
 function Build-Inputs($Raw) {
+  if (Is-V2Dashboard $Raw) { return @() }
   $inputs = @()
   $rawInputs = @()
   if ($null -ne $Raw.PSObject.Properties['__inputs']) { $rawInputs = @($Raw.__inputs) }
@@ -267,6 +409,14 @@ function Get-DashboardOverrides() {
 
 function Set-DashboardBuildDescription($Raw, [string]$BuildMarker) {
   if ($null -eq $Raw -or [string]::IsNullOrWhiteSpace($BuildMarker)) { return $Raw }
+  if (Is-V2Dashboard $Raw) {
+    foreach ($variable in @($Raw.spec.variables)) {
+      if ([string]$variable.spec.name -eq 'dashboardBuild') {
+        $variable.spec.description = $BuildMarker
+      }
+    }
+    return $Raw
+  }
   if ($null -eq $Raw.PSObject.Properties['templating'] -or $null -eq $Raw.templating) { return $Raw }
   if ($null -eq $Raw.templating.PSObject.Properties['list']) { return $Raw }
   foreach ($variable in @($Raw.templating.list)) {
@@ -279,6 +429,27 @@ function Set-DashboardBuildDescription($Raw, [string]$BuildMarker) {
 
 function Apply-DashboardFilterOverrides($Raw, [hashtable]$Overrides) {
   if ($null -eq $Raw -or $null -eq $Overrides -or $Overrides.Count -eq 0) { return $Raw }
+  if (Is-V2Dashboard $Raw) {
+    foreach ($variable in @($Raw.spec.variables)) {
+      $name = [string]$variable.spec.name
+      if (-not $Overrides.ContainsKey($name)) { continue }
+      $value = [string]$Overrides[$name]
+      if ([string]::IsNullOrWhiteSpace($value)) { continue }
+      if ($variable.kind -ne 'QueryVariable') {
+        $variable.spec.query = $value
+      }
+      if ($null -eq $variable.spec.current) {
+        $variable.spec | Add-Member -NotePropertyName current -NotePropertyValue ([pscustomobject]@{ text = $value; value = $value }) -Force
+      } else {
+        $variable.spec.current.text = $value
+        $variable.spec.current.value = $value
+      }
+      if ($null -ne $variable.spec.PSObject.Properties['options']) {
+        $variable.spec.options = @([pscustomobject]@{ selected = $true; text = $value; value = $value })
+      }
+    }
+    return $Raw
+  }
   if ($null -eq $Raw.PSObject.Properties['templating'] -or $null -eq $Raw.templating) { return $Raw }
   if ($null -eq $Raw.templating.PSObject.Properties['list']) { return $Raw }
   foreach ($variable in @($Raw.templating.list)) {
@@ -353,6 +524,23 @@ function Create-LibraryPanel($Element) {
   Invoke-GrafanaApi POST '/api/library-elements' $body | Out-Null
   Write-Host "Created library panel: $($body.name) [$($Element.uid)]" -ForegroundColor Green
 }
+
+function Import-ClassicDashboard($Dashboard) {
+  $body = @{ dashboard = $Dashboard.raw; folderUid = $settings.GRAFANA_FOLDER_UID; overwrite = $true; message = 'EVCC VM dashboard install'; inputs = [object[]]@($Dashboard.inputs) }
+  Invoke-GrafanaApi POST '/api/dashboards/import' $body | Out-Null
+}
+
+function Import-V2Dashboard($Dashboard) {
+  $raw = Ensure-V2FolderAnnotation $Dashboard.raw
+  $path = Get-DashboardPath $raw
+  $existing = Invoke-GrafanaApi GET $path -Allow404
+  if ($null -ne $existing -and $existing.metadata.resourceVersion) {
+    $raw.metadata.resourceVersion = $existing.metadata.resourceVersion
+    Invoke-GrafanaApi PUT $path $raw | Out-Null
+    return
+  }
+  Invoke-GrafanaApi POST '/apis/dashboard.grafana.app/v2/namespaces/default/dashboards' $raw | Out-Null
+}
 function Confirm-Apply() {
   $answer = Read-Host 'Proceed with dashboard deployment? [y/N]'
   return $answer -match '^(y|yes)$'
@@ -373,6 +561,7 @@ $settings = @{
   GITHUB_REF = 'main'
   DASHBOARD_LANGUAGE = 'en'
   DASHBOARD_VARIANT = 'gen'
+  DASHBOARD_SET = 'default'
   DASHBOARD_LOCAL_DIR = ''
   PURGE = 'false'
   DASHBOARD_FILTER_PEAK_POWER_LIMIT = ''
@@ -392,7 +581,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_SET','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -405,6 +594,7 @@ Merge-Setting $settings 'GRAFANA_PASSWORD' $password
 Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_UID' $datasourceuid
 Merge-Setting $settings 'DASHBOARD_LANGUAGE' $language
 Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
+Merge-Setting $settings 'DASHBOARD_SET' $dashboardset
 Merge-Setting $settings 'DASHBOARD_SOURCE_MODE' $sourcemode
 Merge-Setting $settings 'GITHUB_REPO' $githubrepo
 Merge-Setting $settings 'GITHUB_REF' $githubref
@@ -420,14 +610,8 @@ $dashboardOverrides = Get-DashboardOverrides
 if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
 
-$dashboardFiles = @(
-  'VM_ EVCC_ All-time.json',
-  'VM_ EVCC_ Jahr.json',
-  'VM_ EVCC_ Monat.json',
-  'VM_ EVCC_ Today - Details.json',
-  'VM_ EVCC_ Today.json',
-  'VM_ EVCC_ Today - Mobile.json'
-)
+$dashboardSelection = Get-DashboardFilesFromManifest
+$dashboardFiles = @($dashboardSelection.Files)
 
 $dashboards = @()
 $libraryElements = @{}
@@ -436,6 +620,7 @@ foreach ($fileName in $dashboardFiles) {
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
   $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
   $raw = Replace-DatasourcePlaceholders $raw
+  $raw = Ensure-V2FolderAnnotation $raw
   $dashboards += @{ fileName = $fileName; raw = $raw; inputs = (Build-Inputs $raw) }
   if ($null -ne $raw.PSObject.Properties['__elements']) {
     foreach ($prop in $raw.__elements.PSObject.Properties) { $libraryElements[$prop.Name] = $prop.Value }
@@ -450,6 +635,7 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
+Write-Host "Dashboard set: $($dashboardSelection.Name)"
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
   Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)"
 } else {
@@ -469,7 +655,7 @@ if ($activeDashboardOverrides.Count -gt 0) {
 }
 Write-Host ''
 Write-Host 'Will import dashboards:'
-foreach ($dashboard in $dashboards) { Write-Host "- $($dashboard.raw.title) [$($dashboard.raw.uid)]" }
+foreach ($dashboard in $dashboards) { Write-Host "- $(Get-DashboardTitle $dashboard.raw) [$(Get-DashboardUid $dashboard.raw)]" }
 Write-Host ''
 Write-Host 'Dashboards embed these library panels:'
 foreach ($element in $libraryElements.Values) { Write-Host "- $($element.name) [$($element.uid)]" }
@@ -490,13 +676,19 @@ if ($settings.PURGE -ne 'true' -and $existingLibrary.Count -gt 0) {
 if ($settings.PURGE -eq 'true') {
   $existingDashboards = @()
   foreach ($dashboard in $dashboards) {
-    if (-not $dashboard.raw.uid) { continue }
-    $existing = Invoke-GrafanaApi GET "/api/dashboards/uid/$([Uri]::EscapeDataString($dashboard.raw.uid))" -Allow404
-    if ($null -ne $existing) { $existingDashboards += $existing.dashboard }
+    $path = Get-DashboardPath $dashboard.raw
+    if ([string]::IsNullOrWhiteSpace($path)) { continue }
+    $existing = Invoke-GrafanaApi GET $path -Allow404
+    if ($null -eq $existing) { continue }
+    if (Is-V2Dashboard $dashboard.raw) {
+      $existingDashboards += $existing
+    } else {
+      $existingDashboards += $existing.dashboard
+    }
   }
   Write-Host ''
   Write-Host 'Will delete existing dashboards before import:'
-  if ($existingDashboards.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingDashboards) { Write-Host "- $($item.title) [$($item.uid)]" } }
+  if ($existingDashboards.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingDashboards) { Write-Host "- $(Get-DashboardTitle $item) [$(Get-DashboardUid $item)]" } }
   Write-Host ''
   Write-Host 'Will ensure referenced library panels before import:'
   if ($existingLibrary.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
@@ -511,8 +703,9 @@ if (-not (Confirm-Apply)) {
 Ensure-Folder
 if ($settings.PURGE -eq 'true') {
   foreach ($dashboard in $dashboards) {
-    if ($dashboard.raw.uid) {
-      Remove-And-Report 'dashboard' $dashboard.raw.title $dashboard.raw.uid "/api/dashboards/uid/$([Uri]::EscapeDataString($dashboard.raw.uid))"
+    $uid = Get-DashboardUid $dashboard.raw
+    if ($uid) {
+      Remove-And-Report 'dashboard' (Get-DashboardTitle $dashboard.raw) $uid (Get-DashboardPath $dashboard.raw)
     }
   }
 }
@@ -526,12 +719,18 @@ foreach ($uid in ($libraryElements.Keys | Sort-Object)) {
 }
 
 foreach ($dashboard in $dashboards) {
-  $body = @{ dashboard = $dashboard.raw; folderUid = $settings.GRAFANA_FOLDER_UID; overwrite = $true; message = 'EVCC VM dashboard install'; inputs = [object[]]@($dashboard.inputs) }
-  Write-Host "Importing dashboard: $($dashboard.raw.title) [$($dashboard.raw.uid)]"
-  Invoke-GrafanaApi POST '/api/dashboards/import' $body | Out-Null
-  Write-Host "Imported dashboard: $($dashboard.raw.title)"
+  $title = Get-DashboardTitle $dashboard.raw
+  $uid = Get-DashboardUid $dashboard.raw
+  Write-Host "Importing dashboard: $title [$uid]"
+  if (Is-V2Dashboard $dashboard.raw) {
+    Import-V2Dashboard $dashboard
+  } else {
+    Import-ClassicDashboard $dashboard
+  }
+  Write-Host "Imported dashboard: $title"
 }
 
 Write-Host ''
 Write-Host 'Install finished.' -ForegroundColor Green
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
+
