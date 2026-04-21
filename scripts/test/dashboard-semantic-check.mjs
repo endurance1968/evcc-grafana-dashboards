@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.04.21.2
+ * Version: 2026.04.21.4
  * Last modified: 2026-04-21
  */
 import fs from "node:fs";
@@ -250,6 +250,17 @@ function validateDashboard(fileName, dashboard) {
     for (const item of loadpointItems) {
       assert(!item.spec?.repeat, failures, `${fileName}: loadpoint panel item ${item.spec?.element?.name || "?"} must not repeat independently`);
     }
+  }
+
+  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+    const powerHistoryTargets = dashboard.__elements?.afc1nq1oy29s0a?.model?.targets || [];
+    assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: embedded Power history library panel must include PV forecast target`);
+    const powerHistoryOverrides = dashboard.__elements?.afc1nq1oy29s0a?.model?.fieldConfig?.overrides || [];
+    const forecastOverride = powerHistoryOverrides.find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "PV forecast");
+    const forecastProperties = new Map((forecastOverride?.properties || []).map((property) => [property.id, property.value]));
+    assert(forecastProperties.get("color")?.mode === "fixed" && forecastProperties.get("color")?.fixedColor === "#2F8F5B", failures, `${fileName}: PV forecast must be fixed dark green`);
+    assert(forecastProperties.get("custom.lineStyle")?.fill === "dash", failures, `${fileName}: PV forecast must be dashed`);
+    assert(forecastProperties.get("custom.fillOpacity") === 0, failures, `${fileName}: PV forecast must not use area fill`);
   }
 
   for (const expected of expectedLinks[fileName] || []) {
