@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.04.21.4
- * Last modified: 2026-04-21
+ * Version: 2026.04.22.2
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -250,6 +250,17 @@ function validateDashboard(fileName, dashboard) {
     for (const item of loadpointItems) {
       assert(!item.spec?.repeat, failures, `${fileName}: loadpoint panel item ${item.spec?.element?.name || "?"} must not repeat independently`);
     }
+
+    const pvPowerPanel = dashboard.spec?.elements?.["panel-27"]?.spec;
+    const pvPowerQueries = pvPowerPanel?.data?.spec?.queries || [];
+    const pvPowerRefs = pvPowerQueries.map((query) => query.spec?.refId);
+    assert(pvPowerQueries.some((query) => query.spec?.refId === "pvPowerTotal" && String(query.spec?.query?.spec?.expr || "").includes('pvPower_value{id=""}') && query.spec?.query?.spec?.legendFormat === "Total"), failures, `${fileName}: PV power panel must include a Total PV target`);
+    assert(pvPowerRefs.indexOf("pvPowerPerString") >= 0 && pvPowerRefs.indexOf("pvPowerTotal") > pvPowerRefs.indexOf("pvPowerPerString"), failures, `${fileName}: PV power Total target must be after pvPowerPerString`);
+    const totalOverride = (pvPowerPanel?.vizConfig?.spec?.fieldConfig?.overrides || []).find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "Total");
+    const totalProperties = new Map((totalOverride?.properties || []).map((property) => [property.id, property.value]));
+    assert(totalProperties.get("color")?.mode === "fixed" && totalProperties.get("color")?.fixedColor === "text", failures, `${fileName}: PV power Total must be fixed grey/text color`);
+    assert(totalProperties.get("custom.lineStyle")?.fill === "dash", failures, `${fileName}: PV power Total must be dashed`);
+    assert(totalProperties.get("custom.fillOpacity") === 0, failures, `${fileName}: PV power Total must not use area fill`);
   }
 
   if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {

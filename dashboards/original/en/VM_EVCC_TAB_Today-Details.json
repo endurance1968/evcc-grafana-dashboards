@@ -275,6 +275,29 @@
                     "refId": "pvPowerPerString",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(pvPower_value{id=\"\"}) < $peakPowerLimit",
+                        "format": "time_series",
+                        "legendFormat": "Total",
+                        "range": true,
+                        "refId": "pvPowerTotal"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "pvPowerTotal",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
@@ -369,13 +392,31 @@
                     "properties": [
                       {
                         "id": "custom.lineWidth",
-                        "value": 1
+                        "value": 2
                       },
                       {
                         "id": "color",
                         "value": {
                           "fixedColor": "text",
                           "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.drawStyle",
+                        "value": "line"
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "fill": "dash",
+                          "dash": [
+                            8,
+                            6
+                          ]
                         }
                       }
                     ]
