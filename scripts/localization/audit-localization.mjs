@@ -1,13 +1,14 @@
 /**
  * Script: audit-localization.mjs
  * Purpose: Scans source dashboards for untranslated texts and writes missing translation reports per language.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
+  portableRelative,
   familyReportPath,
   familySourceDir,
   readLanguagesConfig,
@@ -178,7 +179,7 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
   const missing = new Map();
 
   for (const file of files) {
-    const relative = path.relative(sourceDir, file);
+    const relative = portableRelative(sourceDir, file);
     const json = readJson(file);
 
     walk(json, (key, value, node) => {
@@ -214,11 +215,11 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
     generatedAt: new Date().toISOString(),
     sourceLanguage,
     targetLanguage,
-    sourceDir: path.relative(repoRoot, sourceDir),
-    mappingFile: path.relative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage)),
+    sourceDir: portableRelative(repoRoot, sourceDir),
+    mappingFile: portableRelative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage)),
     notes: [
       "Fill each value with the final target-language translation.",
-      `Then merge into ${path.relative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage))} under exact.`,
+      `Then merge into ${portableRelative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage))} under exact.`,
       "Use exactSources to see which source dashboard file names produced each candidate.",
       "This audit includes displayName/displayNameFromDS override values.",
       "This is a candidate list; some entries can be intentionally unchanged.",
@@ -229,7 +230,7 @@ function auditTarget({ sourceLanguage, targetLanguage, sourceDir }) {
 
   console.log(`Target '${targetLanguage}': scanned ${files.length} dashboard files.`);
   console.log(`Target '${targetLanguage}': missing translation candidates: ${sorted.length}`);
-  console.log(`Suggestion file: ${path.relative(repoRoot, outputFile)}`);
+  console.log(`Suggestion file: ${portableRelative(repoRoot, outputFile)}`);
 
   if (sorted.length > 0) {
     console.log("Top candidates:");
@@ -269,7 +270,7 @@ function main() {
   for (const targetLanguage of requestedTargets) {
     if (!configuredTargets.includes(targetLanguage)) {
       throw new Error(
-        `Unknown target language '${targetLanguage}'. Configure it in ${path.relative(repoRoot, family.languagesConfigPath)}`,
+        `Unknown target language '${targetLanguage}'. Configure it in ${portableRelative(repoRoot, family.languagesConfigPath)}`,
       );
     }
   }

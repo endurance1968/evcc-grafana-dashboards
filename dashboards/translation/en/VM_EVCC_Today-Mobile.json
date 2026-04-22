@@ -244,6 +244,51 @@
                   }
                 }
               ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "PV forecast"
+              },
+              "properties": [
+                {
+                  "id": "color",
+                  "value": {
+                    "fixedColor": "#2F8F5B",
+                    "mode": "fixed"
+                  }
+                },
+                {
+                  "id": "custom.drawStyle",
+                  "value": "line"
+                },
+                {
+                  "id": "custom.lineInterpolation",
+                  "value": "smooth"
+                },
+                {
+                  "id": "custom.lineWidth",
+                  "value": 2
+                },
+                {
+                  "id": "custom.fillOpacity",
+                  "value": 0
+                },
+                {
+                  "id": "custom.pointSize",
+                  "value": 0
+                },
+                {
+                  "id": "custom.lineStyle",
+                  "value": {
+                    "fill": "dash",
+                    "dash": [
+                      8,
+                      6
+                    ]
+                  }
+                }
+              ]
             }
           ]
         },
@@ -331,6 +376,20 @@
             "legendFormat": "{{loadpoint}}",
             "range": true,
             "refId": "loadpointPower"
+          },
+          {
+            "datasource": {
+              "type": "victoriametrics-metrics-datasource",
+              "uid": "${DS_VM-EVCC}"
+            },
+            "editorMode": "code",
+            "expr": "avg(tariffSolar_value)",
+            "format": "time_series",
+            "hide": false,
+            "interval": "1h",
+            "legendFormat": "PV forecast",
+            "range": true,
+            "refId": "pvForecast"
           }
         ],
         "type": "timeseries"

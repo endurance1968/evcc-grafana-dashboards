@@ -14,12 +14,13 @@ import {
 } from "./_lib.mjs";
 import {
   familySourceDir,
+  portableRelative,
   familyTranslationDir,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.04.20.1";
-const SCRIPT_LAST_MODIFIED = "2026-04-20";
+const SCRIPT_VERSION = "2026.04.22.1";
+const SCRIPT_LAST_MODIFIED = "2026-04-22";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -198,7 +199,7 @@ function repoSubdirForSelection() {
 }
 
 function defaultLocalSource() {
-  return path.relative(
+  return portableRelative(
     repoRoot,
     variant === "orig" ? familySourceDir(family, language) : familyTranslationDir(family, language),
   );
@@ -385,7 +386,7 @@ function stageDashboards(sourceInput, targetDir, overridesPath, sourceLabel) {
     const raw = JSON.parse(fs.readFileSync(file, "utf8"));
     const patched = applyOverridesToDashboard(raw, overrides);
     applyDashboardBuildDescription(patched, buildMarker);
-    const rel = path.relative(sourceRoot, file);
+    const rel = portableRelative(sourceRoot, file);
     const out = path.join(targetDir, rel);
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, `${JSON.stringify(patched, null, 2)}\n`, "utf8");
@@ -411,7 +412,7 @@ async function resolveRawSource() {
   if (!fs.existsSync(localInput)) {
     throw new Error(`Local source not found: ${localInput}`);
   }
-  return { rawSource: localInput, sourceLabel: path.relative(repoRoot, localInput) };
+  return { rawSource: localInput, sourceLabel: portableRelative(repoRoot, localInput) };
 }
 
 async function main() {
@@ -451,4 +452,3 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
-

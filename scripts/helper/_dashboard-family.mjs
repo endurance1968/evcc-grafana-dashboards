@@ -1,8 +1,8 @@
 /**
  * Script: _dashboard-family.mjs
  * Purpose: Shared helper for resolving the fixed VM dashboard paths, language config, and workflow directories.
- * Version: 2026.04.19.3
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -14,6 +14,14 @@ function ensureNoLegacyFamilyArg(argv = process.argv) {
   if (legacyArg) {
     throw new Error("The --family option was removed. This repository always uses the VM dashboards.");
   }
+}
+
+export function toPortablePath(filePath) {
+  return String(filePath).replace(/\\/g, "/");
+}
+
+export function portableRelative(fromPath, toPath) {
+  return toPortablePath(path.relative(fromPath, toPath));
 }
 
 export function resolveDashboardFamily() {

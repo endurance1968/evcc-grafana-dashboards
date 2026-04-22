@@ -1,13 +1,14 @@
 /**
  * Script: prune-mappings-to-source.mjs
  * Purpose: Removes mapping entries that no longer occur in the current source dashboards.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
+  portableRelative,
   familySourceDir,
   readLanguagesConfig,
   resolveDashboardFamily,
@@ -192,7 +193,7 @@ function main() {
   const sourceDir = familySourceDir(family, sourceLanguage);
 
   if (!fs.existsSync(sourceDir)) {
-    throw new Error(`Source directory does not exist: ${sourceDir}`);
+    throw new Error(`Source directory does not exist: ${portableRelative(process.cwd(), sourceDir)}`);
   }
 
   const { files, values } = collectSourceStrings(sourceDir);

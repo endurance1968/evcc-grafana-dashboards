@@ -1,8 +1,8 @@
 /**
  * Script: localization-idempotency-check.mjs
  * Purpose: Verify generated dashboard translations are reproducible from dashboards/original without creating diffs.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -10,6 +10,7 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   familySourceDir,
+  portableRelative,
   familyTranslationDir,
   readLanguagesConfig,
   resolveDashboardFamily,
@@ -51,7 +52,7 @@ function fileHash(filePath) {
 
 function snapshotTranslationFiles() {
   const files = collectJsonFiles(family.translationRoot);
-  return new Map(files.map((filePath) => [path.relative(repoRoot, filePath), fileHash(filePath)]));
+  return new Map(files.map((filePath) => [portableRelative(repoRoot, filePath), fileHash(filePath)]));
 }
 
 function changedFiles(before, after) {
@@ -70,14 +71,14 @@ function assertSourceLanguageCopy() {
   const mismatches = [];
 
   for (const sourceFile of collectJsonFiles(sourceDir)) {
-    const relative = path.relative(sourceDir, sourceFile);
+    const relative = portableRelative(sourceDir, sourceFile);
     const generatedFile = path.join(generatedDir, relative);
     if (!fs.existsSync(generatedFile)) {
-      mismatches.push(path.relative(repoRoot, generatedFile));
+      mismatches.push(portableRelative(repoRoot, generatedFile));
       continue;
     }
     if (canonicalJson(sourceFile) !== canonicalJson(generatedFile)) {
-      mismatches.push(path.relative(repoRoot, generatedFile));
+      mismatches.push(portableRelative(repoRoot, generatedFile));
     }
   }
 
@@ -105,8 +106,8 @@ function main() {
   console.log("Localization idempotency check");
   console.log("==============================");
   console.log("Script:        localization-idempotency-check.mjs");
-  console.log("Version:       2026.04.19.1");
-  console.log("Last modified: 2026-04-19");
+  console.log("Version:       2026.04.22.1");
+  console.log("Last modified: 2026-04-22");
   console.log("");
   console.log("Result");
   console.log("------");

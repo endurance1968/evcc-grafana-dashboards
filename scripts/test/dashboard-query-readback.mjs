@@ -1,12 +1,13 @@
 /**
  * Script: dashboard-query-readback.mjs
  * Purpose: Execute original VM dashboard MetricsQL targets against VictoriaMetrics after Grafana macro substitution.
- * Version: 2026.04.20.2
- * Last modified: 2026-04-20
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
+import { portableRelative } from "../helper/_dashboard-family.mjs";
 import {
   collectDashboardPanels,
   dashboardTimeSettings,
@@ -400,7 +401,7 @@ function readTargets(sourceDir) {
         }
         targets.push({
           file,
-          fileName: path.relative(sourceDir, file),
+          fileName: portableRelative(sourceDir, file),
           dashboard,
           panelId: panel.id,
           panelTitle: panel.title || String(panel.id),
@@ -473,8 +474,8 @@ async function main() {
     console.log("Dashboard query readback");
     console.log("========================");
     console.log("Script:        dashboard-query-readback.mjs");
-    console.log("Version:       2026.04.20.2");
-    console.log("Last modified: 2026-04-20");
+    console.log("Version:       2026.04.22.1");
+    console.log("Last modified: 2026-04-22");
     console.log(`VM base URL:   ${baseUrl}`);
     console.log(`Source dir:    ${sourceDir}`);
     console.log(`Query time:    ${now.toISOString().replace(".000Z", "Z")}`);

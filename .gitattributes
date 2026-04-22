@@ -1,0 +1,9 @@
+# Keep text files stable across Windows/Linux checkouts.
+* text=auto eol=lf
+
+# Binary assets must not be line-normalized.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary

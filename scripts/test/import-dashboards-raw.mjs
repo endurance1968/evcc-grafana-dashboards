@@ -1,8 +1,8 @@
 /**
  * Script: import-dashboards-raw.mjs
  * Purpose: Import raw dashboard JSON files into Grafana and emit an import manifest.
- * Version: 2026.04.20.2
- * Last modified: 2026-04-20
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -20,6 +20,7 @@ import {
 } from "./_lib.mjs";
 import {
   familyTranslationDir,
+  portableRelative,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
@@ -39,7 +40,7 @@ const family = resolveDashboardFamily();
 function defaultSourceFromConfig() {
   const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
   const firstTarget = targetLanguages.find(Boolean) || sourceLanguage;
-  return path.relative(process.cwd(), familyTranslationDir(family, firstTarget));
+  return portableRelative(process.cwd(), familyTranslationDir(family, firstTarget));
 }
 
 const baseUrl = requireEnv("GRAFANA_URL");
@@ -329,7 +330,7 @@ async function main() {
       : await importClassicDashboard(dashboard, inputs);
 
     imported.push({
-      sourceFile: path.relative(process.cwd(), file),
+      sourceFile: portableRelative(process.cwd(), file),
       uid: result.uid,
       url: result.url,
       status: result.status,
@@ -343,7 +344,7 @@ async function main() {
     createdAt: new Date().toISOString(),
     family: family.name,
     tag,
-    source: path.relative(process.cwd(), path.resolve(source)),
+    source: portableRelative(process.cwd(), path.resolve(source)),
     dashboardSet,
     grafanaUrl: baseUrl,
     folderUid,

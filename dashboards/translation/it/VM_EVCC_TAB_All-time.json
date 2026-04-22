@@ -5884,45 +5884,6 @@
                           "name": "panel-18"
                         }
                       }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "x": 0,
-                        "y": 30,
-                        "width": 8,
-                        "height": 11,
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-38"
-                        }
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "x": 8,
-                        "y": 30,
-                        "width": 8,
-                        "height": 11,
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-39"
-                        }
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "x": 16,
-                        "y": 30,
-                        "width": 8,
-                        "height": 11,
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-40"
-                        }
-                      }
                     }
                   ]
                 }
@@ -5962,6 +5923,45 @@
                           "name": "panel-54"
                         }
                       }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 13,
+                        "width": 8,
+                        "height": 11,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-38"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 8,
+                        "y": 13,
+                        "width": 8,
+                        "height": 11,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-39"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 16,
+                        "y": 13,
+                        "width": 8,
+                        "height": 11,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-40"
+                        }
+                      }
                     }
                   ]
                 }
@@ -5988,25 +5988,12 @@
                           "name": "panel-28"
                         }
                       }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          {
-            "kind": "TabsLayoutTab",
-            "spec": {
-              "title": "Bilancio",
-              "layout": {
-                "kind": "GridLayout",
-                "spec": {
-                  "items": [
+                    },
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 0,
+                        "y": 13,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -6019,7 +6006,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 8,
-                        "y": 0,
+                        "y": 13,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -6032,7 +6019,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 16,
-                        "y": 0,
+                        "y": 13,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -6040,25 +6027,12 @@
                           "name": "panel-51"
                         }
                       }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          {
-            "kind": "TabsLayoutTab",
-            "spec": {
-              "title": "Veicoli",
-              "layout": {
-                "kind": "GridLayout",
-                "spec": {
-                  "items": [
+                    },
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 0,
+                        "y": 23,
                         "width": 12,
                         "height": 10,
                         "element": {
@@ -6087,7 +6061,7 @@
         "type": "link",
         "icon": "dashboard",
         "tooltip": "",
-        "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser",
+        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now%2Fy&to=now&timezone=browser",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,
@@ -6099,7 +6073,7 @@
         "type": "link",
         "icon": "dashboard",
         "tooltip": "",
-        "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser",
+        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now%2FM&to=now&timezone=browser",
         "tags": [],
         "asDropdown": false,
         "targetBlank": false,

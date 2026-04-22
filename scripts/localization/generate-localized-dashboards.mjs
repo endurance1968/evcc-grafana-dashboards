@@ -1,13 +1,14 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
+  portableRelative,
   familySourceDir,
   familyTranslationDir,
   readLanguagesConfig,
@@ -134,7 +135,7 @@ function main() {
 
     let count = 0;
     for (const sourceFile of files) {
-      const relative = path.relative(sourceDir, sourceFile);
+      const relative = portableRelative(sourceDir, sourceFile);
       const targetFile = path.join(outDir, relative);
       ensureDir(path.dirname(targetFile));
 
@@ -149,10 +150,10 @@ function main() {
     }
 
     console.log(`Generated ${count} dashboard files for '${targetLanguage}'.`);
-    console.log(`Output: ${path.relative(repoRoot, outDir)}`);
+    console.log(`Output: ${portableRelative(repoRoot, outDir)}`);
     if (targetLanguage !== sourceLanguage) {
       console.log(
-        `Mapping: ${path.relative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage))}`,
+        `Mapping: ${portableRelative(repoRoot, familyMappingPath(family, sourceLanguage, targetLanguage))}`,
       );
     }
   }

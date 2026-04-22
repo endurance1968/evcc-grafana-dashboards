@@ -1,14 +1,15 @@
 /**
  * Script: adopt-missing-into-mappings.mjs
  * Purpose: Copies open audit findings from missing reports into the real mapping files as exact entries.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
   familyReportPath,
+  portableRelative,
   readLanguagesConfig,
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
@@ -150,7 +151,7 @@ function main() {
   for (const targetLanguage of requestedTargets) {
     if (!configuredTargets.includes(targetLanguage)) {
       throw new Error(
-        `Unknown target language '${targetLanguage}'. Configure it in ${path.relative(repoRoot, family.languagesConfigPath)}`,
+        `Unknown target language '${targetLanguage}'. Configure it in ${portableRelative(repoRoot, family.languagesConfigPath)}`,
       );
     }
   }

@@ -1,14 +1,15 @@
 /**
  * Script: run-suite.mjs
  * Purpose: Run the Grafana dashboard test workflow across source and translation variants.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { loadEnvFile, parseArg, sanitizeTag } from "./_lib.mjs";
 import {
   familySourceDir,
+  portableRelative,
   familyTranslationDir,
   readLanguagesConfig,
   resolveDashboardFamily,
@@ -28,11 +29,11 @@ const familyTagPrefix = `${sanitizeTag(family.tagPrefix)}-`;
 const sets = [
   {
     tag: `${familyTagPrefix}original-${sanitizeTag(sourceLanguage)}`,
-    source: path.relative(repoRoot, familySourceDir(family, sourceLanguage)),
+    source: portableRelative(repoRoot, familySourceDir(family, sourceLanguage)),
   },
   ...targetLanguages.map((lang) => ({
     tag: `${familyTagPrefix}${sanitizeTag(lang)}-gen`,
-    source: path.relative(repoRoot, familyTranslationDir(family, lang)),
+    source: portableRelative(repoRoot, familyTranslationDir(family, lang)),
   })),
 ];
 
@@ -71,8 +72,4 @@ if (withFinalCleanup) {
   run("scripts/test/cleanup-grafana.mjs");
 }
 
-console.log('`nGrafana dashboard test suite finished.');
-
-
-
-
+console.log("\nGrafana dashboard test suite finished.");

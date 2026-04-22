@@ -1,13 +1,14 @@
 /**
  * Script: sync-displayname-mappings.mjs
  * Purpose: Syncs missing displayName-related exact mappings from the current source and generated dashboards.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.22.1
+ * Last modified: 2026-04-22
  */
 import fs from "node:fs";
 import path from "node:path";
 import {
   familyMappingPath,
+  portableRelative,
   familySourceDir,
   familyTranslationDir,
   readLanguagesConfig,
@@ -89,7 +90,7 @@ function updateMapping(sourceLanguage, targetLanguage) {
   const pairs = new Map();
 
   for (const sourceFile of files) {
-    const relative = path.relative(sourceLangDir, sourceFile);
+    const relative = portableRelative(sourceLangDir, sourceFile);
     const targetFile = path.join(targetLangDir, relative);
     if (!fs.existsSync(targetFile)) {
       continue;
@@ -131,4 +132,3 @@ function main() {
 }
 
 main();
-
