@@ -6021,7 +6021,7 @@
                         "x": 0,
                         "y": 23,
                         "width": 12,
-                        "height": 10,
+                        "height": 7,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-49"
