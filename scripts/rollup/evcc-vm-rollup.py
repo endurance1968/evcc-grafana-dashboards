@@ -19,8 +19,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.14.1"
-SCRIPT_LAST_MODIFIED = "2026-04-14"
+SCRIPT_VERSION = "2026.04.24.1"
+SCRIPT_LAST_MODIFIED = "2026-04-24"
 
 
 def current_local_timestamp() -> datetime:
@@ -1478,17 +1478,26 @@ def summarize_counter_spread_samples(
     counter_samples: list[tuple[int, float]],
     unit_multiplier: float = 1000.0,
 ) -> float | None:
-    values = [
-        value
-        for _, value in counter_samples
+    samples = [
+        (timestamp, value)
+        for timestamp, value in counter_samples
         if math.isfinite(value) and value >= 0
     ]
-    if len(values) < 2:
+    samples.sort(key=lambda item: item[0])
+    if len(samples) < 2:
         return None
-    spread = max(values) - min(values)
-    if spread < 0:
+
+    total_delta = 0.0
+    previous = samples[0][1]
+    for _, value in samples[1:]:
+        delta = value - previous
+        if delta >= 0:
+            total_delta += delta
+        previous = value
+
+    if total_delta <= 0:
         return None
-    return spread * unit_multiplier
+    return total_delta * unit_multiplier
 
 
 def summarize_battery_energy_samples(

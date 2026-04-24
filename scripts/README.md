@@ -231,6 +231,12 @@ npm run test:render-e2e
 
 This starts temporary Grafana and VictoriaMetrics containers, imports minimal VM fixture data, creates the VM datasource, imports the original VM dashboards, and runs the hardened browser render smoke against critical panels. The Forgejo CI workflow runs this command after installing the Chromium browser for Playwright.
 
+To run the same browser render smoke against the Grafana 13 TAB dashboard set:
+
+```bash
+npm run test:render-e2e:tabs
+```
+
 The rollup E2E test is not just a smoke test. It imports deterministic raw fixture data, runs `evcc-vm-rollup.py --replace-range --write` twice, then asserts expected daily energy, tariff, and cost values, duplicate-free daily timestamps, and identical required rollup output after the second replace run.
 
 ## Configuration

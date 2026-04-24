@@ -31,6 +31,7 @@ The deployer defaults to the generated dashboard set:
 - ref: `main`
 - language: `en`
 - variant: `gen`
+- dashboard set: `default`
 - folder UID/title: `evcc` / `EVCC`
 - datasource UID: `vm-evcc`
 - purge before import: `false`
@@ -82,6 +83,7 @@ Optional values:
 - `GRAFANA_FOLDER_TITLE`
 - `DASHBOARD_LANGUAGE`
 - `DASHBOARD_VARIANT`
+- `DASHBOARD_SET=default|tabs`
 - `DASHBOARD_SOURCE_MODE=github|local`
 - `DASHBOARD_LOCAL_DIR`
 - `GITHUB_REPO`
@@ -111,6 +113,8 @@ DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
 DASHBOARD_TARIFF_PRICE_INTERVAL=15m
 DASHBOARD_INSTALLED_WATT_PEAK=20
+# Optional: requires Grafana 13.0.1 or newer.
+# DASHBOARD_SET=tabs
 DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
@@ -129,6 +133,8 @@ GRAFANA_AUTH_MODE=basic
 GRAFANA_USER=admin
 GRAFANA_PASSWORD=<admin_password>
 ```
+
+Set `DASHBOARD_SET=tabs` to deploy the Grafana 13 TAB variants. They replace the longer row-based `All-time`, `Year`, `Month`, and `Today - Details` layouts with tabs for better navigation. Use Grafana 13.0.1 or newer for this set.
 
 All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
 

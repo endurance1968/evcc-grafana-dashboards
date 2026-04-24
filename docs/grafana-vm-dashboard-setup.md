@@ -32,6 +32,7 @@ Important:
 You need:
 
 - a running Grafana instance
+- Grafana 13.0.1 or newer if you want to use the TAB dashboard set; the default dashboard set does not require tabs
 - a running VictoriaMetrics instance
 - a Grafana service-account token
 - internet access to GitHub
@@ -174,6 +175,7 @@ Default values also used by the deployer:
 - branch: `main`
 - language: `en`
 - variant: `gen`
+- dashboard set: `default`
 
 Important:
 
@@ -318,6 +320,16 @@ Meaning:
 
 - `orig`: original dashboards
 - `gen`: generated localized dashboards
+
+## Optional: use TAB dashboards
+
+The repository also ships a `tabs` dashboard set. It keeps `Today` and `Today - Mobile` unchanged and uses Grafana tabs for the longer `All-time`, `Year`, `Month`, and `Today - Details` dashboards.
+
+Use Grafana 13.0.1 or newer and set:
+
+```env
+DASHBOARD_SET=tabs
+```
 
 ## If you use a different datasource UID
 

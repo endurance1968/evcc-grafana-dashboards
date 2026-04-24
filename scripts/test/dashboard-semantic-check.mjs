@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.04.22.3
- * Last modified: 2026-04-22
+ * Version: 2026.04.24.1
+ * Last modified: 2026-04-24
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -91,13 +91,13 @@ const criticalPanels = {
   "VM_EVCC_All-time.json": [
     { id: 12, title: "Energy totals", type: "bargauge", minTargets: 5 },
     { id: 24, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 2 },
+    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 1 },
     { id: 38, title: "Days with highest yield", type: "table", minTargets: 1 },
   ],
   "VM_EVCC_TAB_All-time.json": [
     { id: 12, title: "Energy totals", type: "bargauge", minTargets: 5 },
     { id: 24, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 2 },
+    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 1 },
     { id: 38, title: "Days with highest yield", type: "table", minTargets: 1 },
   ],
   "VM_EVCC_Jahr.json": [
@@ -209,10 +209,61 @@ function hasBatterySplit(panel) {
   );
 }
 
+function hasDashedDarkGreenForecast(panel) {
+  const color = propertyValue(panel, "Forecast", "color");
+  const lineStyle = propertyValue(panel, "Forecast", "custom.lineStyle");
+  const fillOpacity = propertyValue(panel, "Forecast", "custom.fillOpacity");
+  const lineWidth = propertyValue(panel, "Forecast", "custom.lineWidth");
+
+  return (
+    color?.mode === "fixed" &&
+    color?.fixedColor === "#2F8F5B" &&
+    lineStyle?.fill === "dash" &&
+    Array.isArray(lineStyle?.dash) &&
+    lineStyle.dash[0] === 8 &&
+    lineStyle.dash[1] === 6 &&
+    fillOpacity === 0 &&
+    lineWidth === 2
+  );
+}
+
 function assert(condition, failures, message) {
   if (!condition) {
     failures.push(message);
   }
+}
+
+function validateDeployManifest(manifest) {
+  const failures = [];
+  const setNames = Object.keys(manifest?.sets || {});
+
+  assert(setNames.length > 0, failures, "deploy manifest: no dashboard sets configured");
+  assert(Boolean(manifest?.sets?.[manifest?.defaultSet]), failures, `deploy manifest: defaultSet '${manifest?.defaultSet}' is not configured`);
+
+  for (const setName of setNames) {
+    const files = manifest.sets[setName];
+    assert(Array.isArray(files) && files.length > 0, failures, `deploy manifest: set '${setName}' is empty or not an array`);
+    const seen = new Set();
+    for (const file of files || []) {
+      const fileName = String(file);
+      assert(fileName.endsWith(".json"), failures, `deploy manifest: '${fileName}' in set '${setName}' is not a JSON dashboard`);
+      assert(!fileName.includes("\\") && !fileName.includes("/"), failures, `deploy manifest: '${fileName}' in set '${setName}' must be a file name only`);
+      assert(!seen.has(fileName), failures, `deploy manifest: duplicate '${fileName}' in set '${setName}'`);
+      seen.add(fileName);
+    }
+  }
+
+  const defaultFiles = new Set(manifest?.sets?.default || []);
+  const tabFiles = new Set(manifest?.sets?.tabs || []);
+  assert(tabFiles.has("VM_EVCC_TAB_All-time.json"), failures, "deploy manifest: tabs set must include TAB All-time dashboard");
+  assert(tabFiles.has("VM_EVCC_TAB_Jahr.json"), failures, "deploy manifest: tabs set must include TAB Year dashboard");
+  assert(tabFiles.has("VM_EVCC_TAB_Monat.json"), failures, "deploy manifest: tabs set must include TAB Month dashboard");
+  assert(tabFiles.has("VM_EVCC_TAB_Today-Details.json"), failures, "deploy manifest: tabs set must include TAB Today Details dashboard");
+  assert(tabFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: tabs set must keep the normal Today dashboard");
+  assert(tabFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: tabs set must keep the normal Today Mobile dashboard");
+  assert(defaultFiles.has("VM_EVCC_Today-Details.json"), failures, "deploy manifest: default set must keep the row-based Today Details dashboard");
+
+  return failures;
 }
 
 function validateDashboard(fileName, dashboard) {
@@ -258,6 +309,12 @@ function validateDashboard(fileName, dashboard) {
     assert(!pvPowerRefs.includes("pvPowerTotal"), failures, `${fileName}: PV power panel must not include separate Total target when strings are stacked`);
     const pvStacking = pvPowerPanel?.vizConfig?.spec?.fieldConfig?.defaults?.custom?.stacking;
     assert(pvStacking?.mode === "normal", failures, `${fileName}: PV power panel must stack PV strings additively`);
+
+    const forecastPanel = panels.find((panel) => panel.id === 16 && panel.title === "Forecast" && panel.type === "timeseries");
+    assert(Boolean(forecastPanel), failures, `${fileName}: missing PV tab timeseries Forecast panel`);
+    if (forecastPanel) {
+      assert(hasDashedDarkGreenForecast(forecastPanel), failures, `${fileName}: PV tab Forecast series must be dark green, dashed, and unfilled`);
+    }
   }
 
   if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
@@ -318,8 +375,9 @@ function validateDashboard(fileName, dashboard) {
 }
 
 function main() {
-  const files = manifestFilesUnion(readDeployManifest(repoRoot)).sort((a, b) => a.localeCompare(b));
-  const allFailures = [];
+  const manifest = readDeployManifest(repoRoot);
+  const files = manifestFilesUnion(manifest).sort((a, b) => a.localeCompare(b));
+  const allFailures = validateDeployManifest(manifest);
   let panelCount = 0;
   let targetCount = 0;
 

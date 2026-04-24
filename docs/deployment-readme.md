@@ -7,6 +7,7 @@ This guide is intended for the first dashboard deployment.
 You need:
 
 - a running Grafana instance
+- Grafana 13.0.1 or newer if you want to use the TAB dashboard set; the default dashboard set does not require tabs
 - a working VictoriaMetrics datasource in Grafana
 - a Grafana service-account token
 - internet access to GitHub
@@ -148,6 +149,8 @@ DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
 DASHBOARD_TARIFF_PRICE_INTERVAL=15m
 DASHBOARD_INSTALLED_WATT_PEAK=20
+# Optional: deploy the Grafana 13 TAB dashboard set instead of the default row-based set.
+# DASHBOARD_SET=tabs
 DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
@@ -158,6 +161,8 @@ DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
 All of these values are optional. They are applied when you run the deployer again later, so you can change hidden dashboard variables and the header buttons without editing the JSON files by hand. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is the same in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+
+To deploy the TAB set, set `DASHBOARD_SET=tabs`. This replaces the longer `All-time`, `Year`, `Month`, and `Today - Details` layouts with Grafana tabs for easier navigation. Use Grafana 13.0.1 or newer for this set.
 
 Every deployed dashboard also gets a small visible `Build` variable in the header. Hover over it to see the deployment timestamp, selected language/variant, and source ref.
 

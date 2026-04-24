@@ -585,6 +585,29 @@ class VmRollupTests(unittest.TestCase):
 
         self.assertAlmostEqual(value, 1250.0, places=6)
 
+    def test_summarize_counter_spread_samples_treats_decrease_as_reset(self):
+        value = MODULE.summarize_counter_spread_samples(
+            [
+                (0, 100.0),
+                (10, 101.25),
+                (20, 5.0),
+                (30, 6.5),
+            ]
+        )
+
+        self.assertAlmostEqual(value, 2750.0, places=6)
+
+    def test_summarize_counter_spread_samples_returns_none_without_positive_delta(self):
+        value = MODULE.summarize_counter_spread_samples(
+            [
+                (0, 100.0),
+                (10, 99.0),
+                (20, 98.0),
+            ]
+        )
+
+        self.assertIsNone(value)
+
     def test_fetch_grid_energy_rollups_prefers_counter_spread_for_import(self):
         def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):
             if "gridPower_value" in query:

@@ -1,17 +1,16 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.04.24.1
+ * Last modified: 2026-04-24
  */
 import { spawnSync } from "node:child_process";
+import net from "node:net";
 import path from "node:path";
 
 const repoRoot = process.cwd();
 const defaultGrafanaImage = "grafana/grafana:13.0.1";
 const defaultVmImage = "victoriametrics/victoria-metrics:v1.110.0";
-const defaultGrafanaPort = "13031";
-const defaultVmPort = "18433";
 const datasourceUid = "vm-evcc";
 const datasourceName = "VM-EVCC";
 
@@ -30,6 +29,24 @@ function parseArg(name, fallback = "") {
 
 function hasFlag(name) {
   return process.argv.includes(`--${name}`);
+}
+
+async function findFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      server.close(() => {
+        if (!address || typeof address === "string") {
+          reject(new Error("Could not allocate a free local TCP port"));
+          return;
+        }
+        resolve(String(address.port));
+      });
+    });
+  });
 }
 
 function run(command, args, options = {}) {
@@ -383,11 +400,12 @@ async function main() {
   const args = {
     grafanaImage: parseArg("grafana-image", defaultGrafanaImage),
     vmImage: parseArg("vm-image", defaultVmImage),
-    grafanaPort: parseArg("grafana-port", defaultGrafanaPort),
-    vmPort: parseArg("vm-port", defaultVmPort),
+    grafanaPort: parseArg("grafana-port", ""),
+    vmPort: parseArg("vm-port", ""),
     grafanaUser: parseArg("grafana-user", "admin"),
     grafanaPassword: parseArg("grafana-password", "admin"),
     source: parseArg("source", "dashboards/original/en"),
+    dashboardSet: parseArg("dashboard-set", ""),
     tag: parseArg("tag", "vm-render-e2e"),
     manifest: parseArg("manifest", "tests/artifacts/import-manifest-vm-render-e2e.json"),
     waitMs: parseArg("wait-ms", "5000"),
@@ -397,6 +415,8 @@ async function main() {
   if (Number.isNaN(now.getTime())) {
     throw new Error("--fixture-now must be an ISO timestamp");
   }
+  args.grafanaPort ||= await findFreePort();
+  args.vmPort ||= await findFreePort();
 
   const dockerEnv = startDockerEnvironment(args);
   const grafanaBaseUrl = `http://127.0.0.1:${args.grafanaPort}`;
@@ -414,20 +434,19 @@ async function main() {
       `--source=${args.source}`,
       `--tag=${args.tag}`,
       `--manifest=${args.manifest}`,
+      ...(args.dashboardSet ? [`--dashboard-set=${args.dashboardSet}`] : []),
     ], { env });
     run("node", [
       "scripts/test/render-smoke-check.mjs",
       `--manifest=${args.manifest}`,
-      "--from=now-7d",
-      "--to=now",
       `--wait-ms=${args.waitMs}`,
     ], { env });
 
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.04.19.1");
-    console.log("Last modified: 2026-04-19");
+    console.log("Version:       2026.04.24.1");
+    console.log("Last modified: 2026-04-24");
     console.log("");
     console.log("Result");
     console.log("------");

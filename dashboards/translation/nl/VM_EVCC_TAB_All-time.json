@@ -2562,7 +2562,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n)\nlabel_join(\n  label_set(clamp_min(monthlyImport - monthlyExport, 0), \"kind\", \"Costs\"),\n  \"series\", \" \", \"local_year\", \"kind\"\n)",
+                        "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  yearlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year),\n  costs = label_join(\n    label_set(clamp_min(monthlyImport - monthlyExport, 0), \"kind\", \"Costs\"),\n    \"series\", \" \", \"local_year\", \"kind\"\n  ),\n  income = label_join(\n    label_set(clamp_min(monthlyExport - monthlyImport, 0), \"kind\", \"Income\"),\n    \"series\", \" \", \"local_year\", \"kind\"\n  ),\n)\ncosts or (income and on (local_year) (yearlyExport > 0))",
                         "format": "table",
                         "instant": true,
                         "range": false
@@ -2571,31 +2571,18 @@
                     "refId": "A",
                     "hidden": false
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "vm-evcc"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  yearlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year),\n)\nlabel_join(\n  label_set(clamp_min(monthlyExport - monthlyImport, 0), \"kind\", \"Income\"),\n  \"series\", \" \", \"local_year\", \"kind\"\n)\nand on (local_year) (yearlyExport > 0)",
-                        "format": "table",
-                        "instant": true,
-                        "range": false
-                      }
-                    },
-                    "refId": "B",
-                    "hidden": false
-                  }
                 }
               ],
               "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "labelsToFields",
+                  "spec": {
+                    "options": {
+                      "mode": "columns"
+                    }
+                  }
+                },
                 {
                   "kind": "Transformation",
                   "group": "sortBy",

@@ -1,8 +1,8 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.04.21.1
- * Last modified: 2026-04-21
+ * Version: 2026.04.24.1
+ * Last modified: 2026-04-24
  */
 import path from "node:path";
 import { chromium } from "playwright";
@@ -176,7 +176,11 @@ function sourceFileName(dashboard) {
 
 function dashboardPath(dashboard) {
   if (dashboard.url) {
-    return dashboard.url;
+    const rawUrl = String(dashboard.url);
+    if (rawUrl.startsWith("/")) {
+      return rawUrl;
+    }
+    return `/d/${encodeURIComponent(dashboard.uid || rawUrl)}`;
   }
   return `/d/${encodeURIComponent(dashboard.uid)}`;
 }

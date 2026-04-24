@@ -1031,7 +1031,7 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "yellow",
+                          "fixedColor": "#2F8F5B",
                           "mode": "fixed"
                         }
                       },
@@ -1042,6 +1042,28 @@
                       {
                         "id": "custom.lineInterpolation",
                         "value": "smooth"
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.pointSize",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "fill": "dash",
+                          "dash": [
+                            8,
+                            6
+                          ]
+                        }
                       }
                     ]
                   }

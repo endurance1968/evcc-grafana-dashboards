@@ -19,6 +19,7 @@ Example dashboard:
 
 - a complete VictoriaMetrics-based EVCC dashboard set
 - generated dashboard translations based on an English source set
+- optional Grafana 13 TAB dashboard variants for better navigation than long collapsible dashboard rows
 - deploy scripts for first-time imports and later updates
 - a rollup script for daily long-range dashboard metrics
 - documentation for InfluxDB to VictoriaMetrics migration
