@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import bisect
 import configparser
 import json
 import math
@@ -19,8 +20,23 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.24.1"
-SCRIPT_LAST_MODIFIED = "2026-04-24"
+SCRIPT_VERSION = "2026.04.25.3"
+SCRIPT_LAST_MODIFIED = "2026-04-25"
+
+PROFILE_FAMILY_LABELS = (
+    ("positive_energy_s", "Positive energy rollups"),
+    ("consumer_attribution_s", "Consumer source attribution"),
+    ("price_rollups_s", "Grid price and cost rollups"),
+    ("grid_energy_s", "Grid counter energy rollups"),
+    ("battery_energy_s", "Battery counter energy rollups"),
+    ("vehicle_price_s", "Vehicle cost rollups"),
+    ("aggregate_price_s", "Aggregate cost rollups"),
+    ("vehicle_distance_s", "Vehicle distance rollups"),
+    ("battery_soc_s", "Battery SOC extrema"),
+    ("generic_rollup_s", "Generic direct rollups"),
+    ("health_rollup_s", "PV health rollups"),
+    ("import_s", "VictoriaMetrics import"),
+)
 
 
 def current_local_timestamp() -> datetime:
@@ -452,6 +468,9 @@ def detect_dimensions(settings: Settings) -> dict[str, list[str]]:
 def build_catalog(settings: Settings) -> list[RollupMetric]:
     root = base_matchers(settings)
     root_no_id = join_matchers(root, 'id=""')
+    loadpoint_present = 'loadpoint!=""'
+    vehicle_present = 'vehicle!=""'
+    title_present = 'title!=""'
     return [
         RollupMetric(
             key="pv_daily_energy",
@@ -474,7 +493,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="loadpoint_daily_energy",
             record=record_name(settings, "loadpoint_energy_daily_wh"),
-            expr=f"integrate((avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')}))[1d]) / 3600",
+            expr=f"integrate((avg by (loadpoint) ({selector('chargePower_value', root, loadpoint_present)}))[1d]) / 3600",
             description="Per-loadpoint daily charging energy.",
             phase="phase-1",
             implemented=True,
@@ -483,7 +502,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="vehicle_daily_energy",
             record=record_name(settings, "vehicle_energy_daily_wh"),
-            expr=f"integrate((avg by (vehicle) ({selector('chargePower_value', root, 'vehicle!=""')}))[1d]) / 3600",
+            expr=f"integrate((avg by (vehicle) ({selector('chargePower_value', root, vehicle_present)}))[1d]) / 3600",
             description="Per-vehicle daily charging energy.",
             phase="phase-1",
             implemented=True,
@@ -558,7 +577,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
-            expr=f"integrate((avg by (title) ({selector('extPower_value', root, 'title!=""')}))[1d]) / 3600",
+            expr=f"integrate((avg by (title) ({selector('extPower_value', root, title_present)}))[1d]) / 3600",
             description="Per-ext-title daily energy.",
             phase="phase-1",
             implemented=True,
@@ -567,7 +586,7 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="aux_daily_energy",
             record=record_name(settings, "aux_energy_daily_wh"),
-            expr=f"integrate((avg by (title) ({selector('auxPower_value', root, 'title!=""')}))[1d]) / 3600",
+            expr=f"integrate((avg by (title) ({selector('auxPower_value', root, title_present)}))[1d]) / 3600",
             description="Per-aux-title daily energy.",
             phase="phase-1",
             implemented=True,
@@ -1229,6 +1248,27 @@ def fetch_battery_soc_extrema(settings: Settings, window: DayWindow) -> tuple[fl
     return min(positive_values), max(positive_values)
 
 
+def fetch_battery_soc_extrema_from_matrix(matrix: list[dict], window: DayWindow) -> tuple[float | None, float | None]:
+    start_ts = iso_to_timestamp(window.start_iso)
+    end_ts = iso_to_timestamp(window.end_iso)
+    all_values: list[float] = []
+    for result_item in slice_matrix_samples(matrix, start_ts, end_ts):
+        all_values.extend(value for _, value in result_item.get("samples", []))
+    positive_values = [value for value in all_values if value > 0]
+    if not positive_values:
+        return None, None
+    return min(positive_values), max(positive_values)
+
+
+def fetch_chunk_battery_soc_matrix(settings: Settings, chunk: ChunkWindow) -> list[dict]:
+    return fetch_series_range(
+        settings,
+        f"{selector('batterySoc_value', base_matchers(settings))}",
+        chunk.start_iso,
+        chunk.end_iso,
+        "10m",
+    )
+
 def fetch_series_range(
     settings: Settings,
     query: str,
@@ -1336,19 +1376,14 @@ def slice_samples(
     include_last_before: bool = False,
     max_lookback_seconds: int | None = None,
 ) -> list[tuple[int, float]]:
-    sliced = [(timestamp, value) for timestamp, value in samples if start_ts <= timestamp < end_ts]
-    if include_last_before:
-        previous = None
-        for timestamp, value in samples:
-            if timestamp >= start_ts:
-                break
-            previous = (timestamp, value)
-        if previous is not None and (
-            max_lookback_seconds is None or previous[0] >= (start_ts - max_lookback_seconds)
-        ):
+    start_index = bisect.bisect_left(samples, (start_ts, -math.inf))
+    end_index = bisect.bisect_left(samples, (end_ts, -math.inf))
+    sliced = samples[start_index:end_index]
+    if include_last_before and start_index > 0:
+        previous = samples[start_index - 1]
+        if max_lookback_seconds is None or previous[0] >= (start_ts - max_lookback_seconds):
             sliced.insert(0, previous)
     return sliced
-
 
 
 def slice_matrix_samples(
@@ -1612,21 +1647,26 @@ def summarize_legacy_positive_energy_rollups_from_matrix(
 
 def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     root = base_matchers(settings)
+    id_empty = 'id=""'
+    id_present = 'id!=""'
+    loadpoint_present = 'loadpoint!=""'
+    vehicle_present = 'vehicle!=""'
+    title_present = 'title!=""'
     if item.key == "pv_daily_energy":
         return (
-            f'sum(avg by (id) ({selector("pvPower_value", root, "id!=\"\"")})) '
-            f'or avg({selector("pvPower_value", root, "id=\"\"")})'
+            f'sum(avg by (id) ({selector("pvPower_value", root, id_present)})) '
+            f'or avg({selector("pvPower_value", root, id_empty)})'
         )
     if item.key == "home_daily_energy":
         return f'avg({selector("homePower_value", root)})'
     if item.key == "loadpoint_daily_energy":
-        return f'avg by (loadpoint) ({selector("chargePower_value", root, "loadpoint!=\"\"")})'
+        return f'avg by (loadpoint) ({selector("chargePower_value", root, loadpoint_present)})'
     if item.key == "vehicle_daily_energy":
-        return f'avg by (vehicle) ({selector("chargePower_value", root, "vehicle!=\"\"")})'
+        return f'avg by (vehicle) ({selector("chargePower_value", root, vehicle_present)})'
     if item.key == "ext_daily_energy":
-        return f'avg by (title) ({selector("extPower_value", root, "title!=\"\"")})'
+        return f'avg by (title) ({selector("extPower_value", root, title_present)})'
     if item.key == "aux_daily_energy":
-        return f'avg by (title) ({selector("auxPower_value", root, "title!=\"\"")})'
+        return f'avg by (title) ({selector("auxPower_value", root, title_present)})'
     raise ValueError(f"Unsupported positive energy key: {item.key}")
 
 
@@ -1747,6 +1787,59 @@ def attribute_consumer_bucket_maps(
     return totals
 
 
+def attribute_consumer_bucket_maps_by_window(
+    consumer_maps: dict[str, dict[int, float]],
+    pv_bucket_map: dict[int, float],
+    battery_bucket_map: dict[int, float],
+    bucket_seconds: int,
+    windows: list[DayWindow],
+) -> dict[str, dict[str, dict[str, float]]]:
+    totals_by_day: dict[str, dict[str, dict[str, float]]] = {
+        window.day: {}
+        for window in windows
+    }
+    window_ranges = [
+        (iso_to_timestamp(window.start_iso), iso_to_timestamp(window.end_iso), window.day)
+        for window in windows
+    ]
+    all_bucket_starts = sorted(
+        {
+            bucket_start
+            for bucket_map in consumer_maps.values()
+            for bucket_start in bucket_map
+        }
+    )
+    hours_per_bucket = bucket_seconds / 3600.0
+    window_index = 0
+    for bucket_start in all_bucket_starts:
+        while window_index < len(window_ranges) and bucket_start >= window_ranges[window_index][1]:
+            window_index += 1
+        if window_index >= len(window_ranges):
+            break
+        window_start, window_end, day = window_ranges[window_index]
+        if bucket_start < window_start or bucket_start >= window_end:
+            continue
+        active_powers = {
+            consumer: power
+            for consumer, bucket_map in consumer_maps.items()
+            for power in [bucket_map.get(bucket_start, 0.0)]
+            if math.isfinite(power) and power > 0.0
+        }
+        total_power = sum(active_powers.values())
+        if total_power <= 0.0:
+            continue
+        pv_supply = min(max(pv_bucket_map.get(bucket_start, 0.0), 0.0), total_power)
+        remaining_after_pv = max(total_power - pv_supply, 0.0)
+        battery_supply = min(max(battery_bucket_map.get(bucket_start, 0.0), 0.0), remaining_after_pv)
+        grid_supply = max(total_power - pv_supply - battery_supply, 0.0)
+        for consumer, power in active_powers.items():
+            share = power / total_power
+            consumer_totals = totals_by_day[day].setdefault(consumer, {"pv": 0.0, "battery": 0.0, "grid": 0.0})
+            consumer_totals["pv"] += pv_supply * share * hours_per_bucket
+            consumer_totals["battery"] += battery_supply * share * hours_per_bucket
+            consumer_totals["grid"] += grid_supply * share * hours_per_bucket
+    return totals_by_day
+
 def summarize_consumer_source_attribution_rollups(
     settings: Settings,
     window: DayWindow,
@@ -1818,40 +1911,119 @@ def summarize_consumer_source_attribution_rollups(
     return out
 
 
+def summarize_consumer_source_attribution_rollups_for_windows(
+    settings: Settings,
+    windows: list[DayWindow],
+    context: dict[str, object],
+) -> dict[str, dict[str, list[tuple[dict[str, str], float]]]]:
+    if not windows:
+        return {}
+    bucket_seconds = parse_step_seconds(settings.energy_rollup_step)
+    start_ts = iso_to_timestamp(windows[0].start_iso)
+    end_ts = iso_to_timestamp(windows[-1].end_iso)
+    pv_bucket_map = build_positive_bucket_average_map(
+        slice_samples(context["pv_samples"], start_ts, end_ts),
+        start_ts,
+        end_ts,
+        bucket_seconds,
+    )
+    battery_bucket_map = build_positive_bucket_average_map(
+        slice_samples(context["battery_samples"], start_ts, end_ts),
+        start_ts,
+        end_ts,
+        bucket_seconds,
+    )
+    loadpoint_maps = build_consumer_bucket_average_maps(
+        context["charge_loadpoint_matrix"],
+        start_ts,
+        end_ts,
+        bucket_seconds,
+        "loadpoint",
+    )
+    ext_maps = build_consumer_bucket_average_maps(
+        context["ext_title_matrix"],
+        start_ts,
+        end_ts,
+        bucket_seconds,
+        "title",
+    )
+    aux_maps = build_consumer_bucket_average_maps(
+        context["aux_title_matrix"],
+        start_ts,
+        end_ts,
+        bucket_seconds,
+        "title",
+    )
+    metric_name_by_key = {
+        "loadpoint_daily_energy_from_pv": "loadpoint_energy_from_pv_daily_wh",
+        "loadpoint_daily_energy_from_battery": "loadpoint_energy_from_battery_daily_wh",
+        "loadpoint_daily_energy_from_grid": "loadpoint_energy_from_grid_daily_wh",
+        "ext_daily_energy_from_pv": "ext_energy_from_pv_daily_wh",
+        "ext_daily_energy_from_battery": "ext_energy_from_battery_daily_wh",
+        "ext_daily_energy_from_grid": "ext_energy_from_grid_daily_wh",
+        "aux_daily_energy_from_pv": "aux_energy_from_pv_daily_wh",
+        "aux_daily_energy_from_battery": "aux_energy_from_battery_daily_wh",
+        "aux_daily_energy_from_grid": "aux_energy_from_grid_daily_wh",
+    }
+    out = {
+        window.day: {metric_key: [] for metric_key in metric_name_by_key}
+        for window in windows
+    }
+    window_by_day = {window.day: window for window in windows}
+    group_specs = [
+        (loadpoint_maps, "loadpoint", "loadpoint_daily_energy_from"),
+        (ext_maps, "title", "ext_daily_energy_from"),
+        (aux_maps, "title", "aux_daily_energy_from"),
+    ]
+    for consumer_maps, output_label, metric_prefix in group_specs:
+        totals_by_day = attribute_consumer_bucket_maps_by_window(consumer_maps, pv_bucket_map, battery_bucket_map, bucket_seconds, windows)
+        for day, consumer_totals in totals_by_day.items():
+            window = window_by_day[day]
+            for consumer, totals in consumer_totals.items():
+                for source_name in ("pv", "battery", "grid"):
+                    metric_key = f"{metric_prefix}_{source_name}"
+                    labels = base_daily_labels(settings, record_name(settings, metric_name_by_key[metric_key]), window)
+                    labels[output_label] = consumer
+                    out[day][metric_key].append((labels, totals[source_name]))
+    return out
+
 def fetch_chunk_consumer_attribution_context(settings: Settings, chunk: ChunkWindow) -> dict[str, object]:
     root = base_matchers(settings)
+    id_empty = 'id=""'
+    loadpoint_present = 'loadpoint!=""'
+    title_present = 'title!=""'
     context = {
         "pv_samples": fetch_single_series_range(
             settings,
-            f"avg({selector('pvPower_value', root, 'id=""')})",
+            f"avg({selector('pvPower_value', root, id_empty)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "battery_samples": fetch_single_series_range(
             settings,
-            f"avg_over_time(avg({selector('batteryPower_value', root, 'id=""')})[{settings.raw_sample_step}])",
+            f"avg_over_time(avg({selector('batteryPower_value', root, id_empty)})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "charge_loadpoint_matrix": fetch_series_range(
             settings,
-            f"avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')})",
+            f"avg by (loadpoint) ({selector('chargePower_value', root, loadpoint_present)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "ext_title_matrix": fetch_series_range(
             settings,
-            f"avg by (title) ({selector('extPower_value', root, 'title!=""')})",
+            f"avg by (title) ({selector('extPower_value', root, title_present)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "aux_title_matrix": fetch_series_range(
             settings,
-            f"avg by (title) ({selector('auxPower_value', root, 'title!=""')})",
+            f"avg by (title) ({selector('auxPower_value', root, title_present)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -1872,6 +2044,75 @@ def summarize_bucket_battery_energy(
         "battery_discharge_daily_energy": discharge_wh,
     }
 
+
+def positive_energy_kwh_by_bucket(
+    samples: list[tuple[int, float]],
+    bucket_starts: list[int],
+    raw_step_seconds: int,
+    bucket_minutes: int,
+) -> list[tuple[int, float]]:
+    bucket_seconds = bucket_minutes * 60
+    out: list[tuple[int, float]] = []
+    sample_index = 0
+    for bucket_start in bucket_starts:
+        bucket_end = bucket_start + bucket_seconds
+        while sample_index < len(samples) and samples[sample_index][0] < bucket_start:
+            sample_index += 1
+        scan = sample_index
+        bucket_kwh = 0.0
+        while scan < len(samples):
+            timestamp, value = samples[scan]
+            if timestamp >= bucket_end:
+                break
+            if value > 0.0:
+                bucket_kwh += value * raw_step_seconds / 3600000.0
+            scan += 1
+        out.append((bucket_start, bucket_kwh))
+    return out
+
+
+def tariff_price_by_bucket(
+    tariff_samples: list[tuple[int, float]],
+    bucket_starts: list[int],
+    bucket_minutes: int,
+) -> list[tuple[int, float | None]]:
+    bucket_seconds = bucket_minutes * 60
+    out: list[tuple[int, float | None]] = []
+    tariff_index = 0
+    last_price: float | None = None
+    for bucket_start in bucket_starts:
+        bucket_end = bucket_start + bucket_seconds
+        while tariff_index < len(tariff_samples) and tariff_samples[tariff_index][0] < bucket_start:
+            last_price = tariff_samples[tariff_index][1]
+            tariff_index += 1
+        bucket_price = last_price
+        scan = tariff_index
+        while scan < len(tariff_samples):
+            timestamp, value = tariff_samples[scan]
+            if timestamp >= bucket_end:
+                break
+            if timestamp >= bucket_start:
+                bucket_price = value
+            scan += 1
+        tariff_index = scan
+        out.append((bucket_start, bucket_price))
+    return out
+
+
+def cost_from_bucket_kwh(
+    bucket_kwh: list[tuple[int, float]],
+    bucket_prices: list[tuple[int, float | None]],
+) -> float | None:
+    if len(bucket_kwh) != len(bucket_prices):
+        raise ValueError("bucket energy and price lists must have the same length")
+    total_cost = 0.0
+    for (energy_bucket, kwh), (price_bucket, price) in zip(bucket_kwh, bucket_prices):
+        if energy_bucket != price_bucket:
+            raise ValueError("bucket energy and price timestamps do not align")
+        if price is None:
+            continue
+        total_cost += kwh * price
+    return total_cost
 
 def quarter_hour_price_rollups(
     grid_samples: list[tuple[int, float]],
@@ -2026,10 +2267,12 @@ def fetch_battery_energy_rollups(
 ) -> dict[str, float]:
     start_ts = iso_to_timestamp(window.start_iso)
     end_ts = iso_to_timestamp(window.end_iso)
+    root = base_matchers(settings)
+    id_empty = 'id=""'
     if context is None:
         battery_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg({selector("batteryPower_value", base_matchers(settings), "id=\"\"")})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("batteryPower_value", root, id_empty)})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2043,6 +2286,9 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
     raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
     extended_start_iso = to_iso_z(datetime.fromisoformat(chunk.start_iso.replace("Z", "+00:00")) - timedelta(minutes=settings.price_bucket_minutes))
     root = base_matchers(settings)
+    id_empty = 'id=""'
+    loadpoint_present = 'loadpoint!=""'
+    vehicle_present = 'vehicle!=""'
     context = {
         "raw_step_seconds": raw_step_seconds,
         "grid_samples": fetch_single_series_range(
@@ -2061,7 +2307,7 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
         ),
         "battery_samples": fetch_single_series_range(
             settings,
-            f"avg_over_time(avg({selector('batteryPower_value', root, 'id=""')})[{settings.raw_sample_step}])",
+            f"avg_over_time(avg({selector('batteryPower_value', root, id_empty)})[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -2075,14 +2321,14 @@ def fetch_chunk_price_context(settings: Settings, chunk: ChunkWindow) -> dict[st
         ),
         "charge_total_samples": fetch_single_series_range(
             settings,
-            f"avg_over_time((sum(avg by (loadpoint) ({selector('chargePower_value', root, 'loadpoint!=""')})))[{settings.raw_sample_step}])",
+            f"avg_over_time((sum(avg by (loadpoint) ({selector('chargePower_value', root, loadpoint_present)})))[{settings.raw_sample_step}])",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
         ),
         "charge_vehicle_matrix": fetch_series_range(
             settings,
-            f"avg by (vehicle) ({selector('chargePower_value', root, 'vehicle!=""')})",
+            f"avg by (vehicle) ({selector('chargePower_value', root, vehicle_present)})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -2278,6 +2524,8 @@ def fetch_vehicle_price_rollups(
     bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
     start_ts = iso_to_timestamp(window.start_iso)
     end_ts = iso_to_timestamp(window.end_iso)
+    root = base_matchers(settings)
+    vehicle_present = 'vehicle!=""'
     if context is None:
         start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
         extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
@@ -2297,7 +2545,7 @@ def fetch_vehicle_price_rollups(
         )
         charge_matrix = fetch_series_range(
             settings,
-            f'avg by (vehicle) ({selector("chargePower_value", base_matchers(settings), "vehicle!=\"\"")})',
+            f'avg by (vehicle) ({selector("chargePower_value", root, vehicle_present)})',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2335,6 +2583,74 @@ def fetch_vehicle_price_rollups(
     return out
 
 
+def fetch_all_vehicle_price_rollups(
+    settings: Settings,
+    window: DayWindow,
+    context: dict[str, object] | None = None,
+) -> dict[str, list[tuple[dict[str, str], float]]]:
+    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
+    bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
+    start_ts = iso_to_timestamp(window.start_iso)
+    end_ts = iso_to_timestamp(window.end_iso)
+    root = base_matchers(settings)
+    vehicle_present = 'vehicle!=""'
+    if context is None:
+        start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
+        extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
+        grid_tariff_samples = fetch_single_series_range(
+            settings,
+            f'avg({selector("tariffGrid_value", base_matchers(settings))})',
+            extended_start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        charge_tariff_samples = fetch_single_series_range(
+            settings,
+            f'avg({selector("tariffPriceLoadpoints_value", base_matchers(settings))})',
+            extended_start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        charge_matrix = fetch_series_range(
+            settings,
+            f'avg by (vehicle) ({selector("chargePower_value", root, vehicle_present)})',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+    else:
+        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        charge_tariff_samples = slice_samples(context["loadpoint_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        charge_matrix = slice_matrix_samples(context["charge_vehicle_matrix"], start_ts, end_ts)
+
+    records = {
+        "vehicle_charge_cost_daily": record_name(settings, "vehicle_charge_cost_daily_eur"),
+        "potential_vehicle_charge_cost_daily": record_name(settings, "potential_vehicle_charge_cost_daily_eur"),
+    }
+    out: dict[str, list[tuple[dict[str, str], float]]] = {key: [] for key in records}
+    tariff_price_sets = {
+        "vehicle_charge_cost_daily": tariff_price_by_bucket(charge_tariff_samples, bucket_starts, settings.price_bucket_minutes),
+        "potential_vehicle_charge_cost_daily": tariff_price_by_bucket(grid_tariff_samples, bucket_starts, settings.price_bucket_minutes),
+    }
+    for result_item in charge_matrix:
+        vehicle = str(result_item.get("metric", {}).get("vehicle", "")).strip()
+        if not vehicle:
+            continue
+        bucket_kwh = positive_energy_kwh_by_bucket(
+            result_item["samples"],
+            bucket_starts,
+            raw_step_seconds,
+            settings.price_bucket_minutes,
+        )
+        for key, bucket_prices in tariff_price_sets.items():
+            value = cost_from_bucket_kwh(bucket_kwh, bucket_prices)
+            if value is None or not math.isfinite(value):
+                continue
+            labels = base_daily_labels(settings, records[key], window)
+            labels["vehicle"] = vehicle
+            out[key].append((labels, value))
+    return out
+
 def fetch_aggregate_price_rollups(
     settings: Settings,
     item: RollupMetric,
@@ -2345,6 +2661,9 @@ def fetch_aggregate_price_rollups(
     bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
     start_ts = iso_to_timestamp(window.start_iso)
     end_ts = iso_to_timestamp(window.end_iso)
+    root = base_matchers(settings)
+    loadpoint_present = 'loadpoint!=""'
+    id_empty = 'id=""'
     if context is None:
         start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
         extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
@@ -2371,14 +2690,14 @@ def fetch_aggregate_price_rollups(
         )
         charge_total_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time((sum(avg by (loadpoint) ({selector("chargePower_value", base_matchers(settings), "loadpoint!=\"\"")})))[{settings.raw_sample_step}])',
+            f'avg_over_time((sum(avg by (loadpoint) ({selector("chargePower_value", root, loadpoint_present)})))[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
         )
         battery_samples = fetch_single_series_range(
             settings,
-            f'avg_over_time(avg({selector("batteryPower_value", base_matchers(settings), "id=\"\"")})[{settings.raw_sample_step}])',
+            f'avg_over_time(avg({selector("batteryPower_value", root, id_empty)})[{settings.raw_sample_step}])',
             window.start_iso,
             window.end_iso,
             settings.raw_sample_step,
@@ -2452,6 +2771,87 @@ def fetch_aggregate_price_rollups(
     raise ValueError(f"Unsupported aggregate price rollup key: {item.key}")
 
 
+def fetch_all_aggregate_price_rollups(
+    settings: Settings,
+    window: DayWindow,
+    context: dict[str, object] | None = None,
+) -> dict[str, float | None]:
+    raw_step_seconds = parse_step_seconds(settings.raw_sample_step)
+    bucket_starts = bucket_start_timestamps(window, settings.price_bucket_minutes)
+    start_ts = iso_to_timestamp(window.start_iso)
+    end_ts = iso_to_timestamp(window.end_iso)
+    root = base_matchers(settings)
+    loadpoint_present = 'loadpoint!=""'
+    id_empty = 'id=""'
+    if context is None:
+        start_dt = datetime.fromisoformat(window.start_iso.replace("Z", "+00:00"))
+        extended_start_iso = to_iso_z(start_dt - timedelta(minutes=settings.price_bucket_minutes))
+        grid_tariff_samples = fetch_single_series_range(
+            settings,
+            f'avg({selector("tariffGrid_value", base_matchers(settings))})',
+            extended_start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        feed_in_tariff_samples = fetch_single_series_range(
+            settings,
+            f'avg({selector("tariffFeedIn_value", base_matchers(settings))})',
+            extended_start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        home_samples = fetch_single_series_range(
+            settings,
+            f'avg_over_time(avg({selector("homePower_value", base_matchers(settings))})[{settings.raw_sample_step}])',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        charge_total_samples = fetch_single_series_range(
+            settings,
+            f'avg_over_time((sum(avg by (loadpoint) ({selector("chargePower_value", root, loadpoint_present)})))[{settings.raw_sample_step}])',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+        battery_samples = fetch_single_series_range(
+            settings,
+            f'avg_over_time(avg({selector("batteryPower_value", root, id_empty)})[{settings.raw_sample_step}])',
+            window.start_iso,
+            window.end_iso,
+            settings.raw_sample_step,
+        )
+    else:
+        grid_tariff_samples = slice_samples(context["grid_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        feed_in_tariff_samples = slice_samples(context["feed_in_tariff_samples"], start_ts, end_ts, include_last_before=True, max_lookback_seconds=settings.price_bucket_minutes * 60)
+        home_samples = slice_samples(context["home_samples"], start_ts, end_ts)
+        charge_total_samples = slice_samples(context["charge_total_samples"], start_ts, end_ts)
+        battery_samples = slice_samples(context["battery_samples"], start_ts, end_ts)
+
+    grid_prices = tariff_price_by_bucket(grid_tariff_samples, bucket_starts, settings.price_bucket_minutes)
+    feed_in_prices = tariff_price_by_bucket(feed_in_tariff_samples, bucket_starts, settings.price_bucket_minutes)
+    home_bucket_kwh = positive_energy_kwh_by_bucket(home_samples, bucket_starts, raw_step_seconds, settings.price_bucket_minutes)
+    loadpoint_bucket_kwh = positive_energy_kwh_by_bucket(charge_total_samples, bucket_starts, raw_step_seconds, settings.price_bucket_minutes)
+    discharge_bucket_kwh = positive_energy_kwh_by_bucket(
+        [(timestamp, max(value, 0.0)) for timestamp, value in battery_samples],
+        bucket_starts,
+        raw_step_seconds,
+        settings.price_bucket_minutes,
+    )
+    charge_bucket_kwh = positive_energy_kwh_by_bucket(
+        [(timestamp, max(-value, 0.0)) for timestamp, value in battery_samples],
+        bucket_starts,
+        raw_step_seconds,
+        settings.price_bucket_minutes,
+    )
+
+    return {
+        "potential_home_cost_daily": cost_from_bucket_kwh(home_bucket_kwh, grid_prices),
+        "potential_loadpoint_cost_daily": cost_from_bucket_kwh(loadpoint_bucket_kwh, grid_prices),
+        "battery_discharge_value_daily": cost_from_bucket_kwh(discharge_bucket_kwh, grid_prices),
+        "battery_charge_feedin_cost_daily": cost_from_bucket_kwh(charge_bucket_kwh, feed_in_prices) or 0.0,
+    }
+
 def window_local_labels(window: DayWindow) -> dict[str, str]:
     return {
         "local_year": window.local_year,
@@ -2520,6 +2920,24 @@ def serialize_import_jsonl(series_rows: list[dict]) -> bytes:
 
 def add_duration(profile: dict[str, float], key: str, started_at: float) -> None:
     profile[key] = profile.get(key, 0.0) + (time.perf_counter() - started_at)
+
+
+def rollup_family_profile(profile: dict[str, float | int]) -> list[dict[str, float | str]]:
+    total_s = float(profile.get("total_s", 0.0) or 0.0)
+    rows: list[dict[str, float | str]] = []
+    for key, label in PROFILE_FAMILY_LABELS:
+        seconds = float(profile.get(key, 0.0) or 0.0)
+        if seconds <= 0.0:
+            continue
+        rows.append(
+            {
+                "key": key,
+                "label": label,
+                "seconds": round(seconds, 6),
+                "percent": round((seconds / total_s) * 100.0, 2) if total_s > 0.0 else 0.0,
+            }
+        )
+    return sorted(rows, key=lambda item: float(item["seconds"]), reverse=True)
 
 
 def mean_of_top(values: list[float], limit: int) -> float | None:
@@ -2698,7 +3116,9 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         )
         shared_price_contexts: dict[str, dict[str, object]] = {}
         attribution_contexts: dict[str, dict[str, object]] = {}
+        attribution_rollups_by_block: dict[str, dict[str, dict[str, list[tuple[dict[str, str], float]]]]] = {}
         positive_energy_contexts: dict[tuple[str, str], list[dict]] = {}
+        chunk_battery_soc_matrix: list[dict] | None = None
 
         update_peak_memory()
         if args.progress:
@@ -2715,6 +3135,9 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             price_rollups: dict[str, float | None] | None = None
             grid_energy_rollups: dict[str, float] | None = None
             battery_energy_rollups: dict[str, float] | None = None
+            battery_soc_extrema: tuple[float | None, float | None] | None = None
+            vehicle_price_rollups: dict[str, list[tuple[dict[str, str], float]]] | None = None
+            aggregate_price_rollups: dict[str, float | None] | None = None
             attribution_rollups: dict[str, list[tuple[dict[str, str], float]]] | None = None
             shared_price_context = shared_price_contexts.get(fetch_block.name)
             for item in catalog:
@@ -2754,7 +3177,11 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     continue
                 if item.key in {"battery_soc_daily_min", "battery_soc_daily_max"}:
                     started_at = time.perf_counter()
-                    day_min, day_max = fetch_battery_soc_extrema(settings, window)
+                    if battery_soc_extrema is None:
+                        if chunk_battery_soc_matrix is None:
+                            chunk_battery_soc_matrix = fetch_chunk_battery_soc_matrix(settings, build_chunk_window(chunk_name, chunk_windows))
+                        battery_soc_extrema = fetch_battery_soc_extrema_from_matrix(chunk_battery_soc_matrix, window)
+                    day_min, day_max = battery_soc_extrema
                     selected_value = day_min if item.key == "battery_soc_daily_min" else day_max
                     if selected_value is None:
                         skipped += 1
@@ -2860,7 +3287,9 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if shared_price_context is None:
                         shared_price_context = fetch_chunk_price_context(settings, fetch_block)
                         shared_price_contexts[fetch_block.name] = shared_price_context
-                    for labels, value in fetch_vehicle_price_rollups(settings, item, window, shared_price_context):
+                    if vehicle_price_rollups is None:
+                        vehicle_price_rollups = fetch_all_vehicle_price_rollups(settings, window, shared_price_context)
+                    for labels, value in vehicle_price_rollups.get(item.key, []):
                         if not math.isfinite(value):
                             skipped += 1
                             bump_skip_reason(skip_reasons, "invalid_value")
@@ -2880,7 +3309,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if shared_price_context is None:
                         shared_price_context = fetch_chunk_price_context(settings, fetch_block)
                         shared_price_contexts[fetch_block.name] = shared_price_context
-                    aggregate_price_rollups = fetch_aggregate_price_rollups(settings, item, window, shared_price_context)
+                    if aggregate_price_rollups is None:
+                        aggregate_price_rollups = fetch_all_aggregate_price_rollups(settings, window, shared_price_context)
                     selected_value = aggregate_price_rollups.get(item.key)
                     if selected_value is None or not math.isfinite(selected_value):
                         skipped += 1
@@ -2949,8 +3379,13 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     if attribution_context is None:
                         attribution_context = fetch_chunk_consumer_attribution_context(settings, fetch_block)
                         attribution_contexts[fetch_block.name] = attribution_context
+                    block_attribution_rollups = attribution_rollups_by_block.get(fetch_block.name)
+                    if block_attribution_rollups is None:
+                        block_windows = [candidate for candidate in chunk_windows if fetch_block_by_day[candidate.day].name == fetch_block.name]
+                        block_attribution_rollups = summarize_consumer_source_attribution_rollups_for_windows(settings, block_windows, attribution_context)
+                        attribution_rollups_by_block[fetch_block.name] = block_attribution_rollups
                     if attribution_rollups is None:
-                        attribution_rollups = summarize_consumer_source_attribution_rollups(settings, window, attribution_context)
+                        attribution_rollups = block_attribution_rollups.get(window.day, {})
                     for labels, value in attribution_rollups.get(item.key, []):
                         if not math.isfinite(value):
                             skipped += 1
@@ -3049,6 +3484,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     seen_series_keys.update(tuple(sorted(row["metric"].items())) for row in health_series_rows)
     update_peak_memory()
     ACTIVE_PROFILE["total_s"] = time.perf_counter() - total_started_at
+    rounded_profile = {key: round(float(value), 6) for key, value in ACTIVE_PROFILE.items()}
 
     summary = {
         "script": script_metadata(),
@@ -3079,7 +3515,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "batches": total_batches,
         "batch_size": args.batch_size,
         "import_results": import_results,
-        "profile": {key: round(float(value), 6) for key, value in ACTIVE_PROFILE.items()},
+        "profile": rounded_profile,
+        "profile_families": rollup_family_profile(rounded_profile),
     }
     if args.json:
         print(json.dumps(summary, indent=2, ensure_ascii=True))
@@ -3251,9 +3688,18 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
                 f"series={item['series']}, skipped={item['skipped']}{skip_reason_text}"
             )
 
+    profile_families = summary.get("profile_families", [])
+    if profile_families:
+        print("\nRollup family timings")
+        print("---------------------")
+        for item in profile_families[:8]:
+            print(f"- {item['label']}: {item['seconds']} s ({item['percent']}%)")
+
     print("\nInterpretation")
     print("--------------")
     print("- 'Skipped items' are grouped below so you can see whether they mostly come from missing source data, invalid values, or missing labels.")
+    if profile_families:
+        print("- 'Rollup family timings' show where runtime is spent; use them before changing batch sizes, caching, or parallelism.")
     if args.write:
         print("- Write mode calculated the rollups and imported the resulting evcc_* metrics into VictoriaMetrics.")
         if summary.get("replace_range"):

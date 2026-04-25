@@ -147,6 +147,8 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 
 Rollups are daily values. Schedule the refresh once per day after `yesterday` is complete. For production, prefer `--replace-range`: delete the monthly rollup scope that contains `yesterday`, then rebuild that month up to `yesterday`. This makes the refresh idempotent and avoids duplicate samples with the same series labels and timestamp in VictoriaMetrics.
 
+For Raspberry Pi-class deployments, run the rollup job on at least a Raspberry Pi 4 with 4 GB RAM or comparable hardware. Raspberry Pi 3 and 1-2 GB systems are not recommended for the monthly replace path.
+
 Example cron:
 
 ```cron

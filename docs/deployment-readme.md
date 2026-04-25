@@ -17,6 +17,8 @@ On Linux or Raspberry Pi you additionally need:
 - for `deploy-python.sh`: `curl` and `python3`
 - for `deploy-bash.sh`: `bash`, `curl`, and `jq`
 
+If the same host also runs the VictoriaMetrics rollup job, use at least a Raspberry Pi 4 with 4 GB RAM or comparable hardware. Smaller Raspberry Pi models may still deploy dashboards, but are not recommended for the monthly `--replace-range` rollup workload.
+
 If something is missing:
 
 ```bash

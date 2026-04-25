@@ -385,6 +385,11 @@ Important fields:
 - `max_fetch_points_per_series`
   - limits how many raw samples per series are fetched in a single request chunk
 
+Hardware note:
+
+- if the same host runs VictoriaMetrics and the rollup job, use at least a Raspberry Pi 4 with 4 GB RAM or comparable hardware
+- Raspberry Pi 3 and 1-2 GB systems are not recommended for the monthly `--replace-range` rollup path
+
 Operational assumption:
 
 - one VictoriaMetrics instance is dedicated to one EVCC instance

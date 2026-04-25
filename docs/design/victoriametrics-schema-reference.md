@@ -345,6 +345,8 @@ Recent full rebuild profile over `2025-01-01 .. 2026-03-27`:
 - VM write time negligible
 - main cost center is still VM read/query time
 
+Minimum recommended hardware for running the rollup job on Raspberry Pi-class systems is Raspberry Pi 4 with 4 GB RAM or comparable hardware. Raspberry Pi 3 and 1-2 GB systems are not recommended for the monthly `--replace-range` rollup path because the current Python process can peak around 1.25 GB before accounting for the operating system, VictoriaMetrics, and other services.
+
 ### Namespace status
 
 Current intended production state:

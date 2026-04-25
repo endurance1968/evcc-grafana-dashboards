@@ -55,6 +55,21 @@ class VmRollupTests(unittest.TestCase):
         self.assertNotIn("grid_export_credit_daily", deferred)
         self.assertEqual(deferred, set())
 
+    def test_rollup_family_profile_sorts_and_calculates_percentages(self):
+        rows = MODULE.rollup_family_profile(
+            {
+                "total_s": 20.0,
+                "positive_energy_s": 3.0,
+                "price_rollups_s": 5.0,
+                "grid_energy_s": 0.0,
+            }
+        )
+
+        self.assertEqual([row["key"] for row in rows], ["price_rollups_s", "positive_energy_s"])
+        self.assertEqual(rows[0]["label"], "Grid price and cost rollups")
+        self.assertEqual(rows[0]["seconds"], 5.0)
+        self.assertEqual(rows[0]["percent"], 25.0)
+
     def test_vehicle_distance_rollup_collapses_to_vehicle_dimension(self):
         item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "vehicle_daily_distance")
         self.assertEqual(item.group_labels, ("vehicle",))
@@ -768,6 +783,118 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(yearly["values"][0], 20.0, places=6)
         self.assertAlmostEqual(monthly["values"][0], 10.0, places=6)
 
+    def test_fetch_battery_soc_extrema_from_matrix_slices_window_and_ignores_non_positive_values(self):
+        window = MODULE.DayWindow(
+            day="1970-01-02",
+            start_iso="1970-01-02T00:00:00Z",
+            end_iso="1970-01-03T00:00:00Z",
+            sample_timestamp_ms=86400000,
+            local_year="1970",
+            local_month="01",
+            local_day="02",
+            local_date="1970-01-02",
+        )
+        matrix = [
+            {"metric": {"id": "battery-1"}, "samples": [(86399, 95.0), (86400, 0.0), (86460, 55.0), (86520, 61.0)]},
+            {"metric": {"id": "battery-2"}, "samples": [(86410, -1.0), (86470, 78.0), (172800, 10.0)]},
+        ]
+
+        self.assertEqual(MODULE.fetch_battery_soc_extrema_from_matrix(matrix, window), (55.0, 78.0))
+
+    def test_fetch_all_vehicle_price_rollups_matches_individual_vehicle_rollups(self):
+        window = MODULE.DayWindow(
+            day="1970-01-01",
+            start_iso="1970-01-01T00:00:00Z",
+            end_iso="1970-01-01T00:30:00Z",
+            sample_timestamp_ms=0,
+            local_year="1970",
+            local_month="01",
+            local_day="01",
+            local_date="1970-01-01",
+        )
+        context = {
+            "grid_tariff_samples": [(0, 0.30), (900, 0.40)],
+            "loadpoint_tariff_samples": [(0, 0.10), (900, 0.20)],
+            "charge_vehicle_matrix": [
+                {"metric": {"vehicle": "BMW i3"}, "samples": [(0, 1000.0), (30, 1000.0), (900, 2000.0), (930, 2000.0)]},
+            ],
+        }
+        catalog = MODULE.build_catalog(self.settings)
+        all_rollups = MODULE.fetch_all_vehicle_price_rollups(self.settings, window, context)
+
+        for key in ("vehicle_charge_cost_daily", "potential_vehicle_charge_cost_daily"):
+            item = next(metric for metric in catalog if metric.key == key)
+            individual = MODULE.fetch_vehicle_price_rollups(self.settings, item, window, context)
+            self.assertEqual(all_rollups[key], individual)
+
+    def test_fetch_all_aggregate_price_rollups_matches_individual_aggregate_rollups(self):
+        window = MODULE.DayWindow(
+            day="1970-01-01",
+            start_iso="1970-01-01T00:00:00Z",
+            end_iso="1970-01-01T00:30:00Z",
+            sample_timestamp_ms=0,
+            local_year="1970",
+            local_month="01",
+            local_day="01",
+            local_date="1970-01-01",
+        )
+        context = {
+            "grid_tariff_samples": [(0, 0.30), (900, 0.40)],
+            "feed_in_tariff_samples": [(0, 0.08), (900, 0.10)],
+            "home_samples": [(0, 1000.0), (30, 1000.0), (900, 2000.0), (930, 2000.0)],
+            "charge_total_samples": [(0, 500.0), (30, 500.0), (900, 1000.0), (930, 1000.0)],
+            "battery_samples": [(0, -500.0), (30, 500.0), (900, -1000.0), (930, 1000.0)],
+        }
+        catalog = MODULE.build_catalog(self.settings)
+        all_rollups = MODULE.fetch_all_aggregate_price_rollups(self.settings, window, context)
+
+        for key in (
+            "potential_home_cost_daily",
+            "potential_loadpoint_cost_daily",
+            "battery_discharge_value_daily",
+            "battery_charge_feedin_cost_daily",
+        ):
+            item = next(metric for metric in catalog if metric.key == key)
+            individual = MODULE.fetch_aggregate_price_rollups(self.settings, item, window, context)
+            self.assertEqual(all_rollups[key], individual[key])
+
+    def test_attribute_consumer_bucket_maps_by_window_keeps_daily_boundaries(self):
+        windows = [
+            MODULE.DayWindow(
+                day="1970-01-01",
+                start_iso="1970-01-01T00:00:00Z",
+                end_iso="1970-01-02T00:00:00Z",
+                sample_timestamp_ms=0,
+                local_year="1970",
+                local_month="01",
+                local_day="01",
+                local_date="1970-01-01",
+            ),
+            MODULE.DayWindow(
+                day="1970-01-02",
+                start_iso="1970-01-02T00:00:00Z",
+                end_iso="1970-01-03T00:00:00Z",
+                sample_timestamp_ms=86400000,
+                local_year="1970",
+                local_month="01",
+                local_day="02",
+                local_date="1970-01-02",
+            ),
+        ]
+        totals = MODULE.attribute_consumer_bucket_maps_by_window(
+            consumer_maps={"C1": {0: 1000.0, 86400: 2000.0}, "C2": {0: 1000.0}},
+            pv_bucket_map={0: 1000.0, 86400: 500.0},
+            battery_bucket_map={0: 500.0, 86400: 100.0},
+            bucket_seconds=60,
+            windows=windows,
+        )
+
+        self.assertIn("C1", totals["1970-01-01"])
+        self.assertIn("C2", totals["1970-01-01"])
+        self.assertIn("C1", totals["1970-01-02"])
+        self.assertNotIn("C2", totals["1970-01-02"])
+        self.assertAlmostEqual(totals["1970-01-01"]["C1"]["pv"], 1000.0 * 0.5 / 60.0, places=6)
+        self.assertAlmostEqual(totals["1970-01-02"]["C1"]["grid"], 1400.0 / 60.0, places=6)
 
 if __name__ == "__main__":
     unittest.main()
