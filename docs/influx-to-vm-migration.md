@@ -62,10 +62,10 @@ mkdir -p /opt/evcc-vm-migration
 cd /opt/evcc-vm-migration
 ```
 
-Download the required files:
+Download the required files from the public GitHub repository:
 
 ```bash
-BASE="http://192.168.1.222/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
 
 curl -fsSLo evcc-vm-rollup.py "$BASE/scripts/rollup/evcc-vm-rollup.py"
 curl -fsSLo evcc-vm-rollup-prod.conf.example "$BASE/scripts/rollup/evcc-vm-rollup-prod.conf.example"
@@ -73,6 +73,12 @@ curl -fsSLo evcc-vm-rollup.conf.example "$BASE/scripts/rollup/evcc-vm-rollup.con
 curl -fsSLo check_data.py "$BASE/scripts/helper/check_data.py"
 curl -fsSLo compare_import_coverage.py "$BASE/scripts/helper/compare_import_coverage.py"
 curl -fsSLo vm-rewrite-drop-label.py "$BASE/scripts/helper/vm-rewrite-drop-label.py"
+```
+
+If you intentionally download from a local Forgejo mirror instead, use its raw endpoint, for example:
+
+```bash
+BASE="http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
 ```
 
 ## Files used in this migration
