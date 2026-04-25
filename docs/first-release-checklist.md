@@ -62,7 +62,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 - [ ] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [ ] localized dashboards are regenerated from the current `orig/en` source
-- [ ] screenshots are regenerated from the current localized dashboards
+- [ ] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed
 - [ ] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
 
 ## 6. Release packaging
@@ -86,5 +86,5 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [ ] daily rollup refresh tested
 - [ ] Windows and Linux deployers tested
 - [ ] localization audit at `0`
-- [ ] screenshot set regenerated from the final sources
+- [ ] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
 - [ ] one complete end-to-end user walkthrough completed from the published docs

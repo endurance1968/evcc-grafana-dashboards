@@ -3,12 +3,8 @@
 .env
 .env.local
 
-# Test artifacts
-tests/artifacts/*
-!tests/artifacts/screenshots/
-tests/artifacts/screenshots/*
-!tests/artifacts/screenshots/vm/
-!tests/artifacts/screenshots/vm/**
+# Test artifacts are local, disposable output. Release documentation screenshots live in docs/screenshots/.
+tests/artifacts/**
 
 # Playwright cache/state
 .playwright/
@@ -26,9 +22,9 @@ __pycache__/
 
 # Local backups and temporary work files
 tmp/
+
 # Local external energy comparison caches
 data/energy-comparison/tibber/*
 !data/energy-comparison/tibber/.gitkeep
 data/energy-comparison/vrm/*
 !data/energy-comparison/vrm/.gitkeep
-
