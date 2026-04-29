@@ -213,7 +213,7 @@ Verify Forgejo Actions wiring from a developer machine:
 npm run test:forgejo-actions
 ```
 
-The default Forgejo Web/API URL is `http://192.168.0.127:3000`, matching the local Forgejo instance used for this repository. Override it with `FORGEJO_BASE_URL` or `--base-url` if the instance moves. The check verifies that Actions are enabled and that the latest workflow run is not stuck in `waiting`; `waiting` means no matching runner has accepted the job yet. The CI workflow also starts with a `Runner Docker readiness` step, so a runner without Docker access fails before the Docker-backed query/readback, render, or rollup tests.
+The default Forgejo Web/API URL is `http://192.168.0.127:3000`, matching the local Forgejo instance used for this repository. Override it with `FORGEJO_BASE_URL` or `--base-url` if the instance moves. The check verifies that Actions are enabled and that the latest workflow run was picked up by a runner. `waiting` or `cancelled` with a never-started timestamp means no matching runner accepted the job. The CI workflow also starts with a `Runner Docker readiness` step, so a runner without Docker access fails before the Docker-backed query/readback, render, or rollup tests.
 
 For browser-level Grafana rendering, run the suite with render smoke enabled after importing dashboards:
 

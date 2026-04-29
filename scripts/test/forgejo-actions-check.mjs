@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /*
  * Purpose: Verify that the Forgejo repository has Actions enabled and that the latest workflow run is picked up by a runner.
- * Version: 2026.04.15.3
- * Last modified: 2026-04-15
+ * Version: 2026.04.29.1
+ * Last modified: 2026-04-29
  */
 
 const scriptName = "forgejo-actions-check.mjs";
-const scriptVersion = "2026.04.15.3";
-const scriptLastModified = "2026-04-15";
+const scriptVersion = "2026.04.29.1";
+const scriptLastModified = "2026-04-29";
 
 const args = process.argv.slice(2);
 
@@ -68,6 +68,14 @@ function statusIsRunning(status) {
   return ["running", "success", "failure", "cancelled", "skipped"].includes(String(status || "").toLowerCase());
 }
 
+function isNeverStartedTimestamp(value) {
+  if (!value) {
+    return true;
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) || parsed.getUTCFullYear() <= 1971;
+}
+
 async function main() {
   const baseUrl = readArg("base-url", process.env.FORGEJO_BASE_URL || "http://192.168.0.127:3000");
   const repo = readArg("repo", process.env.FORGEJO_REPO || "olaf-krause/evcc-grafana-dashboards");
@@ -125,6 +133,15 @@ async function main() {
     console.log("------");
     console.log("WARNING: Forgejo Actions are enabled, but the latest workflow is waiting for a runner.");
     return;
+  }
+  if (String(run.status || "").toLowerCase() === "cancelled" && isNeverStartedTimestamp(run.started)) {
+    fail(
+      "Result: CRITICAL - latest workflow was cancelled before a runner started it. A matching Forgejo runner is missing, offline, busy, or unable to accept this job.",
+      2,
+    );
+  }
+  if (String(run.status || "").toLowerCase() === "cancelled") {
+    fail("Result: WARNING - latest workflow was cancelled after it started; inspect the run before trusting CI status.", 1);
   }
   if (!statusIsRunning(run.status) && !statusIsTerminal(run.status)) {
     fail(`Result: WARNING - latest workflow has unexpected status '${run.status}'.`, 1);
