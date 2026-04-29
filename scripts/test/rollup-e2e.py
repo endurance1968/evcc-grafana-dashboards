@@ -8,6 +8,7 @@ import configparser
 import json
 import os
 import socket
+import struct
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -22,15 +24,15 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.04.15.1"
-SCRIPT_LAST_MODIFIED = "2026-04-15"
+SCRIPT_VERSION = "2026.04.29.1"
+SCRIPT_LAST_MODIFIED = "2026-04-29"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
 FIXTURE_LABEL = "evcc_rollup_e2e"
 ROLLUP_PREFIX = "e2e_evcc"
 DEFAULT_DOCKER_IMAGE = "victoriametrics/victoria-metrics:v1.110.0"
-DEFAULT_DOCKER_PORT = 18428
+DEFAULT_DOCKER_PORT = 0
 
 
 @dataclass(frozen=True)
@@ -49,7 +51,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--docker", action="store_true", help="Start a temporary VictoriaMetrics Docker container.")
     parser.add_argument("--docker-image", default=DEFAULT_DOCKER_IMAGE, help="VictoriaMetrics Docker image to run.")
-    parser.add_argument("--docker-port", type=int, default=DEFAULT_DOCKER_PORT, help="Host port for --docker mode.")
+    parser.add_argument("--docker-port", type=int, default=DEFAULT_DOCKER_PORT, help="Host port for --docker mode; 0 lets Docker choose a free port.")
+    parser.add_argument(
+        "--docker-bind-address",
+        default=os.environ.get("ROLLUP_E2E_DOCKER_BIND_ADDRESS", ""),
+        help="Host address used for Docker port publishing; defaults to 0.0.0.0 inside containers, otherwise 127.0.0.1.",
+    )
+    parser.add_argument(
+        "--docker-published-host",
+        default=os.environ.get("ROLLUP_E2E_DOCKER_PUBLISHED_HOST", ""),
+        help="Host name used by the test process to reach the published Docker port; defaults to host.docker.internal inside containers, otherwise 127.0.0.1.",
+    )
     parser.add_argument("--keep-docker", action="store_true", help="Do not stop the Docker container after the test.")
     parser.add_argument("--base-url", default=os.environ.get("ROLLUP_E2E_VM_URL", ""), help="Disposable VM base URL.")
     parser.add_argument(
@@ -63,6 +75,35 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--json", action="store_true", help="Emit machine-readable JSON summary.")
     return parser.parse_args()
 
+
+def runs_inside_container() -> bool:
+    return Path("/.dockerenv").exists() or Path("/run/.containerenv").exists()
+
+
+def default_docker_bind_address() -> str:
+    return "0.0.0.0" if runs_inside_container() else "127.0.0.1"
+
+
+def docker_host_published_address() -> str:
+    try:
+        infos = socket.getaddrinfo("host.docker.internal", None, socket.AF_INET, socket.SOCK_STREAM)
+        if infos:
+            return str(infos[0][4][0])
+    except socket.gaierror:
+        pass
+    try:
+        with Path("/proc/net/route").open("r", encoding="utf-8") as handle:
+            for line in handle.readlines()[1:]:
+                fields = line.split()
+                if len(fields) >= 3 and fields[1] == "00000000":
+                    return socket.inet_ntoa(struct.pack("<L", int(fields[2], 16)))
+    except OSError:
+        pass
+    return "host.docker.internal"
+
+
+def default_docker_published_host() -> str:
+    return docker_host_published_address() if runs_inside_container() else "127.0.0.1"
 
 def log(message: str, *, json_mode: bool) -> None:
     if not json_mode:
@@ -99,35 +140,85 @@ def wait_for_query_result(base_url: str, query: str, query_time: str, timeout_se
     raise RuntimeError(f"query did not return data within {timeout_seconds}s: {query} at {query_time}")
 
 
-def wait_for_port_free(port: int) -> None:
+def wait_for_port_free(host: str, port: int) -> None:
+    if port <= 0:
+        return
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.settimeout(0.2)
-        if sock.connect_ex(("127.0.0.1", port)) == 0:
-            raise RuntimeError(f"Port {port} is already in use; pass --docker-port with a free port.")
+        if sock.connect_ex((host, port)) == 0:
+            raise RuntimeError(f"Port {host}:{port} is already in use; pass --docker-port with a free port.")
 
+
+
+def docker_published_port(container_name: str) -> int:
+    result = subprocess.run(
+        ["docker", "port", container_name, "8428/tcp"],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"docker port failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}")
+    lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    if not lines:
+        raise RuntimeError(f"Docker did not report a published port for {container_name}:8428/tcp")
+    port_text = lines[0].rsplit(":", 1)[-1]
+    try:
+        return int(port_text)
+    except ValueError as exc:
+        raise RuntimeError(f"Could not parse Docker published port from {lines[0]!r}") from exc
 
 def start_docker_vm(args: argparse.Namespace, json_mode: bool) -> tuple[str, str]:
-    wait_for_port_free(args.docker_port)
-    name = f"evcc-rollup-e2e-{os.getpid()}"
-    cmd = [
-        "docker",
-        "run",
-        "--rm",
-        "-d",
-        "--name",
-        name,
-        "-p",
-        f"127.0.0.1:{args.docker_port}:8428",
-        args.docker_image,
-        "-retentionPeriod=100y",
-    ]
+    name = f"evcc-rollup-e2e-{os.getpid()}-{uuid.uuid4().hex[:8]}"
+    if runs_inside_container():
+        cmd = [
+            "docker",
+            "run",
+            "--rm",
+            "-d",
+            "--name",
+            name,
+            "--network",
+            f"container:{socket.gethostname()}",
+            args.docker_image,
+            "-retentionPeriod=100y",
+        ]
+        base_url = "http://127.0.0.1:8428"
+    else:
+        bind_address = args.docker_bind_address or default_docker_bind_address()
+        published_host = args.docker_published_host or default_docker_published_host()
+        wait_for_port_free(published_host, args.docker_port)
+        port_mapping = f"{bind_address}:{args.docker_port}:8428" if args.docker_port > 0 else f"{bind_address}::8428"
+        cmd = [
+            "docker",
+            "run",
+            "--rm",
+            "-d",
+            "--name",
+            name,
+            "-p",
+            port_mapping,
+            args.docker_image,
+            "-retentionPeriod=100y",
+        ]
+        published_port = args.docker_port
+        base_url = ""
+
     log(f"$ {' '.join(cmd)}", json_mode=json_mode)
     result = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
     if result.returncode != 0:
         raise RuntimeError(f"docker run failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}")
-    base_url = f"http://127.0.0.1:{args.docker_port}"
-    wait_for_vm(base_url)
-    return name, base_url
+    try:
+        if not runs_inside_container():
+            published_port = args.docker_port if args.docker_port > 0 else docker_published_port(name)
+            published_host = args.docker_published_host or default_docker_published_host()
+            base_url = f"http://{published_host}:{published_port}"
+        wait_for_vm(base_url)
+        return name, base_url
+    except Exception:
+        subprocess.run(["docker", "stop", name], cwd=REPO_ROOT, text=True, capture_output=True, check=False)
+        raise
 
 
 def stop_docker_vm(container_name: str, json_mode: bool) -> None:
