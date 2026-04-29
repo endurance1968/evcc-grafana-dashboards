@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-query-readback.mjs
  * Purpose: Execute original VM dashboard MetricsQL targets against VictoriaMetrics after Grafana macro substitution.
- * Version: 2026.04.22.1
- * Last modified: 2026-04-22
+ * Version: 2026.04.29.1
+ * Last modified: 2026-04-29
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -66,6 +66,18 @@ function run(command, args, options = {}) {
     throw result.error;
   }
   return result;
+}
+
+function runsInsideContainer() {
+  return fs.existsSync("/.dockerenv") || fs.existsSync("/run/.containerenv");
+}
+
+function defaultDockerBindAddress() {
+  return runsInsideContainer() ? "0.0.0.0" : "127.0.0.1";
+}
+
+function defaultDockerPublishedHost() {
+  return runsInsideContainer() ? "host.docker.internal" : "127.0.0.1";
 }
 
 function collectFiles(dir, predicate) {
@@ -363,7 +375,7 @@ async function waitForVm(baseUrl) {
   throw new Error(`VictoriaMetrics did not become healthy at ${baseUrl}: ${lastError}`);
 }
 
-function startDockerVm(image, port) {
+function startDockerVm(image, port, bindAddress, publishedHost) {
   const name = `evcc-dashboard-query-readback-${process.pid}`;
   const result = run("docker", [
     "run",
@@ -372,14 +384,14 @@ function startDockerVm(image, port) {
     "--name",
     name,
     "-p",
-    `127.0.0.1:${port}:8428`,
+    `${bindAddress}:${port}:8428`,
     image,
     "-retentionPeriod=100y",
   ]);
   if (result.status !== 0) {
     throw new Error(`docker run failed: ${result.stderr.trim() || result.stdout.trim()}`);
   }
-  return { name, baseUrl: `http://127.0.0.1:${port}` };
+  return { name, baseUrl: `http://${publishedHost}:${port}` };
 }
 
 function stopDockerVm(name) {
@@ -449,6 +461,8 @@ async function main() {
   const docker = hasFlag("docker");
   const dockerImage = parseArg("docker-image", defaultDockerImage);
   const dockerPort = parseArg("docker-port", defaultDockerPort);
+  const dockerBindAddress = parseArg("docker-bind-address", process.env.QUERY_READBACK_DOCKER_BIND_ADDRESS || defaultDockerBindAddress());
+  const dockerPublishedHost = parseArg("docker-published-host", process.env.QUERY_READBACK_DOCKER_PUBLISHED_HOST || defaultDockerPublishedHost());
   const keepDocker = hasFlag("keep-docker");
   const now = new Date(parseArg("now", defaultNow));
   if (Number.isNaN(now.getTime())) {
@@ -458,7 +472,7 @@ async function main() {
   let baseUrl = parseArg("base-url", process.env.QUERY_READBACK_VM_BASE_URL || "");
   let containerName = "";
   if (docker) {
-    const dockerVm = startDockerVm(dockerImage, dockerPort);
+    const dockerVm = startDockerVm(dockerImage, dockerPort, dockerBindAddress, dockerPublishedHost);
     baseUrl = dockerVm.baseUrl;
     containerName = dockerVm.name;
   }
@@ -474,8 +488,8 @@ async function main() {
     console.log("Dashboard query readback");
     console.log("========================");
     console.log("Script:        dashboard-query-readback.mjs");
-    console.log("Version:       2026.04.22.1");
-    console.log("Last modified: 2026-04-22");
+    console.log("Version:       2026.04.29.1");
+    console.log("Last modified: 2026-04-29");
     console.log(`VM base URL:   ${baseUrl}`);
     console.log(`Source dir:    ${sourceDir}`);
     console.log(`Query time:    ${now.toISOString().replace(".000Z", "Z")}`);
