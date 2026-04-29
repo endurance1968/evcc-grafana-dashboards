@@ -1,10 +1,11 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.04.24.1
- * Last modified: 2026-04-24
+ * Version: 2026.04.29.1
+ * Last modified: 2026-04-29
  */
 import { spawnSync } from "node:child_process";
+import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
 
@@ -29,6 +30,18 @@ function parseArg(name, fallback = "") {
 
 function hasFlag(name) {
   return process.argv.includes(`--${name}`);
+}
+
+function runsInsideContainer() {
+  return fs.existsSync("/.dockerenv") || fs.existsSync("/run/.containerenv");
+}
+
+function defaultDockerBindAddress() {
+  return runsInsideContainer() ? "0.0.0.0" : "127.0.0.1";
+}
+
+function defaultDockerPublishedHost() {
+  return runsInsideContainer() ? "host.docker.internal" : "127.0.0.1";
 }
 
 async function findFreePort() {
@@ -342,7 +355,7 @@ function startDockerEnvironment(args) {
     "--network",
     networkName,
     "-p",
-    `127.0.0.1:${args.vmPort}:8428`,
+    `${args.dockerBindAddress}:${args.vmPort}:8428`,
     args.vmImage,
     "-retentionPeriod=100y",
   ]);
@@ -355,7 +368,7 @@ function startDockerEnvironment(args) {
     "--network",
     networkName,
     "-p",
-    `127.0.0.1:${args.grafanaPort}:3000`,
+    `${args.dockerBindAddress}:${args.grafanaPort}:3000`,
     "-e",
     `GF_SECURITY_ADMIN_USER=${args.grafanaUser}`,
     "-e",
@@ -402,6 +415,8 @@ async function main() {
     vmImage: parseArg("vm-image", defaultVmImage),
     grafanaPort: parseArg("grafana-port", ""),
     vmPort: parseArg("vm-port", ""),
+    dockerBindAddress: parseArg("docker-bind-address", process.env.RENDER_E2E_DOCKER_BIND_ADDRESS || defaultDockerBindAddress()),
+    dockerPublishedHost: parseArg("docker-published-host", process.env.RENDER_E2E_DOCKER_PUBLISHED_HOST || defaultDockerPublishedHost()),
     grafanaUser: parseArg("grafana-user", "admin"),
     grafanaPassword: parseArg("grafana-password", "admin"),
     source: parseArg("source", "dashboards/original/en"),
@@ -419,8 +434,8 @@ async function main() {
   args.vmPort ||= await findFreePort();
 
   const dockerEnv = startDockerEnvironment(args);
-  const grafanaBaseUrl = `http://127.0.0.1:${args.grafanaPort}`;
-  const vmBaseUrl = `http://127.0.0.1:${args.vmPort}`;
+  const grafanaBaseUrl = `http://${args.dockerPublishedHost}:${args.grafanaPort}`;
+  const vmBaseUrl = `http://${args.dockerPublishedHost}:${args.vmPort}`;
   try {
     await waitForHttp(`${vmBaseUrl}/health`);
     await waitForHttp(`${grafanaBaseUrl}/api/health`, 120000);
@@ -445,8 +460,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.04.24.1");
-    console.log("Last modified: 2026-04-24");
+    console.log("Version:       2026.04.29.1");
+    console.log("Last modified: 2026-04-29");
     console.log("");
     console.log("Result");
     console.log("------");
