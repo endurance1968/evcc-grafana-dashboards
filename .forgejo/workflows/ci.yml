@@ -60,6 +60,12 @@ jobs:
       - name: Dashboard query readback
         run: npm run test:query-readback
 
+      - name: Dedup series disposable E2E
+        run: npm run test:dedup-e2e
+
+      - name: Rename label disposable E2E
+        run: npm run test:rename-e2e
+
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 

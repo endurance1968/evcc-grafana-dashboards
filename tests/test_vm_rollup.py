@@ -76,6 +76,17 @@ class VmRollupTests(unittest.TestCase):
         self.assertIn("by (vehicle)", item.expr)
         self.assertNotIn("loadpoint", item.expr)
 
+    def test_pv_daily_energy_query_prefers_title_over_unstable_evcc_id(self):
+        item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "pv_daily_energy")
+
+        query = MODULE.positive_energy_query(self.settings, item)
+
+        self.assertIn("sum(avg by (title)", query)
+        self.assertIn('pvPower_value{id!="",title!=""}', query)
+        self.assertIn("or sum(avg by (id)", query)
+        self.assertIn('pvPower_value{id!="",title=""}', query)
+        self.assertIn('or avg(pvPower_value{id=""})', query)
+
     def test_battery_soc_rollups_collapse_to_single_series(self):
         catalog = MODULE.build_catalog(self.settings)
         min_item = next(metric for metric in catalog if metric.key == "battery_soc_daily_min")
@@ -230,7 +241,9 @@ class VmRollupTests(unittest.TestCase):
         vehicle_item = next(metric for metric in catalog if metric.key == "vehicle_daily_energy")
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, pv_item),
-            'sum(avg by (id) (pvPower_value{id!=""})) or avg(pvPower_value{id=""})',
+            'sum(avg by (title) (pvPower_value{id!="",title!=""})) '
+            'or sum(avg by (id) (pvPower_value{id!="",title=""})) '
+            'or avg(pvPower_value{id=""})',
         )
         self.assertEqual(
             MODULE.positive_energy_query(self.settings, loadpoint_item),
@@ -324,10 +337,12 @@ class VmRollupTests(unittest.TestCase):
         original_fetch_rollup_vector = MODULE.fetch_rollup_vector
         original_positive_matrix = MODULE.fetch_chunk_positive_energy_matrix
         original_build_health = MODULE.build_pv_health_rollups
+        original_fetch_existing_pv = MODULE.fetch_existing_pv_daily_values_by_year
         MODULE.build_catalog = fake_build_catalog
         MODULE.fetch_rollup_vector = fail_fetch_rollup_vector
         MODULE.fetch_chunk_positive_energy_matrix = fake_fetch_chunk_positive_energy_matrix
         MODULE.build_pv_health_rollups = fake_build_health
+        MODULE.fetch_existing_pv_daily_values_by_year = lambda *_args, **_kwargs: {}
         try:
             stdout = io.StringIO()
             with contextlib.redirect_stdout(stdout):
@@ -337,6 +352,7 @@ class VmRollupTests(unittest.TestCase):
             MODULE.fetch_rollup_vector = original_fetch_rollup_vector
             MODULE.fetch_chunk_positive_energy_matrix = original_positive_matrix
             MODULE.build_pv_health_rollups = original_build_health
+            MODULE.fetch_existing_pv_daily_values_by_year = original_fetch_existing_pv
 
         summary = MODULE.json.loads(stdout.getvalue())
         self.assertEqual(result, 0)
@@ -782,6 +798,56 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(monthly["metric"], {"__name__": "evcc_pv_top5_mean_monthly_wh", "local_year": "2025", "local_month": "01"})
         self.assertAlmostEqual(yearly["values"][0], 20.0, places=6)
         self.assertAlmostEqual(monthly["values"][0], 10.0, places=6)
+
+    def test_build_pv_health_rollups_merges_existing_year_before_top30(self):
+        current_ts = 1777586400000
+        existing = {
+            "2026": {
+                "samples": {
+                    1767222000000: 60000.0,
+                    1767308400000: 70000.0,
+                    1767394800000: 80000.0,
+                },
+                "timestamp_ms": 1767394800000,
+            }
+        }
+        current = {
+            "2026": {
+                "values": [90000.0],
+                "samples": {current_ts: 90000.0},
+                "timestamp_ms": current_ts,
+            }
+        }
+
+        result = MODULE.build_pv_health_rollups(self.settings, current, {}, existing)
+
+        yearly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top30_mean_yearly_wh")
+        self.assertEqual(yearly["timestamps"], [current_ts])
+        self.assertAlmostEqual(yearly["values"][0], 75000.0, places=6)
+
+    def test_build_pv_health_rollups_current_samples_override_existing_same_day(self):
+        timestamp = 1777586400000
+        existing = {
+            "2026": {
+                "samples": {
+                    timestamp: 10000.0,
+                    1777672800000: 60000.0,
+                },
+                "timestamp_ms": 1777672800000,
+            }
+        }
+        current = {
+            "2026": {
+                "values": [90000.0],
+                "samples": {timestamp: 90000.0},
+                "timestamp_ms": timestamp,
+            }
+        }
+
+        result = MODULE.build_pv_health_rollups(self.settings, current, {}, existing)
+
+        yearly = next(row for row in result if row["metric"]["__name__"] == "evcc_pv_top30_mean_yearly_wh")
+        self.assertAlmostEqual(yearly["values"][0], 75000.0, places=6)
 
     def test_fetch_battery_soc_extrema_from_matrix_slices_window_and_ignores_non_positive_values(self):
         window = MODULE.DayWindow(

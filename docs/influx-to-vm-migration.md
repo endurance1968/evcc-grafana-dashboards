@@ -73,6 +73,7 @@ curl -fsSLo evcc-vm-rollup.conf.example "$BASE/scripts/rollup/evcc-vm-rollup.con
 curl -fsSLo check_data.py "$BASE/scripts/helper/check_data.py"
 curl -fsSLo compare_import_coverage.py "$BASE/scripts/helper/compare_import_coverage.py"
 curl -fsSLo vm-rewrite-drop-label.py "$BASE/scripts/helper/vm-rewrite-drop-label.py"
+curl -fsSLo vm-rewrite-label-value.py "$BASE/scripts/helper/vm-rewrite-label-value.py"
 ```
 
 If you intentionally download from a local Forgejo mirror instead, use its raw endpoint, for example:
@@ -91,6 +92,8 @@ BASE="http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/m
   - `compare_import_coverage.py`
 - safe first cleanup step:
   - `vm-rewrite-drop-label.py`
+- optional historical business-label rename:
+  - `vm-rewrite-label-value.py`
 - rollup engine:
   - `evcc-vm-rollup.py`
 - production rollup config:
@@ -369,7 +372,43 @@ This gives two verified production cases for the same command:
 - if exact hostless target series already exist, keep them authoritative with `--keep-target-values-on-conflict`
 - if only the host-tagged transition series exist, the rewrite cleanly recreates the hostless targets and removes the host-tagged originals
 
-## 4. Create the rollup configuration
+## 4. Optional: rename historical business label values
+
+Use `vm-rewrite-label-value.py` only for deliberate business-label renames, for example after changing PV names in EVCC. Change the live EVCC configuration first; otherwise new samples will keep arriving with the old title and the history will split again.
+
+Example:
+
+```bash
+python3 vm-rewrite-label-value.py \
+  --base-url http://localhost:8428 \
+  --matcher '{title="Balkon PV"}' \
+  --label title \
+  --from "Balkon PV" \
+  --to "Balkon Sued" \
+  --backup-jsonl backups/rename-balkon-pv.jsonl \
+  --rewritten-jsonl backups/rename-balkon-sued.jsonl
+```
+
+The dry-run writes both files, searches the full historical range by default, checks whether `title="Balkon Sued"` already exists, and prints a recommendation. Use `--start` and `--end` only if you intentionally want to restrict the rewrite window; the script accepts Unix seconds or RFC3339 and sends Unix seconds to VictoriaMetrics. The default start is Unix second `1`, not `0`, because VictoriaMetrics may treat `start=0` as an empty edge case. For a clean rename, follow the recommended flags:
+
+```bash
+python3 vm-rewrite-label-value.py \
+  --base-url http://localhost:8428 \
+  --matcher '{title="Balkon PV"}' \
+  --label title \
+  --from "Balkon PV" \
+  --to "Balkon Sued" \
+  --backup-jsonl backups/rename-balkon-pv.jsonl \
+  --rewritten-jsonl backups/rename-balkon-sued.jsonl \
+  --reset-cache \
+  --write
+```
+
+If the dry-run reports existing target overlap, use the printed `--merge-target` recommendation and review whether `--keep-target-values-on-conflict` or `--allow-value-conflicts` is the correct conflict policy.
+
+For PV devices, prefer `title` as the stable business key. EVCC can renumber PV `id` values when PV devices are added, removed, or reordered, so `id` should be treated as an EVCC-internal list position rather than a durable device identity.
+
+## 5. Create the rollup configuration
 
 Create the production config from the example:
 
@@ -422,7 +461,7 @@ Important:
 - rollups should be based on business labels, not infrastructure labels
 - the `[benchmark]` section is optional; if omitted, the script uses the last 30 days with `step = 1d`
 
-## 5. Inspect the rollup before writing
+## 6. Inspect the rollup before writing
 
 Use these two commands before the first backfill:
 
@@ -456,7 +495,7 @@ This is useful because it tells you early:
 - which rollups are Python-only and will only be computed during backfill
 - whether `max_fetch_points_per_series` fits your hardware
 
-## 6. Run the initial rollup backfill
+## 7. Run the initial rollup backfill
 
 This creates the daily rollups in the `evcc_*` namespace.
 
@@ -490,7 +529,7 @@ Notes:
 - that keeps memory usage and progress visibility manageable
 - `--write` refuses today or future local days by default; use the latest completed local day, usually yesterday, as `--end-day`
 
-## 7. Verify the rollups
+## 8. Verify the rollups
 
 Example check for a daily PV rollup:
 
@@ -509,7 +548,7 @@ python3 check_data.py \
   --end-time 2026-03-30T23:59:59Z
 ```
 
-## 8. Set up the daily rollup refresh
+## 9. Set up the daily rollup refresh
 
 Use a simple cron job that runs once per day after the previous local day is complete.
 
@@ -570,7 +609,7 @@ Optional check:
 sudo crontab -l
 ```
 
-## 9. Remove InfluxDB from the active dashboard path
+## 10. Remove InfluxDB from the active dashboard path
 
 Once you are sure that:
 
@@ -695,4 +734,3 @@ Summary from this verified comparison:
 - `VM rollup` is on Influx dashboard level for `Home`, `Loadpoints`, and `Battery netto`
 - `VM rollup` is closer to `VRM` than Influx for `Grid import`
 - `VM aggregation` remains visibly less reliable, especially for `PV`, `Loadpoints`, and several `Grid import` months
-

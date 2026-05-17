@@ -1,8 +1,8 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.04.19.1
- * Last modified: 2026-04-19
+ * Version: 2026.05.16.4
+ * Last modified: 2026-05-16
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,12 +17,17 @@ const pythonScripts = [
   "scripts/helper/fetch_vrm_kwh_cache.py",
   "scripts/helper/validate_energy_comparison.py",
   "scripts/helper/vm-rewrite-drop-label.py",
+  "scripts/helper/vm-dedup-series.py",
+  "scripts/helper/vm-rewrite-label-value.py",
   "scripts/rollup/evcc-vm-rollup.py",
+  "scripts/test/dedup-series-e2e.py",
+  "scripts/test/live-dedup-rehearsal.py",
+  "scripts/test/rename-label-e2e.py",
   "scripts/test/rollup-e2e.py",
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.04.19.1 (last modified 2026-04-19)");
+  console.log("local-checks.mjs v2026.05.16.4 (last modified 2026-05-16)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -191,7 +196,21 @@ function runOptionalBashSyntaxChecks() {
 function main() {
   logHeader();
   const jsOnly = process.argv.includes("--js-only");
+  const dedupE2eOnly = process.argv.includes("--dedup-e2e");
+  const renameE2eOnly = process.argv.includes("--rename-e2e");
   const rollupE2eOnly = process.argv.includes("--rollup-e2e");
+  if (dedupE2eOnly) {
+    const python = findPython();
+    run(python, ["scripts/test/dedup-series-e2e.py", "--docker"]);
+    console.log("\nDedup series E2E check passed.");
+    return;
+  }
+  if (renameE2eOnly) {
+    const python = findPython();
+    run(python, ["scripts/test/rename-label-e2e.py", "--docker"]);
+    console.log("\nRename label E2E check passed.");
+    return;
+  }
   if (rollupE2eOnly) {
     const python = findPython();
     run(python, ["scripts/test/rollup-e2e.py", "--docker"]);

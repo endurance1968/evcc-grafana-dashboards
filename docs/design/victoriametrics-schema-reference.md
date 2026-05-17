@@ -101,12 +101,15 @@ Raw EVCC history should be queried directly by metric name and business labels o
 Avoid relying on:
 
 - `host`
+- PV `id` as a stable device identity
 
 Reason:
 
 - imported history can be hostless
 - live writes can carry extra infra labels
 - host-dependent queries break historical correctness
+- EVCC can renumber PV `id` values when PV devices are added, removed, or reordered
+- for PV devices, prefer `title` as the durable business label and treat `id` as an EVCC-internal list position
 
 ### Daily rollups
 

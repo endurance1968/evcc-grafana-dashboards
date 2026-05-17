@@ -2562,7 +2562,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  yearlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year),\n  costs = label_join(\n    label_set(clamp_min(monthlyImport - monthlyExport, 0), \"kind\", \"Costs\"),\n    \"series\", \" \", \"local_year\", \"kind\"\n  ),\n  income = label_join(\n    label_set(clamp_min(monthlyExport - monthlyImport, 0), \"kind\", \"Income\"),\n    \"series\", \" \", \"local_year\", \"kind\"\n  ),\n)\ncosts or (income and on (local_year) (yearlyExport > 0))",
+                        "expr": "WITH (\n  monthlyImport = sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n  monthlyExport = sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur[1d]))[$__range:1d])) by (local_year, local_month),\n)\nlabel_join(\n  label_set(monthlyImport - monthlyExport, \"kind\", \"Costs\"),\n  \"series\", \" \", \"local_year\", \"kind\"\n)",
                         "format": "table",
                         "instant": true,
                         "range": false
@@ -2743,7 +2743,7 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#c84b5b",
+                          "fixedColor": "#e02f44",
                           "mode": "fixed"
                         }
                       }
@@ -2758,7 +2758,7 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#f2495c",
+                          "fixedColor": "#8f1d2c",
                           "mode": "fixed"
                         }
                       }
@@ -3326,7 +3326,7 @@
                   },
                   "color": {
                     "mode": "fixed",
-                    "fixedColor": "#c84b5b"
+                    "fixedColor": "#f2495c"
                   },
                   "custom": {
                     "align": "auto",
@@ -3381,7 +3381,7 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#c84b5b",
+                          "fixedColor": "#f2495c",
                           "mode": "fixed"
                         }
                       }

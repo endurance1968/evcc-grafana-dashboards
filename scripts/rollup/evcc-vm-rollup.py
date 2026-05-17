@@ -20,8 +20,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.04.25.3"
-SCRIPT_LAST_MODIFIED = "2026-04-25"
+SCRIPT_VERSION = "2026.05.17.1"
+SCRIPT_LAST_MODIFIED = "2026-05-17"
 
 PROFILE_FAMILY_LABELS = (
     ("positive_energy_s", "Positive energy rollups"),
@@ -969,6 +969,34 @@ def delete_rollup_scopes(settings: Settings, scopes: list[MonthScope], write: bo
     return results
 
 
+def delete_yearly_health_rollups(settings: Settings, local_years: set[str], write: bool) -> list[dict[str, str | int]]:
+    record = record_name(settings, "pv_top30_mean_yearly_wh")
+    results: list[dict[str, str | int]] = []
+    for local_year in sorted(local_years):
+        start_iso, end_iso = local_year_bounds_iso(settings, local_year)
+        matcher = f'{{__name__="{promql_string(record)}",local_year="{promql_string(local_year)}"}}'
+        before = count_matching_series(settings, matcher, start_iso, end_iso)
+        after = before
+        status = "dry-run"
+        if write:
+            http_post_form(settings, "/api/v1/admin/tsdb/delete_series", [("match[]", matcher)])
+            after = count_matching_series(settings, matcher, start_iso, end_iso)
+            status = "deleted"
+        results.append(
+            {
+                "local_year": local_year,
+                "local_month": "",
+                "matcher": matcher,
+                "start": start_iso,
+                "end": end_iso,
+                "series_before": before,
+                "series_after": after,
+                "status": status,
+            }
+        )
+    return results
+
+
 def build_window_chunks(windows: list[DayWindow]) -> list[tuple[str, list[DayWindow]]]:
     chunks: list[tuple[str, list[DayWindow]]] = []
     current_label = ""
@@ -1652,9 +1680,11 @@ def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     loadpoint_present = 'loadpoint!=""'
     vehicle_present = 'vehicle!=""'
     title_present = 'title!=""'
+    title_missing = 'title=""'
     if item.key == "pv_daily_energy":
         return (
-            f'sum(avg by (id) ({selector("pvPower_value", root, id_present)})) '
+            f'sum(avg by (title) ({selector("pvPower_value", root, id_present, title_present)})) '
+            f'or sum(avg by (id) ({selector("pvPower_value", root, id_present, title_missing)})) '
             f'or avg({selector("pvPower_value", root, id_empty)})'
         )
     if item.key == "home_daily_energy":
@@ -2950,18 +2980,129 @@ def mean_of_top(values: list[float], limit: int) -> float | None:
     return sum(top_values) / len(top_values)
 
 
+def local_year_bounds_iso(settings: Settings, local_year: str) -> tuple[str, str]:
+    tz = ZoneInfo(settings.timezone)
+    year = int(local_year)
+    start_local = datetime(year, 1, 1, tzinfo=tz)
+    end_local = datetime(year + 1, 1, 1, tzinfo=tz)
+    return to_iso_z(start_local), to_iso_z(end_local)
+
+
+def payload_samples(payload: dict[str, object] | None) -> dict[int, float]:
+    if not payload:
+        return {}
+    raw_samples = payload.get("samples")
+    if not isinstance(raw_samples, dict):
+        return {}
+    samples: dict[int, float] = {}
+    for timestamp, value in raw_samples.items():
+        try:
+            timestamp_ms = int(timestamp)
+            numeric = float(value)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(numeric):
+            samples[timestamp_ms] = numeric
+    return samples
+
+
+def payload_values(payload: dict[str, object] | None) -> list[float]:
+    samples = payload_samples(payload)
+    if samples:
+        return list(samples.values())
+    raw_values = payload.get("values", []) if payload else []
+    values: list[float] = []
+    if isinstance(raw_values, list):
+        for value in raw_values:
+            try:
+                numeric = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(numeric):
+                values.append(numeric)
+    return values
+
+
+def payload_timestamp_ms(payload: dict[str, object] | None) -> int:
+    samples = payload_samples(payload)
+    if samples:
+        return max(samples)
+    if not payload:
+        return 0
+    try:
+        return int(payload.get("timestamp_ms", 0) or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def fetch_existing_pv_daily_values_by_year(settings: Settings, local_years: set[str]) -> dict[str, dict[str, object]]:
+    record = record_name(settings, "pv_energy_daily_wh")
+    allowed_labels = {"__name__", "local_year", "local_month", "local_day", "local_date"}
+    existing: dict[str, dict[str, object]] = {}
+    for local_year in sorted(local_years):
+        start_iso, end_iso = local_year_bounds_iso(settings, local_year)
+        matcher = f'{record}{{local_year="{promql_string(local_year)}"}}'
+        text = http_get_text(
+            settings,
+            "/api/v1/export",
+            {
+                "match[]": [matcher],
+                "start": start_iso,
+                "end": end_iso,
+            },
+        )
+        samples: dict[int, float] = {}
+        for line in text.splitlines():
+            if not line.strip():
+                continue
+            item = json.loads(line)
+            metric = item.get("metric", {})
+            if not isinstance(metric, dict):
+                continue
+            if any(label not in allowed_labels for label in metric):
+                continue
+            timestamps = item.get("timestamps", [])
+            values = item.get("values", [])
+            for timestamp_ms, value in zip(timestamps, values):
+                try:
+                    timestamp = int(timestamp_ms)
+                    numeric = float(value)
+                except (TypeError, ValueError):
+                    continue
+                if math.isfinite(numeric):
+                    samples[timestamp] = numeric
+        if samples:
+            existing[local_year] = {"samples": samples, "timestamp_ms": max(samples)}
+    return existing
+
+
 def build_pv_health_rollups(
     settings: Settings,
     pv_daily_values_by_year: dict[str, dict[str, object]],
     pv_daily_values_by_year_month: dict[tuple[str, str], dict[str, object]],
+    existing_pv_daily_values_by_year: dict[str, dict[str, object]] | None = None,
 ) -> list[dict]:
     series_rows: list[dict] = []
     yearly_record = record_name(settings, "pv_top30_mean_yearly_wh")
     monthly_record = record_name(settings, "pv_top5_mean_monthly_wh")
+    existing_pv_daily_values_by_year = existing_pv_daily_values_by_year or {}
 
-    for local_year, payload in sorted(pv_daily_values_by_year.items()):
-        value = mean_of_top(payload.get("values", []), 30)
-        timestamp_ms = int(payload.get("timestamp_ms", 0) or 0)
+    yearly_keys = set(existing_pv_daily_values_by_year) | set(pv_daily_values_by_year)
+    for local_year in sorted(yearly_keys):
+        merged_samples = payload_samples(existing_pv_daily_values_by_year.get(local_year))
+        current_payload = pv_daily_values_by_year.get(local_year)
+        current_samples = payload_samples(current_payload)
+        if current_samples:
+            merged_samples.update(current_samples)
+            values = list(merged_samples.values())
+            timestamp_ms = max(merged_samples)
+        else:
+            values = payload_values(existing_pv_daily_values_by_year.get(local_year)) + payload_values(current_payload)
+            timestamp_ms = max(
+                payload_timestamp_ms(existing_pv_daily_values_by_year.get(local_year)),
+                payload_timestamp_ms(current_payload),
+            )
+        value = mean_of_top(values, 30)
         if value is None or timestamp_ms <= 0:
             continue
         series_rows.append(
@@ -2976,8 +3117,8 @@ def build_pv_health_rollups(
         )
 
     for (local_year, local_month), payload in sorted(pv_daily_values_by_year_month.items()):
-        value = mean_of_top(payload.get("values", []), 5)
-        timestamp_ms = int(payload.get("timestamp_ms", 0) or 0)
+        value = mean_of_top(payload_values(payload), 5)
+        timestamp_ms = payload_timestamp_ms(payload)
         if value is None or timestamp_ms <= 0:
             continue
         series_rows.append(
@@ -3219,16 +3360,18 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         if item.key == "pv_daily_energy":
                             year_bucket = pv_daily_values_by_year.setdefault(
                                 window.local_year,
-                                {"values": [], "timestamp_ms": 0},
+                                {"values": [], "samples": {}, "timestamp_ms": 0},
                             )
                             year_bucket["values"].append(value)
+                            year_bucket["samples"][window.sample_timestamp_ms] = value
                             year_bucket["timestamp_ms"] = max(int(year_bucket["timestamp_ms"]), window.sample_timestamp_ms)
                             month_key = (window.local_year, window.local_month)
                             month_bucket = pv_daily_values_by_year_month.setdefault(
                                 month_key,
-                                {"values": [], "timestamp_ms": 0},
+                                {"values": [], "samples": {}, "timestamp_ms": 0},
                             )
                             month_bucket["values"].append(value)
+                            month_bucket["samples"][window.sample_timestamp_ms] = value
                             month_bucket["timestamp_ms"] = max(int(month_bucket["timestamp_ms"]), window.sample_timestamp_ms)
                         emitted_samples += 1
                     add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
@@ -3462,13 +3605,24 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
             )
 
     health_started_at = time.perf_counter()
+    existing_pv_daily_values_by_year = fetch_existing_pv_daily_values_by_year(
+        settings,
+        set(pv_daily_values_by_year),
+    )
     health_series_rows = build_pv_health_rollups(
         settings,
         pv_daily_values_by_year,
         pv_daily_values_by_year_month,
+        existing_pv_daily_values_by_year,
     )
     add_duration(ACTIVE_PROFILE, "health_rollup_s", health_started_at)
     if args.write and health_series_rows:
+        yearly_health_years = {
+            row["metric"]["local_year"]
+            for row in health_series_rows
+            if row["metric"].get("__name__") == record_name(settings, "pv_top30_mean_yearly_wh")
+        }
+        replace_summary.extend(delete_yearly_health_rollups(settings, yearly_health_years, args.write))
         for batch_index, batch in enumerate(chunked(health_series_rows, args.batch_size), start=1):
             response = http_post_bytes(settings, "/api/v1/import", serialize_import_jsonl(batch))
             import_results.append(
