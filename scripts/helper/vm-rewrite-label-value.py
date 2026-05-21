@@ -22,8 +22,8 @@ from typing import Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-label-value.py"
-SCRIPT_VERSION = "2026.05.16.15"
-SCRIPT_LAST_MODIFIED = "2026-05-16"
+SCRIPT_VERSION = "2026.05.21.1"
+SCRIPT_LAST_MODIFIED = "2026-05-21"
 DEFAULT_START = "1"
 
 
@@ -300,14 +300,18 @@ def merge_points(
     }
 
 
-def combine_rewritten_series(items: list[dict], allow_value_conflicts: bool) -> dict:
+def combine_rewritten_series(
+    items: list[dict],
+    allow_value_conflicts: bool,
+    keep_existing_values_on_conflict: bool = False,
+) -> dict:
     if not items:
         raise ValueError("items must not be empty")
     return merge_points(
         items[0]["metric"],
         items,
         allow_value_conflicts=allow_value_conflicts,
-        keep_existing_values_on_conflict=False,
+        keep_existing_values_on_conflict=keep_existing_values_on_conflict,
     )
 
 
@@ -588,7 +592,11 @@ def main() -> int:
     deleted_targets = 0
 
     for _, group_items in sorted(target_groups.items()):
-        source_target = combine_rewritten_series(group_items, allow_value_conflicts=args.allow_value_conflicts)
+        source_target = combine_rewritten_series(
+            group_items,
+            allow_value_conflicts=args.allow_value_conflicts,
+            keep_existing_values_on_conflict=args.keep_target_values_on_conflict,
+        )
         existing = fetch_exact_series(args.base_url, source_target["metric"], args.start, args.end)
         target_overlap, target_conflicts = analyze_target_overlap(source_target, existing)
         overlaps += target_overlap
@@ -721,3 +729,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+

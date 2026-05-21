@@ -69,6 +69,20 @@ class VmRewriteLabelValueTests(unittest.TestCase):
         self.assertEqual(merged["timestamps"], [1000, 2000, 3000])
         self.assertEqual(merged["values"], [1.0, 2.0, 3.0])
 
+    def test_combine_rewritten_series_can_keep_first_value_on_internal_conflict(self):
+        metric = {"__name__": "pvEnergy_value", "id": "3", "title": "Terrasse Sued"}
+        first = {"metric": metric, "timestamps": [1000, 2000], "values": [2886.618, 2887.0]}
+        second = {"metric": metric, "timestamps": [1000, 3000], "values": [2886.617, 2888.0]}
+
+        merged = MODULE.combine_rewritten_series(
+            [first, second],
+            allow_value_conflicts=False,
+            keep_existing_values_on_conflict=True,
+        )
+
+        self.assertEqual(merged["timestamps"], [1000, 2000, 3000])
+        self.assertEqual(merged["values"], [2886.618, 2887.0, 2888.0])
+
     def test_dry_run_recommendation_for_clean_rename_is_write_ready(self):
         recommendation = MODULE.dry_run_recommendation(exported_series=4, overlaps=0, conflicts=0)
 
@@ -232,3 +246,4 @@ class VmRewriteLabelValueTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
