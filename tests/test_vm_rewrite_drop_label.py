@@ -1,10 +1,9 @@
 import importlib.util
 import json
 import pathlib
-import shutil
 import sys
+import tempfile
 import unittest
-import uuid
 
 MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "helper" / "vm-rewrite-drop-label.py"
 SPEC = importlib.util.spec_from_file_location("vm_rewrite_drop_label", MODULE_PATH)
@@ -99,13 +98,8 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             },
         ]
 
-        temp_root = pathlib.Path(__file__).resolve().parent / "_tmp_vm_rewrite_drop_label"
-        temp_root.mkdir(exist_ok=True)
-        temp_dir = temp_root / str(uuid.uuid4())
-        temp_dir.mkdir()
-        rewritten_path = temp_dir / "rewritten.jsonl"
-
-        try:
+        with tempfile.TemporaryDirectory(prefix="evcc-vm-rewrite-drop-label-") as temp_dir_name:
+            rewritten_path = pathlib.Path(temp_dir_name) / "rewritten.jsonl"
             rewritten_path.write_text(
                 "".join(json.dumps(row, separators=(",", ":")) + "\n" for row in rows),
                 encoding="utf-8",
@@ -129,8 +123,6 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             finally:
                 MODULE.http_post_bytes = original_http_post_bytes
                 MODULE.delete_target_matcher = original_delete_target_matcher
-        finally:
-            shutil.rmtree(temp_dir, ignore_errors=True)
 
         matcher = '{__name__="pvPower_value"}'
         self.assertEqual(list(expected_targets), [matcher])

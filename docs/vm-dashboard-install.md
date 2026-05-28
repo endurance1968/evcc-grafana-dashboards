@@ -1,31 +1,19 @@
-# VM Dashboard Install
+# VM Dashboard Install Reference
 
-For a simpler first-time walkthrough, start here:
+For a first-time walkthrough, start with [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md). For a short command-only version, use [deployment-readme.md](./deployment-readme.md).
 
-- [deployment-readme.md](./deployment-readme.md)
+This document is the deployer option reference.
 
-This document describes the end-user deployment path for the VictoriaMetrics dashboards in more detail.
+## Deployer Goals
 
-## Goal
+- no Node.js required for end users
+- import dashboards and embedded Grafana library panels
+- support Windows PowerShell, portable POSIX shell with Python, and Bash + `jq`
+- keep `PURGE=false` as the safe default
 
-- no Node.js required
-- simple first-deploy defaults
-- import both dashboards and Grafana library panels
+## Default Behavior
 
-## Recommended Grafana access
-
-Use a Grafana service-account token with permissions to:
-
-- create and update folders
-- create and update dashboards
-- create and update library panels
-- delete dashboards when `PURGE=true`
-
-This is simpler and safer than automating a username and password. Grafana 12 and 13 both support service-account tokens via the `Authorization: Bearer ...` HTTP header. Grafana 13 deprecates the old `/api` route family for a future major release, but does not remove it, so the deployers continue to work with Grafana 12 and 13.
-
-## Default behavior
-
-The deployer defaults to the generated dashboard set:
+Defaults:
 
 - source repo: `endurance1968/evcc-grafana-dashboards`
 - ref: `main`
@@ -36,97 +24,26 @@ The deployer defaults to the generated dashboard set:
 - datasource UID: `vm-evcc`
 - purge before import: `false`
 
-Default is `PURGE=false`, so existing dashboards are overwritten by UID and matching library panels are updated in place. Use `PURGE=true` only when you explicitly want to delete the known dashboards first and then rebuild the matching library-panel state from the embedded `__elements` definitions.
-
-When `PURGE=true`, the deployer deletes only:
-
-- the dashboards whose `uid` is present in the six VM dashboard JSON files
-
-After that, the deployer upserts the referenced library panels from the embedded `__elements` definitions and only then imports the dashboards. This mirrors the tested raw import path used in the Grafana render E2E validation.
-
-For most first deployments you only need to set:
-
-- `GRAFANA_URL`
-- `GRAFANA_API_TOKEN`
-
-The deployer can optionally set the hidden dashboard filter variables during deployment.
-
-That means:
-
-- colors come from the checked-in dashboard JSON files
-- dashboard variable defaults can come either from the checked-in dashboard JSON files or from optional deploy-time overrides
-- user-specific changes can be done in Grafana after import, by re-running the deployer with dashboard overrides, or by deploying from a local dashboard directory
-
-## Config file
-
-Copy:
-
-- `vm-dashboard-install.env.example`
-
-to:
-
-- `vm-dashboard-install.env`
-
-and set at least:
-
-- `GRAFANA_URL`
-- `GRAFANA_API_TOKEN`
-
-Optional values:
-
-- `GRAFANA_DS_VM_EVCC_UID`
-- `GRAFANA_AUTH_MODE=auto|token|basic`
-- `GRAFANA_SERVICE_ACCOUNT_TOKEN`
-- `GRAFANA_USER`
-- `GRAFANA_PASSWORD`
-- `GRAFANA_FOLDER_UID`
-- `GRAFANA_FOLDER_TITLE`
-- `DASHBOARD_LANGUAGE`
-- `DASHBOARD_VARIANT`
-- `DASHBOARD_SET=default|tabs`
-- `DASHBOARD_SOURCE_MODE=github|local`
-- `DASHBOARD_LOCAL_DIR`
-- `GITHUB_REPO`
-- `GITHUB_REF`
-- `PURGE`
-
-Optional dashboard variable overrides:
-
-- `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
-- `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
-- `DASHBOARD_TARIFF_PRICE_INTERVAL`
-- `DASHBOARD_INSTALLED_WATT_PEAK`
-- `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
-- `DASHBOARD_FILTER_EXT_BLOCKLIST`
-- `DASHBOARD_FILTER_AUX_BLOCKLIST`
-- `DASHBOARD_FILTER_VEHICLE_BLOCKLIST`
-- `DASHBOARD_EVCC_URL`
-- `DASHBOARD_PORTAL_TITLE`
-- `DASHBOARD_PORTAL_URL`
-
-Example:
+Recommended for Grafana 13.0.1 or newer:
 
 ```env
-GRAFANA_AUTH_MODE=auto
-GRAFANA_API_TOKEN=<service_account_token>
-DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
-DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
-DASHBOARD_TARIFF_PRICE_INTERVAL=15m
-DASHBOARD_INSTALLED_WATT_PEAK=20
-# Optional: requires Grafana 13.0.1 or newer.
-# DASHBOARD_SET=tabs
-DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
-DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
-DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
-DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
-DASHBOARD_EVCC_URL=http://home:7070/#/
-DASHBOARD_PORTAL_TITLE=Solarman
-DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+DASHBOARD_SET=tabs
 ```
 
-`GRAFANA_API_TOKEN` is the preferred setting for Grafana 12/13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty. If a migrated/old API key fails with `Invalid API key`, generate a new service-account token in Grafana and replace the value.
+## Required Config
 
-For local recovery when token auth is unavailable and Grafana basic auth is enabled, you can use:
+Copy `vm-dashboard-install.env.example` to `vm-dashboard-install.env` and set at least:
+
+```env
+GRAFANA_URL=http://<your-grafana-ip>:3000
+GRAFANA_AUTH_MODE=auto
+GRAFANA_API_TOKEN=<service_account_token>
+GRAFANA_DS_VM_EVCC_UID=vm-evcc
+```
+
+`GRAFANA_API_TOKEN` is the preferred setting for Grafana 12/13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty.
+
+Local recovery fallback when basic auth is enabled:
 
 ```env
 GRAFANA_AUTH_MODE=basic
@@ -134,119 +51,120 @@ GRAFANA_USER=admin
 GRAFANA_PASSWORD=<admin_password>
 ```
 
-Set `DASHBOARD_SET=tabs` to deploy the Grafana 13 TAB variants. They replace the longer row-based `All-time`, `Year`, `Month`, and `Today - Details` layouts with tabs for better navigation. Use Grafana 13.0.1 or newer for this set.
+## Dashboard Selection
 
-All of these values are optional. They let you set hidden dashboard variables and the header buttons during deployment without editing the dashboard JSON files manually. `DASHBOARD_INSTALLED_WATT_PEAK` is the installed PV peak in kWp and is used for the specific-yield panels. The behavior is identical in `deploy.ps1`, `deploy-python.sh`, and `deploy-bash.sh`.
+```env
+DASHBOARD_LANGUAGE=de
+DASHBOARD_VARIANT=gen
+DASHBOARD_SET=tabs
+```
 
-The dashboards include a small visible `Build` variable in the header. Hover over it to see the deployment timestamp, selected language/variant, and source ref.
+Values:
 
-Runtime overrides are also available:
+- `DASHBOARD_LANGUAGE`: `en`, `de`, `fr`, `es`, `it`, `nl`, `hi`, `zh`
+- `DASHBOARD_VARIANT`: `gen` for generated localized dashboards, `orig` for original source dashboards
+- `DASHBOARD_SET`: `default` or `tabs`
 
-- PowerShell: `-url`, `-token`, `-purge`
-- Python shell deployer: `--url`, `--token`, `--purge`
-- Bash-only deployer: `--url`, `--token`, `--purge`
+The deployable file lists are defined in `dashboards/deploy-manifest.json`.
 
-Those values override the config file for a single run. The link/button values update the hidden dashboard variables used by the `EVCC` and portal buttons in the header.
+## Source Selection
 
-Backward compatibility: the old names `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL` and `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL` are still accepted as aliases.
+Default GitHub source:
 
-## User customization
+```env
+DASHBOARD_SOURCE_MODE=github
+GITHUB_REPO=endurance1968/evcc-grafana-dashboards
+GITHUB_REF=main
+```
 
-The deployer is intentionally import-only.
+Local checkout source:
 
-Recommended customization paths:
+```env
+DASHBOARD_SOURCE_MODE=local
+DASHBOARD_LOCAL_DIR=/path/to/evcc-grafana-dashboards/dashboards/translation/de
+```
+
+## Folder And Datasource
+
+```env
+GRAFANA_FOLDER_UID=evcc
+GRAFANA_FOLDER_TITLE=EVCC
+GRAFANA_DS_VM_EVCC_UID=vm-evcc
+```
+
+If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before deployment.
+
+## Update Behavior
+
+```env
+PURGE=false
+```
+
+`PURGE=false` overwrites known dashboards by UID and updates referenced library panels in place.
+
+```env
+PURGE=true
+```
+
+`PURGE=true` deletes known EVCC dashboards first and then recreates dashboards and embedded library panels. Use this for a deliberate full rebuild.
+
+## Optional Dashboard Variable Overrides
+
+These values let you set hidden dashboard variables and header buttons without editing dashboard JSON files:
+
+```env
+DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
+DASHBOARD_ENERGY_SAMPLE_INTERVAL=30s
+DASHBOARD_TARIFF_PRICE_INTERVAL=15m
+DASHBOARD_INSTALLED_WATT_PEAK=20
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
+DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
+DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_EVCC_URL=http://home:7070/#/
+DASHBOARD_PORTAL_TITLE=Solarman
+DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+```
+
+Backward-compatible aliases are still accepted:
+
+- `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL`
+- `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL`
+
+Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see deployment timestamp, selected language/variant, dashboard set, and source ref.
+
+## Runtime Arguments
+
+PowerShell:
+
+```powershell
+.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false -dashboardset tabs
+```
+
+Portable shell with Python:
+
+```bash
+./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+```
+
+Bash + `jq`:
+
+```bash
+./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+```
+
+Runtime arguments override the config file for that run.
+
+## User Customization
+
+The deployer is intentionally import-only. Recommended customization paths:
 
 - change dashboard variables in Grafana and save the dashboard
-- or deploy from a local dashboard directory via `DASHBOARD_SOURCE_MODE=local`
+- set deploy-time dashboard variable overrides in `vm-dashboard-install.env`
+- deploy from a local dashboard directory with `DASHBOARD_SOURCE_MODE=local`
 
-The deployer intentionally does not rewrite:
+The deployer intentionally does not rewrite colors or arbitrary panel settings.
 
-- colors
-- panel settings
+## Maintainer Note
 
-The only supported deploy-time customization is the set of hidden dashboard filter variables listed above.
-
-## Windows
-
-PowerShell only, no Node.js required:
-
-```powershell
-.\deploy.ps1
-```
-
-With an explicit config file:
-
-```powershell
-.\deploy.ps1 -config .\vm-dashboard-install.env
-```
-
-Or directly with the key values:
-
-```powershell
-.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
-```
-
-## Linux / Raspberry Pi with the Python shell deployer
-
-This variant uses `python3`, which is usually already present.
-
-If not:
-
-```bash
-sudo apt install python3
-```
-
-Run:
-
-```bash
-sh ./deploy-python.sh
-```
-
-With an explicit config file:
-
-```bash
-sh ./deploy-python.sh --config ./vm-dashboard-install.env
-```
-
-Or directly with the key values:
-
-```bash
-sh ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
-```
-
-## Linux / Raspberry Pi with the Bash-only deployer
-
-This variant needs `jq`:
-
-```bash
-sudo apt install jq
-```
-
-Run:
-
-```bash
-./deploy-bash.sh
-```
-
-With an explicit config file:
-
-```bash
-./deploy-bash.sh --config ./vm-dashboard-install.env
-```
-
-Or directly with the key values:
-
-```bash
-./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
-```
-
-## Maintainer note
-
-The Node.js scripts under `scripts/test` remain the maintainer workflow for:
-
-- localization generation
-- test-folder imports
-- screenshot automation
-- smoke checks
-
-End users should prefer the deploy scripts above.
+Node.js scripts under `scripts/test` remain the maintainer workflow for localization generation, test-folder imports, screenshot automation, and smoke checks. End users should prefer the deploy scripts above.

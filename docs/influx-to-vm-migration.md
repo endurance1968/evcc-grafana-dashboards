@@ -1,59 +1,29 @@
-# Migrate from InfluxDB to VictoriaMetrics
+# Migrate From InfluxDB To VictoriaMetrics
 
-This guide describes the recommended end-user path from an existing EVCC + InfluxDB setup to VictoriaMetrics.
+This is the normal end-user path from an existing EVCC + InfluxDB setup to VictoriaMetrics.
 
-Note:
+This guide intentionally covers only the green path. If a check fails, continue with [migration-troubleshooting.md](./migration-troubleshooting.md). For release and energy-calibration background, see [migration-validation-notes.md](./migration-validation-notes.md).
 
-- this guide uses `localhost` for VictoriaMetrics examples
-- replace `localhost` with your actual VictoriaMetrics host if VictoriaMetrics is not running locally
+## Target State
 
-Assumptions:
+After migration, VictoriaMetrics contains two data layers:
 
-- VictoriaMetrics is already installed and reachable
-- `vmctl` is installed
-- EVCC already writes to VictoriaMetrics, or will do so after the migration
-- this repository assumes one VictoriaMetrics instance is dedicated to exactly one EVCC instance
+- raw EVCC metrics, used by `Today`, `Today - Mobile`, and `Today - Details`
+- daily `evcc_*` rollups, used by `Month`, `Year`, and `All-time`
 
-Not covered here:
+The rollup engine does not overwrite raw EVCC metrics. It writes additional daily metrics in the `evcc_*` namespace.
 
-- installing VictoriaMetrics itself
-- installing Grafana itself
-- deploying the Grafana dashboards
+## Assumptions
 
-## Target state
+- VictoriaMetrics is installed and reachable.
+- `vmctl` is installed.
+- You can reach the InfluxDB v1 query API.
+- Python 3.11 or newer is available.
+- One VictoriaMetrics instance is dedicated to one EVCC instance.
 
-After migration, there are two data layers:
+If VictoriaMetrics or Grafana is not installed yet, start at [docs/README.md](./README.md).
 
-- raw data in VictoriaMetrics
-  - used by `Today`, `Today - Mobile`, and `Today - Details`
-- daily rollups in the `evcc_*` namespace
-  - used by `Month`, `Year`, and `All-time`
-
-Important:
-
-- raw data is not overwritten by the rollup engine
-- rollups are added on top
-- the `Today*` dashboards continue to use raw data
-
-## What you need
-
-- Python 3.11 or newer
-- HTTP access to the InfluxDB v1 query API
-- HTTP access to VictoriaMetrics
-- `vmctl`
-
-Practical minimum on Linux:
-
-```bash
-sudo apt update
-sudo apt install -y python3 curl
-```
-
-For Debian 13, see also:
-
-- [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
-
-## Download the required files
+## 1. Download The Migration Files
 
 Create a working directory:
 
@@ -62,71 +32,43 @@ mkdir -p /opt/evcc-vm-migration
 cd /opt/evcc-vm-migration
 ```
 
-Download the required files from the public GitHub repository:
+Download the scripts:
 
 ```bash
 BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
 
 curl -fsSLo evcc-vm-rollup.py "$BASE/scripts/rollup/evcc-vm-rollup.py"
 curl -fsSLo evcc-vm-rollup-prod.conf.example "$BASE/scripts/rollup/evcc-vm-rollup-prod.conf.example"
-curl -fsSLo evcc-vm-rollup.conf.example "$BASE/scripts/rollup/evcc-vm-rollup.conf.example"
 curl -fsSLo check_data.py "$BASE/scripts/helper/check_data.py"
 curl -fsSLo compare_import_coverage.py "$BASE/scripts/helper/compare_import_coverage.py"
 curl -fsSLo vm-rewrite-drop-label.py "$BASE/scripts/helper/vm-rewrite-drop-label.py"
-curl -fsSLo vm-rewrite-label-value.py "$BASE/scripts/helper/vm-rewrite-label-value.py"
 ```
 
-If you intentionally download from a local Forgejo mirror instead, use its raw endpoint, for example:
+If you intentionally download from the local Forgejo mirror used for this project, use the port-forward address:
 
 ```bash
 BASE="http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
 ```
 
-## Files used in this migration
-
-- raw-data import:
-  - `vmctl`
-- health and presence checks:
-  - `check_data.py`
-- source-versus-import coverage check:
-  - `compare_import_coverage.py`
-- safe first cleanup step:
-  - `vm-rewrite-drop-label.py`
-- optional historical business-label rename:
-  - `vm-rewrite-label-value.py`
-- rollup engine:
-  - `evcc-vm-rollup.py`
-- production rollup config:
-  - `evcc-vm-rollup-prod.conf.example`
-
-## 1. Check VictoriaMetrics and EVCC first
-
-Before moving data, verify:
-
-- VictoriaMetrics responds:
+## 2. Verify VictoriaMetrics
 
 ```bash
 curl -fsSL http://localhost:8428/health
 ```
 
-- Grafana will later point to VictoriaMetrics
-- EVCC should ultimately write to VictoriaMetrics as well
+Expected result:
 
-If EVCC still writes to InfluxDB in parallel during the transition, that is fine for a temporary migration window.
+```text
+OK
+```
 
-## 2. Import raw data from InfluxDB into VictoriaMetrics
+Replace `localhost` with your VictoriaMetrics host when the command runs from another machine.
 
-For raw-data migration, use `vmctl influx`.
+## 3. Import Raw Data From InfluxDB
 
-Why this is the preferred path in this repository now:
+Use `vmctl influx`. This keeps EVCC business labels such as `loadpoint`, `vehicle`, `id`, and `title` intact.
 
-- it preserves the InfluxDB tag structure much more faithfully than the older normalized import path
-- it keeps business dimensions such as `loadpoint`, `vehicle`, `id`, and `title`
-- this gives you the best raw-data fidelity before any cleanup or normalization step
-
-### 2.1 Run the import
-
-Example:
+Without InfluxDB authentication:
 
 ```bash
 yes | vmctl influx \
@@ -138,7 +80,7 @@ yes | vmctl influx \
   --vm-addr='http://localhost:8428'
 ```
 
-If your InfluxDB requires auth:
+With InfluxDB authentication:
 
 ```bash
 yes | vmctl influx \
@@ -152,59 +94,30 @@ yes | vmctl influx \
   --vm-addr='http://localhost:8428'
 ```
 
-Notes:
+Important:
 
-- the repository assumes that this VictoriaMetrics instance stores data for exactly one EVCC instance, so `vmctl` is run with `--influx-skip-database-label` and no synthetic `db` label is stored
-- the live Telegraf path should mirror that model and write to VictoriaMetrics via `[[outputs.http]]` to `/influx/write` with `data_format = "influx"` instead of `[[outputs.influxdb]]`, so no synthetic `db` label is added during live ingest
-- the imported raw model can include labels such as `loadpoint`, `vehicle`, `id`, `title`, and sometimes `host`
-- that richer label model is expected and is the basis for the cleanup step below
+- Keep `--influx-skip-database-label` for this repository's default model.
+- Do not use a synthetic `db` label to multiplex multiple EVCC instances into one VictoriaMetrics instance.
+- During transition, EVCC may still write to InfluxDB in parallel.
 
-### 2.2 Verify the raw data directly
+## 4. Validate The Raw Import
 
-Query VictoriaMetrics directly:
-
-```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=pvPower_value' \
-  --data-urlencode 'start=2026-03-28T00:00:00Z' \
-  --data-urlencode 'end=2026-03-30T00:00:00Z'
-```
-
-You should also inspect a few labelsets:
+Run the VM-only checker:
 
 ```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=chargePower_value' \
-  --data-urlencode 'start=2026-03-28T00:00:00Z' \
-  --data-urlencode 'end=2026-03-30T00:00:00Z'
-```
-
-### 2.3 Run the repository data check
-
-Use the VM-only checker after the import. In the default `auto` phase it validates raw data first and only checks rollups once they exist. It also reports whether `host`-tagged series are present and should be normalized away.
-
-For a current production VM:
-
-```bash
-python3 check_data.py --base-url http://localhost:8428
-
-# explicit raw-import phase
 python3 check_data.py --base-url http://localhost:8428 --phase raw
 ```
 
-For a historical benchmark or migration VM, anchor the logical check point to the imported range:
+For a historical migration range, anchor the check near your imported end date:
 
 ```bash
 python3 check_data.py \
   --base-url http://localhost:8428 \
+  --phase raw \
   --end-time 2026-03-30T23:59:59Z
 ```
 
-### 2.4 Compare import coverage against Influx before cleanup
-
-Run this directly after `vmctl` and before any `host` rewrite. The default run checks the full Influx measurement set, but splits the result into `repo-relevant` and `additional` groups so the conclusion clearly shows whether the active dashboard schema is blocked or only extra EVCC metadata families are affected.
-
-If this check reports problems, stop here and explicitly re-import the affected measurements before cleanup or rollups.
+Then compare Influx source coverage against VictoriaMetrics:
 
 ```bash
 python3 compare_import_coverage.py \
@@ -216,78 +129,19 @@ python3 compare_import_coverage.py \
   --only-problems
 ```
 
-Use `--measurement-regex '^batterySoc$'` if you want to inspect only one suspicious measurement. Use `--repo-relevant-only` only when you explicitly want to limit the check to the active dashboard schema. Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap. The helper now also runs a critical monthly PV total-series parity check against the original Influx legacy semantics for `pvPower{id=""}` so it can catch cases where the measurement exists in VM but the imported raw values are still materially too low.
+Expected result:
 
-If that critical PV check fails, the safest repair path is:
+- `Repo-relevant problems: 0`
+- `Critical energy problems: 0`
+- final status `OK FOR REPO`
 
-1. delete the affected raw `pvPower_value` family in VictoriaMetrics
-2. re-import only `pvPower` via `vmctl influx --influx-filter-series`
-3. rerun `compare_import_coverage.py` for `pvPower`
-4. rebuild the `evcc_*` rollups after the raw PV data is healthy again
+If the check reports missing or drifting data, stop and use [migration-troubleshooting.md](./migration-troubleshooting.md) before building rollups.
 
-Example repair run for `pvPower` only:
+## 5. Clean Up `host` Only If The Checker Recommends It
 
-```bash
-curl -fsS -X POST 'http://localhost:8428/api/v1/admin/tsdb/delete_series' \
-  --data-urlencode 'match[]=pvPower_value'
+The raw import may contain infrastructure labels such as `host`. Keep EVCC business labels, but remove `host` when `check_data.py` reports host-tagged series.
 
-yes | vmctl influx \
-  --influx-addr='http://<influx-host>:8086' \
-  --influx-user='<user>' \
-  --influx-password='<password>' \
-  --influx-database='evcc' \
-  --influx-filter-series "on evcc from pvPower" \
-  --influx-filter-time-start='2025-01-01T00:00:00Z' \
-  --influx-filter-time-end='2026-03-31T23:59:59Z' \
-  --influx-skip-database-label \
-  --vm-addr='http://localhost:8428'
-
-python3 compare_import_coverage.py \
-  --influx-url http://<influx-host>:8086 \
-  --influx-db evcc \
-  --vm-base-url http://localhost:8428 \
-  --start 2025-01-01T00:00:00Z \
-  --end 2026-03-31T23:59:59Z \
-  --measurement-regex '^pvPower$' \
-  --only-problems
-```
-
-The `--influx-filter-series` flag is documented in the official vmctl InfluxDB docs: [Filtering](https://docs.victoriametrics.com/victoriametrics/vmctl/influxdb/).
-
-## 3. First cleanup step: remove `host` only if needed
-
-Do this step only if the data check or a direct series query shows host-tagged raw series.
-
-Why `host` is the safest first target:
-
-- it is an infrastructure label, not a business dimension
-- it can create duplicate-looking raw series without adding dashboard value
-- removing it does not throw away EVCC domain information such as `loadpoint`, `vehicle`, `id`, or `title`
-
-Do **not** blindly drop these labels:
-
-- `loadpoint`
-- `vehicle`
-- `id`
-- `title`
-
-Those labels carry the EVCC semantics that we want to preserve.
-
-### 3.1 Check first whether `host` is present
-
-The default `check_data.py` output already reports this in the `Label hygiene checks` section.
-
-You can also query it directly:
-
-```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]={host!=""}' \
-  --data-urlencode 'start=2024-01-01T00:00:00Z' \
-  --data-urlencode 'end=2026-03-30T23:59:59Z'
-```
-If this returns no series, skip the `host` cleanup step.
-
-### 3.2 Dry-run the rewrite first
+Dry-run first:
 
 ```bash
 python3 vm-rewrite-drop-label.py \
@@ -298,27 +152,7 @@ python3 vm-rewrite-drop-label.py \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
 
-The dry-run exports the host-tagged source series, removes `host` in memory, and reports:
-
-- how many source series were exported
-- whether transformed timestamps overlap existing hostless target series
-- whether there are value conflicts
-- a `Recommendation` block with `GO FOR IT`, `REVIEW`, or `STOP`
-- the exact write flags to append for the next run
-
-### 3.3 Follow the recommended write flags
-
-If the dry-run looks clean, follow the `Recommendation` block from the tool output. In the clean case it now looks like this:
-
-```text
-GO FOR IT: Dry-run is clean. You can continue with the write step.
-Recommended write flags:
-  --merge-target \
-  --reset-cache \
-  --write
-```
-
-That means the next write run should use the same base command plus exactly those flags:
+If the output says `GO FOR IT`, rerun the same command with the recommended write flags printed by the tool, usually:
 
 ```bash
 python3 vm-rewrite-drop-label.py \
@@ -332,113 +166,14 @@ python3 vm-rewrite-drop-label.py \
   --write
 ```
 
-Important:
+If the recommendation is `REVIEW` or `STOP`, use [migration-troubleshooting.md](./migration-troubleshooting.md).
 
-- start with the dry-run first
-- keep the backup JSONL
-- if the recommendation mentions overlapping or conflicting hostless targets, follow the printed conflict-safe flag set instead of the clean-case flags
-- if the analysis shows that all source points already overlap existing hostless target points and only value conflicts remain, prefer `--keep-target-values-on-conflict` so the existing hostless target values stay authoritative
-- only use `--allow-value-conflicts` if you have reviewed the differences and want source values to win explicitly
-
-Typical conflict-safe write command for that case:
-
-```bash
-python3 vm-rewrite-drop-label.py \
-  --base-url http://localhost:8428 \
-  --matcher '{host!=""}' \
-  --drop-label host \
-  --backup-jsonl backups/evcc-host-series.jsonl \
-  --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
-  --merge-target \
-  --keep-target-values-on-conflict \
-  --reset-cache \
-  --write
-```
-
-Verified examples from 2026-04-06:
-
-- conflict-preserving case on a partially normalized test VM:
-  - background: a short Telegraf transition phase had written duplicate raw series with `host!=""`
-  - dry-run result: `175` host-tagged source series, `187695` source points, `187695` overlapping timestamps, `4774` value conflicts
-  - interpretation: all host-tagged samples already had hostless counterparts, so the hostless series were treated as authoritative and host-tagged samples were merged only when timestamps were missing
-  - write result with `--merge-target --keep-target-values-on-conflict`: import verification passed with `ok=true`, `checked_targets=175`, `failures=[]`, and `source_series_after_delete=0`
-- clean end-to-end migration run on a freshly restored VM using `vm-rewrite-drop-label.py v2026.04.06.2`:
-  - analyze result: `175` host-tagged source series, `187695` source points, `0` exact overlaps, `0` conflicts
-  - write result: `import_verification.ok=true`, `failures=[]`, `source_series_after_delete=0`, `Host-tagged series: 0`
-  - follow-up validation: `compare_import_coverage.py` reported `Repo-relevant problems: 0`, `Critical energy problems: 0`, and `OK FOR REPO`
-
-This gives two verified production cases for the same command:
-
-- if exact hostless target series already exist, keep them authoritative with `--keep-target-values-on-conflict`
-- if only the host-tagged transition series exist, the rewrite cleanly recreates the hostless targets and removes the host-tagged originals
-
-## 4. Optional: rename historical business label values
-
-Use `vm-rewrite-label-value.py` only for deliberate business-label renames, for example after changing PV names in EVCC. Change the live EVCC configuration first; otherwise new samples will keep arriving with the old title and the history will split again.
-
-Example:
-
-```bash
-python3 vm-rewrite-label-value.py \
-  --base-url http://localhost:8428 \
-  --matcher '{title="Balkon PV"}' \
-  --label title \
-  --from "Balkon PV" \
-  --to "Balkon Sued" \
-  --backup-jsonl backups/rename-balkon-pv.jsonl \
-  --rewritten-jsonl backups/rename-balkon-sued.jsonl
-```
-
-The dry-run writes both files, searches the full historical range by default, checks whether `title="Balkon Sued"` already exists, and prints a recommendation. Use `--start` and `--end` only if you intentionally want to restrict the rewrite window; the script accepts Unix seconds or RFC3339 and sends Unix seconds to VictoriaMetrics. The default start is Unix second `1`, not `0`, because VictoriaMetrics may treat `start=0` as an empty edge case. For a clean rename, follow the recommended flags:
-
-```bash
-python3 vm-rewrite-label-value.py \
-  --base-url http://localhost:8428 \
-  --matcher '{title="Balkon PV"}' \
-  --label title \
-  --from "Balkon PV" \
-  --to "Balkon Sued" \
-  --backup-jsonl backups/rename-balkon-pv.jsonl \
-  --rewritten-jsonl backups/rename-balkon-sued.jsonl \
-  --reset-cache \
-  --write
-```
-
-If the dry-run reports existing target overlap, use the printed `--merge-target` recommendation and review whether `--keep-target-values-on-conflict` or `--allow-value-conflicts` is the correct conflict policy.
-
-For PV devices, prefer `title` as the stable business key. EVCC can renumber PV `id` values when PV devices are added, removed, or reordered, so `id` should be treated as an EVCC-internal list position rather than a durable device identity.
-
-## 5. Create the rollup configuration
-
-Create the production config from the example:
+## 6. Create The Rollup Config
 
 ```bash
 sudo cp evcc-vm-rollup-prod.conf.example /etc/evcc-vm-rollup.conf
 sudo editor /etc/evcc-vm-rollup.conf
 ```
-
-Important fields:
-
-- `base_url`
-  - URL of your VictoriaMetrics instance
-- `timezone`
-  - for example `Europe/Berlin`
-- `metric_prefix`
-  - production value `evcc`
-- `price_bucket_minutes`
-  - usually `15` for dynamic tariffs
-- `max_fetch_points_per_series`
-  - limits how many raw samples per series are fetched in a single request chunk
-
-Hardware note:
-
-- if the same host runs VictoriaMetrics and the rollup job, use at least a Raspberry Pi 4 with 4 GB RAM or comparable hardware
-- Raspberry Pi 3 and 1-2 GB systems are not recommended for the monthly `--replace-range` rollup path
-
-Operational assumption:
-
-- one VictoriaMetrics instance is dedicated to one EVCC instance
-- if you operate multiple EVCC instances, run multiple VictoriaMetrics instances
 
 Recommended production core:
 
@@ -454,52 +189,25 @@ price_bucket_minutes = 15
 max_fetch_points_per_series = 28000
 ```
 
-Important:
+Keep `metric_prefix = evcc`. The dashboards expect production rollups such as `evcc_pv_energy_daily_wh`.
 
-- `metric_prefix = evcc` creates production rollups such as `evcc_pv_energy_daily_wh`
-- keep `host_label` empty unless you have a very good reason not to
-- rollups should be based on business labels, not infrastructure labels
-- the `[benchmark]` section is optional; if omitted, the script uses the last 30 days with `step = 1d`
-
-## 6. Inspect the rollup before writing
-
-Use these two commands before the first backfill:
-
-- `detect`
-  - shows which business dimensions were found in the raw data, for example loadpoints, vehicles, `EXT` titles, and `AUX` titles
-- `plan`
-  - shows which rollups will be created from the detected raw model and helps verify that the config matches your installation
-
-### 5.1 Detect dimensions
+## 7. Inspect The Rollup Plan
 
 ```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf detect
-```
-
-### 5.2 Show the rollup plan
-
-```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf plan
-```
-
-### 5.3 Run the benchmark
-
-```bash
 python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf benchmark
 ```
 
-This is useful because it tells you early:
+Expected result:
 
-- whether the required raw source metrics can be queried from VictoriaMetrics
-- whether the direct source queries are fast enough
-- which rollups are Python-only and will only be computed during backfill
-- whether `max_fetch_points_per_series` fits your hardware
+- `detect` finds your loadpoints, vehicles, and optional EXT/AUX titles.
+- `plan` lists the `evcc_*` daily rollups to be created.
+- `benchmark` can query representative raw data without timeouts.
 
-## 7. Run the initial rollup backfill
+## 8. Run The Initial Backfill
 
-This creates the daily rollups in the `evcc_*` namespace.
-
-### 6.1 Dry-run first
+Dry-run first:
 
 ```bash
 python3 evcc-vm-rollup.py \
@@ -510,7 +218,7 @@ python3 evcc-vm-rollup.py \
   --progress
 ```
 
-### 6.2 Then run the real write
+Then write completed days only:
 
 ```bash
 python3 evcc-vm-rollup.py \
@@ -522,16 +230,9 @@ python3 evcc-vm-rollup.py \
   --write
 ```
 
-Notes:
+Use yesterday as `--end-day` for a live system. The write path rejects today and future local days by default.
 
-- the backfill is processed and written month by month
-- the script does not keep the full historical range in memory at once
-- that keeps memory usage and progress visibility manageable
-- `--write` refuses today or future local days by default; use the latest completed local day, usually yesterday, as `--end-day`
-
-## 8. Verify the rollups
-
-Example check for a daily PV rollup:
+## 9. Verify Rollups
 
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
@@ -540,7 +241,7 @@ curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'end=2026-03-31T23:59:59Z'
 ```
 
-Then run the repository checker again:
+Then run the checker again without forcing `--phase raw`:
 
 ```bash
 python3 check_data.py \
@@ -548,13 +249,9 @@ python3 check_data.py \
   --end-time 2026-03-30T23:59:59Z
 ```
 
-## 9. Set up the daily rollup refresh
+Expected result: raw checks and rollup checks are both OK.
 
-Use a simple cron job that runs once per day after the previous local day is complete.
-
-The rollup script writes one sample per local day and series. Run it only once per day after `yesterday` is complete. The recommended production command uses `--replace-range`: it deletes the monthly rollup scope that contains `yesterday`, then rebuilds that month up to `yesterday`. This keeps the refresh idempotent and avoids duplicate samples for the same series and timestamp. Do not run the daily refresh hourly.
-
-### 8.1 Create the wrapper script
+## 10. Schedule The Daily Refresh
 
 Create `/usr/local/bin/evcc-vm-rollup-daily.sh`:
 
@@ -575,162 +272,21 @@ Then:
 
 ```bash
 sudo chmod +x /usr/local/bin/evcc-vm-rollup-daily.sh
-```
-
-### 8.2 Create the cron job
-
-Open root crontab:
-
-```bash
 sudo crontab -e
 ```
 
-Add this entry:
+Add:
 
 ```cron
 5 5 * * * /usr/local/bin/evcc-vm-rollup-daily.sh >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
-Optional manual monthly delete dry-run:
+Run the refresh only once per day after the previous local day is complete.
 
-```bash
-python3 evcc-vm-rollup.py \
-  --config /etc/evcc-vm-rollup.conf \
-  delete \
-  --start-day 2026-04-01 \
-  --end-day 2026-04-30
-```
+## 11. Deploy Grafana Dashboards
 
-Add `--write` only after the dry-run matcher and series counts look correct.
+Continue with [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md).
 
-Optional check:
+## Quick Completion Check
 
-```bash
-sudo crontab -l
-```
-
-## 10. Remove InfluxDB from the active dashboard path
-
-Once you are sure that:
-
-- raw data arrives correctly in VictoriaMetrics
-- rollups are running correctly
-- the first host cleanup step is complete or consciously postponed
-
-EVCC no longer needs to depend on InfluxDB for dashboarding.
-
-At that point you can:
-
-- keep InfluxDB only as backup or reference
-- or later shut it down completely
-
-## Easy things to forget
-
-- Grafana must point to VictoriaMetrics, not InfluxDB
-- `Today*` and the long-range dashboards work on different data layers
-- `metric_prefix` must be `evcc`, not `test_evcc`
-- the raw-data import does not replace the ongoing rollup process
-- the rollup needs a scheduler, or `Month/Year/All-time` will stop updating
-- `host` should be treated as infrastructure noise unless you explicitly need it
-- if something looks wrong, verify raw data first, then rollups
-
-## Recommendation for this repository
-
-Current recommendation:
-
-- use `vmctl influx` for the raw-data import
-- remove `host` as the first cleanup step only when `host`-tagged series are actually present
-- keep business labels such as `loadpoint`, `vehicle`, `id`, and `title`
-- use `compare_import_coverage.py` and `check_data.py` after the raw import, then run `check_data.py` again after the initial rollup backfill
-
-## Next steps
-
-- review whether the five basic daily rollups should move closer to the maintainer's PromQL-based logic:
-  - PV energy
-  - home energy
-  - grid import energy
-  - grid export energy
-  - loadpoint energy
-- keep the broader Python backfill logic mainly for rollups that are harder to express cleanly in PromQL:
-  - tariff and cost rollups
-  - PV/battery/grid attribution
-  - more complex vehicle and battery calculations
-
-## Short version
-
-1. verify VictoriaMetrics
-2. import raw data with `vmctl influx`
-3. verify raw data with `compare_import_coverage.py` and `check_data.py`
-4. if needed, remove `host` with `vm-rewrite-drop-label.py`
-5. create the production rollup config
-6. run `detect`, `plan`, and `benchmark`
-7. run the initial rollup backfill with `--write`
-8. verify the rollups
-9. set up the daily rollup job
-10. keep InfluxDB only as fallback or historical reference
-
-
-
-## 2026-04-06 calibration baseline before mean rollup switch
-
-Before switching the Python rollup path from `max` to `mean` for PV and home daily energy, the observed baseline was:
-
-- `evcc_pv_energy_daily_wh`: current VM rollup matched a raw `max` bucket path, while Influx and the usable VRM comparison months tracked the raw `mean` path much more closely.
-- `evcc_home_energy_daily_wh`: current VM rollup matched a raw `max` bucket path, while Influx tracked the raw `mean` path much more closely.
-- `evcc_grid_import_daily_wh`: current VM rollup matched the `gridEnergy` counter-spread path and was usually closer to VRM than the legacy Influx aggregate, so it was intentionally left unchanged.
-
-This baseline should be used as the before-state when validating the next full backfill after the PV/home reducer change.
-
-## 2026-04-06 verified comparison after PV/home mean switch
-
-After the PV/home reducer switch, the monthly comparison was revalidated against:
-
-- Influx raw monthly semantics for `PV`, `Home`, and `Grid import`
-- the Influx `EVCC_AGGREGATIONS` datasource (`evcc_agg`) for dashboard-level `Home`, `Loadpoints`, and `Battery netto`
-- VictoriaMetrics rollups in the `evcc_*` namespace
-- the locally cached Victron VRM day totals for `PV` and `Grid import`
-
-Important dashboard semantics for the Influx month dashboard `Gesamt: Energieverteilung`:
-
-- `Home` comes from `homeDailyEnergy`
-- `Loadpoints` come from `loadpointDailyEnergy`
-- `Battery netto` is `chargeDailyEnergy - dischargeDailyEnergy`
-
-Comparison months with complete VRM coverage:
-
-- `2025-08`
-- `2025-09`
-- `2026-02`
-- `2026-03`
-
-Bold values below are the values that were observed to be genuinely close within the same row.
-
-| Month | Metric | Influx | VM rollup | VM aggregation | VRM |
-| --- | --- | ---: | ---: | ---: | ---: |
-| 2025-08 | PV | **1825.700** | **1826.580** | 1793.831 | **1829.700** |
-| 2025-08 | Home | **1990.773** | **1994.219** | **1986.997** | - |
-| 2025-08 | Grid import | 655.300 | **633.260** | 657.920 | **634.000** |
-| 2025-08 | Loadpoints | **366.213** | **366.768** | 715.256 | - |
-| 2025-08 | Battery netto | **57.051** | **55.911** | 125.630 | - |
-| 2025-09 | PV | **996.500** | **997.219** | 1021.473 | **996.200** |
-| 2025-09 | Home | **1244.685** | **1245.235** | **1239.921** | - |
-| 2025-09 | Grid import | 624.000 | **612.290** | 591.455 | **611.900** |
-| 2025-09 | Loadpoints | **367.166** | **367.416** | 750.311 | - |
-| 2025-09 | Battery netto | **-21.578** | **-19.482** | -41.672 | - |
-| 2026-02 | PV | **511.800** | **511.763** | 540.248 | **512.200** |
-| 2026-02 | Home | **1128.338** | **1129.096** | **1138.051** | - |
-| 2026-02 | Grid import | **1176.500** | **1168.690** | 1149.994 | **1165.600** |
-| 2026-02 | Loadpoints | **515.632** | **516.647** | 934.805 | - |
-| 2026-02 | Battery netto | **28.346** | **29.868** | 157.272 | - |
-| 2026-03 | PV | **1252.900** | **1252.948** | 1185.964 | **1249.900** |
-| 2026-03 | Home | **1262.666** | **1265.252** | 1218.546 | - |
-| 2026-03 | Grid import | 531.500 | **512.810** | 469.013 | **510.800** |
-| 2026-03 | Loadpoints | **405.301** | **406.338** | 796.323 | - |
-| 2026-03 | Battery netto | **63.557** | **60.979** | **59.970** | - |
-
-Summary from this verified comparison:
-
-- `VM rollup` is on Influx/VRM level for `PV`
-- `VM rollup` is on Influx dashboard level for `Home`, `Loadpoints`, and `Battery netto`
-- `VM rollup` is closer to `VRM` than Influx for `Grid import`
-- `VM aggregation` remains visibly less reliable, especially for `PV`, `Loadpoints`, and several `Grid import` months
+Use [migration-checklist.md](./migration-checklist.md) before removing InfluxDB from the active dashboard path.

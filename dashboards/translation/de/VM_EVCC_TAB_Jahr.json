@@ -6442,7 +6442,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Year Tabs",
+    "title": "VM: EVCC: Jahr Tabs",
     "variables": [
       {
         "kind": "ConstantVariable",

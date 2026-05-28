@@ -1,78 +1,84 @@
 # EVCC with VictoriaMetrics and Grafana
 
-This is the fastest end-to-end entry point for a user who:
+This is the main entry point for users who want EVCC dashboards on VictoriaMetrics.
 
-- already runs EVCC
-- currently stores EVCC history in InfluxDB
-- wants to move to VictoriaMetrics and the new EVCC dashboard set
+## Pick Your Path
 
-## Recommended order
+### I already use EVCC with InfluxDB
 
-1. Install VictoriaMetrics
-2. Install Grafana
-3. Import historic InfluxDB raw data into VictoriaMetrics
-4. Generate the daily rollups
-5. Connect Grafana to VictoriaMetrics
-6. Deploy the EVCC dashboards
-7. Set up the daily rollup refresh
+Use this path when you want to keep your history and move the dashboard backend to VictoriaMetrics:
 
-## Choose your runtime
+1. Install VictoriaMetrics.
+2. Install or reuse Grafana.
+3. Import historic InfluxDB raw data into VictoriaMetrics.
+4. Build the daily `evcc_*` rollups.
+5. Connect Grafana to VictoriaMetrics.
+6. Deploy the dashboards.
+7. Schedule the daily rollup refresh.
 
-### Debian 13 VM or LXC
+Start here:
 
-- VictoriaMetrics:
-  - [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
-- Grafana:
-  - [grafana-install-debian-13.md](./grafana-install-debian-13.md)
+- [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration.md)
+- [Migration checklist](./migration-checklist.md)
 
-### Docker
+### I am setting up a new VictoriaMetrics stack
 
-- VictoriaMetrics:
-  - [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
-- Grafana:
-  - [grafana-install-docker.md](./grafana-install-docker.md)
+Install the runtime first, then deploy dashboards:
 
-## Then migrate data and build rollups
+- VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
+- VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- Grafana on Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13.md)
+- Grafana with Docker: [grafana-install-docker.md](./grafana-install-docker.md)
+- Dashboard setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-If you already have EVCC + InfluxDB, continue with:
+### I only want to update dashboards
 
-- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+Use the deployment guide directly:
 
-That guide covers:
+- [Grafana dashboard setup](./grafana-vm-dashboard-setup.md)
+- Quick deploy reference: [deployment-readme.md](./deployment-readme.md)
+- Full deployer option reference: [vm-dashboard-install.md](./vm-dashboard-install.md)
 
-- one-time raw-data import from InfluxDB into VictoriaMetrics
-- initial rollup backfill
-- ongoing daily rollup refresh
+## Data Model At A Glance
 
-## Then connect Grafana and deploy dashboards
+```mermaid
+flowchart LR
+  EVCC["EVCC"] --> Raw["VictoriaMetrics raw metrics"]
+  Influx["InfluxDB history"] --> Import["vmctl influx import"] --> Raw
+  Raw --> Today["Today dashboards"]
+  Raw --> Rollup["evcc-vm-rollup.py"]
+  Rollup --> Daily["evcc_* daily rollups"]
+  Daily --> LongRange["Month / Year / All-time dashboards"]
+  Grafana["Grafana datasource vm-evcc"] --> Today
+  Grafana --> LongRange
+```
 
-Once VictoriaMetrics is running and the data is present, continue with:
+Key point: `Today`, `Today - Mobile`, and `Today - Details` use raw VictoriaMetrics data. `Month`, `Year`, and `All-time` use daily `evcc_*` rollups.
 
-- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+## Recommended Dashboard Set
 
-That guide covers:
+The repository ships two deployable sets:
 
-- creating the VictoriaMetrics datasource in Grafana
-- creating a Grafana service-account token
-- the first dashboard deployment
-- later dashboard updates
+- `default`: classic row-based dashboards, works without Grafana tabs.
+- `tabs`: recommended for Grafana 13.0.1 or newer because long dashboards are easier to navigate.
 
-## Additional end-user deploy docs
+Set this in `vm-dashboard-install.env` when you want the tabbed set:
 
-- quick deploy guide:
-  - [deployment-readme.md](./deployment-readme.md)
-- technical deploy details:
-  - [vm-dashboard-install.md](./vm-dashboard-install.md)
+```env
+DASHBOARD_SET=tabs
+```
 
-## Release preparation
+## Advanced Docs
 
-- first end-user release checklist:
-  - [first-release-checklist.md](./first-release-checklist.md)
+Use these only when the normal migration path reports a problem or when you maintain the repository:
 
-## Short version
+- Migration troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
+- Migration validation notes: [migration-validation-notes.md](./migration-validation-notes.md)
+- Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
+- Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
+- Localization maintainer workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow.md)
 
-For a typical migration from EVCC + InfluxDB to EVCC + VictoriaMetrics, there are really only three major blocks:
+## Release Preparation
 
-1. Get VictoriaMetrics running
-2. Move raw data and rollups into VictoriaMetrics
-3. Connect Grafana and deploy the dashboards
+- First end-user release checklist: [first-release-checklist.md](./first-release-checklist.md)
+- Screenshot policy: [screenshots/README.md](./screenshots/README.md)

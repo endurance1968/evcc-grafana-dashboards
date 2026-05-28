@@ -253,7 +253,7 @@ Key settings:
 
 The repo assumes one VictoriaMetrics instance per EVCC instance. If you run multiple EVCC instances, run multiple VictoriaMetrics instances as well instead of multiplexing them via a shared `db` label.
 
-For the operator-facing workflow, installation steps, and cron examples, see `docs/design/victoriametrics-aggregation-guide.md`.
+For the operator-facing workflow, installation steps, and cron examples, see `docs/influx-to-vm-migration.md` and `docs/migration-checklist.md`.
 
 ## Safety model
 

@@ -4709,7 +4709,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Today - Details Tabs",
+    "title": "VM: EVCC: Heute - Details Tabs",
     "variables": [
       {
         "kind": "ConstantVariable",

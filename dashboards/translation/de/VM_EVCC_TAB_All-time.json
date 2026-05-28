@@ -6130,7 +6130,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: All-time Tabs",
+    "title": "VM: EVCC: Gesamtzeitraum Tabs",
     "variables": [
       {
         "kind": "ConstantVariable",
