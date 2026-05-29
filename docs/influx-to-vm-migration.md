@@ -137,6 +137,8 @@ python3 compare_import_coverage.py \
   --only-problems
 ```
 
+Use a closed comparison window. If EVCC still writes to InfluxDB while you run the import, do not compare against the moving current hour. Use completed days, for example yesterday as `--end`, or the exact import snapshot end. Otherwise the checker can correctly report `TRUNCATED` because InfluxDB has newer samples than the finished VictoriaMetrics import.
+
 Expected result:
 
 - `Repo-relevant problems: 0`
@@ -159,6 +161,8 @@ python3 vm-rewrite-drop-label.py \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
+
+On a full real EVCC history this dry-run can take several minutes because it checks the target series for conflicts before writing. Let it finish and follow the recommendation from the tool output.
 
 If the output says `GO FOR IT`, rerun the same command with the recommended write flags printed by the tool, usually:
 

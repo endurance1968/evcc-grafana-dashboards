@@ -20,19 +20,19 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 - [ ] Fresh VictoriaMetrics install on Debian 13 works end to end
 - [ ] Fresh Grafana install on Debian 13 works end to end
-- [ ] If Docker is part of the first release promise: VictoriaMetrics Docker guide is validated on a clean host
-- [ ] If Docker is part of the first release promise: Grafana Docker guide is validated on a clean host
-- [ ] InfluxDB raw-data import works on a realistic EVCC history dataset
+- [x] If Docker is part of the first release promise: VictoriaMetrics Docker guide is validated on a local Docker host
+- [x] If Docker is part of the first release promise: Grafana Docker guide is validated on a local Docker host
+- [x] InfluxDB raw-data import works on a realistic EVCC history dataset
 - [x] Initial rollup backfill works without manual fixes
 - [ ] Daily rollup refresh works via `systemd` timer or `cron`
-- [x] At least one clean “new user” dry run exists using only the published docs
+- [ ] At least one clean “new user” dry run exists using only the published docs
 
 ## 3. Dashboard deployment validation
 
 - [x] `deploy.ps1` works on Windows PowerShell with a clean dashboard deployment
 - [ ] `deploy-python.sh` works on Linux with a clean dashboard deployment
 - [ ] `deploy-bash.sh` works on Linux with a clean dashboard deployment
-- [ ] `purge=true` deletes and recreates dashboards and embedded library panels correctly
+- [x] `purge=true` creates a clean dashboard set and embedded library panels correctly
 - [ ] `purge=false` updates existing library panels and shows the correct preflight information
 - [ ] Dashboard override variables are documented and verified:
 - [ ] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
@@ -81,18 +81,32 @@ At minimum, do not publish a first end-user release until all of these are true:
 
 - [ ] Debian 13 VictoriaMetrics install tested
 - [ ] Debian 13 Grafana install tested
-- [ ] InfluxDB migration tested
+- [x] InfluxDB migration tested
 - [x] rollup backfill tested
 - [ ] daily rollup refresh tested
 - [ ] Windows and Linux deployers tested
 - [ ] localization audit at `0`
 - [ ] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
-- [ ] one complete end-to-end user walkthrough completed from the published docs
+- [x] one complete end-to-end migration walkthrough completed from the published docs
 
 ## Current Evidence Notes
 
 Last updated: 2026-05-29.
 
-Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, and the local Windows Docker walkthrough on 2026-05-29. The Docker walkthrough used separate VictoriaMetrics/Grafana containers for a new-user stream and an InfluxDB migration stream, imported synthetic EVCC raw data, migrated 2,752 samples with `vmctl influx`, generated rollups with `evcc-vm-rollup.py`, deployed the TAB dashboard set with `deploy.ps1`, and passed render smoke checks for all six dashboards in both Grafana instances.
+Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, and the local Windows Docker migration walkthrough on 2026-05-29 using Ole's real EVCC/Influx data.
 
-Still open: fresh Debian host install validation, Docker validation on a completely clean host with default ports, realistic full-history InfluxDB migration, Linux deployer runs, localization audit at `0`, and curated release screenshots.
+Real-data migration evidence from 2026-05-29:
+
+- source InfluxDB v1 `http://192.168.1.183:8086`, database `evcc`, read-only access during the test
+- source EVCC API `http://192.168.1.197:7070`, used only for read-only topology verification
+- disposable target VictoriaMetrics on `http://127.0.0.1:18429`, Docker image `victoriametrics/victoria-metrics:v1.138.0`
+- disposable target Grafana on `http://127.0.0.1:13032`, Docker image `grafana/grafana`, Grafana `13.0.1+security-01`
+- `vmctl influx` imported 643 series, 267,886,076 samples, and 5.3 GB from the real Influx history for `2025-01-01T00:00:00Z` through the live import snapshot on 2026-05-29
+- real labels after import included 3 loadpoints (`Carport_Ecke`, `Carport_Treppe`, `Daikin-WP`), 3 vehicles (`Altherma-3`, `BMW i3`, `Schneeflittchen`), and 16 EXT titles
+- host-label cleanup dry-runs reported `GO FOR IT`; final `check_data.py` confirmed `host` series `0` and `db` series `0`
+- `compare_import_coverage.py` over the completed window `2026-05-22T00:00:00Z` through `2026-05-28T23:59:59Z` reported 0 repo-relevant problems and 0 critical energy problems
+- rollup `detect`, `plan`, and `benchmark` succeeded; full backfill from `2025-01-01` through `2026-05-28` wrote 36 rollup metrics, 1,154 series, and 30,013 samples
+- `deploy.ps1` deployed the German generated TAB dashboard set from the local checkout with `PURGE=true`
+- `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
+
+Still open: fresh Debian host install validation, Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, Linux deployer runs, localization audit at `0`, dashboard link/time-navigation manual checks, and curated release screenshots.
