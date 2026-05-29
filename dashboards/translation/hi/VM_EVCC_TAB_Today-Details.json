@@ -4709,7 +4709,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Today - Details Tabs",
+    "title": "VM: EVCC: आज - विवरण टैब",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4721,10 +4721,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।",
           "options": [
             {
               "text": "info",
@@ -5168,7 +5168,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Tariffs",
+              "title": "टैरिफ",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

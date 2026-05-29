@@ -4709,7 +4709,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Today - Details Tabs",
+    "title": "VM: EVCC: Oggi - Dettagli - Schede",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4724,7 +4724,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "Le informazioni di build vengono impostate durante il deploy.",
           "options": [
             {
               "text": "info",
@@ -5168,7 +5168,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Tariffs",
+              "title": "Tariffe",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

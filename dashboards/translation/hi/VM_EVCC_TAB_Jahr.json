@@ -6442,7 +6442,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Year Tabs",
+    "title": "VM: EVCC: वर्ष टैब",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6454,10 +6454,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।",
           "options": [
             {
               "text": "info",
@@ -6500,7 +6500,7 @@
           "label": "वाहन ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
+          "description": "उन वाहनों के लिए Regex जिन्हें नहीं दिखाना है। कुछ भी फिल्टर न करना हो तो ^none$ इस्तेमाल करें। कई सटीक नामों के लिए ^(वाहन A|वाहन B)$ इस्तेमाल करें।",
           "options": [
             {
               "text": "^none$",

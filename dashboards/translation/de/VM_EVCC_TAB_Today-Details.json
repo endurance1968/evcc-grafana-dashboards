@@ -4724,7 +4724,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "Build-Information wird beim Deployment gesetzt.",
           "options": [
             {
               "text": "info",
@@ -5168,7 +5168,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Tariffs",
+              "title": "Tarife",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

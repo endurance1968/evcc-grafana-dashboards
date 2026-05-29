@@ -3820,7 +3820,7 @@
     },
     {
       "id": 50,
-      "title": "PV system amortization",
+      "title": "PV सिस्टम अमोर्टाइजेशन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4186,7 +4186,7 @@
     },
     {
       "id": 51,
-      "title": "Battery amortization",
+      "title": "बैटरी अमोर्टाइजेशन",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4946,11 +4946,11 @@
       {
         "name": "dashboardBuild",
         "type": "constant",
-        "label": "Build",
+        "label": "बिल्ड",
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।",
         "current": {
           "text": "info",
           "value": "info",
@@ -4983,7 +4983,7 @@
         "hide": 2
       },
       {
-        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
+        "description": "उन वाहनों के लिए Regex जिन्हें नहीं दिखाना है। कुछ भी फिल्टर न करना हो तो ^none$ इस्तेमाल करें। कई सटीक नामों के लिए ^(वाहन A|वाहन B)$ इस्तेमाल करें।",
         "hide": 2,
         "label": "वाहन ब्लॉकलिस्ट",
         "name": "vehicleBlocklist",
@@ -5028,7 +5028,7 @@
         "regex": "",
         "regexApplyTo": "value",
         "type": "query",
-        "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+        "description": "दोहराए गए ड्राइविंग-कॉस्ट पैनलों में दिखाए जाने वाले वाहन। मल्टी-सलेक्ट चालू रखें ताकि उपयोगकर्ता एक या अधिक वाहन चुन सकें।",
         "skipUrlSync": false,
         "allValue": ""
       },

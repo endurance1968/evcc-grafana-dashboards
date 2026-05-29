@@ -4269,7 +4269,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "PV system amortization",
+          "title": "Afschrijving PV-systeem",
           "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
           "links": [],
           "data": {
@@ -4732,7 +4732,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Battery amortization",
+          "title": "Afschrijving batterij",
           "description": "Bij minder dan 365 dagen gegevens worden waarden geëxtrapoleerd naar een volledig jaar, met een overeenkomstige onnauwkeurigheid afhankelijk van de gemeten periode.",
           "links": [],
           "data": {
@@ -6130,7 +6130,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: All-time Tabs",
+    "title": "VM: EVCC: Gehele periode Tabs",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6144,7 +6144,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "Build-informatie wordt tijdens de deployment ingesteld."
         }
       },
       {
@@ -6173,7 +6173,7 @@
           "label": "Blokkeerlijst voertuigen",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+          "description": "Regex voor voertuigen die niet getoond moeten worden. Gebruik ^none$ als er niets gefilterd moet worden. Gebruik voor meerdere exacte namen ^(Voertuig A|Voertuig B)$."
         }
       },
       {
@@ -6188,7 +6188,7 @@
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
-          "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+          "description": "Voertuigen die in de herhaalde panelen voor rijkosten worden getoond. Laat meervoudige selectie ingeschakeld zodat gebruikers een of meer voertuigen kunnen kiezen.",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

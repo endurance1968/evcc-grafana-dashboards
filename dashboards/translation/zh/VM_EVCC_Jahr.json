@@ -5398,11 +5398,11 @@
       {
         "name": "dashboardBuild",
         "type": "constant",
-        "label": "Build",
+        "label": "构建",
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "构建信息在部署期间设置。",
         "current": {
           "text": "info",
           "value": "info",
@@ -5451,7 +5451,7 @@
           }
         ],
         "hide": 2,
-        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+        "description": "用于隐藏车辆的正则表达式。无需过滤时使用 ^none$。多个精确名称可使用 ^(车辆 A|车辆 B)$。"
       },
       {
         "name": "extBlocklist",

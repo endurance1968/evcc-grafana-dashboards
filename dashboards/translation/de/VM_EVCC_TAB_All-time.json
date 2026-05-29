@@ -4269,7 +4269,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "PV system amortization",
+          "title": "PV-Anlagenamortisation",
           "description": "Bei weniger als 365 Tagen Daten werden die Werte auf ein volles Jahr extrapoliert. Die Genauigkeit hängt dabei vom erfassten Zeitraum ab.",
           "links": [],
           "data": {
@@ -4732,7 +4732,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Battery amortization",
+          "title": "Batterieamortisation",
           "description": "Bei weniger als 365 Tagen Daten werden die Werte auf ein volles Jahr extrapoliert. Die Genauigkeit hängt dabei vom erfassten Zeitraum ab.",
           "links": [],
           "data": {
@@ -6144,7 +6144,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "Build-Information wird beim Deployment gesetzt."
         }
       },
       {
@@ -6173,7 +6173,7 @@
           "label": "Blocklist für Fahrzeuge",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+          "description": "Regex fuer Fahrzeuge, die nicht angezeigt werden sollen. Verwende ^none$, wenn nichts gefiltert werden soll. Fuer mehrere exakte Namen verwende ^(Fahrzeug A|Fahrzeug B)$."
         }
       },
       {
@@ -6188,7 +6188,7 @@
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
-          "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+          "description": "Fahrzeuge, die in den wiederholten Fahrtkosten-Panels angezeigt werden. Mehrfachauswahl aktiviert lassen, damit Benutzer ein oder mehrere Fahrzeuge auswaehlen koennen.",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

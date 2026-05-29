@@ -4779,7 +4779,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Month Tabs",
+    "title": "VM: EVCC: Mese - Schede",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4794,7 +4794,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "Le informazioni di build vengono impostate durante il deploy."
         }
       },
       {

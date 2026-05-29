@@ -4269,7 +4269,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "PV system amortization",
+          "title": "光伏系统摊销",
           "description": "当数据少于365天时，数值会外推到全年，误差取决于已覆盖的时间段。",
           "links": [],
           "data": {
@@ -4732,7 +4732,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Battery amortization",
+          "title": "电池摊销",
           "description": "当数据少于365天时，数值会外推到全年，误差取决于已覆盖的时间段。",
           "links": [],
           "data": {
@@ -6130,7 +6130,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: All-time Tabs",
+    "title": "VM: EVCC: 全部时间 标签页",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6141,10 +6141,10 @@
             "text": "info",
             "value": "info"
           },
-          "label": "Build",
+          "label": "构建",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "构建信息在部署期间设置。"
         }
       },
       {
@@ -6173,7 +6173,7 @@
           "label": "车辆屏蔽列表",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+          "description": "用于隐藏车辆的正则表达式。无需过滤时使用 ^none$。多个精确名称可使用 ^(车辆 A|车辆 B)$。"
         }
       },
       {
@@ -6188,7 +6188,7 @@
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
-          "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+          "description": "重复行驶成本面板中显示的车辆。保持多选启用，以便用户可以选择一辆或多辆车。",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

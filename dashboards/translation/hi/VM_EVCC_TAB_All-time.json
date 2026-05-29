@@ -4269,7 +4269,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "PV system amortization",
+          "title": "PV सिस्टम अमोर्टाइजेशन",
           "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
           "links": [],
           "data": {
@@ -4732,7 +4732,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Battery amortization",
+          "title": "बैटरी अमोर्टाइजेशन",
           "description": "यदि डेटा 365 दिनों से कम है, तो मानों को पूरे वर्ष के लिए एक्सट्रपलेट किया जाता है और सटीकता दर्ज अवधि पर निर्भर करती है।",
           "links": [],
           "data": {
@@ -6130,7 +6130,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: All-time Tabs",
+    "title": "VM: EVCC: पूरा समय टैब",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6141,10 +6141,10 @@
             "text": "info",
             "value": "info"
           },
-          "label": "Build",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।"
         }
       },
       {
@@ -6173,7 +6173,7 @@
           "label": "वाहन ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+          "description": "उन वाहनों के लिए Regex जिन्हें नहीं दिखाना है। कुछ भी फिल्टर न करना हो तो ^none$ इस्तेमाल करें। कई सटीक नामों के लिए ^(वाहन A|वाहन B)$ इस्तेमाल करें।"
         }
       },
       {
@@ -6188,7 +6188,7 @@
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
-          "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+          "description": "दोहराए गए ड्राइविंग-कॉस्ट पैनलों में दिखाए जाने वाले वाहन। मल्टी-सलेक्ट चालू रखें ताकि उपयोगकर्ता एक या अधिक वाहन चुन सकें।",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

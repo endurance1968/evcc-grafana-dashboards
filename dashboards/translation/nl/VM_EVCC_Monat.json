@@ -3817,7 +3817,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "Build-informatie wordt tijdens de deployment ingesteld.",
         "current": {
           "text": "info",
           "value": "info",
@@ -3984,7 +3984,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Month",
+  "title": "VM: EVCC: Maand",
   "uid": "vm-month-en-orig",
   "version": 2,
   "weekStart": ""

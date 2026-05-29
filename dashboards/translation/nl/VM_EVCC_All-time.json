@@ -3820,7 +3820,7 @@
     },
     {
       "id": 50,
-      "title": "PV system amortization",
+      "title": "Afschrijving PV-systeem",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4186,7 +4186,7 @@
     },
     {
       "id": 51,
-      "title": "Battery amortization",
+      "title": "Afschrijving batterij",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4950,7 +4950,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "Build-informatie wordt tijdens de deployment ingesteld.",
         "current": {
           "text": "info",
           "value": "info",
@@ -4983,7 +4983,7 @@
         "hide": 2
       },
       {
-        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
+        "description": "Regex voor voertuigen die niet getoond moeten worden. Gebruik ^none$ als er niets gefilterd moet worden. Gebruik voor meerdere exacte namen ^(Voertuig A|Voertuig B)$.",
         "hide": 2,
         "label": "Blokkeerlijst voertuigen",
         "name": "vehicleBlocklist",
@@ -5028,7 +5028,7 @@
         "regex": "",
         "regexApplyTo": "value",
         "type": "query",
-        "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+        "description": "Voertuigen die in de herhaalde panelen voor rijkosten worden getoond. Laat meervoudige selectie ingeschakeld zodat gebruikers een of meer voertuigen kunnen kiezen.",
         "skipUrlSync": false,
         "allValue": ""
       },

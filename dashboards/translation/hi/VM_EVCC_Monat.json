@@ -3813,11 +3813,11 @@
       {
         "name": "dashboardBuild",
         "type": "constant",
-        "label": "Build",
+        "label": "बिल्ड",
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।",
         "current": {
           "text": "info",
           "value": "info",
@@ -3984,7 +3984,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "VM: EVCC: Month",
+  "title": "VM: EVCC: महीना",
   "uid": "vm-month-en-orig",
   "version": 2,
   "weekStart": ""

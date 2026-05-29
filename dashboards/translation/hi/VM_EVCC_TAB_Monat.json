@@ -4779,7 +4779,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Month Tabs",
+    "title": "VM: EVCC: महीना टैब",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4791,10 +4791,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।"
         }
       },
       {

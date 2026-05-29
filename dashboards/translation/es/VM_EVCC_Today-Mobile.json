@@ -48,7 +48,7 @@
       "type": "constant",
       "label": "Lista de bloqueo de vehículos",
       "value": "^none$",
-      "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+      "description": "Regex para vehiculos que no deben mostrarse. Use ^none$ cuando no se deba filtrar nada. Para varios nombres exactos use ^(Vehiculo A|Vehiculo B)$."
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
@@ -2586,7 +2586,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "La informacion de build se establece durante el despliegue.",
         "current": {
           "text": "info",
           "value": "info",

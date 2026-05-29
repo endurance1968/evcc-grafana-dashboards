@@ -24,28 +24,28 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] If Docker is part of the first release promise: Grafana Docker guide is validated on a local Docker host
 - [x] InfluxDB raw-data import works on a realistic EVCC history dataset
 - [x] Initial rollup backfill works without manual fixes
-- [ ] Daily rollup refresh works via `systemd` timer or `cron`
+- [x] Daily rollup refresh works via `systemd` timer or `cron`
 - [ ] At least one clean “new user” dry run exists using only the published docs
 
 ## 3. Dashboard deployment validation
 
 - [x] `deploy.ps1` works on Windows PowerShell with a clean dashboard deployment
-- [ ] `deploy-python.sh` works on Linux with a clean dashboard deployment
-- [ ] `deploy-bash.sh` works on Linux with a clean dashboard deployment
+- [x] `deploy-python.sh` works on Linux with a clean dashboard deployment
+- [x] `deploy-bash.sh` works on Linux with a clean dashboard deployment
 - [x] `purge=true` creates a clean dashboard set and embedded library panels correctly
-- [ ] `purge=false` updates existing library panels and shows the correct preflight information
-- [ ] Dashboard override variables are documented and verified:
-- [ ] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
-- [ ] `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
-- [ ] `DASHBOARD_TARIFF_PRICE_INTERVAL`
-- [ ] `DASHBOARD_INSTALLED_WATT_PEAK`
-- [ ] `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
-- [ ] `DASHBOARD_FILTER_EXT_BLOCKLIST`
-- [ ] `DASHBOARD_FILTER_AUX_BLOCKLIST`
-- [ ] `DASHBOARD_FILTER_VEHICLE_BLOCKLIST`
-- [ ] `DASHBOARD_EVCC_URL`
-- [ ] `DASHBOARD_PORTAL_TITLE`
-- [ ] `DASHBOARD_PORTAL_URL`
+- [x] `purge=false` updates existing library panels and shows the correct preflight information
+- [x] Dashboard override variables are documented and verified:
+- [x] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
+- [x] `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
+- [x] `DASHBOARD_TARIFF_PRICE_INTERVAL`
+- [x] `DASHBOARD_INSTALLED_WATT_PEAK`
+- [x] `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
+- [x] `DASHBOARD_FILTER_EXT_BLOCKLIST`
+- [x] `DASHBOARD_FILTER_AUX_BLOCKLIST`
+- [x] `DASHBOARD_FILTER_VEHICLE_BLOCKLIST`
+- [x] `DASHBOARD_EVCC_URL`
+- [x] `DASHBOARD_PORTAL_TITLE`
+- [x] `DASHBOARD_PORTAL_URL`
 
 ## 4. Dashboard quality
 
@@ -60,7 +60,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 ## 5. Localization
 
-- [ ] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
+- [x] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [x] localized dashboards are regenerated from the current `orig/en` source
 - [ ] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed
 - [ ] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
@@ -83,9 +83,9 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] Debian 13 Grafana install tested
 - [x] InfluxDB migration tested
 - [x] rollup backfill tested
-- [ ] daily rollup refresh tested
-- [ ] Windows and Linux deployers tested
-- [ ] localization audit at `0`
+- [x] daily rollup refresh tested
+- [x] Windows and Linux deployers tested
+- [x] localization audit at `0`
 - [ ] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
 
@@ -109,7 +109,7 @@ Real-data migration evidence from 2026-05-29:
 - `deploy.ps1` deployed the German generated TAB dashboard set from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 
-Still open: Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, Linux deployer runs, localization audit at `0`, dashboard link/time-navigation manual checks, and curated release screenshots.
+Still open: Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, dashboard link/time-navigation manual checks, visual consistency review, curated release screenshots, release notes, and final release packaging.
 
 Debian 13 install evidence from 2026-05-29:
 
@@ -122,3 +122,12 @@ Debian 13 install evidence from 2026-05-29:
 - docs now include `curl` in Grafana base packages because the verification step uses `curl -I`
 - VictoriaMetrics datasource plugin install was validated with `grafana cli --homepath=/usr/share/grafana --pluginsDir /var/lib/grafana/plugins plugins install victoriametrics-metrics-datasource`
 - Grafana `/api/health` returned `database: ok`, and a VictoriaMetrics datasource pointed at the fresh Debian VictoriaMetrics test instance returned `Data source is working`
+
+Additional autonomous release-gate evidence from 2026-05-29:
+
+- `deploy-python.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie` and completed a clean Linux deployment (`PURGE=true`) of the German generated TAB set against Grafana `13.0.1` on disposable Docker port `13035`.
+- `deploy-bash.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie`, completed `PURGE=true`, and then completed `PURGE=false` against the same disposable Grafana instance.
+- The Linux deployers now handle Grafana dashboard v2 JSON via `/apis/dashboard.grafana.app/v2/...`, including folder annotations and `metadata.resourceVersion` updates for existing dashboards.
+- Dashboard override validation queried Grafana after deployment and verified 46 override variable instances across all 6 dashboards, including v2 TAB dashboards and classic dashboards, with folder placement in `evcc-release-bash`.
+- Daily rollup refresh validation used the documented cron-style `date -d 'yesterday'` wrapper shape in blank `debian:trixie` against disposable VictoriaMetrics on port `18434`; a date shim fixed `yesterday` to the already-seeded February fixture month, and the run executed `backfill --replace-range --write` successfully after `rollup-e2e.py` had validated repeated replacement without duplicate daily samples.
+- Localization audit now reports `0` missing candidates for `de`, `fr`, `nl`, `es`, `it`, `zh`, and `hi`; generated localized dashboards were regenerated and `npm run test:localization-idempotency` passed.

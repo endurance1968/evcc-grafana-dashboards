@@ -2,8 +2,8 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.04.20.2"
-SCRIPT_LAST_MODIFIED="2026-04-20"
+SCRIPT_VERSION="2026.05.29.1"
+SCRIPT_LAST_MODIFIED="2026-05-29"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -244,7 +244,40 @@ def replace_ds(node):
         return out
     return node
 
+def is_v2_dashboard(raw):
+    return isinstance(raw, dict) and raw.get("kind") == "Dashboard" and str(raw.get("apiVersion", "")).startswith("dashboard.grafana.app/v2")
+
+
+def dashboard_title(raw):
+    if is_v2_dashboard(raw):
+        return ((raw.get("spec") or {}).get("title") or "")
+    return raw.get("title") or ""
+
+
+def dashboard_uid(raw):
+    if is_v2_dashboard(raw):
+        return ((raw.get("metadata") or {}).get("name") or "")
+    return raw.get("uid") or ""
+
+
+def dashboard_path(raw):
+    uid = dashboard_uid(raw)
+    if is_v2_dashboard(raw):
+        return f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
+    return f"/api/dashboards/uid/{urllib.parse.quote(uid)}"
+
+
+def ensure_v2_folder_annotation(raw):
+    if not is_v2_dashboard(raw):
+        return raw
+    metadata = raw.setdefault("metadata", {})
+    annotations = metadata.setdefault("annotations", {})
+    annotations["grafana.app/folder"] = settings["GRAFANA_FOLDER_UID"]
+    return raw
+
 def build_inputs(raw):
+    if is_v2_dashboard(raw):
+        return []
     out = []
     for item in raw.get("__inputs", []):
         if not item or not item.get("name") or not item.get("type"):
@@ -289,14 +322,39 @@ def build_dashboard_overrides(settings):
 def apply_dashboard_build_description(raw, marker):
     if not marker:
         return raw
+    if is_v2_dashboard(raw):
+        for variable in (raw.get("spec") or {}).get("variables") or []:
+            variable_spec = variable.get("spec") or {}
+            if variable_spec.get("name") == "dashboardBuild":
+                variable_spec["description"] = marker
+                variable["spec"] = variable_spec
+        return raw
+
     for variable in (raw.get("templating") or {}).get("list") or []:
         if variable.get("name") == "dashboardBuild":
             variable["description"] = marker
     return raw
-
 def apply_dashboard_filter_overrides(raw, overrides):
     if not overrides:
         return raw
+    if is_v2_dashboard(raw):
+        for variable in (raw.get("spec") or {}).get("variables") or []:
+            variable_spec = variable.get("spec") or {}
+            name = variable_spec.get("name")
+            value = str(overrides.get(name, "") or "").strip()
+            if not value:
+                continue
+            if variable.get("kind") != "QueryVariable":
+                variable_spec["query"] = value
+            current = dict(variable_spec.get("current") or {})
+            current["text"] = value
+            current["value"] = value
+            variable_spec["current"] = current
+            if "options" in variable_spec:
+                variable_spec["options"] = [{"selected": True, "text": value, "value": value}]
+            variable["spec"] = variable_spec
+        return raw
+
     templating = raw.get("templating") or {}
     variables = templating.get("list") or []
     for variable in variables:
@@ -312,7 +370,6 @@ def apply_dashboard_filter_overrides(raw, overrides):
         if "options" in variable:
             variable["options"] = [{"selected": True, "text": value, "value": value}]
     return raw
-
 def confirm_apply():
     if settings.get("CLI_YES", "").lower() == "true":
         return True
@@ -367,6 +424,30 @@ def create_library_panel(element):
     }
     api("POST", "/api/library-elements", body)
     print(f"Created library panel: {body['name']} [{uid}]")
+
+def import_dashboard(dashboard):
+    raw = dashboard["raw"]
+    if is_v2_dashboard(raw):
+        path = dashboard_path(raw)
+        existing = api("GET", path, allow_404=True)
+        if existing is not None:
+            resource_version = (existing.get("metadata") or {}).get("resourceVersion")
+            if resource_version:
+                raw.setdefault("metadata", {})["resourceVersion"] = resource_version
+                api("PUT", path, raw)
+                return
+        api("POST", "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards", raw)
+        return
+
+    body = {
+        "dashboard": raw,
+        "folderUid": settings["GRAFANA_FOLDER_UID"],
+        "overwrite": True,
+        "message": "EVCC VM dashboard install",
+        "inputs": dashboard["inputs"],
+    }
+    api("POST", "/api/dashboards/import", body)
+
 DASHBOARD_FILES = load_dashboard_files()
 
 dashboard_build_marker = build_dashboard_marker(settings)
@@ -379,6 +460,7 @@ for filename in DASHBOARD_FILES:
     raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
     raw = apply_dashboard_build_description(raw, dashboard_build_marker)
     raw = replace_ds(raw)
+    raw = ensure_v2_folder_annotation(raw)
     dashboards.append({"raw": raw, "inputs": build_inputs(raw)})
     for uid, element in raw.get("__elements", {}).items():
         library[uid] = element
@@ -408,7 +490,7 @@ if active_dashboard_overrides:
 print()
 print("Will import dashboards:")
 for dashboard in dashboards:
-    print(f"- {dashboard['raw'].get('title')} [{dashboard['raw'].get('uid')}]")
+    print(f"- {dashboard_title(dashboard['raw'])} [{dashboard_uid(dashboard['raw'])}]")
 print()
 print("Dashboards embed these library panels:")
 for element in library.values():
@@ -433,12 +515,12 @@ if settings["PURGE"].lower() != "true" and existing_library:
 if settings["PURGE"].lower() == "true":
     existing_dashboards = []
     for dashboard in dashboards:
-        uid = dashboard["raw"].get("uid")
+        uid = dashboard_uid(dashboard["raw"])
         if not uid:
             continue
-        existing = api("GET", f"/api/dashboards/uid/{urllib.parse.quote(uid)}", allow_404=True)
+        existing = api("GET", dashboard_path(dashboard["raw"]), allow_404=True)
         if existing is not None:
-            existing_dashboards.append(existing["dashboard"])
+            existing_dashboards.append(existing.get("dashboard") or existing)
 
     print()
     print("Will delete existing dashboards before import:")
@@ -446,8 +528,7 @@ if settings["PURGE"].lower() == "true":
         print("- none")
     else:
         for item in existing_dashboards:
-            print(f"- {item.get('title')} [{item.get('uid')}]")
-
+            print(f"- {dashboard_title(item)} [{dashboard_uid(item)}]")
     print()
     print("Will ensure referenced library panels before import:")
     if not existing_library:
@@ -467,9 +548,9 @@ if api("GET", f"/api/folders/{folder_uid}", allow_404=True) is None:
 
 if settings["PURGE"].lower() == "true":
     for dashboard in dashboards:
-        uid = dashboard["raw"].get("uid")
+        uid = dashboard_uid(dashboard["raw"])
         if uid:
-            delete_and_report("dashboard", dashboard["raw"].get("title"), uid, f"/api/dashboards/uid/{urllib.parse.quote(uid)}")
+            delete_and_report("dashboard", dashboard_title(dashboard["raw"]) or uid, uid, dashboard_path(dashboard["raw"]))
 
 for uid, element in sorted(library.items()):
     if uid in existing_library:
@@ -478,15 +559,9 @@ for uid, element in sorted(library.items()):
     create_library_panel(element)
 
 for dashboard in dashboards:
-    body = {
-        "dashboard": dashboard["raw"],
-        "folderUid": settings["GRAFANA_FOLDER_UID"],
-        "overwrite": True,
-        "message": "EVCC VM dashboard install",
-        "inputs": dashboard["inputs"],
-    }
-    api("POST", "/api/dashboards/import", body)
-    print(f"Imported dashboard: {dashboard['raw'].get('title')}")
+    print(f"Importing dashboard: {dashboard_title(dashboard['raw'])} [{dashboard_uid(dashboard['raw'])}]")
+    import_dashboard(dashboard)
+    print(f"Imported dashboard: {dashboard_title(dashboard['raw'])}")
 
 print()
 print("Install finished.")

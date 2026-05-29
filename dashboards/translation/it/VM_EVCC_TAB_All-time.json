@@ -4269,7 +4269,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "PV system amortization",
+          "title": "Ammortamento impianto FV",
           "description": "Con meno di 365 giorni di dati, i valori vengono estrapolati a un anno intero con l’imprecisione corrispondente in base al periodo rilevato.",
           "links": [],
           "data": {
@@ -4732,7 +4732,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Battery amortization",
+          "title": "Ammortamento batteria",
           "description": "Con meno di 365 giorni di dati, i valori vengono estrapolati a un anno intero con l’imprecisione corrispondente in base al periodo rilevato.",
           "links": [],
           "data": {
@@ -6130,7 +6130,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: All-time Tabs",
+    "title": "VM: EVCC: Intero periodo - Schede",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6144,7 +6144,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "Le informazioni di build vengono impostate durante il deploy."
         }
       },
       {
@@ -6173,7 +6173,7 @@
           "label": "Blocklist veicoli",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+          "description": "Regex per i veicoli da non mostrare. Usa ^none$ quando non deve essere filtrato nulla. Per piu nomi esatti usa ^(Veicolo A|Veicolo B)$."
         }
       },
       {
@@ -6188,7 +6188,7 @@
           "hide": "dontHide",
           "refresh": "onDashboardLoad",
           "skipUrlSync": false,
-          "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+          "description": "Veicoli mostrati nei pannelli ripetuti dei costi di guida. Mantieni attiva la selezione multipla affinche gli utenti possano scegliere uno o piu veicoli.",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

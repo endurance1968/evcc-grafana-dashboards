@@ -48,7 +48,7 @@
       "type": "constant",
       "label": "Blocklist für Fahrzeuge",
       "value": "^none$",
-      "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$."
+      "description": "Regex fuer Fahrzeuge, die nicht angezeigt werden sollen. Verwende ^none$, wenn nichts gefiltert werden soll. Fuer mehrere exakte Namen verwende ^(Fahrzeug A|Fahrzeug B)$."
     },
     {
       "name": "VAR_ENERGYSAMPLEINTERVAL",
@@ -2586,7 +2586,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "Build-Information wird beim Deployment gesetzt.",
         "current": {
           "text": "info",
           "value": "info",

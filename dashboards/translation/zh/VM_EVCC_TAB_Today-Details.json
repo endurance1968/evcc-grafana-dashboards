@@ -4709,7 +4709,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Today - Details Tabs",
+    "title": "VM: EVCC: 今天 - 详情 标签页",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4721,10 +4721,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "构建",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "构建信息在部署期间设置。",
           "options": [
             {
               "text": "info",
@@ -5168,7 +5168,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Tariffs",
+              "title": "电价",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

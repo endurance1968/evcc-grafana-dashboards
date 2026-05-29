@@ -6442,7 +6442,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Year Tabs",
+    "title": "VM: EVCC: Año - Pestañas",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -6457,7 +6457,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment.",
+          "description": "La informacion de build se establece durante el despliegue.",
           "options": [
             {
               "text": "info",
@@ -6500,7 +6500,7 @@
           "label": "Lista de bloqueo de vehículos",
           "hide": "hideVariable",
           "skipUrlSync": false,
-          "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
+          "description": "Regex para vehiculos que no deben mostrarse. Use ^none$ cuando no se deba filtrar nada. Para varios nombres exactos use ^(Vehiculo A|Vehiculo B)$.",
           "options": [
             {
               "text": "^none$",

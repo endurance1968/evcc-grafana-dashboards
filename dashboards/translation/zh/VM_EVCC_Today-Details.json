@@ -3992,11 +3992,11 @@
       {
         "name": "dashboardBuild",
         "type": "constant",
-        "label": "Build",
+        "label": "构建",
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "构建信息在部署期间设置。",
         "current": {
           "text": "info",
           "value": "info",

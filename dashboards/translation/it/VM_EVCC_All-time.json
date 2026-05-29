@@ -3820,7 +3820,7 @@
     },
     {
       "id": 50,
-      "title": "PV system amortization",
+      "title": "Ammortamento impianto FV",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4186,7 +4186,7 @@
     },
     {
       "id": 51,
-      "title": "Battery amortization",
+      "title": "Ammortamento batteria",
       "type": "stat",
       "datasource": {
         "type": "victoriametrics-metrics-datasource",
@@ -4950,7 +4950,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "Le informazioni di build vengono impostate durante il deploy.",
         "current": {
           "text": "info",
           "value": "info",
@@ -4983,7 +4983,7 @@
         "hide": 2
       },
       {
-        "description": "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.",
+        "description": "Regex per i veicoli da non mostrare. Usa ^none$ quando non deve essere filtrato nulla. Per piu nomi esatti usa ^(Veicolo A|Veicolo B)$.",
         "hide": 2,
         "label": "Blocklist veicoli",
         "name": "vehicleBlocklist",
@@ -5028,7 +5028,7 @@
         "regex": "",
         "regexApplyTo": "value",
         "type": "query",
-        "description": "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.",
+        "description": "Veicoli mostrati nei pannelli ripetuti dei costi di guida. Mantieni attiva la selezione multipla affinche gli utenti possano scegliere uno o piu veicoli.",
         "skipUrlSync": false,
         "allValue": ""
       },

@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.04.20.2"
-SCRIPT_LAST_MODIFIED="2026-04-20"
+SCRIPT_VERSION="2026.05.29.1"
+SCRIPT_LAST_MODIFIED="2026-05-29"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -245,6 +245,42 @@ fetch_source() {
   curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_REF/$subdir/$(urlencode "$filename")" -o "$out_file"
 }
 
+dashboard_is_v2() {
+  jq -e '.kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"))' "$1" >/dev/null
+}
+
+dashboard_title() {
+  jq -r 'if .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2")) then .spec.title else .title end // ""' "$1"
+}
+
+dashboard_uid() {
+  jq -r 'if .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2")) then .metadata.name else .uid end // ""' "$1"
+}
+
+dashboard_api_path() {
+  local file="$1"
+  local uid
+  uid=$(dashboard_uid "$file")
+  if dashboard_is_v2 "$file"; then
+    printf '/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/%s' "$(urlencode "$uid")"
+  else
+    printf '/api/dashboards/uid/%s' "$(urlencode "$uid")"
+  fi
+}
+
+ensure_v2_folder_annotation() {
+  local file="$1"
+  local tmp_file="${file}.tmp"
+  jq --arg folder "$GRAFANA_FOLDER_UID" '
+    def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
+    if is_v2 then
+      .metadata = (.metadata // {})
+      | .metadata.annotations = (.metadata.annotations // {})
+      | .metadata.annotations["grafana.app/folder"] = $folder
+    else . end
+  ' "$file" > "$tmp_file"
+  mv "$tmp_file" "$file"
+}
 apply_dashboard_override() {
   local file="$1"
   local variable_name="$2"
@@ -252,7 +288,16 @@ apply_dashboard_override() {
   [[ -n "$value" ]] || return 0
   local tmp_file="${file}.tmp"
   jq --arg name "$variable_name" --arg value "$value" '
-    if .templating and .templating.list then
+    def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
+    if is_v2 then
+      .spec.variables |= map(
+        if .spec.name == $name then
+          (if .kind != "QueryVariable" then .spec.query = $value else . end)
+          | .spec.current = ((.spec.current // {}) + {text:$value, value:$value})
+          | if ((.spec // {}) | has("options")) then .spec.options = [{selected:true, text:$value, value:$value}] else . end
+        else . end
+      )
+    elif .templating and .templating.list then
       .templating.list |= map(
         if .name == $name then
           .query = $value
@@ -281,7 +326,14 @@ apply_dashboard_build_description() {
   local marker="$2"
   local tmp_file="${file}.tmp"
   jq --arg description "$marker" '
-    if .templating and .templating.list then
+    def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
+    if is_v2 then
+      .spec.variables |= map(
+        if .spec.name == "dashboardBuild" then
+          .spec.description = $description
+        else . end
+      )
+    elif .templating and .templating.list then
       .templating.list |= map(
         if .name == "dashboardBuild" then
           .description = $description
@@ -348,20 +400,24 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   tmp_ds_file="$raw_file.ds"
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" "$replace_ds_filter" "$raw_file" > "$tmp_ds_file"
   mv "$tmp_ds_file" "$raw_file"
+  ensure_v2_folder_annotation "$raw_file"
 
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
-    [.__inputs[]? | select(.name and .type) |
-      if .type == "datasource" then
-        if .name == "DS_VM-EVCC" then
-          {name: .name, type: .type, pluginId: .pluginId, value: $ds}
-        elif .pluginId == "__expr__" then
-          {name: .name, type: .type, pluginId: .pluginId, value: "__expr__"}
+    def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
+    if is_v2 then [] else
+      [.__inputs[]? | select(.name and .type) |
+        if .type == "datasource" then
+          if .name == "DS_VM-EVCC" then
+            {name: .name, type: .type, pluginId: .pluginId, value: $ds}
+          elif .pluginId == "__expr__" then
+            {name: .name, type: .type, pluginId: .pluginId, value: "__expr__"}
+          else
+            error("Missing datasource mapping for \(.name)")
+          end
         else
-          error("Missing datasource mapping for \(.name)")
-        end
-      else
-        {name: .name, type: .type, value: (.value // "")}
-      end]
+          {name: .name, type: .type, value: (.value // "")}
+        end]
+    end
   ' "$raw_file" > "$inputs_file"
 
   jq -c --arg ds "$GRAFANA_DS_VM_EVCC_UID" "(.__elements // {}) | to_entries[]? | {uid: .value.uid, name: .value.name, kind: (.value.kind // 1), model: (.value.model | $replace_ds_filter)}" "$raw_file" |
@@ -404,7 +460,7 @@ echo
 echo "Will import dashboards:"
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
-  echo "- $(jq -r '.title' "$raw_file") [$(jq -r '.uid // ""' "$raw_file")]"
+  echo "- $(dashboard_title "$raw_file") [$(dashboard_uid "$raw_file")]"
 done
 echo
 echo "Dashboards embed these library panels:"
@@ -442,12 +498,12 @@ if [[ "${PURGE,,}" == "true" ]]; then
   found=0
   for file_name in "${DASHBOARD_FILES[@]}"; do
     raw_file="$TMP_DIR/$file_name"
-    uid=$(jq -r '.uid // empty' "$raw_file")
+    uid=$(dashboard_uid "$raw_file")
     [[ -n "$uid" ]] || continue
     purge_out="$TMP_DIR/check-dashboard.json"
-    status=$(api GET "/api/dashboards/uid/$(urlencode "$uid")" "" "$purge_out")
+    status=$(api GET "$(dashboard_api_path "$raw_file")" "" "$purge_out")
     if [[ "$status" == "200" ]]; then
-      echo "- $(jq -r '.dashboard.title' "$purge_out") [$uid]"
+      echo "- $(dashboard_title "$raw_file") [$uid]"
       found=1
     elif [[ "$status" != "404" ]]; then
       echo "Failed to inspect dashboard $uid: $(cat "$purge_out")" >&2
@@ -528,17 +584,17 @@ fi
 if [[ "${PURGE,,}" == "true" ]]; then
   for file_name in "${DASHBOARD_FILES[@]}"; do
     raw_file="$TMP_DIR/$file_name"
-    uid=$(jq -r '.uid // empty' "$raw_file")
+    uid=$(dashboard_uid "$raw_file")
     if [[ -n "$uid" ]]; then
       purge_out="$TMP_DIR/purge-dashboard.json"
-      status=$(api DELETE "/api/dashboards/uid/$(urlencode "$uid")" "" "$purge_out")
+      status=$(api DELETE "$(dashboard_api_path "$raw_file")" "" "$purge_out")
       if [[ "$status" == "404" ]]; then
-        echo "Skipping dashboard delete (not found): $(jq -r '.title // ""' "$raw_file") [$uid]"
+        echo "Skipping dashboard delete (not found): $(dashboard_title "$raw_file") [$uid]"
       elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
         echo "Failed to purge dashboard $uid: $(cat "$purge_out")" >&2
         exit 1
       else
-        echo "Deleted dashboard: $(jq -r '.title // ""' "$raw_file") [$uid]"
+        echo "Deleted dashboard: $(dashboard_title "$raw_file") [$uid]"
       fi
     fi
   done
@@ -605,19 +661,37 @@ done
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
   inputs_file="$TMP_DIR/$file_name.inputs.json"
-  body_file="$TMP_DIR/$file_name.import.json"
-  jq -n \
-    --slurpfile dashboard "$raw_file" \
-    --slurpfile inputs "$inputs_file" \
-    --arg folderUid "$GRAFANA_FOLDER_UID" \
-    '{dashboard:$dashboard[0],folderUid:$folderUid,overwrite:true,message:"EVCC VM dashboard install",inputs:$inputs[0]}' > "$body_file"
+  title=$(dashboard_title "$raw_file")
+  uid=$(dashboard_uid "$raw_file")
+  echo "Importing dashboard: $title [$uid]"
   out_file="$TMP_DIR/$file_name.import.out.json"
-  status=$(api POST "/api/dashboards/import" "$body_file" "$out_file")
+  if dashboard_is_v2 "$raw_file"; then
+    existing_out="$TMP_DIR/$file_name.v2.existing.json"
+    status=$(api GET "$(dashboard_api_path "$raw_file")" "" "$existing_out")
+    if [[ "$status" == "200" ]]; then
+      body_file="$TMP_DIR/$file_name.v2.put.json"
+      resource_version=$(jq -r '.metadata.resourceVersion // empty' "$existing_out")
+      jq --arg resourceVersion "$resource_version" '.metadata.resourceVersion = $resourceVersion' "$raw_file" > "$body_file"
+      status=$(api PUT "$(dashboard_api_path "$raw_file")" "$body_file" "$out_file")
+    elif [[ "$status" == "404" ]]; then
+      status=$(api POST "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards" "$raw_file" "$out_file")
+    else
+      echo "Failed to inspect dashboard $uid: $(cat "$existing_out")" >&2
+      exit 1
+    fi
+  else
+    body_file="$TMP_DIR/$file_name.import.json"
+    jq -n \
+      --slurpfile dashboard "$raw_file" \
+      --slurpfile inputs "$inputs_file" \
+      --arg folderUid "$GRAFANA_FOLDER_UID" \
+      '{dashboard:$dashboard[0],folderUid:$folderUid,overwrite:true,message:"EVCC VM dashboard install",inputs:$inputs[0]}' > "$body_file"
+    status=$(api POST "/api/dashboards/import" "$body_file" "$out_file")
+  fi
   if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
     echo "Failed to import dashboard $file_name: $(cat "$out_file")" >&2
     exit 1
   fi
-  title=$(jq -r '.dashboard.title // empty' "$body_file")
   echo "Imported dashboard: $title"
 done
 

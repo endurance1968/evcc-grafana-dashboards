@@ -3996,7 +3996,7 @@
         "query": "info",
         "hide": 0,
         "skipUrlSync": true,
-        "description": "Build information is set during deployment.",
+        "description": "Le informazioni di build vengono impostate durante il deploy.",
         "current": {
           "text": "info",
           "value": "info",
