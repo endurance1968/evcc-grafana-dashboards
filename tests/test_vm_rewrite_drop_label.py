@@ -185,6 +185,60 @@ class VmRewriteDropLabelTests(unittest.TestCase):
         self.assertEqual(MODULE.remaining_value_conflicts(3, 10), 0)
 
 
+    def test_find_unmanaged_hostless_sibling_series_flags_delete_risk(self):
+        target_metrics = {'{__name__="pvPower_value"}': {"__name__": "pvPower_value"}}
+        rewritten_target_keys = {
+            MODULE.metric_key({"__name__": "pvPower_value"}),
+            MODULE.metric_key({"__name__": "pvPower_value", "id": "2", "title": "ImportedFromHost"}),
+        }
+        exported_metadata = [
+            {"__name__": "pvPower_value"},
+            {"__name__": "pvPower_value", "host": "lx-telegraf"},
+            {"__name__": "pvPower_value", "id": "1", "title": "SMA-Sued"},
+            {"__name__": "pvPower_value", "id": "2", "title": "ImportedFromHost"},
+        ]
+
+        original_series_metadata = MODULE.series_metadata
+        try:
+            MODULE.series_metadata = lambda base_url, matcher: exported_metadata
+            unsafe_count, examples = MODULE.find_unmanaged_hostless_sibling_series(
+                "http://127.0.0.1:8428",
+                target_metrics,
+                "host",
+                rewritten_target_keys,
+            )
+        finally:
+            MODULE.series_metadata = original_series_metadata
+
+        self.assertEqual(unsafe_count, 1)
+        self.assertEqual(examples, [{"__name__": "pvPower_value", "id": "1", "title": "SMA-Sued"}])
+
+    def test_dry_run_recommendation_stops_for_unsafe_target_delete(self):
+        args = MODULE.parse_args.__globals__["argparse"].Namespace(
+            base_url="http://127.0.0.1:8428",
+            matcher='{host!=""}',
+            drop_label="host",
+            backup_jsonl="backups/evcc-host-series.jsonl",
+            rewritten_jsonl="backups/evcc-host-series-without-host.jsonl",
+            allow_overlap=False,
+            merge_target=True,
+            allow_value_conflicts=False,
+            keep_target_values_on_conflict=False,
+            delete_source_when_fully_shadowed=False,
+        )
+
+        recommendation = MODULE.dry_run_recommendation(
+            args,
+            exported_series=1,
+            overlap_timestamps=0,
+            unresolved_value_conflicts=0,
+            delete_only_series=0,
+            unsafe_delete_series=1,
+        )
+
+        self.assertEqual(recommendation["status"], "STOP")
+        self.assertIsNone(recommendation["write_flags"])
+
     def test_dry_run_recommendation_returns_go_for_it_for_clean_run(self):
         args = MODULE.parse_args.__globals__["argparse"].Namespace(
             base_url="http://127.0.0.1:8428",
@@ -205,10 +259,11 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             overlap_timestamps=0,
             unresolved_value_conflicts=0,
             delete_only_series=0,
+            unsafe_delete_series=0,
         )
 
         self.assertEqual(recommendation["status"], "GO FOR IT")
-        self.assertIn("--merge-target", recommendation["write_flags"])
+        self.assertNotIn("--merge-target", recommendation["write_flags"])
         self.assertIn("--write", recommendation["write_flags"])
         self.assertNotIn("python3", recommendation["write_flags"])
         self.assertNotIn("--base-url", recommendation["write_flags"])
@@ -233,6 +288,7 @@ class VmRewriteDropLabelTests(unittest.TestCase):
             overlap_timestamps=0,
             unresolved_value_conflicts=4,
             delete_only_series=0,
+            unsafe_delete_series=0,
         )
 
         self.assertEqual(recommendation["status"], "STOP")

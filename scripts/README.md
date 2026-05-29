@@ -113,12 +113,11 @@ Only if the coverage check and the data check look good, rewrite host-tagged VM-
 python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
 
-The dry-run now prints a `Recommendation` section with a clear status (`GO FOR IT`, `REVIEW`, or `STOP`) and the exact write flags to append next. A clean run looks like this:
+The dry-run now prints a `Recommendation` section with a clear status (`GO FOR IT`, `REVIEW`, or `STOP`) and the exact write flags to append next. A clean run avoids target deletion and looks like this:
 
 ```text
-GO FOR IT: Dry-run is clean. You can continue with the write step.
+GO FOR IT: Dry-run is clean. You can continue with the write step without deleting hostless target matchers.
 Recommended write flags:
-  --merge-target \
   --reset-cache \
   --write
 ```
@@ -126,10 +125,12 @@ Recommended write flags:
 In that clean case, rerun the same command with those flags appended:
 
 ```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --merge-target --reset-cache --write
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --reset-cache --write
 ```
 
-If the recommendation mentions conflicts, follow the printed conflict-safe flag set instead, for example `--keep-target-values-on-conflict`.
+Do not add `--merge-target` manually. When `--merge-target` is used, the script now checks whether the VictoriaMetrics delete selector would also remove existing hostless sibling series that are not rebuilt by this rewrite. If that happens, it returns `STOP` and refuses the write.
+
+If the recommendation mentions conflicts, follow the printed conflict-safe flag set instead, for example `--keep-target-values-on-conflict`. After any cleanup write, rerun `compare_import_coverage.py` and `check_data.py --phase raw` before rollups.
 
 Compare labelsets between two import states or benchmark exports:
 

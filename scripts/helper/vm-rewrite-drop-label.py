@@ -19,8 +19,8 @@ from typing import Callable, Iterator
 
 
 SCRIPT_NAME = "vm-rewrite-drop-label.py"
-SCRIPT_VERSION = "2026.04.09.2"
-SCRIPT_LAST_MODIFIED = "2026-04-09"
+SCRIPT_VERSION = "2026.05.29.1"
+SCRIPT_LAST_MODIFIED = "2026-05-29"
 
 
 @dataclass(frozen=True)
@@ -179,12 +179,22 @@ def dry_run_recommendation(
     overlap_timestamps: int,
     unresolved_value_conflicts: int,
     delete_only_series: int,
+    unsafe_delete_series: int,
 ) -> dict[str, str | None]:
     _ = args
     if exported_series <= 0:
         return {
             "status": "NOTHING TO DO",
             "message": "No matching source series were found. Skip the rewrite.",
+            "write_flags": None,
+        }
+    if unsafe_delete_series > 0:
+        return {
+            "status": "STOP",
+            "message": (
+                "The merge-target delete would also match existing hostless sibling series that are not rebuilt "
+                "by this rewrite. Stop and re-import or validate the affected measurement family before cleanup."
+            ),
             "write_flags": None,
         }
     if overlap_timestamps and not (args.allow_overlap or args.merge_target):
@@ -207,8 +217,8 @@ def dry_run_recommendation(
         }
     return {
         "status": "GO FOR IT",
-        "message": "Dry-run is clean. You can continue with the write step.",
-        "write_flags": build_write_flags(["--merge-target", "--reset-cache", "--write"]),
+        "message": "Dry-run is clean. You can continue with the write step without deleting hostless target matchers.",
+        "write_flags": build_write_flags(["--reset-cache", "--write"]),
     }
 
 
@@ -275,6 +285,39 @@ def fetch_target_series(base_url: str, metric: dict[str, str], dropped_label: st
     # matcher like {__name__="pvPower_value"} only sees the exact
     # hostless target series and not sibling detail series with extra labels.
     return [item for item in iter_export_lines(base_url, matcher) if item.get("metric", {}) == exact_metric]
+
+
+def metric_key(metric: dict[str, str]) -> tuple[tuple[str, str], ...]:
+    return tuple(sorted((str(key), str(value)) for key, value in metric.items()))
+
+
+def series_metadata(base_url: str, matcher: str) -> list[dict[str, str]]:
+    url = f"{base_url.rstrip('/')}/prometheus/api/v1/series?" + urllib.parse.urlencode([("match[]", matcher)])
+    with urllib.request.urlopen(url, timeout=120) as response:
+        payload = json.load(response)
+    return [dict(item) for item in payload.get("data", [])]
+
+
+def find_unmanaged_hostless_sibling_series(
+    base_url: str,
+    target_metrics: dict[str, dict[str, str]],
+    dropped_label: str,
+    rewritten_target_keys: set[tuple[tuple[str, str], ...]],
+    example_limit: int = 10,
+) -> tuple[int, list[dict[str, str]]]:
+    unsafe_count = 0
+    examples: list[dict[str, str]] = []
+    for matcher, target_metric in sorted(target_metrics.items()):
+        for candidate in series_metadata(base_url, matcher):
+            if candidate.get(dropped_label, "") != "":
+                continue
+            candidate_key = metric_key(candidate)
+            if candidate_key in rewritten_target_keys:
+                continue
+            unsafe_count += 1
+            if len(examples) < example_limit:
+                examples.append(candidate)
+    return unsafe_count, examples
 
 
 def series_stats(items: list[dict]) -> SeriesStats:
@@ -664,8 +707,11 @@ def main() -> int:
         delete_only_points = 0
         grouped_unresolved_value_conflicts = 0
         grouped_source_value_conflicts = 0
+        unsafe_delete_series = 0
+        unsafe_delete_examples: list[dict[str, str]] = []
 
         group_files: dict[str, Path] = {}
+        group_metrics: dict[str, dict[str, str]] = {}
         group_label_counts: dict[str, int] = {}
         temp_group_dir_obj: tempfile.TemporaryDirectory[str] | None = None
         temp_group_dir: Path | None = None
@@ -683,6 +729,8 @@ def main() -> int:
 
                     rewritten = transform_series(exported, args.drop_label)
                     matcher = target_matcher(rewritten["metric"], args.drop_label)
+                    group_metrics.setdefault(matcher, rewritten["metric"])
+                    group_label_counts.setdefault(matcher, len(rewritten["metric"]))
                     existing = fetch_target_series(args.base_url, rewritten["metric"], args.drop_label)
                     checked_series += 1
                     current_overlap, current_conflicts = analyze_target_overlap(rewritten, existing)
@@ -703,7 +751,6 @@ def main() -> int:
                         if group_path is None:
                             group_path = temp_group_dir / f"group_{len(group_files):05d}.jsonl"
                             group_files[matcher] = group_path
-                            group_label_counts[matcher] = len(rewritten["metric"])
                         with group_path.open("a", encoding="utf-8", newline="\n") as group_handle:
                             append_jsonl_line(group_handle, rewritten)
 
@@ -806,6 +853,20 @@ def main() -> int:
                                 "Rewrite aggregation progress: "
                                 f"targets={grouped_index}, output_points={output_points}, delete_only_series={delete_only_series}, unresolved_group_conflicts={grouped_unresolved_value_conflicts}, grouped_source_conflicts={grouped_source_value_conflicts}"
                             )
+            if args.merge_target or overlap_timestamps:
+                rewritten_target_keys = {metric_key(metric) for metric in group_metrics.values()}
+                unsafe_delete_series, unsafe_delete_examples = find_unmanaged_hostless_sibling_series(
+                    args.base_url,
+                    group_metrics,
+                    args.drop_label,
+                    rewritten_target_keys,
+                )
+                if unsafe_delete_series > 0:
+                    progress(
+                        "Unsafe target delete detected: "
+                        f"unmanaged_hostless_sibling_series={unsafe_delete_series}. "
+                        "Refusing to recommend or run target deletion for this matcher set."
+                    )
         finally:
             if temp_group_dir_obj is not None:
                 temp_group_dir_obj.cleanup()
@@ -836,6 +897,8 @@ def main() -> int:
             "delete_only_points": delete_only_points,
             "grouped_unresolved_value_conflicts": grouped_unresolved_value_conflicts,
             "grouped_source_value_conflicts": grouped_source_value_conflicts,
+            "unsafe_delete_series": unsafe_delete_series,
+            "unsafe_delete_examples": unsafe_delete_examples,
             "streaming": True,
             "max_import_line_bytes": args.max_import_line_bytes,
             "performance": {
@@ -847,7 +910,7 @@ def main() -> int:
         }
 
         if overlap_timestamps and not (args.allow_overlap or args.merge_target):
-            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, 0, delete_only_series)
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, 0, delete_only_series, unsafe_delete_series)
             print(json.dumps(summary, indent=2))
             print_recommendation(summary["recommendation"])
             print(
@@ -864,7 +927,7 @@ def main() -> int:
         summary["unresolved_value_conflicts"] = unresolved_value_conflicts
 
         if unresolved_value_conflicts and not (args.allow_value_conflicts or args.keep_target_values_on_conflict):
-            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series)
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series, unsafe_delete_series)
             print(json.dumps(summary, indent=2))
             print_recommendation(summary["recommendation"])
             print(
@@ -876,10 +939,22 @@ def main() -> int:
         if not args.write:
             total_finished_at = perf_counter()
             summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
-            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series)
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series, unsafe_delete_series)
             print(json.dumps(summary, indent=2))
             print_recommendation(summary["recommendation"])
             return 0
+
+        if args.merge_target and unsafe_delete_series > 0:
+            total_finished_at = perf_counter()
+            summary["performance"]["total_seconds"] = elapsed_seconds(total_started_at, total_finished_at)
+            summary["recommendation"] = dry_run_recommendation(args, exported_series, overlap_timestamps, unresolved_value_conflicts, delete_only_series, unsafe_delete_series)
+            print(json.dumps(summary, indent=2))
+            print_recommendation(summary["recommendation"])
+            print(
+                "Refusing to delete hostless target matchers because unmanaged hostless sibling series would be removed.",
+                file=sys.stderr,
+            )
+            return 6
 
         if rewritten_path is None:
             raise RuntimeError("Internal error: no rewritten JSONL path available for write mode")

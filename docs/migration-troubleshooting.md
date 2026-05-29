@@ -124,10 +124,11 @@ python3 vm-rewrite-drop-label.py \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
-  --merge-target \
   --reset-cache \
   --write
 ```
+
+If the tool reports that a target delete would remove unmanaged hostless sibling series, stop. Re-import or validate the affected measurement family first; otherwise detail dashboards can lose PV string or battery detail series even though aggregate panels still show values.
 
 Conflict-preserving case, when hostless target values should remain authoritative:
 

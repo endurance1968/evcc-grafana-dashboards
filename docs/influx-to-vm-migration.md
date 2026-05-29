@@ -164,7 +164,7 @@ python3 vm-rewrite-drop-label.py \
 
 On a full real EVCC history this dry-run can take several minutes because it checks the target series for conflicts before writing. Let it finish and follow the recommendation from the tool output.
 
-If the output says `GO FOR IT`, rerun the same command with the recommended write flags printed by the tool, usually:
+If the output says `GO FOR IT`, rerun the same command only with the recommended write flags printed by the tool. A normal clean run should not need `--merge-target`:
 
 ```bash
 python3 vm-rewrite-drop-label.py \
@@ -173,12 +173,15 @@ python3 vm-rewrite-drop-label.py \
   --drop-label host \
   --backup-jsonl backups/evcc-host-series.jsonl \
   --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
-  --merge-target \
   --reset-cache \
   --write
 ```
 
-If the recommendation is `REVIEW` or `STOP`, use [migration-troubleshooting.md](./migration-troubleshooting.md).
+Do not add `--merge-target` manually. The tool now stops if a target delete would also match existing hostless sibling series, for example PV string or battery detail series with `id` and `title` labels that are used by the detail dashboards.
+
+After the cleanup, rerun the raw import validation from step 4 against the same closed window. Continue only if `compare_import_coverage.py` still reports `OK FOR REPO` and `check_data.py --phase raw` no longer reports host-tagged series.
+
+If the recommendation is `REVIEW` or `STOP`, use [migration-troubleshooting.md](./migration-troubleshooting.md). Do not build rollups on top of a partially cleaned raw import.
 
 ## 6. Create The Rollup Config
 
