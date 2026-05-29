@@ -2,9 +2,23 @@
 
 This guide covers a straightforward Grafana installation on a Debian 13 VM or Debian 13 LXC.
 
+## Validation status
+
+Current status:
+
+- Grafana APT repository setup: tested on blank `debian:trixie` Docker on 2026-05-29
+- `grafana-enterprise` installation: tested
+- Grafana HTTP/API health check: confirmed
+- VictoriaMetrics datasource plugin installation for this dashboard set: tested
+
+Docker validation note:
+
+A standard `debian:trixie` Docker container does not run `systemd`. In that environment, the package installation can be checked, but `systemctl enable --now grafana-server` must be skipped. For the 2026-05-29 release check, Grafana was started manually with the same Debian package paths as the service file, and `/api/health` returned `database: ok`.
+
 Assumptions:
 
 - Debian 13 is already running
+- the commands below are written for a user with `sudo`; if you are logged in as `root`, omit `sudo`
 - you want to run Grafana locally via `systemd`
 - Grafana will later use VictoriaMetrics as its datasource
 
@@ -55,7 +69,7 @@ This guide uses:
 
 ```bash
 sudo apt update
-sudo apt install -y apt-transport-https wget gnupg
+sudo apt install -y apt-transport-https wget gnupg curl
 ```
 
 ## 2. Add the Grafana APT key
@@ -94,7 +108,22 @@ If you explicitly want the OSS package:
 sudo apt install -y grafana
 ```
 
-## 5. Start and enable Grafana
+## 5. Install The VictoriaMetrics Datasource Plugin
+
+The EVCC dashboards use the VictoriaMetrics datasource plugin. Install it before creating the datasource:
+
+```bash
+sudo grafana cli \
+  --homepath=/usr/share/grafana \
+  --pluginsDir /var/lib/grafana/plugins \
+  plugins install victoriametrics-metrics-datasource
+```
+
+The explicit `--homepath` and `--pluginsDir` flags are important for the Debian package layout. A plain `grafana cli plugins install ...` can fail because it cannot find the packaged Grafana home path.
+
+Restart Grafana after installing or updating plugins.
+
+## 6. Start and enable Grafana
 
 ```bash
 sudo systemctl daemon-reload
@@ -107,7 +136,7 @@ Check status:
 sudo systemctl status grafana-server
 ```
 
-## 6. Verify the installation
+## 7. Verify the installation
 
 Local check:
 
@@ -126,7 +155,7 @@ A fresh installation typically starts with:
 
 Grafana will normally force a password change on first login.
 
-## 7. Verify network access
+## 8. Verify network access
 
 If Grafana should be reachable from another host:
 
@@ -140,7 +169,7 @@ ss -ltnp | grep 3000
 
 If you use a firewall, allow port `3000` there as well.
 
-## 8. Updates
+## 9. Updates
 
 If Grafana was installed from the APT repository, updates work through `apt`:
 
@@ -163,7 +192,7 @@ sudo apt update
 sudo apt install grafana
 ```
 
-## 9. Prepare for EVCC
+## 10. Prepare for EVCC
 
 Once Grafana is running, the next normal step is:
 

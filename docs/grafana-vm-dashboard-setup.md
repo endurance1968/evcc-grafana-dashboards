@@ -57,6 +57,16 @@ In Grafana:
 
 If the VictoriaMetrics datasource plugin is not available, install it first and restart Grafana.
 
+On a Debian package install, use:
+
+```bash
+sudo grafana cli \
+  --homepath=/usr/share/grafana \
+  --pluginsDir /var/lib/grafana/plugins \
+  plugins install victoriametrics-metrics-datasource
+sudo systemctl restart grafana-server
+```
+
 Docker note: if Grafana and VictoriaMetrics run as separate Docker containers, `localhost` inside Grafana points to the Grafana container, not to VictoriaMetrics. On Docker Desktop, use a datasource URL such as `http://host.docker.internal:8428`. On a user-defined Docker network, use the VictoriaMetrics container name, for example `http://victoriametrics:8428`.
 
 ## 2. Create A Service-Account Token

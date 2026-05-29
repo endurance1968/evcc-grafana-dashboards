@@ -9,12 +9,18 @@ This guide was manually executed and validated on a Debian 13 VM/LXC as part of 
 Current status:
 
 - VictoriaMetrics installation: tested
-- service start via `systemd`: tested
+- service start via `systemd`: tested on a normal Debian VM/LXC
+- blank `debian:trixie` Docker validation: tested on 2026-05-29
 - VictoriaMetrics running after installation: confirmed
+
+Docker validation note:
+
+A standard `debian:trixie` Docker container does not run `systemd`. In that environment, the package and service-file steps can be checked, but `systemctl enable --now ...` must be skipped. For the 2026-05-29 release check, VictoriaMetrics was started manually with the same binary, user, data path, and flags as the service file, and `/health` returned `OK`.
 
 Assumptions:
 
 - Debian 13 is already running
+- the commands below are written for a user with `sudo`; if you are logged in as `root`, omit `sudo`
 - you want a single VictoriaMetrics instance
 - the instance should run locally via `systemd`
 

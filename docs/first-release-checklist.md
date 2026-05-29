@@ -8,9 +8,9 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 - [x] Root [README.md](../README.md) still matches the current repo scope and preview status
 - [x] [docs/README.md](./README.md) still reflects the recommended end-to-end order
-- [ ] [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) is tested and up to date
+- [x] [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) is tested and up to date
 - [x] [victoriametrics-install-docker.md](./victoriametrics-install-docker.md) is reviewed and still accurate
-- [ ] [grafana-install-debian-13.md](./grafana-install-debian-13.md) is tested and up to date
+- [x] [grafana-install-debian-13.md](./grafana-install-debian-13.md) is tested and up to date
 - [x] [grafana-install-docker.md](./grafana-install-docker.md) is reviewed and still accurate
 - [x] [influx-to-vm-migration.md](./influx-to-vm-migration.md) matches the current migration and rollup commands
 - [x] [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md) matches the current Grafana setup and deploy flow
@@ -18,8 +18,8 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 ## 2. Installation and migration validation
 
-- [ ] Fresh VictoriaMetrics install on Debian 13 works end to end
-- [ ] Fresh Grafana install on Debian 13 works end to end
+- [x] Fresh VictoriaMetrics install on Debian 13 works end to end
+- [x] Fresh Grafana install on Debian 13 works end to end
 - [x] If Docker is part of the first release promise: VictoriaMetrics Docker guide is validated on a local Docker host
 - [x] If Docker is part of the first release promise: Grafana Docker guide is validated on a local Docker host
 - [x] InfluxDB raw-data import works on a realistic EVCC history dataset
@@ -79,8 +79,8 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 At minimum, do not publish a first end-user release until all of these are true:
 
-- [ ] Debian 13 VictoriaMetrics install tested
-- [ ] Debian 13 Grafana install tested
+- [x] Debian 13 VictoriaMetrics install tested
+- [x] Debian 13 Grafana install tested
 - [x] InfluxDB migration tested
 - [x] rollup backfill tested
 - [ ] daily rollup refresh tested
@@ -109,4 +109,16 @@ Real-data migration evidence from 2026-05-29:
 - `deploy.ps1` deployed the German generated TAB dashboard set from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 
-Still open: fresh Debian host install validation, Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, Linux deployer runs, localization audit at `0`, dashboard link/time-navigation manual checks, and curated release screenshots.
+Still open: Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, Linux deployer runs, localization audit at `0`, dashboard link/time-navigation manual checks, and curated release screenshots.
+
+Debian 13 install evidence from 2026-05-29:
+
+- validated in fresh `debian:trixie` Docker containers reporting Debian `13.5` and `x86_64`
+- blank image did not include `sudo`; docs now state that root users can omit `sudo`
+- VictoriaMetrics `v1.139.0` binary and `vmctl` installed from the documented release archives
+- VictoriaMetrics service file was created; standard Docker has no `systemctl`, so runtime was validated by manually starting `victoria-metrics-prod` as the `victoriametrics` user with the documented data path and flags
+- VictoriaMetrics `/health` returned `OK` locally and through the Windows-published Docker port
+- Grafana APT repository setup and `grafana-enterprise` installation succeeded on blank Trixie; installed version was `13.0.1+security-01`
+- docs now include `curl` in Grafana base packages because the verification step uses `curl -I`
+- VictoriaMetrics datasource plugin install was validated with `grafana cli --homepath=/usr/share/grafana --pluginsDir /var/lib/grafana/plugins plugins install victoriametrics-metrics-datasource`
+- Grafana `/api/health` returned `database: ok`, and a VictoriaMetrics datasource pointed at the fresh Debian VictoriaMetrics test instance returned `Data source is working`
