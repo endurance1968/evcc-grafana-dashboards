@@ -45,10 +45,20 @@ At the end, VictoriaMetrics runs:
 
 ## 1. Create the data directory
 
+Linux host:
+
 ```bash
 mkdir -p /opt/victoriametrics/data
 cd /opt/victoriametrics
 ```
+
+Windows Docker Desktop host:
+
+```powershell
+New-Item -ItemType Directory -Force C:\evcc\victoriametrics\data
+```
+
+Use that Windows path in the `-v` option, for example `-v C:\evcc\victoriametrics\data:/victoria-metrics-data`.
 
 ## 2. Pull the image
 
@@ -67,6 +77,20 @@ docker run -d \
   victoriametrics/victoria-metrics:v1.138.0 \
   --storageDataPath=/victoria-metrics-data \
   --retentionPeriod=10y \
+  --selfScrapeInterval=10s
+```
+
+Windows PowerShell example:
+
+```powershell
+docker run -d `
+  --name victoriametrics `
+  --restart unless-stopped `
+  -p 8428:8428 `
+  -v C:\evcc\victoriametrics\data:/victoria-metrics-data `
+  victoriametrics/victoria-metrics:v1.138.0 `
+  --storageDataPath=/victoria-metrics-data `
+  --retentionPeriod=10y `
   --selfScrapeInterval=10s
 ```
 
@@ -122,7 +146,7 @@ Important:
 
 ## Common issues
 
-- port `8428` is already in use
+- port `8428` is already in use; choose another host port such as `-p 18428:8428` and use that port in checks and datasource URLs
 - the host directory is not writable
 - no persistence because the volume was forgotten
 - the firewall blocks port `8428`

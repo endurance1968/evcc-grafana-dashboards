@@ -9,9 +9,9 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] Root [README.md](../README.md) still matches the current repo scope and preview status
 - [x] [docs/README.md](./README.md) still reflects the recommended end-to-end order
 - [ ] [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) is tested and up to date
-- [ ] [victoriametrics-install-docker.md](./victoriametrics-install-docker.md) is reviewed and still accurate
+- [x] [victoriametrics-install-docker.md](./victoriametrics-install-docker.md) is reviewed and still accurate
 - [ ] [grafana-install-debian-13.md](./grafana-install-debian-13.md) is tested and up to date
-- [ ] [grafana-install-docker.md](./grafana-install-docker.md) is reviewed and still accurate
+- [x] [grafana-install-docker.md](./grafana-install-docker.md) is reviewed and still accurate
 - [x] [influx-to-vm-migration.md](./influx-to-vm-migration.md) matches the current migration and rollup commands
 - [x] [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md) matches the current Grafana setup and deploy flow
 - [x] [deployment-readme.md](./deployment-readme.md) and [vm-dashboard-install.md](./vm-dashboard-install.md) match the current deployer options
@@ -23,13 +23,13 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [ ] If Docker is part of the first release promise: VictoriaMetrics Docker guide is validated on a clean host
 - [ ] If Docker is part of the first release promise: Grafana Docker guide is validated on a clean host
 - [ ] InfluxDB raw-data import works on a realistic EVCC history dataset
-- [ ] Initial rollup backfill works without manual fixes
+- [x] Initial rollup backfill works without manual fixes
 - [ ] Daily rollup refresh works via `systemd` timer or `cron`
-- [ ] At least one clean “new user” dry run exists using only the published docs
+- [x] At least one clean “new user” dry run exists using only the published docs
 
 ## 3. Dashboard deployment validation
 
-- [ ] `deploy.ps1` works on Windows PowerShell with a clean dashboard deployment
+- [x] `deploy.ps1` works on Windows PowerShell with a clean dashboard deployment
 - [ ] `deploy-python.sh` works on Linux with a clean dashboard deployment
 - [ ] `deploy-bash.sh` works on Linux with a clean dashboard deployment
 - [ ] `purge=true` deletes and recreates dashboards and embedded library panels correctly
@@ -49,7 +49,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 ## 4. Dashboard quality
 
-- [ ] All six VM dashboards load without panel errors in the production-style deploy path
+- [x] All six VM dashboards load without panel errors in the production-style deploy path
 - [x] `Today` renders correctly including embedded library panels
 - [x] `Month` renders correctly including the consumer panels
 - [x] `Year` renders correctly including the consumer panels and year navigation buttons
@@ -91,8 +91,8 @@ At minimum, do not publish a first end-user release until all of these are true:
 
 ## Current Evidence Notes
 
-Last updated: 2026-05-28.
+Last updated: 2026-05-29.
 
-Checked items above are based on the completed documentation restructuring and the successful `npm run test:rollup-path` run on 2026-05-28. That run covered static/unit checks, localization idempotency, external energy validation with available caches, MetricsQL query readback, disposable Grafana render E2E for the six default VM dashboards, and disposable rollup replace E2E.
+Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, and the local Windows Docker walkthrough on 2026-05-29. The Docker walkthrough used separate VictoriaMetrics/Grafana containers for a new-user stream and an InfluxDB migration stream, imported synthetic EVCC raw data, migrated 2,752 samples with `vmctl influx`, generated rollups with `evcc-vm-rollup.py`, deployed the TAB dashboard set with `deploy.ps1`, and passed render smoke checks for all six dashboards in both Grafana instances.
 
-Still open: fresh Debian/Docker host install validation, real end-to-end deployer runs on clean Windows/Linux Grafana instances, localization audit at `0`, curated release screenshots, and one complete new-user walkthrough from the published docs.
+Still open: fresh Debian host install validation, Docker validation on a completely clean host with default ports, realistic full-history InfluxDB migration, Linux deployer runs, localization audit at `0`, and curated release screenshots.

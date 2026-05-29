@@ -44,10 +44,20 @@ At the end, Grafana runs:
 
 ## 1. Create the data directory
 
+Linux host:
+
 ```bash
 mkdir -p /opt/grafana/data
 cd /opt/grafana
 ```
+
+Windows Docker Desktop host:
+
+```powershell
+New-Item -ItemType Directory -Force C:\evcc\grafana\data
+```
+
+Use that Windows path in the `-v` option, for example `-v C:\evcc\grafana\data:/var/lib/grafana`.
 
 ## 2. Pull the image
 
@@ -63,6 +73,19 @@ docker run -d \
   --restart unless-stopped \
   -p 3000:3000 \
   -v /opt/grafana/data:/var/lib/grafana \
+  -e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource \
+  grafana/grafana
+```
+
+Windows PowerShell example:
+
+```powershell
+docker run -d `
+  --name grafana `
+  --restart unless-stopped `
+  -p 3000:3000 `
+  -v C:\evcc\grafana\data:/var/lib/grafana `
+  -e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource `
   grafana/grafana
 ```
 
@@ -72,6 +95,8 @@ docker run -d \
   - publishes Grafana on port `3000`
 - `-v /opt/grafana/data:/var/lib/grafana`
   - keeps users, datasources, and dashboards persistent on the host
+- `-e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource`
+  - installs the datasource plugin needed by these dashboards
 - `--restart unless-stopped`
   - starts Grafana again automatically after reboots
 
@@ -123,7 +148,7 @@ Important:
 
 ## Common issues
 
-- port `3000` is already in use
+- port `3000` is already in use; choose another host port such as `-p 13030:3000` and set `GRAFANA_URL` to that host port later
 - the volume is missing, so data disappears after container recreation
 - the default password was not changed
 - Grafana is running but the VictoriaMetrics datasource does not exist yet

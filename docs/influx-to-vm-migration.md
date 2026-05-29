@@ -50,6 +50,8 @@ If you intentionally download from the local Forgejo mirror used for this projec
 BASE="http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
 ```
 
+If you run the commands from a repository checkout instead of this working directory, use the repository paths, for example `scripts/helper/check_data.py` and `scripts/rollup/evcc-vm-rollup.py`.
+
 ## 2. Verify VictoriaMetrics
 
 ```bash
@@ -71,7 +73,9 @@ Use `vmctl influx`. This keeps EVCC business labels such as `loadpoint`, `vehicl
 Without InfluxDB authentication:
 
 ```bash
-yes | vmctl influx \
+vmctl influx \
+  -s \
+  --disable-progress-bar \
   --influx-addr='http://<influx-host>:8086' \
   --influx-database='evcc' \
   --influx-filter-time-start='2024-01-01T00:00:00Z' \
@@ -83,7 +87,9 @@ yes | vmctl influx \
 With InfluxDB authentication:
 
 ```bash
-yes | vmctl influx \
+vmctl influx \
+  -s \
+  --disable-progress-bar \
   --influx-addr='http://<influx-host>:8086' \
   --influx-user='<user>' \
   --influx-password='<password>' \
@@ -99,6 +105,8 @@ Important:
 - Keep `--influx-skip-database-label` for this repository's default model.
 - Do not use a synthetic `db` label to multiplex multiple EVCC instances into one VictoriaMetrics instance.
 - During transition, EVCC may still write to InfluxDB in parallel.
+- `-s --disable-progress-bar` makes the import non-interactive and also works when `vmctl` runs in Docker or another non-TTY environment.
+- If `vmctl` runs in a Docker container on Docker Desktop while InfluxDB or VictoriaMetrics are published on the host, use `host.docker.internal` in `--influx-addr` and `--vm-addr`.
 
 ## 4. Validate The Raw Import
 
@@ -174,6 +182,8 @@ If the recommendation is `REVIEW` or `STOP`, use [migration-troubleshooting.md](
 sudo cp evcc-vm-rollup-prod.conf.example /etc/evcc-vm-rollup.conf
 sudo editor /etc/evcc-vm-rollup.conf
 ```
+
+On Windows, keep the config in your working directory and pass that path with `--config`, for example `--config .\evcc-vm-rollup.conf`.
 
 Recommended production core:
 
