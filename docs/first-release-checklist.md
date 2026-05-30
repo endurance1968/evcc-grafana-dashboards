@@ -63,7 +63,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 - [x] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [x] localized dashboards are regenerated from the current `orig/en` source
-- [x] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed
+- [x] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed, and TAB screenshots show the active Grafana tab bar
 - [x] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
 
 ## 6. Release packaging
@@ -87,7 +87,7 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] daily rollup refresh tested
 - [x] Windows and Linux deployers tested
 - [x] localization audit at `0`
-- [x] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
+- [x] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state, including TAB navigation state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
 
 ## Current Evidence Notes
@@ -111,7 +111,7 @@ Real-data migration evidence from 2026-05-29:
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 - Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
 - Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0` on port `18450`, fresh Grafana `13.0.1` on port `13050`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
-- Release screenshots from 2026-05-30 were captured from Grafana `13.0.1` against read-only production-style VictoriaMetrics `http://192.168.1.160:8428` and curated under `docs/screenshots/tabs`.
+- Release screenshots from 2026-05-30 were captured from Grafana `13.0.1` against read-only production-style VictoriaMetrics `http://192.168.1.160:8428` and curated under `docs/screenshots/tabs` as one PNG per active TAB dashboard tab.
 - Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
 - Release notes were added in `docs/release-notes.md`, and root preview wording was removed from `README.md`.
 

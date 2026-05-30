@@ -37,7 +37,7 @@ Two dashboard sets are available:
 - `DASHBOARD_SET=tabs`: recommended for Grafana 13.0.1 or newer
 - `DASHBOARD_SET=default`: classic row-based layout for older Grafana versions or users who prefer rows
 
-The release screenshots document the German generated TAB set under [screenshots/tabs](./screenshots/tabs/README.md).
+The release screenshots document the German generated TAB set with one screenshot per active tab under [screenshots/tabs](./screenshots/tabs/README.md).
 
 ## Deployer Variants
 
@@ -92,6 +92,6 @@ Release validation covered:
 - full rollup dry-run and write backfill
 - daily rollup refresh path
 - Windows and Linux dashboard deployers
-- German TAB dashboard screenshots
+- German TAB dashboard screenshots for every active tab
 - Grafana localization spot-checks for `de`, `fr`, and `zh`
 - local static/unit/dashboard checks via `npm test`
