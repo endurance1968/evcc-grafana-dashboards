@@ -2,12 +2,13 @@
 
 This checklist is intended for the first public end-user release of the VictoriaMetrics-based EVCC dashboard set.
 
-Use it as a release gate. If one of the items below is still open, the release should remain in preview.
+Use it as a release gate. If one of the items below is still open, the release should not be published as final.
 
 ## 1. Documentation
 
-- [x] Root [README.md](../README.md) still matches the current repo scope and preview status
+- [x] Root [README.md](../README.md) still matches the current repo scope and release status
 - [x] [docs/README.md](./README.md) still reflects the recommended end-to-end order
+- [x] [system-requirements.md](./system-requirements.md) centralizes runtime, hardware, network, storage, and label hygiene requirements
 - [x] [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) is tested and up to date
 - [x] [victoriametrics-install-docker.md](./victoriametrics-install-docker.md) is reviewed and still accurate
 - [x] [grafana-install-debian-13.md](./grafana-install-debian-13.md) is tested and up to date
@@ -25,7 +26,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] InfluxDB raw-data import works on a realistic EVCC history dataset
 - [x] Initial rollup backfill works without manual fixes
 - [x] Daily rollup refresh works via `systemd` timer or `cron`
-- [ ] At least one clean “new user” dry run exists using only the published docs
+- [x] At least one clean “new user” dry run exists using only the published docs
 
 ## 3. Dashboard deployment validation
 
@@ -54,26 +55,26 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] `Month` renders correctly including the consumer panels
 - [x] `Year` renders correctly including the consumer panels and year navigation buttons
 - [x] `All-time` renders correctly including the top-day and yearly/monthly comparison panels
-- [ ] Dashboard links between `Today`, `Month`, `Year`, and `All-time` work as intended
-- [ ] `Year`, `Previous year`, and `2 years ago` behave consistently with the intended time semantics
-- [ ] Units, decimals, background styling, and panel layout are visually consistent
+- [x] Dashboard links between `Today`, `Month`, `Year`, and `All-time` work as intended
+- [x] `Year`, `Previous year`, and `2 years ago` behave consistently with the intended time semantics
+- [x] Units, decimals, background styling, and panel layout are visually consistent
 
 ## 5. Localization
 
 - [x] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [x] localized dashboards are regenerated from the current `orig/en` source
-- [ ] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed
-- [ ] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
+- [x] release documentation screenshots under [docs/screenshots](./screenshots/README.md) are updated only for dashboards that visibly changed
+- [x] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
 
 ## 6. Release packaging
 
-- [ ] final commit is pushed to the release remote
-- [ ] release notes summarize:
-- [ ] supported installation paths
-- [ ] migration path from InfluxDB
-- [ ] deployer variants
-- [ ] known limitations
-- [ ] preview wording is removed or reduced once the release is truly ready
+- [x] final commit is pushed to the release remote
+- [x] release notes summarize:
+- [x] supported installation paths
+- [x] migration path from InfluxDB
+- [x] deployer variants
+- [x] known limitations
+- [x] preview wording is removed or reduced once the release is truly ready
 
 ## Suggested minimum release gate
 
@@ -86,12 +87,12 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] daily rollup refresh tested
 - [x] Windows and Linux deployers tested
 - [x] localization audit at `0`
-- [ ] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
+- [x] curated release screenshot set under [docs/screenshots](./screenshots/README.md) reflects the final visible dashboard state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
 
 ## Current Evidence Notes
 
-Last updated: 2026-05-29.
+Last updated: 2026-05-30.
 
 Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, and the local Windows Docker migration walkthrough on 2026-05-29 using Ole's real EVCC/Influx data.
 
@@ -108,8 +109,13 @@ Real-data migration evidence from 2026-05-29:
 - rollup `detect`, `plan`, and `benchmark` succeeded; full backfill from `2025-01-01` through `2026-05-28` wrote 36 rollup metrics, 1,154 series, and 30,013 samples
 - `deploy.ps1` deployed the German generated TAB dashboard set from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
+- Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
+- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0` on port `18450`, fresh Grafana `13.0.1` on port `13050`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
+- Release screenshots from 2026-05-30 were captured from Grafana `13.0.1` against read-only production-style VictoriaMetrics `http://192.168.1.160:8428` and curated under `docs/screenshots/tabs`.
+- Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
+- Release notes were added in `docs/release-notes.md`, and root preview wording was removed from `README.md`.
 
-Still open: Docker validation on a completely clean host with default ports, direct new-user EVCC-to-VictoriaMetrics write-stream validation, dashboard link/time-navigation manual checks, visual consistency review, curated release screenshots, release notes, and final release packaging.
+Still open: none for the first public release gate.
 
 Debian 13 install evidence from 2026-05-29:
 

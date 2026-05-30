@@ -1,5 +1,7 @@
 # Install VictoriaMetrics with Docker
 
+Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 This guide covers a simple single-node VictoriaMetrics installation with Docker.
 
 Assumptions:

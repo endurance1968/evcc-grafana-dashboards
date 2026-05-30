@@ -2,6 +2,8 @@
 
 This is the main entry point for users who want EVCC dashboards on VictoriaMetrics.
 
+Start with the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 ## Pick Your Path
 
 ### I already use EVCC with InfluxDB

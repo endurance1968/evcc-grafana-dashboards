@@ -1,5 +1,7 @@
 # Install Grafana with Docker
 
+Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 This guide covers a simple Grafana installation with Docker.
 
 Assumptions:

@@ -1,5 +1,7 @@
 # Install VictoriaMetrics on Debian 13
 
+Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 This guide covers the installation of a current single-node VictoriaMetrics instance on a Debian 13 VM or Debian 13 LXC.
 
 ## Validation status

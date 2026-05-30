@@ -1,5 +1,7 @@
 # Migrate From InfluxDB To VictoriaMetrics
 
+Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 This is the normal end-user path from an existing EVCC + InfluxDB setup to VictoriaMetrics.
 
 This guide intentionally covers only the green path. If a check fails, continue with [migration-troubleshooting.md](./migration-troubleshooting.md). For release and energy-calibration background, see [migration-validation-notes.md](./migration-validation-notes.md).

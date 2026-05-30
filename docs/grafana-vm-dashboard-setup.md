@@ -1,5 +1,7 @@
 # Set Up Grafana With VictoriaMetrics Dashboards
 
+Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+
 This is the canonical end-user deployment guide. It covers:
 
 - creating the VictoriaMetrics datasource in Grafana

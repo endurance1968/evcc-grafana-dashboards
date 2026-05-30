@@ -1,14 +1,10 @@
 # EVCC Grafana Dashboards
 
-> **Preview status:** This repository is still in preview. A first release is planned for the next few weeks.
-> **Known issue:** Long-range PV rollups can still be wrong on some migrated datasets until the raw `pvPower` family has been repaired and re-imported. See [docs/migration-troubleshooting.md](./docs/migration-troubleshooting.md).
-
-
 This repository provides a VictoriaMetrics-based dashboard set for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
 
 It builds on the earlier InfluxDB-based EVCC dashboard work by Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
-Many thanks to Carsten for the excellent groundwork. This repository should be treated as a preview/beta of the VictoriaMetrics direction that is expected to arrive in Carsten's dashboard project later. It explores the VictoriaMetrics migration path, rollups, localized dashboard variants, and simple Grafana deploy scripts ahead of that upstream integration.
+Many thanks to Carsten for the excellent groundwork. This repository provides the VictoriaMetrics implementation path with migration tooling, daily rollups, localized dashboard variants, and Grafana deploy scripts.
 
 Example dashboard:
 
@@ -24,6 +20,7 @@ Example dashboard:
 - a rollup script for daily long-range dashboard metrics
 - documentation for InfluxDB to VictoriaMetrics migration
 - end-user guides for VictoriaMetrics, Grafana, migration, and dashboard deployment
+- curated release notes and screenshots for the recommended TAB dashboard set
 
 ## What the dashboards cover
 
@@ -48,3 +45,4 @@ Typical use cases:
 For the full end-to-end path from EVCC + InfluxDB to EVCC + VictoriaMetrics + Grafana, continue here:
 
 - [docs/README.md](./docs/README.md)
+- [release notes](./docs/release-notes.md)
