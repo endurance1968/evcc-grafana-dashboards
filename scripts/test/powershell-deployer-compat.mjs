@@ -1,7 +1,7 @@
 /**
  * Script: powershell-deployer-compat.mjs
- * Purpose: Validate deploy.ps1 JSON handling and local manifest resolution under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.05.31.1
+ * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
+ * Version: 2026.05.31.2
  * Last modified: 2026-05-31
  */
 import fs from "node:fs";
@@ -12,7 +12,7 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.05.31.1";
+const version = "2026.05.31.2";
 const lastModified = "2026-05-31";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
@@ -25,7 +25,6 @@ const dashboardPath = path.join(
   defaultDashboardFiles.find((file) => file === "VM_EVCC_Today.json") || defaultDashboardFiles[0],
 );
 const localDashboardDir = path.join(repoRoot, "dashboards", "original", "en");
-const manifestPath = path.join(repoRoot, "dashboards", "deploy-manifest.json");
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -125,14 +124,13 @@ function buildHarness(functionSources) {
     "",
     `$repoRoot = '${repoRoot.replace(/'/g, "''")}'`,
     `$dashboardPath = '${dashboardPath.replace(/'/g, "''")}'`,
-    `$manifestPath = '${manifestPath.replace(/'/g, "''")}'`,
     `$localDashboardDir = '${localDashboardDir.replace(/'/g, "''")}'`,
-    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'local'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
-    "$script:ResolvedLocalRepoRoot = $null",
+    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'localdir'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
+    "$FixedDashboardFiles = @('VM_EVCC_TAB_All-time.json','VM_EVCC_TAB_Jahr.json','VM_EVCC_TAB_Monat.json','VM_EVCC_TAB_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Mobile.json')",
     "$raw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $dashboardPath)",
     "$rewritten = Replace-DatasourcePlaceholders $raw",
-    "$resolvedRepoRoot = Resolve-LocalRepoRoot",
-    "$manifestText = Get-RepoFileContent 'dashboards/deploy-manifest.json'",
+    "$dashboardFiles = @(Get-DashboardFilesFromManifest)",
+    "$sourceText = Get-SourceFileContent 'VM_EVCC_Today.json'",
     "",
     "function Assert-Array([object]$Value, [string]$Name, [int]$ExpectedCount = -1) {",
     "  if ($null -eq $Value) { throw \"$Name is null\" }",
@@ -168,9 +166,9 @@ function buildHarness(functionSources) {
     "Assert-Array $metric.fieldConfig.defaults.thresholds.steps 'metric.fieldConfig.defaults.thresholds.steps' 1",
     "Assert-Array $metric.options.reduceOptions.calcs 'metric.options.reduceOptions.calcs' 1",
     "if ($metric.targets[0].datasource.uid -ne 'vm-evcc') { throw \"metric.targets[0].datasource.uid is $($metric.targets[0].datasource.uid), expected vm-evcc\" }",
-    "",    "if ($resolvedRepoRoot -ne $repoRoot) { throw \"Resolve-LocalRepoRoot returned $resolvedRepoRoot, expected $repoRoot\" }",
-    "if (-not $manifestText.Contains('\"files\"')) { throw 'Manifest text did not contain files array' }",
-    "if ($manifestText -ne (Get-Content -Raw -LiteralPath $manifestPath)) { throw 'Get-RepoFileContent returned unexpected manifest content' }",
+    "",
+    "if ($dashboardFiles.Count -ne 6) { throw \"Get-DashboardFilesFromManifest returned $($dashboardFiles.Count), expected 6\" }",
+    "if (-not $sourceText.Contains('\"title\"')) { throw 'Get-SourceFileContent returned unexpected dashboard content' }",
     "",
     "Write-Output 'Windows PowerShell deployer compatibility check passed.'",
     "",
@@ -189,8 +187,8 @@ function main() {
     extractFunctionSource(deployerText, "Convert-JsonNode"),
     extractFunctionSource(deployerText, "Parse-JsonDocument"),
     extractFunctionSource(deployerText, "Replace-DatasourcePlaceholders"),
-    extractFunctionSource(deployerText, "Resolve-LocalRepoRoot"),
-    extractFunctionSource(deployerText, "Get-RepoFileContent"),
+    extractFunctionSource(deployerText, "Get-SourceFileContent"),
+    extractFunctionSource(deployerText, "Get-DashboardFilesFromManifest"),
   ];
 
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "evcc-ps-compat-"));

@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Deploy dashboards to Grafana from a local checkout or GitHub source.
+Deploy dashboards to Grafana from GitHub, a raw URL base, or a local dashboard directory.
 
 .DESCRIPTION
 Loads the install environment, resolves the requested dashboard source and
@@ -18,6 +18,7 @@ param(
   [string]$sourcemode,
   [string]$githubrepo,
   [string]$githubref,
+  [string]$rawurl,
   [string]$localdir,
   [string]$folderuid,
   [string]$foldertitle,
@@ -29,7 +30,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.6'
+$ScriptVersion = '2026.05.31.7'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -150,72 +151,39 @@ function Get-SourceSubDir() {
   return "dashboards/translation/$($settings.DASHBOARD_LANGUAGE)"
 }
 
-$script:ResolvedLocalRepoRoot = $null
+$FixedDashboardFiles = @(
+  'VM_EVCC_TAB_All-time.json',
+  'VM_EVCC_TAB_Jahr.json',
+  'VM_EVCC_TAB_Monat.json',
+  'VM_EVCC_TAB_Today-Details.json',
+  'VM_EVCC_Today.json',
+  'VM_EVCC_Today-Mobile.json'
+)
 
-function Resolve-LocalRepoRoot() {
-  if ($script:ResolvedLocalRepoRoot) {
-    return $script:ResolvedLocalRepoRoot
+function Get-RemoteSourceUrl([string]$RelativePath) {
+  $segments = New-Object System.Collections.Generic.List[string]
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'rawurl') {
+    $segments.Add(([string]$settings.DASHBOARD_RAW_BASE_URL).TrimEnd('/'))
+  } else {
+    $segments.Add('https://raw.githubusercontent.com')
+    $segments.Add([string]$settings.GITHUB_REPO)
+    $segments.Add([string]$settings.GITHUB_REF)
   }
-
-  $candidates = New-Object System.Collections.Generic.List[string]
-
-  if (-not [string]::IsNullOrWhiteSpace([string]$settings.DASHBOARD_LOCAL_DIR)) {
-    $localDir = [string]$settings.DASHBOARD_LOCAL_DIR
-    if (-not [System.IO.Path]::IsPathRooted($localDir)) {
-      $localDir = Join-Path (Get-Location) $localDir
-    }
-    $resolvedLocalDir = (Resolve-Path -LiteralPath $localDir).Path
-    $cursor = if (Test-Path -LiteralPath $resolvedLocalDir -PathType Leaf) {
-      Split-Path -Parent $resolvedLocalDir
-    } else {
-      $resolvedLocalDir
-    }
-    while (-not [string]::IsNullOrWhiteSpace($cursor)) {
-      $candidates.Add($cursor)
-      $parent = Split-Path -Parent $cursor
-      if ([string]::IsNullOrWhiteSpace($parent) -or $parent -eq $cursor) {
-        break
-      }
-      $cursor = $parent
+  foreach ($part in $RelativePath.Replace('\\','/').Split('/')) {
+    if (-not [string]::IsNullOrWhiteSpace($part)) {
+      $segments.Add([Uri]::EscapeDataString($part))
     }
   }
-
-  if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
-    $candidates.Add($PSScriptRoot)
-    $scriptParent = Split-Path -Parent $PSScriptRoot
-    if (-not [string]::IsNullOrWhiteSpace($scriptParent)) {
-      $candidates.Add($scriptParent)
-    }
-  }
-
-  foreach ($candidate in ($candidates | Select-Object -Unique)) {
-    if ([string]::IsNullOrWhiteSpace($candidate)) {
-      continue
-    }
-    $manifestPath = Join-Path (Join-Path $candidate 'dashboards') 'deploy-manifest.json'
-    if (Test-Path -LiteralPath $manifestPath) {
-      $script:ResolvedLocalRepoRoot = $candidate
-      return $script:ResolvedLocalRepoRoot
-    }
-  }
-
-  throw 'Unable to locate dashboards/deploy-manifest.json for DASHBOARD_SOURCE_MODE=local. Set DASHBOARD_LOCAL_DIR to a dashboard source directory inside the repository checkout.'
+  return ($segments -join '/')
 }
 
 function Get-RepoFileContent([string]$RelativePath) {
-  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
-    $repoRoot = Resolve-LocalRepoRoot
-    return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $repoRoot $RelativePath)
+  $sourceUrl = Get-RemoteSourceUrl $RelativePath
+  try {
+    $response = Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl
+  } catch {
+    throw "Failed to download $RelativePath from $sourceUrl. $($_.Exception.Message)"
   }
-
-  $segments = @('https://raw.githubusercontent.com', $settings.GITHUB_REPO, $settings.GITHUB_REF)
-  foreach ($part in $RelativePath.Replace('\\','/').Split('/')) {
-    if (-not [string]::IsNullOrWhiteSpace($part)) {
-      $segments += [Uri]::EscapeDataString($part)
-    }
-  }
-  $sourceUrl = $segments -join '/'
-  $response = Invoke-WebRequest -UseBasicParsing -Method Get -Uri $sourceUrl
   if ($null -ne $response.RawContentStream) {
     try {
       $response.RawContentStream.Position = 0
@@ -227,13 +195,22 @@ function Get-RepoFileContent([string]$RelativePath) {
 }
 
 function Get-SourceFileContent([string]$FileName) {
-  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
     return Get-Content -Raw -Encoding UTF8 -LiteralPath (Join-Path $settings.DASHBOARD_LOCAL_DIR $FileName)
   }
   return Get-RepoFileContent ((Get-SourceSubDir) + '/' + $FileName)
 }
 
 function Get-DashboardFilesFromManifest() {
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
+    foreach ($file in $FixedDashboardFiles) {
+      $filePath = Join-Path $settings.DASHBOARD_LOCAL_DIR $file
+      if (-not (Test-Path -LiteralPath $filePath -PathType Leaf)) {
+        throw "DASHBOARD_LOCAL_DIR is missing required dashboard file: $file"
+      }
+    }
+    return $FixedDashboardFiles
+  }
   $manifest = Parse-JsonDocument (Get-RepoFileContent 'dashboards/deploy-manifest.json')
   if ($null -eq $manifest.PSObject.Properties['files'] -or $null -eq $manifest.files) {
     throw 'dashboards/deploy-manifest.json is missing a files array.'
@@ -370,13 +347,14 @@ function Build-Inputs($Raw) {
 
 function Get-DashboardBuildMarker() {
   $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss zzz")
-  $source = if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
-    "local:$($settings.DASHBOARD_LOCAL_DIR)"
-  } else {
-    "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
-  }
-  if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
+    $source = "localdir:$($settings.DASHBOARD_LOCAL_DIR)"
     return "deployed $timestamp | $source"
+  }
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'rawurl') {
+    $source = "rawurl:$(([string]$settings.DASHBOARD_RAW_BASE_URL).TrimEnd('/'))"
+  } else {
+    $source = "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
   }
   return "deployed $timestamp | $($settings.DASHBOARD_LANGUAGE)/$($settings.DASHBOARD_VARIANT) | $source"
 }
@@ -561,6 +539,7 @@ $settings = @{
   GITHUB_REF = 'main'
   DASHBOARD_LANGUAGE = 'en'
   DASHBOARD_VARIANT = 'gen'
+  DASHBOARD_RAW_BASE_URL = ''
   DASHBOARD_LOCAL_DIR = ''
   PURGE = 'false'
   PURGE_ONLY = 'false'
@@ -591,7 +570,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_RAW_BASE_URL','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -607,6 +586,7 @@ Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
 Merge-Setting $settings 'DASHBOARD_SOURCE_MODE' $sourcemode
 Merge-Setting $settings 'GITHUB_REPO' $githubrepo
 Merge-Setting $settings 'GITHUB_REF' $githubref
+Merge-Setting $settings 'DASHBOARD_RAW_BASE_URL' $rawurl
 Merge-Setting $settings 'DASHBOARD_LOCAL_DIR' $localdir
 Merge-Setting $settings 'GRAFANA_FOLDER_UID' $folderuid
 Merge-Setting $settings 'GRAFANA_FOLDER_TITLE' $foldertitle
@@ -615,13 +595,27 @@ if ($settings.ContainsKey('DEPLOY_PURGE_ONLY') -and -not (Test-Truthy $settings.
 if (-not [string]::IsNullOrWhiteSpace($purge)) { $settings['PURGE'] = if ($purge -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
 if (-not [string]::IsNullOrWhiteSpace($purgeonly)) { $settings['PURGE_ONLY'] = if ($purgeonly -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
 if (-not $settings.GRAFANA_API_TOKEN -and $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN) { $settings.GRAFANA_API_TOKEN = $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN }
+$settings.DASHBOARD_SOURCE_MODE = ([string]$settings.DASHBOARD_SOURCE_MODE).Trim().ToLowerInvariant()
+switch ($settings.DASHBOARD_SOURCE_MODE) {
+  'github' {
+    if ([string]::IsNullOrWhiteSpace([string]$settings.GITHUB_REPO)) { throw 'GITHUB_REPO is required when DASHBOARD_SOURCE_MODE=github.' }
+    if ([string]::IsNullOrWhiteSpace([string]$settings.GITHUB_REF)) { throw 'GITHUB_REF is required when DASHBOARD_SOURCE_MODE=github.' }
+  }
+  'rawurl' {
+    if ([string]::IsNullOrWhiteSpace([string]$settings.DASHBOARD_RAW_BASE_URL)) { throw 'DASHBOARD_RAW_BASE_URL is required when DASHBOARD_SOURCE_MODE=rawurl.' }
+  }
+  'localdir' {
+    if ([string]::IsNullOrWhiteSpace([string]$settings.DASHBOARD_LOCAL_DIR)) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=localdir.' }
+    if (-not (Test-Path -LiteralPath $settings.DASHBOARD_LOCAL_DIR -PathType Container)) { throw "DASHBOARD_LOCAL_DIR does not exist or is not a directory: $($settings.DASHBOARD_LOCAL_DIR)" }
+  }
+  default { throw 'Unsupported DASHBOARD_SOURCE_MODE. Use github, rawurl, or localdir.' }
+}
 $dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
 $purgeOnlyEnabled = Test-Truthy $settings.PURGE_ONLY
 $purgeEnabled = (Test-Truthy $settings.PURGE) -or $purgeOnlyEnabled
 
 if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
-if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
 
 $dashboardFiles = @(Get-DashboardFilesFromManifest)
 
@@ -647,10 +641,14 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
-if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
-  Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)"
+if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
+  Write-Host "Source: localdir / $($settings.DASHBOARD_LOCAL_DIR)"
 } else {
-  Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)"
+  if ($settings.DASHBOARD_SOURCE_MODE -eq 'rawurl') {
+    Write-Host "Source: rawurl / $(([string]$settings.DASHBOARD_RAW_BASE_URL).TrimEnd('/'))"
+  } else {
+    Write-Host "Source: github / $($settings.GITHUB_REPO) / $($settings.GITHUB_REF)"
+  }
   Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
   Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
 }

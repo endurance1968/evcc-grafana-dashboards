@@ -150,9 +150,10 @@ DASHBOARD_PORTAL_TITLE=VRM
 DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/795774/dashboard
 ```
 
-If the dashboard files should come from the local Forgejo mirror instead of GitHub, add:
+If the dashboard files should come from the local Forgejo mirror instead of GitHub, switch the source mode to `rawurl`:
 
 ```env
+DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
 ```
 

@@ -19,7 +19,7 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.05.31.2";
+const SCRIPT_VERSION = "2026.05.31.3";
 const SCRIPT_LAST_MODIFIED = "2026-05-31";
 
 loadEnvFile(parseArg("env", ".env"));
@@ -30,9 +30,10 @@ const family = resolveDashboardFamily();
 const language = parseArg("language", "en").trim().toLowerCase();
 const variant = parseArg("variant", "orig").trim().toLowerCase();
 const sourceOverride = parseArg("source", "").trim();
-const sourceMode = parseArg("source-mode", parseArg("sourceMode", sourceOverride ? "local" : "github")).trim().toLowerCase();
+const sourceMode = parseArg("source-mode", parseArg("sourceMode", sourceOverride ? "localdir" : "github")).trim().toLowerCase();
 const githubRepoArg = parseArg("github-repo", "").trim();
 const githubRef = parseArg("github-ref", "main").trim() || "main";
+const rawBaseUrl = parseArg("raw-base-url", optionalEnv("DASHBOARD_RAW_BASE_URL", "")).trim();
 const overridesArg = parseArg("overrides", "").trim();
 const purgeLanguage = parseArg("purge", "true") === "true";
 const withSmoke = parseArg("smoke", "true") !== "false";
@@ -43,8 +44,8 @@ const repoRoot = process.cwd();
 if (!["orig", "generated"].includes(variant)) {
   throw new Error("Invalid --variant. Use orig|generated");
 }
-if (!["local", "github"].includes(sourceMode)) {
-  throw new Error("Invalid --source-mode. Use local|github");
+if (!["localdir", "rawurl", "github"].includes(sourceMode)) {
+  throw new Error("Invalid --source-mode. Use localdir|rawurl|github");
 }
 
 const defaultTag = `${family.tagPrefix}-${language}-${variant === "orig" ? "orig" : "gen"}`;
@@ -279,6 +280,22 @@ async function populateFromGitHub(targetDir, repoSlug, ref, subPath) {
     }
   }
 }
+async function populateFromRawUrl(targetDir, baseUrl, subPath) {
+  fs.rmSync(targetDir, { recursive: true, force: true });
+  fs.mkdirSync(targetDir, { recursive: true });
+  const normalizedBase = baseUrl.replace(/\/+$/, "");
+  const normalizedSubPath = subPath.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+  const manifest = await fetchJson(`${normalizedBase}/dashboards/deploy-manifest.json`);
+  const files = Array.isArray(manifest.files) ? manifest.files : [];
+  if (!files.length) {
+    throw new Error("dashboards/deploy-manifest.json is missing a non-empty files array");
+  }
+  for (const file of files) {
+    const fileName = String(file);
+    const text = await fetchText(`${normalizedBase}/${normalizedSubPath}/${encodeURIComponent(fileName)}`);
+    fs.writeFileSync(path.join(targetDir, fileName), text, "utf8");
+  }
+}
 
 function resolveOverridesPath() {
   if (overridesArg.toLowerCase() === "none") {
@@ -405,6 +422,14 @@ async function resolveRawSource() {
     }
     await populateFromGitHub(rawGitHubSource, repoSlug, githubRef, relativeSource);
     return { rawSource: rawGitHubSource, sourceLabel: `github:${repoSlug}@${githubRef}/${relativeSource}` };
+  }
+
+  if (sourceMode === "rawurl") {
+    if (!rawBaseUrl) {
+      throw new Error("Missing --raw-base-url or DASHBOARD_RAW_BASE_URL for --source-mode=rawurl");
+    }
+    await populateFromRawUrl(rawGitHubSource, rawBaseUrl, relativeSource);
+    return { rawSource: rawGitHubSource, sourceLabel: `rawurl:${rawBaseUrl.replace(/\/+$/, "")}/${relativeSource}` };
   }
 
   const localInput = path.resolve(sourceOverride || defaultLocalSource());

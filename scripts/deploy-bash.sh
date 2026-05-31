@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.7"
+SCRIPT_VERSION="2026.05.31.8"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -146,10 +146,32 @@ else
   PURGE_EFFECTIVE="$PURGE"
 fi
 
-if [[ "$DASHBOARD_SOURCE_MODE" == "local" && -z "$DASHBOARD_LOCAL_DIR" ]]; then
-  echo "DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local." >&2
-  exit 1
-fi
+DASHBOARD_SOURCE_MODE="${DASHBOARD_SOURCE_MODE,,}"
+FIXED_DASHBOARD_FILES=(
+  "VM_EVCC_TAB_All-time.json"
+  "VM_EVCC_TAB_Jahr.json"
+  "VM_EVCC_TAB_Monat.json"
+  "VM_EVCC_TAB_Today-Details.json"
+  "VM_EVCC_Today.json"
+  "VM_EVCC_Today-Mobile.json"
+)
+case "$DASHBOARD_SOURCE_MODE" in
+  github)
+    [[ -n "$GITHUB_REPO" ]] || { echo "GITHUB_REPO is required when DASHBOARD_SOURCE_MODE=github." >&2; exit 1; }
+    [[ -n "$GITHUB_REF" ]] || { echo "GITHUB_REF is required when DASHBOARD_SOURCE_MODE=github." >&2; exit 1; }
+    ;;
+  rawurl)
+    [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]] || { echo "DASHBOARD_RAW_BASE_URL is required when DASHBOARD_SOURCE_MODE=rawurl." >&2; exit 1; }
+    ;;
+  localdir)
+    [[ -n "$DASHBOARD_LOCAL_DIR" ]] || { echo "DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=localdir." >&2; exit 1; }
+    [[ -d "$DASHBOARD_LOCAL_DIR" ]] || { echo "DASHBOARD_LOCAL_DIR does not exist or is not a directory: $DASHBOARD_LOCAL_DIR" >&2; exit 1; }
+    ;;
+  *)
+    echo "Unsupported DASHBOARD_SOURCE_MODE. Use github, rawurl, or localdir." >&2
+    exit 1
+    ;;
+esac
 
 auth_mode() {
   local mode="${GRAFANA_AUTH_MODE,,}"
@@ -228,7 +250,7 @@ urlencode() {
 
 remote_source_url() {
   local relative_path="$1"
-  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
+  if [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
     printf '%s/%s' "${DASHBOARD_RAW_BASE_URL%/}" "$relative_path"
     return
   fi
@@ -247,14 +269,20 @@ fetch_remote_content() {
 
 repo_file_content() {
   local relative_path="$1"
-  if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
-    cat "$SCRIPT_DIR/../$relative_path"
-    return
-  fi
   fetch_remote_content "$relative_path"
 }
 
 load_dashboard_files() {
+  if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
+    DASHBOARD_FILES=("${FIXED_DASHBOARD_FILES[@]}")
+    for file_name in "${DASHBOARD_FILES[@]}"; do
+      if [[ ! -f "$DASHBOARD_LOCAL_DIR/$file_name" ]]; then
+        echo "DASHBOARD_LOCAL_DIR is missing required dashboard file: $file_name" >&2
+        exit 1
+      fi
+    done
+    return
+  fi
   local manifest_file="$TMP_DIR/deploy-manifest.json"
   repo_file_content "dashboards/deploy-manifest.json" > "$manifest_file"
   mapfile -t DASHBOARD_FILES < <(jq -r '.files[]?' "$manifest_file")
@@ -266,7 +294,7 @@ load_dashboard_files() {
 fetch_source() {
   local filename="$1"
   local out_file="$2"
-  if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
+  if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
     cp "$DASHBOARD_LOCAL_DIR/$filename" "$out_file"
     return
   fi
@@ -352,13 +380,13 @@ apply_dashboard_override() {
 
 dashboard_build_marker() {
   local source
-  if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
-    source="local:$DASHBOARD_LOCAL_DIR"
+  if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
+    source="localdir:$DASHBOARD_LOCAL_DIR"
     printf 'deployed %s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$source"
     return
   fi
-  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
-    source="raw:${DASHBOARD_RAW_BASE_URL%/}"
+  if [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
+    source="rawurl:${DASHBOARD_RAW_BASE_URL%/}"
   else
     source="github:$GITHUB_REPO@$GITHUB_REF"
   fi
@@ -503,11 +531,11 @@ echo "Grafana version: $(grafana_version)"
 echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
-if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
-  echo "Source: local / $DASHBOARD_LOCAL_DIR"
+if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
+  echo "Source: localdir / $DASHBOARD_LOCAL_DIR"
 else
-  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
-    echo "Source: raw-url / ${DASHBOARD_RAW_BASE_URL%/}"
+  if [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
+    echo "Source: rawurl / ${DASHBOARD_RAW_BASE_URL%/}"
   else
     echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
   fi
@@ -800,11 +828,11 @@ done
 echo
 echo "Install finished."
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
-if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
-  echo "Source: local / $DASHBOARD_LOCAL_DIR"
+if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
+  echo "Source: localdir / $DASHBOARD_LOCAL_DIR"
 else
-  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
-    echo "Source: raw-url / ${DASHBOARD_RAW_BASE_URL%/}"
+  if [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
+    echo "Source: rawurl / ${DASHBOARD_RAW_BASE_URL%/}"
   else
     echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
   fi

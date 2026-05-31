@@ -264,10 +264,11 @@ Datasources are not touched.
 
 Supported arguments:
 
-- `--source-mode=local|github`
+- `--source-mode=localdir|rawurl|github`
 - `--source=<local path or repo-relative path>`
 - `--github-repo=<owner/repo>`
 - `--github-ref=<branch-or-tag>`
+- `--raw-base-url=<repository-root-raw-url>`
 - `--language=<code>`
 - `--variant=orig|generated`
 - Fixed manifest dashboard list from `dashboards/deploy-manifest.json`
@@ -275,7 +276,7 @@ Supported arguments:
 Example local deploy:
 
 ```bash
-node scripts/test/deploy-dashboards.mjs --env=.env.local --source-mode=local --purge=true --smoke=true
+node scripts/test/deploy-dashboards.mjs --env=.env.local --source-mode=localdir --purge=true --smoke=true
 ```
 
 Example GitHub-based deploy:

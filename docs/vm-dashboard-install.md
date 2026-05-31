@@ -63,7 +63,9 @@ The deployable file lists are defined in `dashboards/deploy-manifest.json`.
 
 ## Source Selection
 
-Default GitHub source:
+`DASHBOARD_SOURCE_MODE` selects exactly where dashboard JSON files are loaded from. The deployer validates the variables required by the selected mode and ignores source variables from the other modes.
+
+GitHub source:
 
 ```env
 DASHBOARD_SOURCE_MODE=github
@@ -71,17 +73,17 @@ GITHUB_REPO=endurance1968/evcc-grafana-dashboards
 GITHUB_REF=main
 ```
 
-Local Forgejo or another raw file endpoint can be used without changing the source mode. The value must point at the repository root raw path; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
+Raw URL source, for example local Forgejo. The value must point at the repository root raw path; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
 
 ```env
-DASHBOARD_SOURCE_MODE=github
+DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
 ```
 
-Local checkout source:
+Local dashboard directory source. The directory must contain the six deployable dashboard JSON files for the selected language/variant; the deployer does not read a repository manifest in this mode:
 
 ```env
-DASHBOARD_SOURCE_MODE=local
+DASHBOARD_SOURCE_MODE=localdir
 DASHBOARD_LOCAL_DIR=/path/to/evcc-grafana-dashboards/dashboards/translation/de
 ```
 
@@ -188,7 +190,7 @@ The deployer is intentionally import-only. Recommended customization paths:
 
 - change dashboard variables in Grafana and save the dashboard
 - set deploy-time dashboard variable overrides in `vm-dashboard-install.env`
-- deploy from a local dashboard directory with `DASHBOARD_SOURCE_MODE=local`
+- deploy from a local dashboard directory with `DASHBOARD_SOURCE_MODE=localdir`
 
 The deployer intentionally does not rewrite colors or arbitrary panel settings.
 

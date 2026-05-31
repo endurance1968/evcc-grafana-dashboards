@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.7"
+SCRIPT_VERSION="2026.05.31.8"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -151,15 +151,41 @@ if "DEPLOY_PURGE_ONLY" in settings and not is_truthy(settings.get("PURGE_ONLY", 
 
 if not settings["GRAFANA_API_TOKEN"] and settings.get("GRAFANA_SERVICE_ACCOUNT_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = settings["GRAFANA_SERVICE_ACCOUNT_TOKEN"]
-if settings["DASHBOARD_SOURCE_MODE"] == "local" and not settings["DASHBOARD_LOCAL_DIR"]:
-    raise SystemExit("DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.")
+
+settings["DASHBOARD_SOURCE_MODE"] = (settings.get("DASHBOARD_SOURCE_MODE") or "github").strip().lower()
+FIXED_DASHBOARD_FILES = [
+    "VM_EVCC_TAB_All-time.json",
+    "VM_EVCC_TAB_Jahr.json",
+    "VM_EVCC_TAB_Monat.json",
+    "VM_EVCC_TAB_Today-Details.json",
+    "VM_EVCC_Today.json",
+    "VM_EVCC_Today-Mobile.json",
+]
+
+
+def require_setting(key, mode):
+    if not str(settings.get(key, "") or "").strip():
+        raise SystemExit(f"{key} is required when DASHBOARD_SOURCE_MODE={mode}.")
+
+
+mode = settings["DASHBOARD_SOURCE_MODE"]
+if mode == "github":
+    require_setting("GITHUB_REPO", mode)
+    require_setting("GITHUB_REF", mode)
+elif mode == "rawurl":
+    require_setting("DASHBOARD_RAW_BASE_URL", mode)
+elif mode == "localdir":
+    require_setting("DASHBOARD_LOCAL_DIR", mode)
+    if not Path(settings["DASHBOARD_LOCAL_DIR"]).is_dir():
+        raise SystemExit(f"DASHBOARD_LOCAL_DIR does not exist or is not a directory: {settings['DASHBOARD_LOCAL_DIR']}")
+else:
+    raise SystemExit("Unsupported DASHBOARD_SOURCE_MODE. Use github, rawurl, or localdir.")
 
 
 def remote_source_url(relative_path):
     quoted = "/".join(urllib.parse.quote(part) for part in str(relative_path).split("/"))
-    raw_base_url = (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip().rstrip("/")
-    if raw_base_url:
-        return f"{raw_base_url}/{quoted}"
+    if settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
+        return f"{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}/{quoted}"
     return f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{quoted}"
 
 
@@ -175,13 +201,15 @@ def fetch_remote_text(relative_path):
 
 
 def repo_file_text(relative_path):
-    if settings["DASHBOARD_SOURCE_MODE"] == "local":
-        repo_root = Path(os.environ["SCRIPT_DIR"]).resolve().parent
-        return (repo_root / Path(relative_path)).read_text(encoding="utf-8")
     return fetch_remote_text(relative_path)
 
 
 def load_dashboard_files():
+    if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
+        missing = [file for file in FIXED_DASHBOARD_FILES if not (Path(settings["DASHBOARD_LOCAL_DIR"]) / file).is_file()]
+        if missing:
+            raise RuntimeError("DASHBOARD_LOCAL_DIR is missing required dashboard files: " + ", ".join(missing))
+        return list(FIXED_DASHBOARD_FILES)
     manifest = json.loads(repo_file_text("dashboards/deploy-manifest.json"))
     files = manifest.get("files") or []
     if not isinstance(files, list) or not files:
@@ -257,7 +285,7 @@ def get_source_subdir():
 
 
 def get_source_text(filename):
-    if settings["DASHBOARD_SOURCE_MODE"] == "local":
+    if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
         return (Path(settings["DASHBOARD_LOCAL_DIR"]) / filename).read_text(encoding="utf-8")
     return fetch_remote_text(f"{get_source_subdir()}/{filename}")
 
@@ -325,11 +353,11 @@ def build_inputs(raw):
 
 def build_dashboard_marker(settings):
     timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
-    if settings["DASHBOARD_SOURCE_MODE"] == "local":
-        source = f"local:{settings['DASHBOARD_LOCAL_DIR']}"
+    if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
+        source = f"localdir:{settings['DASHBOARD_LOCAL_DIR']}"
         return f"deployed {timestamp} | {source}"
-    if (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip():
-        source = f"raw:{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}"
+    if settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
+        source = f"rawurl:{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}"
     else:
         source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
     return f"deployed {timestamp} | {settings['DASHBOARD_LANGUAGE']}/{settings['DASHBOARD_VARIANT']} | {source}"
@@ -515,11 +543,11 @@ print(f"Grafana version: {grafana_version()}")
 print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
-if settings["DASHBOARD_SOURCE_MODE"] == "local":
-    print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
+if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
+    print(f"Source: localdir / {settings['DASHBOARD_LOCAL_DIR']}")
 else:
-    if (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip():
-        print(f"Source: raw-url / {settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}")
+    if settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
+        print(f"Source: rawurl / {settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}")
     else:
         print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
     print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
