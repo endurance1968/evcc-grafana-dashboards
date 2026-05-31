@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.2"
+SCRIPT_VERSION="2026.05.31.3"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -100,6 +100,13 @@ settings = {
     "DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL": "",
     "DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL": "",
     "DASHBOARD_INSTALLED_WATT_PEAK": "",
+    "DASHBOARD_ICE_CONSUMPTION_L_PER_100KM": "",
+    "DASHBOARD_FUEL_PRICE_PER_L": "",
+    "DASHBOARD_PV_PURCHASE_PRICE": "",
+    "DASHBOARD_BATTERY_PURCHASE_PRICE": "",
+    "DASHBOARD_RUNNING_COSTS_YEARLY": "",
+    "DASHBOARD_BATTERY_CAPACITY_WH": "",
+    "DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX": "",
     "DASHBOARD_FILTER_LOADPOINT_BLOCKLIST": "",
     "DASHBOARD_FILTER_EXT_BLOCKLIST": "",
     "DASHBOARD_FILTER_AUX_BLOCKLIST": "",
@@ -329,6 +336,13 @@ def build_dashboard_overrides(settings):
         "energySampleInterval": settings.get("DASHBOARD_ENERGY_SAMPLE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL", ""),
         "tariffPriceInterval": settings.get("DASHBOARD_TARIFF_PRICE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL", ""),
         "installedWattPeak": settings.get("DASHBOARD_INSTALLED_WATT_PEAK", ""),
+        "vVerbrauch": settings.get("DASHBOARD_ICE_CONSUMPTION_L_PER_100KM", ""),
+        "spritKosten": settings.get("DASHBOARD_FUEL_PRICE_PER_L", ""),
+        "purchasePricePv": settings.get("DASHBOARD_PV_PURCHASE_PRICE", ""),
+        "batteryPurchasePrice": settings.get("DASHBOARD_BATTERY_PURCHASE_PRICE", ""),
+        "runningCosts": settings.get("DASHBOARD_RUNNING_COSTS_YEARLY", ""),
+        "speicherkapazitaet": settings.get("DASHBOARD_BATTERY_CAPACITY_WH", ""),
+        "heatPumpLoadpointRegex": settings.get("DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX", ""),
         "loadpointBlocklist": settings.get("DASHBOARD_FILTER_LOADPOINT_BLOCKLIST", ""),
         "extBlocklist": settings.get("DASHBOARD_FILTER_EXT_BLOCKLIST", ""),
         "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
