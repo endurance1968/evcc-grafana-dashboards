@@ -130,7 +130,7 @@ At minimum, validate:
 ## Next Steps
 
 - VictoriaMetrics: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13_EN.md) or [victoriametrics-install-docker.md](./victoriametrics-install-docker_EN.md)
-- Live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
+- existing InfluxDB history: [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
+- live ingest as the final step of the VictoriaMetrics installation or migration: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - Grafana: [grafana-install-debian-13.md](./grafana-install-debian-13_EN.md) or [grafana-install-docker.md](./grafana-install-docker_EN.md)
-- Migration: [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
 - Dashboard deployment: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)

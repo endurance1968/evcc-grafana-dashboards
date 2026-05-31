@@ -2,7 +2,7 @@
 
 German version: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
 
-This guide explains how current EVCC metrics are written to VictoriaMetrics. It belongs after the VictoriaMetrics installation and before Grafana dashboard deployment.
+This guide explains how current EVCC metrics are written to VictoriaMetrics. It belongs at the end of the VictoriaMetrics installation or at the end of the InfluxDB migration. From here, continue to Grafana and dashboard deployment.
 
 ## Which Path Should I Use?
 
@@ -203,8 +203,12 @@ Then search VictoriaMetrics for `evcc_ingest_probe`. This probe is not relevant 
 
 ## Next Step
 
-- New installation: continue with [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md) once current raw data arrives in VictoriaMetrics.
-- Migration: continue with [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) once the live data pipeline is working and history should be imported.
+Once current EVCC raw data arrives in VictoriaMetrics, continue with Grafana:
+
+- install Grafana if you do not already have a suitable instance: [grafana-install-debian-13.md](./grafana-install-debian-13_EN.md) or [grafana-install-docker.md](./grafana-install-docker_EN.md)
+- create the Grafana datasource and deploy dashboards: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
+
+If you want to keep existing InfluxDB history and the migration is not complete yet, go back to [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) first. The normal migration path calls this live ingest guide at the end.
 
 ## Sources
 

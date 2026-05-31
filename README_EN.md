@@ -10,6 +10,7 @@ Example dashboard:
 
 ![EVCC dashboard example](./images/dashboard-example-today.png)
 
+More dashboard examples are available in the [screenshot gallery](./docs/screenshots/README_EN.md).
 
 ## What this repository adds
 
@@ -45,5 +46,4 @@ Typical use cases:
 For the full end-to-end path from EVCC + InfluxDB to EVCC + VictoriaMetrics + Grafana, continue here:
 
 - [docs/README.md](./docs/README_EN.md)
-- [EVCC/Telegraf live ingest](./docs/evcc-telegraf-live-ingest_EN.md)
 - [release notes](./docs/release-notes_EN.md)

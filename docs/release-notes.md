@@ -24,13 +24,13 @@ Starte mit [system-requirements.md](./system-requirements.md) und folge danach [
 Der normale Migrationspfad ist in [influx-to-vm-migration.md](./influx-to-vm-migration.md) dokumentiert:
 
 1. VictoriaMetrics installieren oder vorbereiten
-2. aktuellen EVCC/Telegraf-Live-Ingest nach VictoriaMetrics einrichten oder pruefen
-3. rohe EVCC-Historie aus InfluxDB v1 mit `vmctl influx` importieren
-4. Rohdatenabdeckung mit `check_data.py` und `compare_import_coverage.py` validieren
-5. Infrastruktur-Labels wie `host` normalisieren, wenn der Checker es verlangt
-6. `evcc-vm-rollup.py` als Dry-run und danach als Schreib-Backfill fuer taegliche `evcc_*`-Metriken ausfuehren
-7. Grafana mit VictoriaMetrics verbinden und Dashboards deployen
-8. taeglichen Rollup-Refresh fuer abgeschlossene lokale Tage planen
+2. rohe EVCC-Historie aus InfluxDB v1 mit `vmctl influx` importieren
+3. Rohdatenabdeckung mit `check_data.py` und `compare_import_coverage.py` validieren
+4. Infrastruktur-Labels wie `host` normalisieren, wenn der Checker es verlangt
+5. `evcc-vm-rollup.py` als Dry-run und danach als Schreib-Backfill fuer taegliche `evcc_*`-Metriken ausfuehren
+6. taeglichen Rollup-Refresh fuer abgeschlossene lokale Tage planen
+7. aktuellen EVCC/Telegraf-Live-Ingest nach VictoriaMetrics einrichten oder pruefen
+8. von der Live-Ingest-Anleitung aus Grafana mit VictoriaMetrics verbinden und Dashboards deployen
 
 Die Release-Validierung pruefte den Live-Ingest-Pfad, importierte eine echte mehrjaehrige EVCC-Historie nach VictoriaMetrics, bereinigte `host`-Labels, verifizierte `db=0`, erzeugte Rollups und renderte die Dashboards gegen die migrierten Daten.
 

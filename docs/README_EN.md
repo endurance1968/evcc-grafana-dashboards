@@ -11,30 +11,25 @@ Start with the central requirements overview: [system-requirements.md](./system-
 Use this path when you want to keep your history and move the dashboard backend to VictoriaMetrics:
 
 1. Install VictoriaMetrics.
-2. Configure EVCC/Telegraf live ingest to VictoriaMetrics.
-3. Import historic InfluxDB raw data into VictoriaMetrics.
-4. Build the daily `evcc_*` rollups.
-5. Install or reuse Grafana.
-6. Connect Grafana to VictoriaMetrics.
-7. Deploy the dashboards.
-8. Schedule the daily rollup refresh.
+2. Import historic InfluxDB raw data into VictoriaMetrics.
+3. Build the daily `evcc_*` rollups.
+4. Schedule the daily rollup refresh.
+5. Configure EVCC/Telegraf live ingest to VictoriaMetrics.
+6. From the live ingest guide, install/connect Grafana and deploy the dashboards.
 
 Start here:
 
-- [EVCC/Telegraf live ingest to VictoriaMetrics](./evcc-telegraf-live-ingest_EN.md)
 - [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration_EN.md)
 - [Migration checklist](./migration-checklist_EN.md)
+- [EVCC/Telegraf live ingest to VictoriaMetrics](./evcc-telegraf-live-ingest_EN.md)
 
 ### I am setting up a new VictoriaMetrics stack
 
-Install the runtime first, then deploy dashboards:
+Install VictoriaMetrics first. At the end of the VictoriaMetrics guide, continue with EVCC/Telegraf; at the end of the EVCC/Telegraf guide, continue with Grafana and dashboard deployment.
 
 - VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13_EN.md)
 - VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker_EN.md)
 - EVCC/Telegraf live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
-- Grafana on Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13_EN.md)
-- Grafana with Docker: [grafana-install-docker.md](./grafana-install-docker_EN.md)
-- Dashboard setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
 
 ### I only want to update dashboards
 

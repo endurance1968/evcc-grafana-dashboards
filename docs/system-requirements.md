@@ -132,7 +132,7 @@ Mindestens pruefen:
 ## Naechste Schritte
 
 - VictoriaMetrics: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) oder [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
-- Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
+- bei vorhandener InfluxDB-Historie: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- Live-Ingest als Abschluss der VictoriaMetrics-Installation oder Migration: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Grafana: [grafana-install-debian-13.md](./grafana-install-debian-13.md) oder [grafana-install-docker.md](./grafana-install-docker.md)
-- Migration: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 - Dashboard-Deployment: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)

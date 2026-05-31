@@ -2,7 +2,7 @@
 
 Englische Version: [evcc-telegraf-live-ingest_EN.md](./evcc-telegraf-live-ingest_EN.md).
 
-Diese Anleitung beschreibt, wie aktuelle EVCC-Messwerte nach VictoriaMetrics geschrieben werden. Sie gehoert nach der VictoriaMetrics-Installation und vor dem Grafana-Dashboard-Deployment in den Ablauf.
+Diese Anleitung beschreibt, wie aktuelle EVCC-Messwerte nach VictoriaMetrics geschrieben werden. Sie gehoert ans Ende der VictoriaMetrics-Installation oder ans Ende der InfluxDB-Migration. Von hier aus geht es anschliessend weiter zu Grafana und zum Dashboard-Deployment.
 
 ## Wann welcher Pfad?
 
@@ -203,8 +203,12 @@ Danach in VictoriaMetrics nach `evcc_ingest_probe` suchen. Diese Probe ist nicht
 
 ## Naechster Schritt
 
-- Neue Installation: weiter mit [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md), sobald aktuelle Rohdaten in VictoriaMetrics ankommen.
-- Migration: weiter mit [influx-to-vm-migration.md](./influx-to-vm-migration.md), wenn die Live-Datenpipeline steht und die Historie importiert werden soll.
+Wenn aktuelle EVCC-Rohdaten in VictoriaMetrics ankommen, kommt danach Grafana:
+
+- Grafana installieren, falls noch keine passende Instanz vorhanden ist: [grafana-install-debian-13.md](./grafana-install-debian-13.md) oder [grafana-install-docker.md](./grafana-install-docker.md)
+- Grafana-Datasource anlegen und Dashboards deployen: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+
+Wenn du eine vorhandene InfluxDB-Historie uebernehmen willst und die Migration noch nicht abgeschlossen ist, gehe zuerst zurueck zu [influx-to-vm-migration.md](./influx-to-vm-migration.md). Der normale Migrationspfad ruft diese Live-Ingest-Anleitung am Ende auf.
 
 ## Quellen
 

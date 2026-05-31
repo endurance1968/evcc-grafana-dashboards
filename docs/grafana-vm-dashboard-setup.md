@@ -11,7 +11,7 @@ Dies ist die kanonische Endnutzer-Anleitung fuer das Dashboard-Deployment. Sie b
 - Deployment der EVCC-Dashboards
 - spaetere Dashboard-Updates
 
-Wenn aktuelle EVCC-Rohdaten noch nicht in VictoriaMetrics ankommen, richte zuerst [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md) ein. Wenn du vorhandene InfluxDB-Historie uebernimmst, schliesse danach [influx-to-vm-migration.md](./influx-to-vm-migration.md) ab.
+Wenn du vorhandene InfluxDB-Historie uebernimmst, schliesse zuerst [influx-to-vm-migration.md](./influx-to-vm-migration.md) ab. Wenn aktuelle EVCC-Rohdaten noch nicht in VictoriaMetrics ankommen, richte danach [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md) ein.
 
 ## Zielzustand
 

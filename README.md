@@ -12,6 +12,8 @@ Beispiel-Dashboard:
 
 ![EVCC Dashboard Beispiel](./images/dashboard-example-today.png)
 
+Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/screenshots/README.md).
+
 ## Was dieses Repository liefert
 
 - eine vollstaendige EVCC-Dashboard-Sammlung fuer VictoriaMetrics
@@ -43,8 +45,7 @@ Typische Anwendungsfaelle:
 
 ## Einstieg
 
-Der zentrale Einstieg fuer Installation, Live-Ingest, Migration und Dashboard-Deployment ist:
+Der zentrale Einstieg fuer Installation, Migration, Live-Ingest und Dashboard-Deployment ist:
 
 - [docs/README.md](./docs/README.md)
-- [EVCC/Telegraf Live-Ingest](./docs/evcc-telegraf-live-ingest.md)
 - [Release Notes](./docs/release-notes.md)

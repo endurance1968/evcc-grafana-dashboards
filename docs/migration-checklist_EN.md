@@ -16,17 +16,6 @@ Expected:
 OK
 ```
 
-- [ ] Grafana can reach the VictoriaMetrics datasource.
-- [ ] Grafana datasource UID is `vm-evcc`, or `GRAFANA_DS_VM_EVCC_UID` is set to the actual UID.
-
-## Live Ingest
-
-- [ ] EVCC writes current raw data directly or through Telegraf to VictoriaMetrics; see [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md).
-- [ ] Current raw series exist in VictoriaMetrics, for example `gridPower_value`, `pvPower_value`, or `batteryPower_value` for the last few minutes.
-- [ ] If Telegraf is used, `omit_hostname = true` is set.
-- [ ] VictoriaMetrics has no synthetic `db` label for this dashboard stack.
-- [ ] If InfluxDB is still written in parallel, the planned legacy-path shutdown is documented.
-
 ## Raw Import
 
 - [ ] `vmctl influx` completed for the intended time range.
@@ -129,8 +118,18 @@ python3 check_data.py --base-url http://localhost:8428 --end-time 2026-03-30T23:
 tail -n 80 /var/log/evcc-vm-rollup.log
 ```
 
+## Live Ingest
+
+- [ ] EVCC writes current raw data directly or through Telegraf to VictoriaMetrics; see [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md).
+- [ ] Current raw series exist in VictoriaMetrics, for example `gridPower_value`, `pvPower_value`, or `batteryPower_value` for the last few minutes.
+- [ ] If Telegraf is used, `omit_hostname = true` is set.
+- [ ] VictoriaMetrics has no synthetic `db` label for this dashboard stack.
+- [ ] If InfluxDB is still written in parallel, the planned legacy-path shutdown is documented.
+
 ## Grafana
 
+- [ ] Grafana can reach the VictoriaMetrics datasource.
+- [ ] Grafana datasource UID is `vm-evcc`, or `GRAFANA_DS_VM_EVCC_UID` is set to the actual UID.
 - [ ] Dashboards are in the `EVCC` folder.
 - [ ] `Today` shows current raw data.
 - [ ] `Today - Details` shows raw detail panels without datasource errors.

@@ -302,17 +302,11 @@ Add:
 
 Run the refresh only once per day after the previous local day is complete.
 
-## 11. Verify Or Configure Live Ingest
+## 11. Configure EVCC/Telegraf Live Ingest
 
-Before deploying Grafana dashboards, the current EVCC write path to VictoriaMetrics must work. This prevents a migration that contains history while `Today` stays empty after cutover.
+After import, cleanup, rollups, and scheduling, the next step is the current EVCC write path to VictoriaMetrics. This replaces the earlier direct jump to Grafana dashboard deployment at this point.
 
-- If EVCC already writes directly or through Telegraf to VictoriaMetrics, verify current raw series with `check_data.py --phase raw` or a `/api/v1/series` query for the last few minutes.
-- If the current write path is not configured yet, follow [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md).
-- If you want to keep writing to InfluxDB in parallel during transition, use the Telegraf fan-out path from that live ingest guide.
-
-## 12. Deploy Grafana Dashboards
-
-Continue with [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md).
+Continue with [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md). That guide sets up the live write path and then links to Grafana installation and dashboard deployment.
 
 ## Quick Completion Check
 

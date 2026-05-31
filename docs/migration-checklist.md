@@ -18,17 +18,6 @@ Erwartet:
 OK
 ```
 
-- [ ] Grafana kann die VictoriaMetrics-Datasource erreichen.
-- [ ] Die Grafana-Datasource-UID ist `vm-evcc`, oder `GRAFANA_DS_VM_EVCC_UID` ist auf die tatsaechliche UID gesetzt.
-
-## Live-Ingest
-
-- [ ] EVCC schreibt aktuelle Rohdaten direkt oder ueber Telegraf nach VictoriaMetrics, siehe [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
-- [ ] Aktuelle Rohserien existieren in VictoriaMetrics, zum Beispiel `gridPower_value`, `pvPower_value` oder `batteryPower_value` fuer die letzten Minuten.
-- [ ] Bei Telegraf ist `omit_hostname = true` gesetzt.
-- [ ] VictoriaMetrics enthaelt kein kuenstliches `db`-Label fuer diesen Dashboard-Stack.
-- [ ] Falls InfluxDB noch parallel beschrieben wird, ist klar dokumentiert, wann dieser Legacy-Pfad abgeschaltet wird.
-
 ## Rohimport
 
 - [ ] `vmctl influx` ist fuer den vorgesehenen Zeitraum abgeschlossen.
@@ -131,8 +120,18 @@ python3 check_data.py --base-url http://localhost:8428 --end-time 2026-03-30T23:
 tail -n 80 /var/log/evcc-vm-rollup.log
 ```
 
+## Live-Ingest
+
+- [ ] EVCC schreibt aktuelle Rohdaten direkt oder ueber Telegraf nach VictoriaMetrics, siehe [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
+- [ ] Aktuelle Rohserien existieren in VictoriaMetrics, zum Beispiel `gridPower_value`, `pvPower_value` oder `batteryPower_value` fuer die letzten Minuten.
+- [ ] Bei Telegraf ist `omit_hostname = true` gesetzt.
+- [ ] VictoriaMetrics enthaelt kein kuenstliches `db`-Label fuer diesen Dashboard-Stack.
+- [ ] Falls InfluxDB noch parallel beschrieben wird, ist klar dokumentiert, wann dieser Legacy-Pfad abgeschaltet wird.
+
 ## Grafana
 
+- [ ] Grafana kann die VictoriaMetrics-Datasource erreichen.
+- [ ] Die Grafana-Datasource-UID ist `vm-evcc`, oder `GRAFANA_DS_VM_EVCC_UID` ist auf die tatsaechliche UID gesetzt.
 - [ ] Dashboards liegen im Ordner `EVCC`.
 - [ ] `Today` zeigt aktuelle Rohdaten.
 - [ ] `Today - Details` zeigt Rohdaten-Detailpanels ohne Datasource-Fehler.
