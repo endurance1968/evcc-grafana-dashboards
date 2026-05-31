@@ -29,9 +29,10 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.04.20.4'
-$ScriptLastModified = '2026-04-20'
-Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
+$ScriptVersion = '2026.05.31.1'
+$ScriptBuildDate = '2026-05-31'
+$ScriptLastModified = '2026-05-31'
+Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
   $map = @{}

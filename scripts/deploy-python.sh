@@ -2,7 +2,8 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.1"
+SCRIPT_VERSION="2026.05.31.2"
+SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
 
@@ -58,7 +59,7 @@ EOF
   esac
 done
 
-printf '%s v%s (last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
 export CLI_URL CLI_TOKEN CLI_PURGE CLI_DASHBOARD_SET CLI_YES SCRIPT_DIR
 

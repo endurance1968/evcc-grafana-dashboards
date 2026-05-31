@@ -3,7 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.1"
+SCRIPT_VERSION="2026.05.31.2"
+SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
 
@@ -54,7 +55,7 @@ EOF
   esac
 done
 
-printf '%s v%s (last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
+printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
 require_cmd() {
   command -v "$1" >/dev/null 2>&1 || {
