@@ -36,6 +36,42 @@ PURGE_ONLY=false
 
 Grafana 13.0.1 or newer is required. The deployers always install the tab-navigation dashboards; the legacy row-based deploy path and dashboard set selection are no longer available.
 
+## Source And Settings
+
+`DASHBOARD_SOURCE_MODE` decides where dashboard JSON files are imported from:
+
+```env
+DASHBOARD_SOURCE_MODE=github
+# or: DASHBOARD_SOURCE_MODE=rawurl
+# or: DASHBOARD_SOURCE_MODE=localdir
+```
+
+For local Forgejo/raw imports use:
+
+```env
+DASHBOARD_SOURCE_MODE=rawurl
+DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+```
+
+Common dashboard variable overrides can also be set in `vm-dashboard-install.env`:
+
+```env
+DASHBOARD_INSTALLED_WATT_PEAK=22
+DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM=6
+DASHBOARD_FUEL_COST_PER_L=1.75
+DASHBOARD_STORAGE_CAPACITY_WH=9500
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
+DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
+DASHBOARD_EVCC_URL=http://home:7070/#/
+DASHBOARD_PORTAL_TITLE=Solarman
+DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+```
+
+The full option list is in [vm-dashboard-install.md](./vm-dashboard-install.md) and the commented template is `vm-dashboard-install.env.example`. Define each env key only once; duplicate keys are rejected.
+
 ## Run
 
 Linux:
