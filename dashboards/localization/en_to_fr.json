@@ -330,7 +330,11 @@
     "VM: EVCC: Month": "VM : EVCC : Mois",
     "VM: EVCC: Month Tabs": "VM : EVCC : Mois - Onglets",
     "VM: EVCC: Today - Details Tabs": "VM : EVCC : Aujourd hui - Details - Onglets",
-    "VM: EVCC: Year Tabs": "VM : EVCC : Annee - Onglets"
+    "VM: EVCC: Year Tabs": "VM : EVCC : Annee - Onglets",
+    "15 min import energy": "Énergie importée 15 min",
+    "15 min feed-in energy": "Énergie injectée 15 min",
+    "Grid: 15 min import/export energy (MSB approximation)": "Réseau : énergie importée/injectée 15 min (approximation MSB)",
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "Énergie réseau directionnelle sur 15 minutes calculée à partir de la puissance réseau EVCC. Les valeurs positives représentent l'énergie importée, les valeurs négatives l'énergie injectée ; import et injection sont séparés avant l'intégration afin d'approcher des registres distincts du gestionnaire de comptage. Les barres sont alignées sur l'intervalle de 15 minutes précédent."
   },
   "Heat pump source mix": "Répartition des sources de la pompe à chaleur",
   "Heat pump title match": "Correspondance du titre de la pompe à chaleur",

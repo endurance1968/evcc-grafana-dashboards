@@ -330,7 +330,11 @@
     "VM: EVCC: Month": "VM: EVCC: Maand",
     "VM: EVCC: Month Tabs": "VM: EVCC: Maand Tabs",
     "VM: EVCC: Today - Details Tabs": "VM: EVCC: Vandaag - Details Tabs",
-    "VM: EVCC: Year Tabs": "VM: EVCC: Jaar Tabs"
+    "VM: EVCC: Year Tabs": "VM: EVCC: Jaar Tabs",
+    "15 min import energy": "15 min afname-energie",
+    "15 min feed-in energy": "15 min terugleverenergie",
+    "Grid: 15 min import/export energy (MSB approximation)": "Net: 15 min afname-/terugleverenergie (MSB-benadering)",
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "Richtinggescheiden netenergie over 15 minuten uit het EVCC-netvermogen. Positieve waarden zijn afname-energie, negatieve waarden zijn terugleverenergie; afname en teruglevering worden vóór integratie gescheiden om aparte meetregisters van de meetbeheerder te benaderen. Balken zijn uitgelijnd op het vorige 15-minutenraster."
   },
   "Heat pump source mix": "Verdeling energiebronnen warmtepomp",
   "Heat pump title match": "Warmtepomp titelmatch",

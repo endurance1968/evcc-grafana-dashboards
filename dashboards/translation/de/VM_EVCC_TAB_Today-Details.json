@@ -3835,6 +3835,28 @@
                     "refId": "powerL3",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "last_over_time(avg(gridPowers_l1)) + last_over_time(avg(gridPowers_l2)) + last_over_time(avg(gridPowers_l3))",
+                        "format": "time_series",
+                        "legendFormat": "Gesamt",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "powerTotal",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
@@ -3889,7 +3911,23 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Gesamt"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "semi-dark-blue"
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -3969,6 +4007,28 @@
                       }
                     },
                     "refId": "powerL3",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(gridPowers_l1) + avg(gridPowers_l2) + avg(gridPowers_l3)",
+                        "format": "time_series",
+                        "legendFormat": "Gesamt",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "powerTotal",
                     "hidden": false
                   }
                 }
@@ -4052,7 +4112,27 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Gesamt"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "semi-dark-blue"
+                        }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -4611,8 +4691,8 @@
         "kind": "Panel",
         "spec": {
           "id": 43,
-          "title": "Netz: 15 min Bezugs-/Einspeiseenergie (MSB-Naeherung)",
-          "description": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunaehern.",
+          "title": "Netz: 15 min Bezugs-/Einspeiseenergie (MSB-Näherung)",
+          "description": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunähern. Balken sind auf das vorherige 15-Minuten-Raster ausgerichtet.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4629,7 +4709,7 @@
                         "editorMode": "code",
                         "expr": "avg(integrate(clamp_min(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min Bezug Energie",
+                        "legendFormat": "15 min Bezugsenergie",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4652,7 +4732,7 @@
                         "editorMode": "code",
                         "expr": "avg(integrate(clamp_max(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min Einspeisung Energie",
+                        "legendFormat": "15 min Einspeiseenergie",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4702,8 +4782,8 @@
                     "axisLabel": "",
                     "axisPlacement": "left",
                     "axisWidth": 80,
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.85,
+                    "barAlignment": -1,
+                    "barWidthFactor": 1,
                     "drawStyle": "bars",
                     "fillOpacity": 45,
                     "gradientMode": "none",
@@ -4751,7 +4831,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min Bezug Energie"
+                      "options": "15 min Bezugsenergie"
                     },
                     "properties": [
                       {
@@ -4766,7 +4846,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min Einspeisung Energie"
+                      "options": "15 min Einspeiseenergie"
                     },
                     "properties": [
                       {

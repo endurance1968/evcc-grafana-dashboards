@@ -3835,6 +3835,28 @@
                     "refId": "powerL3",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "last_over_time(avg(gridPowers_l1)) + last_over_time(avg(gridPowers_l2)) + last_over_time(avg(gridPowers_l3))",
+                        "format": "time_series",
+                        "legendFormat": "Total",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "powerTotal",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
@@ -3889,7 +3911,23 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "semi-dark-blue"
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -3969,6 +4007,28 @@
                       }
                     },
                     "refId": "powerL3",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(gridPowers_l1) + avg(gridPowers_l2) + avg(gridPowers_l3)",
+                        "format": "time_series",
+                        "legendFormat": "Total",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "powerTotal",
                     "hidden": false
                   }
                 }
@@ -4052,7 +4112,27 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "semi-dark-blue"
+                        }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      }
+                    ]
+                  }
+                ]
               }
             }
           }
@@ -4611,8 +4691,8 @@
         "kind": "Panel",
         "spec": {
           "id": 43,
-          "title": "Grid: 15 min import/export energy (MSB approximation)",
-          "description": "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers.",
+          "title": "Réseau : énergie importée/injectée 15 min (approximation MSB)",
+          "description": "Énergie réseau directionnelle sur 15 minutes calculée à partir de la puissance réseau EVCC. Les valeurs positives représentent l'énergie importée, les valeurs négatives l'énergie injectée ; import et injection sont séparés avant l'intégration afin d'approcher des registres distincts du gestionnaire de comptage. Les barres sont alignées sur l'intervalle de 15 minutes précédent.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4629,7 +4709,7 @@
                         "editorMode": "code",
                         "expr": "avg(integrate(clamp_min(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min import energy",
+                        "legendFormat": "Énergie importée 15 min",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4652,7 +4732,7 @@
                         "editorMode": "code",
                         "expr": "avg(integrate(clamp_max(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min feed-in energy",
+                        "legendFormat": "Énergie injectée 15 min",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4702,8 +4782,8 @@
                     "axisLabel": "",
                     "axisPlacement": "left",
                     "axisWidth": 80,
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.85,
+                    "barAlignment": -1,
+                    "barWidthFactor": 1,
                     "drawStyle": "bars",
                     "fillOpacity": 45,
                     "gradientMode": "none",
@@ -4751,7 +4831,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min import energy"
+                      "options": "Énergie importée 15 min"
                     },
                     "properties": [
                       {
@@ -4766,7 +4846,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min feed-in energy"
+                      "options": "Énergie injectée 15 min"
                     },
                     "properties": [
                       {
