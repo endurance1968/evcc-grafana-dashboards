@@ -73,11 +73,11 @@ GITHUB_REPO=endurance1968/evcc-grafana-dashboards
 GITHUB_REF=main
 ```
 
-Raw URL source, for example local Forgejo. The value must point at the repository root raw path; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
+Raw URL source. The value must point at the repository root raw path, typically `<server:port>/<reponame>/raw/branch/main`; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
-DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
 Local dashboard directory source. The directory must contain the six deployable dashboard JSON files for the selected language/variant; the deployer does not read a repository manifest in this mode:

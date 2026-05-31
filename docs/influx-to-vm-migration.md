@@ -46,10 +46,10 @@ curl -fsSLo compare_import_coverage.py "$BASE/scripts/helper/compare_import_cove
 curl -fsSLo vm-rewrite-drop-label.py "$BASE/scripts/helper/vm-rewrite-drop-label.py"
 ```
 
-If you intentionally download from the local Forgejo mirror used for this project, use the port-forward address:
+If you intentionally download from a self-hosted raw endpoint, use the repository root raw URL pattern:
 
 ```bash
-BASE="http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main"
+BASE="http://<server:port>/<reponame>/raw/branch/main"
 ```
 
 If you run the commands from a repository checkout instead of this working directory, use the repository paths, for example `scripts/helper/check_data.py` and `scripts/rollup/evcc-vm-rollup.py`.

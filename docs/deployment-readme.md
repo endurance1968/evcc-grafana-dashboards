@@ -46,11 +46,11 @@ DASHBOARD_SOURCE_MODE=github
 # or: DASHBOARD_SOURCE_MODE=localdir
 ```
 
-For local Forgejo/raw imports use:
+For a self-hosted raw endpoint use the repository root raw URL pattern:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
-DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
 Common dashboard variable overrides can also be set in `vm-dashboard-install.env`:

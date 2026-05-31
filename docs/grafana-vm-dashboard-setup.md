@@ -150,11 +150,11 @@ DASHBOARD_PORTAL_TITLE=VRM
 DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/795774/dashboard
 ```
 
-If the dashboard files should come from the local Forgejo mirror instead of GitHub, switch the source mode to `rawurl`:
+If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
-DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
 The legacy row-based deploy path has been removed. Use Grafana 13.0.1 or newer; the deploy scripts always install the tab-navigation dashboards.
