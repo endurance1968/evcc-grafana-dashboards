@@ -314,7 +314,7 @@
               "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "max(pvPower_value{id=\"\"}) < $peakPowerLimit",
+            "expr": "max_over_time(pvPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
             "format": "time_series",
             "interval": "$energySampleInterval",
             "legendFormat": "पीवी",
@@ -327,7 +327,7 @@
               "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "max(gridPower_value) < $peakPowerLimit",
+            "expr": "avg_over_time(gridPower_value[$__interval]) < $peakPowerLimit",
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
@@ -341,7 +341,7 @@
               "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "max(homePower_value) * (-1) > (-$peakPowerLimit)",
+            "expr": "max_over_time(homePower_value[$__interval]) * (-1) > (-$peakPowerLimit)",
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
@@ -355,7 +355,7 @@
               "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "avg(batteryPower_value{id=\"\"}) < $peakPowerLimit",
+            "expr": "avg_over_time(batteryPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
@@ -369,7 +369,7 @@
               "uid": "${DS_VM-EVCC}"
             },
             "editorMode": "code",
-            "expr": "avg by (loadpoint) (chargePower_value{id=\"\", loadpoint!~\"$loadpointBlocklist\"}) * (-1) > (-$peakPowerLimit)",
+            "expr": "max by (loadpoint) (max_over_time(chargePower_value{id=\"\", loadpoint!~\"$loadpointBlocklist\"}[$__interval])) * (-1) > (-$peakPowerLimit)",
             "format": "time_series",
             "hide": false,
             "interval": "$energySampleInterval",
