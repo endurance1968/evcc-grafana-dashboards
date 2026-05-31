@@ -41,6 +41,10 @@ Die Deployer verwenden eine gemeinsame `vm-dashboard-install.env`.
 - Jeder Env-Key darf nur einmal aktiv gesetzt sein.
 - Produktionsdaten sollten in Tests nur lesend verwendet werden.
 
+## Screenshots
+
+Die Release-Screenshots liegen direkt unter [screenshots](./screenshots/README.md) und zeigen bei Tab-Dashboards die aktive Grafana-Tab-Leiste.
+
 ## Einstieg
 
 - [README.md](../README.md)

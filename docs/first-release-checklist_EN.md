@@ -111,7 +111,7 @@ Real-data migration evidence from 2026-05-29:
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 - Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
 - Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0` on port `18450`, fresh Grafana `13.0.1` on port `13050`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
-- Release screenshots from 2026-05-30 were captured from Grafana `13.0.1` against read-only production-style VictoriaMetrics `http://192.168.1.160:8428` and curated under `docs/screenshots/tabs` as one PNG per active TAB dashboard tab.
+- Release screenshots from 2026-05-31 were manually refreshed and curated directly under `docs/screenshots` as one PNG per relevant dashboard or active TAB dashboard tab.
 - Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
 - Release notes were added in `docs/release-notes.md`, and root preview wording was removed from `README.md`.
 

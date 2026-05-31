@@ -34,7 +34,7 @@ The release validation imported a real multi-year EVCC history into VictoriaMetr
 
 The deployed dashboards always use the Grafana 13 tab-navigation layout and require Grafana 13.0.1 or newer. The legacy row-based deploy path and dashboard set selection have been removed from the deploy manifest and scripts.
 
-The release screenshots document the German generated TAB set with one screenshot per active tab under [screenshots/tabs](./screenshots/tabs/README_EN.md).
+The release screenshots document the German generated TAB set directly under [screenshots](./screenshots/README_EN.md), including the active Grafana tab bar where dashboards use tabs.
 
 ## Deployer Variants
 
