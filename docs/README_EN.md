@@ -11,15 +11,17 @@ Start with the central requirements overview: [system-requirements.md](./system-
 Use this path when you want to keep your history and move the dashboard backend to VictoriaMetrics:
 
 1. Install VictoriaMetrics.
-2. Install or reuse Grafana.
+2. Configure EVCC/Telegraf live ingest to VictoriaMetrics.
 3. Import historic InfluxDB raw data into VictoriaMetrics.
 4. Build the daily `evcc_*` rollups.
-5. Connect Grafana to VictoriaMetrics.
-6. Deploy the dashboards.
-7. Schedule the daily rollup refresh.
+5. Install or reuse Grafana.
+6. Connect Grafana to VictoriaMetrics.
+7. Deploy the dashboards.
+8. Schedule the daily rollup refresh.
 
 Start here:
 
+- [EVCC/Telegraf live ingest to VictoriaMetrics](./evcc-telegraf-live-ingest_EN.md)
 - [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration_EN.md)
 - [Migration checklist](./migration-checklist_EN.md)
 
@@ -29,6 +31,7 @@ Install the runtime first, then deploy dashboards:
 
 - VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13_EN.md)
 - VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker_EN.md)
+- EVCC/Telegraf live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - Grafana on Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13_EN.md)
 - Grafana with Docker: [grafana-install-docker.md](./grafana-install-docker_EN.md)
 - Dashboard setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
@@ -45,7 +48,7 @@ Use the deployment guide directly:
 
 ```mermaid
 flowchart LR
-  EVCC["EVCC"] --> Raw["VictoriaMetrics raw metrics"]
+  EVCC["EVCC"] --> Ingest["EVCC/Telegraf live ingest"] --> Raw["VictoriaMetrics raw metrics"]
   Influx["InfluxDB history"] --> Import["vmctl influx import"] --> Raw
   Raw --> Today["Today dashboards"]
   Raw --> Rollup["evcc-vm-rollup.py"]
@@ -68,6 +71,7 @@ Use these only when the normal migration path reports a problem or when you main
 - Migration troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting_EN.md)
 - Migration validation notes: [migration-validation-notes.md](./migration-validation-notes_EN.md)
 - Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design_EN.md)
+- Live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference_EN.md)
 - Localization maintainer workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow_EN.md)
 

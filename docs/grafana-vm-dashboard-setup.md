@@ -11,7 +11,7 @@ Dies ist die kanonische Endnutzer-Anleitung fuer das Dashboard-Deployment. Sie b
 - Deployment der EVCC-Dashboards
 - spaetere Dashboard-Updates
 
-Wenn VictoriaMetrics-Daten und Rollups noch nicht bereit sind, schliesse zuerst [influx-to-vm-migration.md](./influx-to-vm-migration.md) ab.
+Wenn aktuelle EVCC-Rohdaten noch nicht in VictoriaMetrics ankommen, richte zuerst [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md) ein. Wenn du vorhandene InfluxDB-Historie uebernimmst, schliesse danach [influx-to-vm-migration.md](./influx-to-vm-migration.md) ab.
 
 ## Zielzustand
 
@@ -29,6 +29,7 @@ Erforderlich:
 
 - laufende Grafana-Instanz
 - laufende VictoriaMetrics-Instanz
+- aktuelle EVCC-Rohdaten in VictoriaMetrics
 - Grafana-Service-Account-Token
 - Internetzugriff auf GitHub fuer die Default-Deploy-Quelle
 

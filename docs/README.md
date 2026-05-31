@@ -13,15 +13,17 @@ Beginne mit der zentralen Uebersicht der Voraussetzungen: [system-requirements.m
 Nutze diesen Pfad, wenn du deine Historie behalten und das Dashboard-Backend auf VictoriaMetrics umstellen moechtest:
 
 1. VictoriaMetrics installieren.
-2. Grafana installieren oder eine bestehende Instanz weiterverwenden.
+2. EVCC/Telegraf Live-Ingest nach VictoriaMetrics einrichten.
 3. Historische InfluxDB-Rohdaten nach VictoriaMetrics importieren.
 4. Taegliche `evcc_*` Rollups erzeugen.
-5. Grafana mit VictoriaMetrics verbinden.
-6. Dashboards deployen.
-7. Taegliche Rollup-Aktualisierung planen.
+5. Grafana installieren oder eine bestehende Instanz weiterverwenden.
+6. Grafana mit VictoriaMetrics verbinden.
+7. Dashboards deployen.
+8. Taegliche Rollup-Aktualisierung planen.
 
 Starte hier:
 
+- [EVCC/Telegraf Live-Ingest nach VictoriaMetrics](./evcc-telegraf-live-ingest.md)
 - [Migration von InfluxDB nach VictoriaMetrics](./influx-to-vm-migration.md)
 - [Migrations-Checkliste](./migration-checklist.md)
 
@@ -31,6 +33,7 @@ Installiere zuerst die Laufzeitumgebung und danach die Dashboards:
 
 - VictoriaMetrics auf Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
 - VictoriaMetrics mit Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- EVCC/Telegraf Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Grafana auf Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13.md)
 - Grafana mit Docker: [grafana-install-docker.md](./grafana-install-docker.md)
 - Dashboard-Setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
@@ -47,7 +50,7 @@ Nutze direkt die Deployment-Dokumentation:
 
 ```mermaid
 flowchart LR
-  EVCC["EVCC"] --> Raw["VictoriaMetrics Rohmetriken"]
+  EVCC["EVCC"] --> Ingest["EVCC/Telegraf Live-Ingest"] --> Raw["VictoriaMetrics Rohmetriken"]
   Influx["InfluxDB Historie"] --> Import["vmctl influx import"] --> Raw
   Raw --> Today["Today Dashboards"]
   Raw --> Rollup["evcc-vm-rollup.py"]
@@ -70,6 +73,7 @@ Diese Dokumente sind vor allem fuer Fehleranalyse, Betrieb und Maintainer releva
 - Migration Troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
 - Migrations-Validierungsnotizen: [migration-validation-notes.md](./migration-validation-notes.md)
 - Rollup-Design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
+- Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Schema-Referenz: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
 - Lokalisierungs-Workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow.md)
 

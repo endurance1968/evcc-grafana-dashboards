@@ -20,6 +20,7 @@ Nicht Teil dieser Anleitung:
 
 Weiterfuehrend:
 
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
@@ -157,8 +158,11 @@ Wichtig:
 
 ## Naechster Schritt
 
-Wenn VictoriaMetrics laeuft, fahre fort mit:
+Wenn VictoriaMetrics laeuft, richte zuerst den aktuellen EVCC-Schreibpfad ein:
 
-- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
-- oder, wenn bereits InfluxDB-Historie vorhanden ist, zuerst:
-  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
+
+Danach:
+
+- bei vorhandener InfluxDB-Historie: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- ohne Historie oder nach abgeschlossener Migration: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)

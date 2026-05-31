@@ -6,6 +6,7 @@ Dieser Ordner enthaelt historische oder fortgeschrittene Dokumente, die nicht me
 
 Nutze stattdessen die aktuellen Einstiegspunkte:
 
+- Live-Ingest: [../evcc-telegraf-live-ingest.md](../evcc-telegraf-live-ingest.md)
 - Migrationspfad: [../influx-to-vm-migration.md](../influx-to-vm-migration.md)
 - Migrationscheckliste: [../migration-checklist.md](../migration-checklist.md)
 - Troubleshooting: [../migration-troubleshooting.md](../migration-troubleshooting.md)
@@ -14,4 +15,4 @@ Nutze stattdessen die aktuellen Einstiegspunkte:
 Archivierte Dateien:
 
 - `victoriametrics-aggregation-guide.md`: ersetzt durch die aktuelle Migrationsanleitung und Checkliste.
-- `telegraf-parallel-pipeline-howto.md`: fortgeschrittenes Fan-out-Setup, nicht Teil des Standard-Dashboard-Migrationspfads.
+- `telegraf-parallel-pipeline-howto.md`: fortgeschrittenes Fan-out-Setup; der kanonische Endnutzerpfad ist jetzt `../evcc-telegraf-live-ingest.md`.

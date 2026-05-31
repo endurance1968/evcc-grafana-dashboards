@@ -20,7 +20,7 @@ Beispiel-Dashboard:
 - Deploy-Skripte fuer Erstimport und Updates
 - ein Rollup-Skript fuer taegliche Langzeit-Metriken
 - Dokumentation fuer die Migration von InfluxDB nach VictoriaMetrics
-- Installations- und Betriebsanleitungen fuer VictoriaMetrics, Grafana, Migration und Dashboard-Deployment
+- Installations- und Betriebsanleitungen fuer VictoriaMetrics, EVCC/Telegraf-Live-Ingest, Grafana, Migration und Dashboard-Deployment
 - Release Notes und Screenshots fuer die empfohlenen Grafana-13-TAB-Dashboards
 
 ## Was die Dashboards abdecken
@@ -43,7 +43,8 @@ Typische Anwendungsfaelle:
 
 ## Einstieg
 
-Der zentrale Einstieg fuer Installation, Migration und Dashboard-Deployment ist:
+Der zentrale Einstieg fuer Installation, Live-Ingest, Migration und Dashboard-Deployment ist:
 
 - [docs/README.md](./docs/README.md)
+- [EVCC/Telegraf Live-Ingest](./docs/evcc-telegraf-live-ingest.md)
 - [Release Notes](./docs/release-notes.md)

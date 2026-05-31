@@ -2,6 +2,8 @@
 
 This document describes the Telegraf fan-out pattern used for EVCC metrics so the same incoming write stream can be sent to multiple backends in parallel.
 
+Note: The canonical end-user guide for EVCC/Telegraf to VictoriaMetrics is [../evcc-telegraf-live-ingest.md](../evcc-telegraf-live-ingest_EN.md). This archived page remains as advanced background for multiple parallel backends.
+
 ## Goal
 
 Use Telegraf as a single ingest point and forward the incoming EVCC metrics to:

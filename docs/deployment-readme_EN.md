@@ -1,6 +1,6 @@
 # Dashboard Deployment Quick Start
 
-This is the short deployment reference. For the full walkthrough, use [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md). For every config option, use [vm-dashboard-install.md](./vm-dashboard-install_EN.md).
+This is the short deployment reference. Before dashboard deployment, current EVCC raw data must arrive in VictoriaMetrics; see [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md). For the full walkthrough, use [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md). For every config option, use [vm-dashboard-install.md](./vm-dashboard-install_EN.md).
 
 ## Recommended Path
 

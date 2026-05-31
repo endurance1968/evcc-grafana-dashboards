@@ -4,6 +4,8 @@ Englische Version: [telegraf-parallel-pipeline-howto_EN.md](./telegraf-parallel-
 
 Dieses Dokument beschreibt das Telegraf-Fan-out-Muster fuer EVCC-Metriken, damit derselbe eingehende Schreibstream parallel an mehrere Backends gesendet werden kann.
 
+Hinweis: Die kanonische Endnutzeranleitung fuer EVCC/Telegraf nach VictoriaMetrics ist [../evcc-telegraf-live-ingest.md](../evcc-telegraf-live-ingest.md). Diese Archivseite bleibt als fortgeschrittener Hintergrund fuer mehrere parallele Backends erhalten.
+
 ## Ziel
 
 Telegraf als einzelnen Ingest-Punkt verwenden und eingehende EVCC-Metriken weiterleiten an:

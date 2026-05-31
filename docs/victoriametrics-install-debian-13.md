@@ -31,7 +31,7 @@ Annahmen:
 Nicht enthalten:
 
 - Grafana installieren
-- EVCC konfigurieren
+- EVCC/Telegraf-Live-Ingest konfigurieren
 - Dashboard-Deployment
 
 ## Ziel
@@ -249,16 +249,22 @@ sudo systemctl status victoriametrics
 
 ## 11. Fuer EVCC vorbereiten
 
-Fuer EVCC und die Dashboards brauchst du normalerweise:
+Fuer EVCC und die Dashboards brauchst du nach dieser Installation normalerweise:
 
 - VictoriaMetrics erreichbar unter `http://<host>:8428`
 - `vmctl` lokal verfuegbar fuer optionale Import-Benchmarks und Migrationen
-- Grafana-Datasource auf diese URL
-- EVCC oder Migrations-/Rollup-Skripte, die diese URL lesen oder beschreiben
+- eine aktuelle EVCC-Rohdatenpipeline nach VictoriaMetrics
+- spaeter eine Grafana-Datasource auf diese VictoriaMetrics-URL
 
-Die InfluxDB-zu-VictoriaMetrics-Migration ist separat beschrieben:
+Richte als naechsten Schritt den Live-Ingest ein:
+
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
+
+Wenn du von InfluxDB migrierst, pruefe zuerst, dass der Live-Ingest fuer neue Daten funktioniert. Importiere danach die Historie und erzeuge Rollups:
 
 - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+
+Wenn du ohne Historie neu startest, kannst du nach den ersten eingehenden Rohdaten direkt mit Grafana fortfahren.
 
 ## Haeufige Probleme
 

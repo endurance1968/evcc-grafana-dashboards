@@ -9,7 +9,7 @@ This is the canonical end-user deployment guide. It covers:
 - deploying the EVCC dashboards
 - updating dashboards later
 
-If VictoriaMetrics data and rollups are not ready yet, finish [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) first.
+If current EVCC raw data does not arrive in VictoriaMetrics yet, set up [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md) first. If you keep existing InfluxDB history, finish [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) afterwards.
 
 ## Target State
 
@@ -27,6 +27,7 @@ Required:
 
 - running Grafana instance
 - running VictoriaMetrics instance
+- current EVCC raw data in VictoriaMetrics
 - Grafana service-account token
 - internet access to GitHub for the default deploy source
 

@@ -18,6 +18,7 @@ Not covered here:
 
 Continue with:
 
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
 - [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
 
@@ -153,10 +154,13 @@ Important:
 - no persistence because the volume was forgotten
 - the firewall blocks port `8428`
 
-## Next step
+## Next Step
 
-Once VictoriaMetrics is running, continue with:
+Once VictoriaMetrics is running, configure the current EVCC write path first:
 
-- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
-- or, if you already have InfluxDB history, first:
-  - [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
+
+Then continue with:
+
+- existing InfluxDB history: [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
+- no history, or after migration: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)

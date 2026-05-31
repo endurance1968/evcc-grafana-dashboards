@@ -11,6 +11,7 @@ Unterstuetzte Endnutzerpfade:
 - VictoriaMetrics auf Debian 13
 - VictoriaMetrics mit Docker
 - Grafana auf Debian 13
+- EVCC/Telegraf-Live-Ingest nach VictoriaMetrics
 - Grafana mit Docker
 - Dashboard-Deployment von Windows PowerShell
 - Dashboard-Deployment von Linux mit dem Python-Deployer
@@ -23,14 +24,15 @@ Starte mit [system-requirements.md](./system-requirements.md) und folge danach [
 Der normale Migrationspfad ist in [influx-to-vm-migration.md](./influx-to-vm-migration.md) dokumentiert:
 
 1. VictoriaMetrics installieren oder vorbereiten
-2. rohe EVCC-Historie aus InfluxDB v1 mit `vmctl influx` importieren
-3. Rohdatenabdeckung mit `check_data.py` und `compare_import_coverage.py` validieren
-4. Infrastruktur-Labels wie `host` normalisieren, wenn der Checker es verlangt
-5. `evcc-vm-rollup.py` als Dry-run und danach als Schreib-Backfill fuer taegliche `evcc_*`-Metriken ausfuehren
-6. Grafana mit VictoriaMetrics verbinden und Dashboards deployen
-7. taeglichen Rollup-Refresh fuer abgeschlossene lokale Tage planen
+2. aktuellen EVCC/Telegraf-Live-Ingest nach VictoriaMetrics einrichten oder pruefen
+3. rohe EVCC-Historie aus InfluxDB v1 mit `vmctl influx` importieren
+4. Rohdatenabdeckung mit `check_data.py` und `compare_import_coverage.py` validieren
+5. Infrastruktur-Labels wie `host` normalisieren, wenn der Checker es verlangt
+6. `evcc-vm-rollup.py` als Dry-run und danach als Schreib-Backfill fuer taegliche `evcc_*`-Metriken ausfuehren
+7. Grafana mit VictoriaMetrics verbinden und Dashboards deployen
+8. taeglichen Rollup-Refresh fuer abgeschlossene lokale Tage planen
 
-Die Release-Validierung importierte eine echte mehrjaehrige EVCC-Historie nach VictoriaMetrics, bereinigte `host`-Labels, verifizierte `db=0`, erzeugte Rollups und renderte die Dashboards gegen die migrierten Daten.
+Die Release-Validierung pruefte den Live-Ingest-Pfad, importierte eine echte mehrjaehrige EVCC-Historie nach VictoriaMetrics, bereinigte `host`-Labels, verifizierte `db=0`, erzeugte Rollups und renderte die Dashboards gegen die migrierten Daten.
 
 ## Dashboard-Set
 

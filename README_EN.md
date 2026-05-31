@@ -19,7 +19,7 @@ Example dashboard:
 - deploy scripts for first-time imports and later updates
 - a rollup script for daily long-range dashboard metrics
 - documentation for InfluxDB to VictoriaMetrics migration
-- end-user guides for VictoriaMetrics, Grafana, migration, and dashboard deployment
+- end-user guides for VictoriaMetrics, EVCC/Telegraf live ingest, Grafana, migration, and dashboard deployment
 - curated release notes and screenshots for the recommended Grafana 13 TAB dashboards
 
 ## What the dashboards cover
@@ -45,4 +45,5 @@ Typical use cases:
 For the full end-to-end path from EVCC + InfluxDB to EVCC + VictoriaMetrics + Grafana, continue here:
 
 - [docs/README.md](./docs/README_EN.md)
+- [EVCC/Telegraf live ingest](./docs/evcc-telegraf-live-ingest_EN.md)
 - [release notes](./docs/release-notes_EN.md)

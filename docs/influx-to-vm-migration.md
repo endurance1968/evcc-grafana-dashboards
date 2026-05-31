@@ -304,7 +304,15 @@ Eintragen:
 
 Die Aktualisierung nur einmal pro Tag ausfuehren, nachdem der vorherige lokale Tag abgeschlossen ist.
 
-## 11. Grafana-Dashboards deployen
+## 11. Live-Ingest pruefen oder einrichten
+
+Bevor du Grafana-Dashboards deploytst, muss der aktuelle EVCC-Schreibpfad nach VictoriaMetrics funktionieren. Das verhindert, dass die Migration zwar historische Daten enthaelt, `Today` aber nach dem Cutover leer bleibt.
+
+- Wenn EVCC bereits direkt oder ueber Telegraf nach VictoriaMetrics schreibt, pruefe aktuelle Rohserien mit `check_data.py --phase raw` oder einer `/api/v1/series`-Abfrage fuer die letzten Minuten.
+- Wenn der aktuelle Schreibpfad noch nicht eingerichtet ist, folge [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
+- Wenn du waehrend der Umstellung noch InfluxDB parallel beschreiben willst, nutze den Telegraf-Fan-out-Pfad aus dieser Live-Ingest-Anleitung.
+
+## 12. Grafana-Dashboards deployen
 
 Weiter mit [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md).
 

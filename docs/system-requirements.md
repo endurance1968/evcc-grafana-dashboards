@@ -10,7 +10,7 @@ Empfohlene produktive Zielstruktur:
 
 - eine VictoriaMetrics-Instanz pro EVCC-Instanz
 - eine Grafana-Instanz mit VictoriaMetrics-Datasource-Plugin
-- EVCC-Rohmetriken werden im Influx-Line-Protocol nach VictoriaMetrics geschrieben
+- EVCC-Rohmetriken werden direkt von EVCC oder ueber Telegraf im Influx-Line-Protocol nach VictoriaMetrics geschrieben
 - taegliche `evcc_*`-Rollups werden durch `evcc-vm-rollup.py` erzeugt
 
 Mehrere EVCC-Systeme sollten nicht ueber ein kuenstliches `db`-Label in eine gemeinsame VictoriaMetrics-Instanz gemultiplext werden. Dashboards und Rollup-Werkzeuge erwarten einen dedizierten VictoriaMetrics-Namespace pro EVCC-System.
@@ -123,6 +123,7 @@ Mindestens pruefen:
 - VictoriaMetrics `/health` liefert `OK`
 - Grafana `/api/health` liefert `database: ok`
 - Grafana-Datasource-Healthcheck liefert `Data source is working`
+- EVCC/Telegraf Live-Ingest liefert aktuelle Rohmetriken nach VictoriaMetrics
 - `check_data.py` meldet erforderliche Rohmetriken und keine `host`- oder `db`-Label-Probleme
 - `compare_import_coverage.py` meldet keine fuer dieses Repository relevanten Importprobleme
 - Rollup-Backfill-Dry-run liefert `GO`, bevor `--write` ausgefuehrt wird
@@ -131,6 +132,7 @@ Mindestens pruefen:
 ## Naechste Schritte
 
 - VictoriaMetrics: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md) oder [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Grafana: [grafana-install-debian-13.md](./grafana-install-debian-13.md) oder [grafana-install-docker.md](./grafana-install-docker.md)
 - Migration: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 - Dashboard-Deployment: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
