@@ -1,7 +1,7 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.05.31.1
+ * Version: 2026.05.31.2
  * Last modified: 2026-05-31
  */
 import fs from "node:fs";
@@ -50,6 +50,54 @@ function translateMatcherOptions(node, mapping) {
   return node;
 }
 
+function originalMatcherFallbackOverride(originalNode, translatedNode, mapping) {
+  const originalOption = originalNode?.matcher?.options;
+  if (
+    originalNode?.matcher?.id !== "byName" ||
+    translatedNode?.matcher?.id !== "byName" ||
+    typeof originalOption !== "string"
+  ) {
+    return null;
+  }
+
+  const translatedOption = translateString(originalOption, mapping);
+  if (translatedOption === originalOption) {
+    return null;
+  }
+
+  return {
+    ...translatedNode,
+    matcher: {
+      ...translatedNode.matcher,
+      options: originalOption,
+    },
+  };
+}
+
+function sameByNameMatcher(left, right) {
+  return (
+    left?.matcher?.id === "byName" &&
+    right?.matcher?.id === "byName" &&
+    left.matcher.options === right.matcher.options
+  );
+}
+
+function translateOverridesWithOriginalMatcherFallback(overrides, mapping) {
+  const translatedOverrides = overrides.map((override) => translateSafeNode(override, mapping));
+  const result = [...translatedOverrides];
+
+  overrides.forEach((override, index) => {
+    const fallback = originalMatcherFallbackOverride(override, translatedOverrides[index], mapping);
+    if (!fallback) {
+      return;
+    }
+    if (!result.some((item) => sameByNameMatcher(item, fallback))) {
+      result.push(fallback);
+    }
+  });
+
+  return result;
+}
 const aliasRiskyKeys = new Set([
   "refId",
   "expression",
@@ -237,6 +285,11 @@ function translateSafeNode(node, mapping) {
       safePropertyIds.has(node.id)
     ) {
       result[childKey] = translateString(childValue, mapping);
+      continue;
+    }
+
+    if (childKey === "overrides" && Array.isArray(childValue)) {
+      result[childKey] = translateOverridesWithOriginalMatcherFallback(childValue, mapping);
       continue;
     }
 

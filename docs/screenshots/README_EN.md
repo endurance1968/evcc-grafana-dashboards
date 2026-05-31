@@ -8,19 +8,25 @@ This directory shows examples of the current EVCC/VictoriaMetrics dashboards.
 
 ### All-Time Energy
 
-<img src="./alltime-energy.png" alt="All-Time Energy Tab" width="720">
+<a href="./alltime-energy.png" target="_blank" rel="noopener">
+  <img src="./alltime-energy.png" alt="All-Time Energy Tab" width="720">
+</a>
 
 All-time energy overview across the full history.
 
 ### All-Time Finances
 
-<img src="./alltime-finances.png" alt="All-Time Finances Tab" width="720">
+<a href="./alltime-finances.png" target="_blank" rel="noopener">
+  <img src="./alltime-finances.png" alt="All-Time Finances Tab" width="720">
+</a>
 
 All-time finance view with cost and savings metrics.
 
 ### All-Time Plant Health
 
-<img src="./alltime-planthealth.png" alt="All-Time Plant Health Tab" width="720">
+<a href="./alltime-planthealth.png" target="_blank" rel="noopener">
+  <img src="./alltime-planthealth.png" alt="All-Time Plant Health Tab" width="720">
+</a>
 
 All-time plant-health view with long-range indicators.
 
@@ -28,31 +34,41 @@ All-time plant-health view with long-range indicators.
 
 ### Year PV
 
-<img src="./year-pv.png" alt="Year PV Tab" width="720">
+<a href="./year-pv.png" target="_blank" rel="noopener">
+  <img src="./year-pv.png" alt="Year PV Tab" width="720">
+</a>
 
 Yearly PV generation and PV comparison.
 
 ### Year Home
 
-<img src="./year-home.png" alt="Year Home Tab" width="720">
+<a href="./year-home.png" target="_blank" rel="noopener">
+  <img src="./year-home.png" alt="Year Home Tab" width="720">
+</a>
 
 Yearly home, grid, and autarky view.
 
 ### Year Battery
 
-<img src="./year-battery.png" alt="Year Battery Tab" width="720">
+<a href="./year-battery.png" target="_blank" rel="noopener">
+  <img src="./year-battery.png" alt="Year Battery Tab" width="720">
+</a>
 
 Yearly battery and storage metrics.
 
 ### Year Consumers
 
-<img src="./year-consumers.png" alt="Year Consumers Tab" width="720">
+<a href="./year-consumers.png" target="_blank" rel="noopener">
+  <img src="./year-consumers.png" alt="Year Consumers Tab" width="720">
+</a>
 
 Yearly consumer view.
 
 ### Year Vehicles
 
-<img src="./year-vehicles.png" alt="Year Vehicles Tab" width="720">
+<a href="./year-vehicles.png" target="_blank" rel="noopener">
+  <img src="./year-vehicles.png" alt="Year Vehicles Tab" width="720">
+</a>
 
 Yearly vehicle and charging energy view.
 
@@ -60,25 +76,33 @@ Yearly vehicle and charging energy view.
 
 ### Month PV
 
-<img src="./month-pv.png" alt="Month PV Tab" width="720">
+<a href="./month-pv.png" target="_blank" rel="noopener">
+  <img src="./month-pv.png" alt="Month PV Tab" width="720">
+</a>
 
 Monthly PV generation and PV analysis.
 
 ### Month Home
 
-<img src="./month-home.png" alt="Month Home Tab" width="720">
+<a href="./month-home.png" target="_blank" rel="noopener">
+  <img src="./month-home.png" alt="Month Home Tab" width="720">
+</a>
 
 Monthly home, grid import, and self-consumption view.
 
 ### Month Battery
 
-<img src="./month-battery.png" alt="Month Battery Tab" width="720">
+<a href="./month-battery.png" target="_blank" rel="noopener">
+  <img src="./month-battery.png" alt="Month Battery Tab" width="720">
+</a>
 
 Monthly battery, SOC, and storage flow view.
 
 ### Month Consumers
 
-<img src="./month-consumers.png" alt="Month Consumers Tab" width="720">
+<a href="./month-consumers.png" target="_blank" rel="noopener">
+  <img src="./month-consumers.png" alt="Month Consumers Tab" width="720">
+</a>
 
 Monthly consumers and load distribution.
 
@@ -86,31 +110,41 @@ Monthly consumers and load distribution.
 
 ### Today Details PV
 
-<img src="./today-pv.png" alt="Today Details PV Tab" width="720">
+<a href="./today-pv.png" target="_blank" rel="noopener">
+  <img src="./today-pv.png" alt="Today Details PV Tab" width="720">
+</a>
 
 PV tab with PV energy, PV power, battery, and forecast.
 
 ### Today Details Grid
 
-<img src="./today-grid.png" alt="Today Details Grid Tab" width="720">
+<a href="./today-grid.png" target="_blank" rel="noopener">
+  <img src="./today-grid.png" alt="Today Details Grid Tab" width="720">
+</a>
 
 Grid tab with import/feed-in visibility and grid history.
 
 ### Today Details Consumption
 
-<img src="./today-consumption.png" alt="Today Details Consumption Tab" width="720">
+<a href="./today-consumption.png" target="_blank" rel="noopener">
+  <img src="./today-consumption.png" alt="Today Details Consumption Tab" width="720">
+</a>
 
 Consumption tab with home consumption and relevant consumers.
 
 ### Today Details Tariffs
 
-<img src="./today-tariffs.png" alt="Today Details Tariffs Tab" width="720">
+<a href="./today-tariffs.png" target="_blank" rel="noopener">
+  <img src="./today-tariffs.png" alt="Today Details Tariffs Tab" width="720">
+</a>
 
 Tariffs tab with price and cost views.
 
 ### Today Details Loadpoints
 
-<img src="./today-loadpoints.png" alt="Today Details Loadpoints Tab" width="720">
+<a href="./today-loadpoints.png" target="_blank" rel="noopener">
+  <img src="./today-loadpoints.png" alt="Today Details Loadpoints Tab" width="720">
+</a>
 
 Loadpoints tab with charging point and vehicle data.
 
@@ -118,7 +152,9 @@ Loadpoints tab with charging point and vehicle data.
 
 ### Today Overview
 
-<img src="./today.png" alt="Today Dashboard" width="720">
+<a href="./today.png" target="_blank" rel="noopener">
+  <img src="./today.png" alt="Today Dashboard" width="720">
+</a>
 
 `VM: EVCC: Today` overview for the current day.
 
@@ -126,6 +162,8 @@ Loadpoints tab with charging point and vehicle data.
 
 ### Today Mobile Overview
 
-<img src="./today-mobile.png" alt="Today Mobile Dashboard" width="420">
+<a href="./today-mobile.png" target="_blank" rel="noopener">
+  <img src="./today-mobile.png" alt="Today Mobile Dashboard" width="420">
+</a>
 
 Compact mobile Today view.
