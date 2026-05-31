@@ -1,8 +1,8 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.04.24.1
- * Last modified: 2026-04-24
+ * Version: 2026.05.31.1
+ * Last modified: 2026-05-31
  */
 import path from "node:path";
 import { chromium } from "playwright";
@@ -28,6 +28,8 @@ const failNoData = parseArg("fail-no-data", "true") !== "false";
 const failQueryErrors = parseArg("fail-query-errors", "true") !== "false";
 const failPageErrors = parseArg("fail-page-errors", "false") === "true";
 const requireCriticalPanels = parseArg("require-critical-panels", "true") !== "false";
+const navigationRetries = Number(parseArg("navigation-retries", optionalEnv("GRAFANA_RENDER_NAVIGATION_RETRIES", "3")));
+const navigationRetryDelayMs = Number(parseArg("navigation-retry-delay-ms", optionalEnv("GRAFANA_RENDER_NAVIGATION_RETRY_DELAY_MS", "2500")));
 
 const renderedErrorTexts = [
   "No numeric fields found",
@@ -301,6 +303,58 @@ async function withPageDiagnostics(page, action) {
   }
 }
 
+function isTransientNavigationError(error) {
+  const message = String(error?.message || error || "");
+  return (
+    message.includes("ERR_CONNECTION_REFUSED") ||
+    message.includes("ERR_CONNECTION_RESET") ||
+    message.includes("ERR_EMPTY_RESPONSE") ||
+    message.includes("net::ERR_TIMED_OUT") ||
+    message.includes("Navigation timeout")
+  );
+}
+
+async function waitForGrafanaHealth() {
+  const deadline = Date.now() + Math.max(1000, navigationRetryDelayMs);
+  let lastError = "";
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(`${baseUrl}/api/health`);
+      if (response.ok) {
+        return;
+      }
+      lastError = `HTTP ${response.status}`;
+    } catch (error) {
+      lastError = error.message || String(error);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  if (lastError) {
+    console.warn(`Grafana health did not recover before retry: ${lastError}`);
+  }
+}
+
+async function gotoWithRetries(page, url, options) {
+  const attempts = Math.max(1, navigationRetries + 1);
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      return await page.goto(url, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= attempts || !isTransientNavigationError(error)) {
+        throw error;
+      }
+      console.warn(
+        `Transient Grafana navigation failure (${attempt}/${attempts}) for ${url}: ${error.message || error}`,
+      );
+      await waitForGrafanaHealth();
+      await new Promise((resolve) => setTimeout(resolve, navigationRetryDelayMs));
+    }
+  }
+  throw lastError;
+}
+
 async function waitForDashboardSettled(page) {
   await page.waitForTimeout(waitMs);
   try {
@@ -312,7 +366,7 @@ async function waitForDashboardSettled(page) {
 }
 
 async function login(page) {
-  await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded" });
+  await gotoWithRetries(page, `${baseUrl}/login`, { waitUntil: "domcontentloaded" });
   await page.fill('input[name="user"]', username);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
@@ -339,7 +393,7 @@ async function pageState(page) {
 
 async function checkFullDashboard(page, dashboard) {
   const { diagnostics } = await withPageDiagnostics(page, async () => {
-    await page.goto(dashboardUrl(dashboard), { waitUntil: "domcontentloaded" });
+    await gotoWithRetries(page, dashboardUrl(dashboard), { waitUntil: "domcontentloaded" });
     await waitForDashboardSettled(page);
   });
   if (diagnostics.length > 0) {
@@ -360,7 +414,7 @@ async function checkFullDashboard(page, dashboard) {
 
 async function checkSoloPanel(page, dashboard, panel) {
   const { diagnostics } = await withPageDiagnostics(page, async () => {
-    await page.goto(panelUrl(dashboard, panel.id), { waitUntil: "domcontentloaded" });
+    await gotoWithRetries(page, panelUrl(dashboard, panel.id), { waitUntil: "domcontentloaded" });
     await waitForDashboardSettled(page);
   });
   if (diagnostics.length > 0) {

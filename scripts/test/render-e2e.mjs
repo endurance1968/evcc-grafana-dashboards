@@ -1,7 +1,7 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.05.31.3
+ * Version: 2026.05.31.4
  * Last modified: 2026-05-31
  */
 import { spawnSync } from "node:child_process";
@@ -423,6 +423,40 @@ function startDockerEnvironment(args) {
   }
 }
 
+function runDiagnostic(command, args) {
+  console.error(`$ ${[command, ...args].join(" ")}`);
+  const result = spawnSync(command, args, {
+    cwd: repoRoot,
+    encoding: "utf8",
+    stdio: "pipe",
+    env: process.env,
+  });
+  if (result.stdout) {
+    console.error(result.stdout.trimEnd());
+  }
+  if (result.stderr) {
+    console.error(result.stderr.trimEnd());
+  }
+  if (result.error) {
+    console.error(`diagnostic command failed: ${result.error.message || result.error}`);
+  } else if (result.status !== 0) {
+    console.error(`diagnostic command exited with ${result.status}`);
+  }
+}
+
+function printDockerDiagnostics(env) {
+  console.error("Render E2E Docker diagnostics before cleanup");
+  console.error("============================================");
+  for (const name of [env.grafanaContainerName, env.vmContainerName].filter(Boolean)) {
+    runDiagnostic("docker", ["ps", "-a", "--filter", `name=${name}`, "--format", "{{.ID}} {{.Names}} {{.Status}} {{.Ports}}"]);
+    runDiagnostic("docker", ["inspect", "--format", "name={{.Name}} status={{.State.Status}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}} error={{.State.Error}}", name]);
+    runDiagnostic("docker", ["logs", "--tail", "160", name]);
+  }
+  if (env.networkName) {
+    runDiagnostic("docker", ["network", "inspect", env.networkName]);
+  }
+}
+
 function stopDockerEnvironment(env, keepDocker) {
   if (keepDocker) {
     return;
@@ -491,16 +525,21 @@ async function main() {
       `--tag=${args.tag}`,
       `--manifest=${args.manifest}`,
     ], { env });
-    run("node", [
-      "scripts/test/render-smoke-check.mjs",
-      `--manifest=${args.manifest}`,
-      `--wait-ms=${args.waitMs}`,
-    ], { env });
+    try {
+      run("node", [
+        "scripts/test/render-smoke-check.mjs",
+        `--manifest=${args.manifest}`,
+        `--wait-ms=${args.waitMs}`,
+      ], { env });
+    } catch (error) {
+      printDockerDiagnostics(dockerEnv);
+      throw error;
+    }
 
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.05.31.3");
+    console.log("Version:       2026.05.31.4");
     console.log("Last modified: 2026-05-31");
     console.log("");
     console.log("Result");
