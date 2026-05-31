@@ -1,8 +1,8 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.04.22.1
- * Last modified: 2026-04-22
+ * Version: 2026.05.31.1
+ * Last modified: 2026-05-31
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -82,7 +82,10 @@ function readJson(filePath) {
 }
 
 function writeJson(filePath, jsonData) {
-  fs.writeFileSync(filePath, `${JSON.stringify(jsonData, null, 2)}\n`, "utf8");
+  const tmpPath = `${filePath}.tmp-${process.pid}`;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(jsonData, null, 2)}\n`, "utf8");
+  fs.rmSync(filePath, { force: true });
+  fs.renameSync(tmpPath, filePath);
 }
 
 function readMapping(sourceLanguage, targetLanguage) {

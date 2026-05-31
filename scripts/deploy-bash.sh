@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.6"
+SCRIPT_VERSION="2026.05.31.7"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -91,6 +91,9 @@ DASHBOARD_TARIFF_PRICE_INTERVAL=""
 DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL=""
 DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL=""
 DASHBOARD_INSTALLED_WATT_PEAK=""
+DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM=""
+DASHBOARD_FUEL_COST_PER_L=""
+DASHBOARD_STORAGE_CAPACITY_WH=""
 DASHBOARD_ICE_CONSUMPTION_L_PER_100KM=""
 DASHBOARD_FUEL_PRICE_PER_L=""
 DASHBOARD_PV_PURCHASE_PRICE=""
@@ -392,12 +395,12 @@ print_dashboard_overrides() {
     "energySampleInterval:${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}" \
     "tariffPriceInterval:${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}" \
     "installedWattPeak:$DASHBOARD_INSTALLED_WATT_PEAK" \
-    "vVerbrauch:$DASHBOARD_ICE_CONSUMPTION_L_PER_100KM" \
-    "spritKosten:$DASHBOARD_FUEL_PRICE_PER_L" \
+    "vehicleConsumption:${DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM:-$DASHBOARD_ICE_CONSUMPTION_L_PER_100KM}" \
+    "fuelCost:${DASHBOARD_FUEL_COST_PER_L:-$DASHBOARD_FUEL_PRICE_PER_L}" \
     "purchasePricePv:$DASHBOARD_PV_PURCHASE_PRICE" \
     "batteryPurchasePrice:$DASHBOARD_BATTERY_PURCHASE_PRICE" \
     "runningCosts:$DASHBOARD_RUNNING_COSTS_YEARLY" \
-    "speicherkapazitaet:$DASHBOARD_BATTERY_CAPACITY_WH" \
+    "storageCapacity:${DASHBOARD_STORAGE_CAPACITY_WH:-$DASHBOARD_BATTERY_CAPACITY_WH}" \
     "heatPumpLoadpointRegex:$DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX" \
     "loadpointBlocklist:$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST" \
     "extBlocklist:$DASHBOARD_FILTER_EXT_BLOCKLIST" \
@@ -437,12 +440,12 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "energySampleInterval" "${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}"
   apply_dashboard_override "$raw_file" "tariffPriceInterval" "${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}"
   apply_dashboard_override "$raw_file" "installedWattPeak" "$DASHBOARD_INSTALLED_WATT_PEAK"
-  apply_dashboard_override "$raw_file" "vVerbrauch" "$DASHBOARD_ICE_CONSUMPTION_L_PER_100KM"
-  apply_dashboard_override "$raw_file" "spritKosten" "$DASHBOARD_FUEL_PRICE_PER_L"
+  apply_dashboard_override "$raw_file" "vehicleConsumption" "${DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM:-$DASHBOARD_ICE_CONSUMPTION_L_PER_100KM}"
+  apply_dashboard_override "$raw_file" "fuelCost" "${DASHBOARD_FUEL_COST_PER_L:-$DASHBOARD_FUEL_PRICE_PER_L}"
   apply_dashboard_override "$raw_file" "purchasePricePv" "$DASHBOARD_PV_PURCHASE_PRICE"
   apply_dashboard_override "$raw_file" "batteryPurchasePrice" "$DASHBOARD_BATTERY_PURCHASE_PRICE"
   apply_dashboard_override "$raw_file" "runningCosts" "$DASHBOARD_RUNNING_COSTS_YEARLY"
-  apply_dashboard_override "$raw_file" "speicherkapazitaet" "$DASHBOARD_BATTERY_CAPACITY_WH"
+  apply_dashboard_override "$raw_file" "storageCapacity" "${DASHBOARD_STORAGE_CAPACITY_WH:-$DASHBOARD_BATTERY_CAPACITY_WH}"
   apply_dashboard_override "$raw_file" "heatPumpLoadpointRegex" "$DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX"
   apply_dashboard_override "$raw_file" "loadpointBlocklist" "$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "extBlocklist" "$DASHBOARD_FILTER_EXT_BLOCKLIST"

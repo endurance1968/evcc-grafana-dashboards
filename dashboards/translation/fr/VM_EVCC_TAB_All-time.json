@@ -3843,7 +3843,7 @@
                         "type": "math"
                       }
                     },
-                    "refId": "vehicleConsumption",
+                    "refId": "electricVehicleConsumption",
                     "hidden": false
                   }
                 },
@@ -3965,7 +3965,7 @@
                         "name": "__expr__"
                       },
                       "spec": {
-                        "expression": "$drivenKm / 100 * $vVerbrauch * $spritKosten",
+                        "expression": "$drivenKm / 100 * $vehicleConsumption * $fuelCost",
                         "type": "math"
                       }
                     },
@@ -4075,7 +4075,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "vehicleConsumption"
+                      "options": "electricVehicleConsumption"
                     },
                     "properties": [
                       {
@@ -4835,7 +4835,7 @@
                         "name": "__expr__"
                       },
                       "spec": {
-                        "expression": "($chargedEnergy / $speicherkapazitaet) * 365 / $numberOfMeasuredDays",
+                        "expression": "($chargedEnergy / $storageCapacity) * 365 / $numberOfMeasuredDays",
                         "type": "math"
                       }
                     },
@@ -6215,7 +6215,7 @@
       {
         "kind": "CustomVariable",
         "spec": {
-          "name": "vVerbrauch",
+          "name": "vehicleConsumption",
           "query": "6",
           "current": {
             "text": "6",
@@ -6239,7 +6239,7 @@
       {
         "kind": "CustomVariable",
         "spec": {
-          "name": "spritKosten",
+          "name": "fuelCost",
           "query": "1.75",
           "current": {
             "text": "1.75",
@@ -6338,7 +6338,7 @@
       {
         "kind": "CustomVariable",
         "spec": {
-          "name": "speicherkapazitaet",
+          "name": "storageCapacity",
           "query": "9500",
           "current": {
             "text": "9500",

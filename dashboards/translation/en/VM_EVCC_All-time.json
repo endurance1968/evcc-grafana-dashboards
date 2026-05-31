@@ -4461,7 +4461,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($chargedEnergy / $speicherkapazitaet) * 365 / $numberOfMeasuredDays",
+          "expression": "($chargedEnergy / $storageCapacity) * 365 / $numberOfMeasuredDays",
           "hide": false,
           "type": "math"
         },
@@ -4609,7 +4609,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "vehicleConsumption"
+              "options": "electricVehicleConsumption"
             },
             "properties": [
               {
@@ -4842,7 +4842,7 @@
           "range": false
         },
         {
-          "refId": "vehicleConsumption",
+          "refId": "electricVehicleConsumption",
           "datasource": {
             "name": "Expression",
             "type": "__expr__",
@@ -4918,7 +4918,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$drivenKm / 100 * $vVerbrauch * $spritKosten",
+          "expression": "$drivenKm / 100 * $vehicleConsumption * $fuelCost",
           "hide": false,
           "type": "math"
         },
@@ -5039,7 +5039,7 @@
         },
         "includeAll": false,
         "label": "ICE consumption l/100km",
-        "name": "vVerbrauch",
+        "name": "vehicleConsumption",
         "options": [
           {
             "selected": true,
@@ -5058,7 +5058,7 @@
         },
         "includeAll": false,
         "label": "Fuel price/l",
-        "name": "spritKosten",
+        "name": "fuelCost",
         "options": [
           {
             "selected": true,
@@ -5137,7 +5137,7 @@
         },
         "includeAll": false,
         "label": "Battery capacity / Wh",
-        "name": "speicherkapazitaet",
+        "name": "storageCapacity",
         "options": [
           {
             "selected": true,
