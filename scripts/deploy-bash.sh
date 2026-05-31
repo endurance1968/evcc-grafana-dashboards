@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Deploy dashboards to Grafana with the bash installer flow.
-# Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
+# Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.4"
+SCRIPT_VERSION="2026.05.31.6"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -13,7 +13,6 @@ CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
 CLI_PURGE_ONLY=""
-CLI_DASHBOARD_SET=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -37,13 +36,9 @@ while [[ $# -gt 0 ]]; do
       CLI_PURGE_ONLY="$2"
       shift 2
       ;;
-    --dashboard-set)
-      CLI_DASHBOARD_SET="$2"
-      shift 2
-      ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--dashboard-set <name>]
+Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false]
 Requires: bash, curl, jq
 EOF
       exit 0
@@ -87,7 +82,6 @@ GITHUB_REF="main"
 DASHBOARD_RAW_BASE_URL=""
 DASHBOARD_LANGUAGE="en"
 DASHBOARD_VARIANT="gen"
-DASHBOARD_SET="default"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
 PURGE_ONLY="false"
@@ -133,9 +127,6 @@ if [[ -n "$CLI_PURGE" ]]; then
 fi
 if [[ -n "$CLI_PURGE_ONLY" ]]; then
   PURGE_ONLY="$CLI_PURGE_ONLY"
-fi
-if [[ -n "$CLI_DASHBOARD_SET" ]]; then
-  DASHBOARD_SET="$CLI_DASHBOARD_SET"
 fi
 if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
   PURGE="$DEPLOY_PURGE"
@@ -206,7 +197,7 @@ api() {
       ;;
     token)
       if [[ -z "$GRAFANA_API_TOKEN" ]]; then
-        echo "Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD." >&2
+        echo "Missing GRAFANA_API_TOKEN. For Grafana 13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD." >&2
         exit 1
       fi
       auth=(-H "Authorization: Bearer $GRAFANA_API_TOKEN")
@@ -263,19 +254,11 @@ repo_file_content() {
 load_dashboard_files() {
   local manifest_file="$TMP_DIR/deploy-manifest.json"
   repo_file_content "dashboards/deploy-manifest.json" > "$manifest_file"
-  local set_name="${DASHBOARD_SET:-}"
-  if [[ -z "$set_name" ]]; then
-    set_name="$(jq -r '.defaultSet // "default"' "$manifest_file")"
-  fi
-  if [[ -z "$set_name" || "$set_name" == "null" ]]; then
-    set_name="default"
-  fi
-  mapfile -t DASHBOARD_FILES < <(jq -r --arg set "$set_name" '.sets[$set][]?' "$manifest_file")
+  mapfile -t DASHBOARD_FILES < <(jq -r '.files[]?' "$manifest_file")
   if [[ ${#DASHBOARD_FILES[@]} -eq 0 ]]; then
-    echo "Dashboard set '$set_name' not found or empty in dashboards/deploy-manifest.json." >&2
+    echo "dashboards/deploy-manifest.json is missing a non-empty files array." >&2
     exit 1
   fi
-  DASHBOARD_SET="$set_name"
 }
 fetch_source() {
   local filename="$1"
@@ -517,7 +500,6 @@ echo "Grafana version: $(grafana_version)"
 echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
-echo "Dashboard set: $DASHBOARD_SET"
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
   echo "Source: local / $DASHBOARD_LOCAL_DIR"
 else

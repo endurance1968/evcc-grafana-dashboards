@@ -4,7 +4,7 @@ Deploy dashboards to Grafana from a local checkout or GitHub source.
 
 .DESCRIPTION
 Loads the install environment, resolves the requested dashboard source and
-pushes the selected dashboard set into the target Grafana folder.
+pushes the fixed dashboard file list into the target Grafana folder.
 #>
 param(
   [string]$config = (Join-Path $PSScriptRoot "vm-dashboard-install.env"),
@@ -23,14 +23,13 @@ param(
   [string]$foldertitle,
   [string]$authmode,
   [string]$user,
-  [string]$password,
-  [string]$dashboardset
+  [string]$password
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.3'
+$ScriptVersion = '2026.05.31.5'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -83,7 +82,7 @@ function Get-GrafanaHeaders {
     return $headers
   }
   if ([string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_API_TOKEN)) {
-    throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 use a service-account token, or set GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.'
+    throw 'Missing GRAFANA_API_TOKEN. For Grafana 13 use a service-account token, or set GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.'
   }
   $headers.Authorization = "Bearer $($settings.GRAFANA_API_TOKEN)"
   return $headers
@@ -236,25 +235,14 @@ function Get-SourceFileContent([string]$FileName) {
 
 function Get-DashboardFilesFromManifest() {
   $manifest = Parse-JsonDocument (Get-RepoFileContent 'dashboards/deploy-manifest.json')
-  $setName = [string]$settings.DASHBOARD_SET
-  if ([string]::IsNullOrWhiteSpace($setName)) {
-    $setName = if ($manifest.PSObject.Properties['defaultSet']) { [string]$manifest.defaultSet } else { 'default' }
+  if ($null -eq $manifest.PSObject.Properties['files'] -or $null -eq $manifest.files) {
+    throw 'dashboards/deploy-manifest.json is missing a files array.'
   }
-  if ([string]::IsNullOrWhiteSpace($setName)) { $setName = 'default' }
-
-  $sets = $manifest.PSObject.Properties['sets']
-  if ($null -eq $sets -or $null -eq $manifest.sets) {
-    throw 'dashboards/deploy-manifest.json is missing a sets object.'
-  }
-  $setProperty = $manifest.sets.PSObject.Properties | Where-Object { $_.Name -eq $setName } | Select-Object -First 1
-  if ($null -eq $setProperty) {
-    throw "Dashboard set '$setName' not found in dashboards/deploy-manifest.json."
-  }
-  $files = @($setProperty.Value | ForEach-Object { [string]$_ })
+  $files = @($manifest.files | ForEach-Object { [string]$_ })
   if ($files.Count -eq 0) {
-    throw "Dashboard set '$setName' is empty in dashboards/deploy-manifest.json."
+    throw 'dashboards/deploy-manifest.json has an empty files array.'
   }
-  return [pscustomobject]@{ Name = $setName; Files = $files }
+  return $files
 }
 
 function Convert-JsonNode($Node) {
@@ -573,7 +561,6 @@ $settings = @{
   GITHUB_REF = 'main'
   DASHBOARD_LANGUAGE = 'en'
   DASHBOARD_VARIANT = 'gen'
-  DASHBOARD_SET = 'default'
   DASHBOARD_LOCAL_DIR = ''
   PURGE = 'false'
   PURGE_ONLY = 'false'
@@ -601,7 +588,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_SET','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -614,7 +601,6 @@ Merge-Setting $settings 'GRAFANA_PASSWORD' $password
 Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_UID' $datasourceuid
 Merge-Setting $settings 'DASHBOARD_LANGUAGE' $language
 Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
-Merge-Setting $settings 'DASHBOARD_SET' $dashboardset
 Merge-Setting $settings 'DASHBOARD_SOURCE_MODE' $sourcemode
 Merge-Setting $settings 'GITHUB_REPO' $githubrepo
 Merge-Setting $settings 'GITHUB_REF' $githubref
@@ -631,11 +617,10 @@ $dashboardOverrides = Get-DashboardOverrides
 $purgeOnlyEnabled = Test-Truthy $settings.PURGE_ONLY
 $purgeEnabled = (Test-Truthy $settings.PURGE) -or $purgeOnlyEnabled
 
-if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
+if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
 
-$dashboardSelection = Get-DashboardFilesFromManifest
-$dashboardFiles = @($dashboardSelection.Files)
+$dashboardFiles = @(Get-DashboardFilesFromManifest)
 
 $dashboards = @()
 $libraryElements = @{}
@@ -659,7 +644,6 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
-Write-Host "Dashboard set: $($dashboardSelection.Name)"
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
   Write-Host "Source: local / $($settings.DASHBOARD_LOCAL_DIR)"
 } else {

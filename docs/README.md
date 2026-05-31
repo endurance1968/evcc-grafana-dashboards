@@ -57,18 +57,9 @@ flowchart LR
 
 Key point: `Today`, `Today - Mobile`, and `Today - Details` use raw VictoriaMetrics data. `Month`, `Year`, and `All-time` use daily `evcc_*` rollups.
 
-## Recommended Dashboard Set
+## Supported Dashboards
 
-The repository ships two deployable sets:
-
-- `default`: classic row-based dashboards, works without Grafana tabs.
-- `tabs`: recommended for Grafana 13.0.1 or newer because long dashboards are easier to navigate.
-
-Set this in `vm-dashboard-install.env` when you want the tabbed set:
-
-```env
-DASHBOARD_SET=tabs
-```
+The deployable dashboards require Grafana 13.0.1 or newer and use Grafana tab navigation for the long dashboard views. Dashboard set selection is no longer supported; the deployers use the fixed manifest file list.
 
 ## Advanced Docs
 

@@ -19,16 +19,12 @@ Defaults:
 - ref: `main`
 - language: `en`
 - variant: `gen`
-- dashboard set: `default`
+- dashboards: fixed Grafana 13 tab-navigation list from `dashboards/deploy-manifest.json`
 - folder UID/title: `evcc` / `EVCC`
 - datasource UID: `vm-evcc`
 - purge before import: `false`
 
-Recommended for Grafana 13.0.1 or newer:
-
-```env
-DASHBOARD_SET=tabs
-```
+Grafana 13.0.1 or newer is required. Dashboard set selection is no longer supported; the deployers always use the fixed tab-navigation file list from `dashboards/deploy-manifest.json`.
 
 ## Required Config
 
@@ -41,7 +37,7 @@ GRAFANA_API_TOKEN=<service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 ```
 
-`GRAFANA_API_TOKEN` is the preferred setting for Grafana 12/13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty.
+`GRAFANA_API_TOKEN` is the preferred setting for Grafana 13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty.
 
 Local recovery fallback when basic auth is enabled:
 
@@ -56,14 +52,12 @@ GRAFANA_PASSWORD=<admin_password>
 ```env
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
-DASHBOARD_SET=tabs
 ```
 
 Values:
 
 - `DASHBOARD_LANGUAGE`: `en`, `de`, `fr`, `es`, `it`, `nl`, `hi`, `zh`
 - `DASHBOARD_VARIANT`: `gen` for generated localized dashboards, `orig` for original source dashboards
-- `DASHBOARD_SET`: `default` or `tabs`
 
 The deployable file lists are defined in `dashboards/deploy-manifest.json`.
 
@@ -155,32 +149,32 @@ Backward-compatible aliases are still accepted:
 - `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL`
 - `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL`
 
-Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see deployment timestamp, selected language/variant, dashboard set, and source ref.
+Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see deployment timestamp, selected language/variant, and source ref.
 
 ## Runtime Arguments
 
 PowerShell:
 
 ```powershell
-.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false -dashboardset tabs
+.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
 # Delete only, no re-import:
-.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purgeonly true -dashboardset tabs
+.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purgeonly true
 ```
 
 Portable shell with Python:
 
 ```bash
-./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
 # Delete only, no re-import:
-./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge-only true --dashboard-set tabs
+./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge-only true
 ```
 
 Bash + `jq`:
 
 ```bash
-./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
 # Delete only, no re-import:
-./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge-only true --dashboard-set tabs
+./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge-only true
 ```
 
 Runtime arguments override the config file for that run.

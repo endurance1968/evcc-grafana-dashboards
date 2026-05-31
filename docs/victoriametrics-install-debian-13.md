@@ -247,7 +247,7 @@ sudo systemctl status victoriametrics
 
 ## 11. Prepare for EVCC
 
-For EVCC and the dashboard set, you normally need:
+For EVCC and the dashboards, you normally need:
 
 - VictoriaMetrics reachable at `http://<host>:8428`
 - `vmctl` available locally for optional import benchmarks and migrations

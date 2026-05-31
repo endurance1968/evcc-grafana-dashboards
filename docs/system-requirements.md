@@ -19,7 +19,7 @@ Do not multiplex multiple EVCC systems into one VictoriaMetrics instance with a 
 | --- | --- | --- |
 | VictoriaMetrics | current single-node release used by the install guide | Debian guide currently validates `v1.139.0`; Docker guide may pin its own tested image tag. |
 | `vmctl` | same VictoriaMetrics release family as the target VictoriaMetrics version | Needed for InfluxDB history migration. |
-| Grafana | 13.0.1 or newer recommended | Required for the recommended tabbed dashboard set with `DASHBOARD_SET=tabs`. Older Grafana versions should use `DASHBOARD_SET=default`. |
+| Grafana | 13.0.1 or newer | Required. The deployable dashboards use Grafana 13 tab navigation; dashboard set selection is no longer supported. |
 | Grafana plugin | `victoriametrics-metrics-datasource` | Required for the `vm-evcc` datasource. |
 | Python | 3.11 or newer | Needed for migration checks, label cleanup, and rollups. |
 | Docker | current Docker Engine or Docker Desktop | Only needed for the Docker install path or disposable validation containers. |
@@ -110,17 +110,9 @@ Grafana should have:
 - service-account token or local admin credentials for dashboard deployment
 - folder `EVCC` for the deployed dashboards
 
-For Grafana 13.0.1 or newer, use the tabbed dashboard set:
+The deployers always install the Grafana 13 tab-navigation dashboards from the fixed manifest file list. Dashboard set selection is no longer supported.
 
-```env
-DASHBOARD_SET=tabs
-```
-
-For older Grafana versions, use:
-
-```env
-DASHBOARD_SET=default
-```
+Grafana versions older than 13.0.1 are no longer supported by the deploy manifest.
 
 ## Post-Install Validation
 

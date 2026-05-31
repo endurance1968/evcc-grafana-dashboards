@@ -1,6 +1,6 @@
 # EVCC Grafana Dashboards
 
-This repository provides a VictoriaMetrics-based dashboard set for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
+This repository provides VictoriaMetrics-based dashboards for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
 
 It builds on the earlier InfluxDB-based EVCC dashboard work by Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
@@ -13,18 +13,18 @@ Example dashboard:
 
 ## What this repository adds
 
-- a complete VictoriaMetrics-based EVCC dashboard set
-- generated dashboard translations based on an English source set
-- optional Grafana 13 TAB dashboard variants for better navigation than long collapsible dashboard rows
+- a complete VictoriaMetrics-based EVCC dashboard collection
+- generated dashboard translations based on the English source dashboards
+- Grafana 13 TAB dashboards as the supported navigation model
 - deploy scripts for first-time imports and later updates
 - a rollup script for daily long-range dashboard metrics
 - documentation for InfluxDB to VictoriaMetrics migration
 - end-user guides for VictoriaMetrics, Grafana, migration, and dashboard deployment
-- curated release notes and screenshots for the recommended TAB dashboard set
+- curated release notes and screenshots for the recommended Grafana 13 TAB dashboards
 
 ## What the dashboards cover
 
-The dashboard set includes day, month, year, and all-time views.
+The dashboards include day, month, year, and all-time views.
 
 - `Today` focuses on the current day: PV, grid, home, battery, charging points, energy flow, forecast, autarky, self-consumption, and costs.
 - `Today - Details` goes deeper into phases, charging metrics, raw histories, and pricing details.

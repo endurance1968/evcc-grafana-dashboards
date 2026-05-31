@@ -11,7 +11,7 @@ Current status:
 - Grafana APT repository setup: tested on blank `debian:trixie` Docker on 2026-05-29
 - `grafana-enterprise` installation: tested
 - Grafana HTTP/API health check: confirmed
-- VictoriaMetrics datasource plugin installation for this dashboard set: tested
+- VictoriaMetrics datasource plugin installation for these dashboards: tested
 
 Docker validation note:
 

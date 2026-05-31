@@ -26,7 +26,7 @@ import {
 } from "../helper/_dashboard-family.mjs";
 import {
   readDeployManifest,
-  resolveDashboardSet,
+  resolveDashboardFiles,
 } from "../helper/deploy-manifest.mjs";
 import {
   dashboardTitle,
@@ -46,7 +46,6 @@ function defaultSourceFromConfig() {
 const baseUrl = requireEnv("GRAFANA_URL");
 const token = requireEnv("GRAFANA_API_TOKEN");
 const source = parseArg("source", defaultSourceFromConfig());
-const dashboardSetArg = parseArg("dashboard-set", optionalEnv("DASHBOARD_SET", "")).trim();
 const tag = sanitizeTag(parseArg("tag", path.basename(path.resolve(source))));
 const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Test");
@@ -99,22 +98,22 @@ function resolveSourceFiles(inputPath) {
   const stat = fs.statSync(resolved);
   if (stat.isFile()) {
     return {
-      dashboardSet: "single-file",
+      sourceKind: "single-file",
       files: [resolved],
     };
   }
 
-  const { setName, files } = resolveDashboardSet(readDeployManifest(process.cwd()), dashboardSetArg);
+  const files = resolveDashboardFiles(readDeployManifest(process.cwd()));
   const resolvedFiles = files.map((fileName) => path.join(resolved, fileName));
   const missing = resolvedFiles.filter((file) => !fs.existsSync(file));
   if (missing.length > 0) {
     throw new Error(
-      `Dashboard set '${setName}' is missing file(s) in ${inputPath}: ${missing.map((file) => path.basename(file)).join(", ")}`,
+      `Deploy manifest is missing file(s) in ${inputPath}: ${missing.map((file) => path.basename(file)).join(", ")}`,
     );
   }
 
   return {
-    dashboardSet: setName,
+    sourceKind: "manifest",
     files: resolvedFiles,
   };
 }
@@ -310,7 +309,7 @@ async function importV2Dashboard(dashboard) {
 }
 
 async function main() {
-  const { dashboardSet, files } = resolveSourceFiles(source);
+  const { sourceKind, files } = resolveSourceFiles(source);
   if (!files.length) throw new Error(`No JSON files found in ${source}`);
 
   await ensureFolder();
@@ -345,7 +344,7 @@ async function main() {
     family: family.name,
     tag,
     source: portableRelative(process.cwd(), path.resolve(source)),
-    dashboardSet,
+    sourceKind,
     grafanaUrl: baseUrl,
     folderUid,
     dashboards: imported,

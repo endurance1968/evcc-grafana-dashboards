@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
-# Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
+# Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.4"
+SCRIPT_VERSION="2026.05.31.6"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -13,7 +13,6 @@ CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
 CLI_PURGE_ONLY=""
-CLI_DASHBOARD_SET=""
 CLI_YES="false"
 
 while [ "$#" -gt 0 ]; do
@@ -38,17 +37,13 @@ while [ "$#" -gt 0 ]; do
       CLI_PURGE_ONLY="$2"
       shift 2
       ;;
-    --dashboard-set)
-      CLI_DASHBOARD_SET="$2"
-      shift 2
-      ;;
     --yes|-y)
       CLI_YES="true"
       shift 1
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--dashboard-set <name>] [--yes]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--yes]
 EOF
       exit 0
       ;;
@@ -66,7 +61,7 @@ done
 
 printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_DASHBOARD_SET CLI_YES SCRIPT_DIR
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_YES SCRIPT_DIR
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -96,7 +91,6 @@ settings = {
     "DASHBOARD_RAW_BASE_URL": "",
     "DASHBOARD_LANGUAGE": "en",
     "DASHBOARD_VARIANT": "gen",
-    "DASHBOARD_SET": "default",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
     "PURGE_ONLY": "false",
@@ -142,8 +136,6 @@ if os.environ.get("CLI_PURGE"):
     settings["PURGE"] = os.environ["CLI_PURGE"]
 if os.environ.get("CLI_PURGE_ONLY"):
     settings["PURGE_ONLY"] = os.environ["CLI_PURGE_ONLY"]
-if os.environ.get("CLI_DASHBOARD_SET"):
-    settings["DASHBOARD_SET"] = os.environ["CLI_DASHBOARD_SET"]
 if os.environ.get("CLI_YES"):
     settings["CLI_YES"] = os.environ["CLI_YES"]
 def is_truthy(value):
@@ -188,11 +180,9 @@ def repo_file_text(relative_path):
 
 def load_dashboard_files():
     manifest = json.loads(repo_file_text("dashboards/deploy-manifest.json"))
-    set_name = str(settings.get("DASHBOARD_SET") or manifest.get("defaultSet") or "default").strip() or "default"
-    files = manifest.get("sets", {}).get(set_name) or []
+    files = manifest.get("files") or []
     if not isinstance(files, list) or not files:
-        raise RuntimeError(f"Dashboard set '{set_name}' not found or empty in dashboards/deploy-manifest.json.")
-    settings["DASHBOARD_SET"] = set_name
+        raise RuntimeError("dashboards/deploy-manifest.json is missing a non-empty files array.")
     return [str(file) for file in files]
 
 def auth_mode():
@@ -219,7 +209,7 @@ def add_auth_headers(req):
         req.add_header("Authorization", f"Basic {base64.b64encode(raw).decode('ascii')}")
         return
     if not settings.get("GRAFANA_API_TOKEN"):
-        raise SystemExit("Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.")
+        raise SystemExit("Missing GRAFANA_API_TOKEN. For Grafana 13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.")
     req.add_header("Authorization", f"Bearer {settings['GRAFANA_API_TOKEN']}")
 
 def grafana_version():
@@ -522,7 +512,6 @@ print(f"Grafana version: {grafana_version()}")
 print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
-print(f"Dashboard set: {settings['DASHBOARD_SET']}")
 if settings["DASHBOARD_SOURCE_MODE"] == "local":
     print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
 else:

@@ -235,33 +235,27 @@ function assert(condition, failures, message) {
 
 function validateDeployManifest(manifest) {
   const failures = [];
-  const setNames = Object.keys(manifest?.sets || {});
+  const files = manifest?.files;
+  assert(Array.isArray(files) && files.length > 0, failures, "deploy manifest: missing non-empty files array");
+  assert(!Object.hasOwn(manifest || {}, "sets"), failures, "deploy manifest: dashboard sets must not be configured");
+  assert(!Object.hasOwn(manifest || {}, "defaultSet"), failures, "deploy manifest: defaultSet must not be configured");
 
-  assert(setNames.length > 0, failures, "deploy manifest: no dashboard sets configured");
-  assert(Boolean(manifest?.sets?.[manifest?.defaultSet]), failures, `deploy manifest: defaultSet '${manifest?.defaultSet}' is not configured`);
-
-  for (const setName of setNames) {
-    const files = manifest.sets[setName];
-    assert(Array.isArray(files) && files.length > 0, failures, `deploy manifest: set '${setName}' is empty or not an array`);
-    const seen = new Set();
-    for (const file of files || []) {
-      const fileName = String(file);
-      assert(fileName.endsWith(".json"), failures, `deploy manifest: '${fileName}' in set '${setName}' is not a JSON dashboard`);
-      assert(!fileName.includes("\\") && !fileName.includes("/"), failures, `deploy manifest: '${fileName}' in set '${setName}' must be a file name only`);
-      assert(!seen.has(fileName), failures, `deploy manifest: duplicate '${fileName}' in set '${setName}'`);
-      seen.add(fileName);
-    }
+  const seen = new Set();
+  for (const file of files || []) {
+    const fileName = String(file);
+    assert(fileName.endsWith(".json"), failures, `deploy manifest: '${fileName}' is not a JSON dashboard`);
+    assert(!fileName.includes("\\") && !fileName.includes("/"), failures, `deploy manifest: '${fileName}' must be a file name only`);
+    assert(!seen.has(fileName), failures, `deploy manifest: duplicate '${fileName}'`);
+    seen.add(fileName);
   }
 
-  const defaultFiles = new Set(manifest?.sets?.default || []);
-  const tabFiles = new Set(manifest?.sets?.tabs || []);
-  assert(tabFiles.has("VM_EVCC_TAB_All-time.json"), failures, "deploy manifest: tabs set must include TAB All-time dashboard");
-  assert(tabFiles.has("VM_EVCC_TAB_Jahr.json"), failures, "deploy manifest: tabs set must include TAB Year dashboard");
-  assert(tabFiles.has("VM_EVCC_TAB_Monat.json"), failures, "deploy manifest: tabs set must include TAB Month dashboard");
-  assert(tabFiles.has("VM_EVCC_TAB_Today-Details.json"), failures, "deploy manifest: tabs set must include TAB Today Details dashboard");
-  assert(tabFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: tabs set must keep the normal Today dashboard");
-  assert(tabFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: tabs set must keep the normal Today Mobile dashboard");
-  assert(defaultFiles.has("VM_EVCC_Today-Details.json"), failures, "deploy manifest: default set must keep the row-based Today Details dashboard");
+  const deployFiles = new Set(files || []);
+  assert(deployFiles.has("VM_EVCC_TAB_All-time.json"), failures, "deploy manifest: must include TAB All-time dashboard");
+  assert(deployFiles.has("VM_EVCC_TAB_Jahr.json"), failures, "deploy manifest: must include TAB Year dashboard");
+  assert(deployFiles.has("VM_EVCC_TAB_Monat.json"), failures, "deploy manifest: must include TAB Month dashboard");
+  assert(deployFiles.has("VM_EVCC_TAB_Today-Details.json"), failures, "deploy manifest: must include TAB Today Details dashboard");
+  assert(deployFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: must keep the normal Today dashboard");
+  assert(deployFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: must keep the normal Today Mobile dashboard");
 
   return failures;
 }

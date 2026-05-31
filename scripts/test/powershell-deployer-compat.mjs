@@ -1,28 +1,28 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and local manifest resolution under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.04.20.4
- * Last modified: 2026-04-20
+ * Version: 2026.05.31.1
+ * Last modified: 2026-05-31
  */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { readDeployManifest, resolveDashboardSet } from "../helper/deploy-manifest.mjs";
+import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-manifest.mjs";
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.04.20.4";
-const lastModified = "2026-04-20";
+const version = "2026.05.31.1";
+const lastModified = "2026-05-31";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
-const { files: defaultDashboardFiles } = resolveDashboardSet(manifest);
+const defaultDashboardFiles = resolveDashboardFiles(manifest);
 const dashboardPath = path.join(
   repoRoot,
   "dashboards",
   "original",
   "en",
-  defaultDashboardFiles.find((file) => file.includes("All-time")) || defaultDashboardFiles[0],
+  defaultDashboardFiles.find((file) => file === "VM_EVCC_Today.json") || defaultDashboardFiles[0],
 );
 const localDashboardDir = path.join(repoRoot, "dashboards", "original", "en");
 const manifestPath = path.join(repoRoot, "dashboards", "deploy-manifest.json");
@@ -139,27 +139,37 @@ function buildHarness(functionSources) {
     "  if (-not ($Value -is [System.Array])) { throw \"$Name is $($Value.GetType().FullName), expected array\" }",
     "  if ($ExpectedCount -ge 0 -and @($Value).Count -ne $ExpectedCount) { throw \"$Name count $(@($Value).Count), expected $ExpectedCount\" }",
     "}",
+    "function Find-PanelByTitle([object]$Node, [string]$Title) {",
+    "  if ($null -eq $Node) { return $null }",
+    "  if ($Node -is [System.Array]) {",
+    "    foreach ($item in $Node) { $found = Find-PanelByTitle $item $Title; if ($null -ne $found) { return $found } }",
+    "    return $null",
+    "  }",
+    "  if ($Node -is [pscustomobject]) {",
+    "    if ($Node.PSObject.Properties['title'] -and $Node.title -eq $Title -and $Node.PSObject.Properties['targets']) { return $Node }",
+    "    foreach ($prop in $Node.PSObject.Properties) { $found = Find-PanelByTitle $prop.Value $Title; if ($null -ne $found) { return $found } }",
+    "  }",
+    "  return $null",
+    "}",
     "",
-    "$avg = @($rewritten.panels | Where-Object { $_.title -eq 'Average yearly specific yield' })[0]",
-    "if ($null -eq $avg) { throw 'Average yearly specific yield panel not found' }",
-    "Assert-Array $avg.targets 'avg.targets' 1",
-    "Assert-Array $avg.fieldConfig.defaults.mappings 'avg.fieldConfig.defaults.mappings' 0",
-    "Assert-Array $avg.fieldConfig.defaults.thresholds.steps 'avg.fieldConfig.defaults.thresholds.steps' 1",
-    "Assert-Array $avg.fieldConfig.overrides 'avg.fieldConfig.overrides' 0",
-    "Assert-Array $avg.options.reduceOptions.calcs 'avg.options.reduceOptions.calcs' 1",
-    "if ($avg.targets[0].datasource.uid -ne 'vm-evcc') { throw \"avg.targets[0].datasource.uid is $($avg.targets[0].datasource.uid), expected vm-evcc\" }",
+    "$power = Find-PanelByTitle $rewritten 'Power'",
+    "if ($null -eq $power) { throw 'Power panel not found' }",
+    "Assert-Array $power.targets 'power.targets' 5",
+    "Assert-Array $power.fieldConfig.defaults.mappings 'power.fieldConfig.defaults.mappings' 0",
+    "Assert-Array $power.fieldConfig.defaults.thresholds.steps 'power.fieldConfig.defaults.thresholds.steps' 3",
+    "Assert-Array $power.options.reduceOptions.calcs 'power.options.reduceOptions.calcs' 1",
+    "if ($power.targets[0].datasource.uid -ne 'vm-evcc') { throw \"power.targets[0].datasource.uid is $($power.targets[0].datasource.uid), expected vm-evcc\" }",
     "",
-    "$metric = @($rewritten.panels | Where-Object { $_.title -eq 'Metric gauges' })[0]",
-    "if ($null -eq $metric) { throw 'Metric gauges panel not found' }",
+    "$metric = Find-PanelByTitle $rewritten 'Metrics'",
+    "if ($null -eq $metric) { throw 'Metrics panel not found' }",
     "Assert-Array $metric.targets 'metric.targets' 7",
     "Assert-Array $metric.fieldConfig.defaults.links 'metric.fieldConfig.defaults.links' 0",
     "Assert-Array $metric.fieldConfig.defaults.mappings 'metric.fieldConfig.defaults.mappings' 0",
     "Assert-Array $metric.fieldConfig.defaults.thresholds.steps 'metric.fieldConfig.defaults.thresholds.steps' 1",
     "Assert-Array $metric.options.reduceOptions.calcs 'metric.options.reduceOptions.calcs' 1",
     "if ($metric.targets[0].datasource.uid -ne 'vm-evcc') { throw \"metric.targets[0].datasource.uid is $($metric.targets[0].datasource.uid), expected vm-evcc\" }",
-    "",
-    "if ($resolvedRepoRoot -ne $repoRoot) { throw \"Resolve-LocalRepoRoot returned $resolvedRepoRoot, expected $repoRoot\" }",
-    "if (-not $manifestText.Contains('defaultSet')) { throw 'Manifest text did not contain defaultSet' }",
+    "",    "if ($resolvedRepoRoot -ne $repoRoot) { throw \"Resolve-LocalRepoRoot returned $resolvedRepoRoot, expected $repoRoot\" }",
+    "if (-not $manifestText.Contains('\"files\"')) { throw 'Manifest text did not contain files array' }",
     "if ($manifestText -ne (Get-Content -Raw -LiteralPath $manifestPath)) { throw 'Get-RepoFileContent returned unexpected manifest content' }",
     "",
     "Write-Output 'Windows PowerShell deployer compatibility check passed.'",

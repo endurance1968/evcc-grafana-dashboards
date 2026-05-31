@@ -1,5 +1,5 @@
 /**
- * Stage dashboard JSON files and deploy a prepared dashboard set into Grafana.
+ * Stage dashboard JSON files and deploy the fixed dashboard list into Grafana.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -19,8 +19,8 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.04.22.1";
-const SCRIPT_LAST_MODIFIED = "2026-04-22";
+const SCRIPT_VERSION = "2026.05.31.2";
+const SCRIPT_LAST_MODIFIED = "2026-05-31";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -38,7 +38,6 @@ const purgeLanguage = parseArg("purge", "true") === "true";
 const withSmoke = parseArg("smoke", "true") !== "false";
 const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const envArg = parseArg("env", ".env");
-const dashboardSet = parseArg("dashboard-set", optionalEnv("DASHBOARD_SET", "default")).trim() || "default";
 const repoRoot = process.cwd();
 
 if (!["orig", "generated"].includes(variant)) {
@@ -433,7 +432,6 @@ async function main() {
     `--source=${stagedSource}`,
     `--tag=${tag}`,
     `--manifest=${manifest}`,
-    `--dashboard-set=${dashboardSet}`,
   ]);
 
   if (withSmoke) {
@@ -444,7 +442,7 @@ async function main() {
   }
 
   console.log(
-    `\nDashboard deploy finished for language='${language}' (variant='${variant}', set='${dashboardSet}', tag='${tag}', source='${sourceLabel}', overrides='${overridesPath || "none"}').`,
+    `\nDashboard deploy finished for language='${language}' (variant='${variant}', tag='${tag}', source='${sourceLabel}', overrides='${overridesPath || "none"}').`,
   );
 }
 

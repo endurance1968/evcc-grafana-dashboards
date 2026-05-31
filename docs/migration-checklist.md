@@ -127,7 +127,7 @@ tail -n 80 /var/log/evcc-vm-rollup.log
 - [ ] `Today` shows current raw data.
 - [ ] `Today - Details` shows raw detail panels without datasource errors.
 - [ ] `Month`, `Year`, and `All-time` show rollup values.
-- [ ] If Grafana 13.0.1 or newer is used, `DASHBOARD_SET=tabs` was tested or consciously skipped.
+- [ ] Grafana 13.0.1 or newer is used and the fixed tab-navigation dashboard deploy was tested.
 
 ## Cutover
 

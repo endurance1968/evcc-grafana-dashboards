@@ -100,7 +100,7 @@ Example:
 
 ```bash
 node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/translation/fr --tag=vm-fr-gen --manifest=tests/artifacts/import-manifest-vm-fr-gen.json
-node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/original/en --dashboard-set=tabs --tag=vm-en-tabs --manifest=tests/artifacts/import-manifest-vm-en-tabs.json
+node scripts/test/import-dashboards-raw.mjs --env=.env.local --source=dashboards/original/en --tag=vm-en-tabs --manifest=tests/artifacts/import-manifest-vm-en-tabs.json
 ```
 
 ## smoke-check.mjs
@@ -270,7 +270,7 @@ Supported arguments:
 - `--github-ref=<branch-or-tag>`
 - `--language=<code>`
 - `--variant=orig|generated`
-- `--dashboard-set=default|tabs`
+- Fixed manifest dashboard list from `dashboards/deploy-manifest.json`
 
 Example local deploy:
 

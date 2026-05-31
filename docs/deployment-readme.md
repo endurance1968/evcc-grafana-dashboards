@@ -30,11 +30,11 @@ GRAFANA_API_TOKEN=<your_service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
-DASHBOARD_SET=tabs
 PURGE=false
+PURGE_ONLY=false
 ```
 
-Use `DASHBOARD_SET=default` if you do not run Grafana 13.0.1 or newer.
+Grafana 13.0.1 or newer is required. The deployers always install the tab-navigation dashboards; the legacy row-based deploy path and dashboard set selection are no longer available.
 
 ## Run
 

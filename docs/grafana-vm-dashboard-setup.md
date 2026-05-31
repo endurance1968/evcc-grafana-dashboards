@@ -17,7 +17,7 @@ Grafana should have:
 
 - a VictoriaMetrics datasource with UID `vm-evcc`
 - a folder called `EVCC`
-- the EVCC dashboard set deployed into that folder
+- the EVCC dashboards deployed into that folder
 
 `Today*` dashboards read raw VictoriaMetrics data. `Month`, `Year`, and `All-time` need the generated `evcc_*` rollups.
 
@@ -32,7 +32,7 @@ Required:
 
 Recommended:
 
-- Grafana 13.0.1 or newer with `DASHBOARD_SET=tabs`
+- Grafana 13.0.1 or newer. The deploy scripts always install the tab-navigation dashboards; dashboard set selection is no longer supported.
 - Linux deploys use `deploy-python.sh` as the primary path
 - Windows deploys use `deploy.ps1`
 
@@ -82,7 +82,7 @@ In Grafana:
 5. Add a service-account token.
 6. Copy the token immediately.
 
-For a simple local deployment, `Admin` in the current organization is usually enough. Grafana 12 and 13 both support service-account tokens for this deploy path.
+For a simple local deployment, `Admin` in the current organization is usually enough. Grafana 13 supports service-account tokens for this deploy path.
 
 ## 3. Download The Deployer
 
@@ -132,7 +132,6 @@ GRAFANA_API_TOKEN=<your_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
-DASHBOARD_SET=tabs
 PURGE=false
 PURGE_ONLY=false
 ```
@@ -157,7 +156,7 @@ If the dashboard files should come from the local Forgejo mirror instead of GitH
 DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
 ```
 
-Use `DASHBOARD_SET=default` if Grafana is older than 13.0.1 or if you explicitly prefer the classic row-based dashboards.
+The legacy row-based deploy path has been removed. Use Grafana 13.0.1 or newer; the deploy scripts always install the tab-navigation dashboards.
 
 ## 5. Run The Deployment
 
@@ -178,17 +177,17 @@ The deployer shows a preflight summary and asks for confirmation before writing.
 Direct one-time commands are also supported:
 
 ```bash
-./deploy-python.sh --url http://<your-grafana-ip>:3000 --token <your_token> --purge false --dashboard-set tabs
+./deploy-python.sh --url http://<your-grafana-ip>:3000 --token <your_token> --purge false
 ```
 
 ```powershell
-.\deploy.ps1 -url http://<your-grafana-ip>:3000 -token <your_token> -purge false -dashboardset tabs
+.\deploy.ps1 -url http://<your-grafana-ip>:3000 -token <your_token> -purge false
 ```
 
 ## What The Deployer Does
 
 - verifies Grafana access
-- resolves the selected dashboard set from `dashboards/deploy-manifest.json`
+- resolves the fixed dashboard file list from `dashboards/deploy-manifest.json`
 - shows which dashboards will be imported
 - updates embedded library panels before dashboard import
 - imports dashboards into the `EVCC` folder

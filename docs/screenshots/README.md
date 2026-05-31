@@ -7,7 +7,7 @@ Test runs, render-smoke screenshots, temporary dashboard imports, performance tr
 Rules for adding screenshots here:
 
 - Add only screenshots that document the current released dashboard state.
-- Prefer the TAB dashboard set when documenting Grafana 13 navigation.
+- Prefer the TAB dashboards when documenting Grafana 13 navigation.
 - Update only screenshots for dashboards that visibly changed in the release.
 - Avoid committing full test screenshot batches or language matrix output.
 - Keep filenames stable and descriptive so diffs remain reviewable.

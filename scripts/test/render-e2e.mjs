@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.04.29.1
- * Last modified: 2026-04-29
+ * Version: 2026.05.31.1
+ * Last modified: 2026-05-31
  */
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
@@ -420,7 +420,6 @@ async function main() {
     grafanaUser: parseArg("grafana-user", "admin"),
     grafanaPassword: parseArg("grafana-password", "admin"),
     source: parseArg("source", "dashboards/original/en"),
-    dashboardSet: parseArg("dashboard-set", ""),
     tag: parseArg("tag", "vm-render-e2e"),
     manifest: parseArg("manifest", "tests/artifacts/import-manifest-vm-render-e2e.json"),
     waitMs: parseArg("wait-ms", "5000"),
@@ -449,7 +448,6 @@ async function main() {
       `--source=${args.source}`,
       `--tag=${args.tag}`,
       `--manifest=${args.manifest}`,
-      ...(args.dashboardSet ? [`--dashboard-set=${args.dashboardSet}`] : []),
     ], { env });
     run("node", [
       "scripts/test/render-smoke-check.mjs",
@@ -460,8 +458,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.04.29.1");
-    console.log("Last modified: 2026-04-29");
+    console.log("Version:       2026.05.31.1");
+    console.log("Last modified: 2026-05-31");
     console.log("");
     console.log("Result");
     console.log("------");

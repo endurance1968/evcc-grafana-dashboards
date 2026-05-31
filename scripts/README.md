@@ -232,7 +232,7 @@ npm run test:render-e2e
 
 This starts temporary Grafana and VictoriaMetrics containers, imports minimal VM fixture data, creates the VM datasource, imports the original VM dashboards, and runs the hardened browser render smoke against critical panels. The Forgejo CI workflow runs this command after installing the Chromium browser for Playwright.
 
-To run the same browser render smoke against the Grafana 13 TAB dashboard set:
+To run the same browser render smoke against the Grafana 13 TAB dashboards:
 
 ```bash
 npm run test:render-e2e:tabs

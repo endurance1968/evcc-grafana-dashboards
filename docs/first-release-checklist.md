@@ -1,6 +1,6 @@
 # First Release Checklist
 
-This checklist is intended for the first public end-user release of the VictoriaMetrics-based EVCC dashboard set.
+This checklist is intended for the first public end-user release of the VictoriaMetrics-based EVCC dashboards.
 
 Use it as a release gate. If one of the items below is still open, the release should not be published as final.
 
@@ -33,7 +33,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] `deploy.ps1` works on Windows PowerShell with a clean dashboard deployment
 - [x] `deploy-python.sh` works on Linux with a clean dashboard deployment
 - [x] `deploy-bash.sh` works on Linux with a clean dashboard deployment
-- [x] `purge=true` creates a clean dashboard set and embedded library panels correctly
+- [x] `purge=true` creates a clean dashboards and embedded library panels correctly
 - [x] `purge=false` updates existing library panels and shows the correct preflight information
 - [x] Dashboard override variables are documented and verified:
 - [x] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
@@ -107,7 +107,7 @@ Real-data migration evidence from 2026-05-29:
 - host-label cleanup dry-runs reported `GO FOR IT`; final `check_data.py` confirmed `host` series `0` and `db` series `0`
 - `compare_import_coverage.py` over the completed window `2026-05-22T00:00:00Z` through `2026-05-28T23:59:59Z` reported 0 repo-relevant problems and 0 critical energy problems
 - rollup `detect`, `plan`, and `benchmark` succeeded; full backfill from `2025-01-01` through `2026-05-28` wrote 36 rollup metrics, 1,154 series, and 30,013 samples
-- `deploy.ps1` deployed the German generated TAB dashboard set from the local checkout with `PURGE=true`
+- `deploy.ps1` deployed the German generated TAB dashboards from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 - Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
 - Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0` on port `18450`, fresh Grafana `13.0.1` on port `13050`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.

@@ -4,7 +4,7 @@ This directory documents the recommended Grafana 13 TAB dashboard series for rel
 
 ## Current Release Screenshots
 
-The first public VictoriaMetrics release includes tab-aware screenshots for every active tab in the German generated TAB dashboard set. These screenshots intentionally show the Grafana tab bar so users can recognize the navigation state shown in the documentation.
+The first public VictoriaMetrics release includes tab-aware screenshots for every active tab in the German generated TAB dashboards. These screenshots intentionally show the Grafana tab bar so users can recognize the navigation state shown in the documentation.
 
 All-time dashboard:
 
@@ -35,24 +35,23 @@ Today - Details dashboard:
 - [today-details-netz.png](./today-details-netz.png)
 - [today-details-ladepunkte.png](./today-details-ladepunkte.png)
 
-`Today` and `Today - Mobile` are shared with the default dashboard set and only need screenshots here if TAB-set deployment changes their visible behavior.
+`Today` and `Today - Mobile` are shared dashboard files in the supported TAB deploy list and only need screenshots here if their visible behavior changes.
 
 ## Capture Source
 
 Current screenshots were captured on 2026-05-30 from a Grafana 13.0.1 test instance using:
 
 ```env
-DASHBOARD_SET=tabs
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
 ```
 
 The datasource pointed read-only at a production-style VictoriaMetrics instance with complete raw data and `evcc_*` rollups. Raw render output stayed under `tests/artifacts/`; only the curated tab screenshots are committed here.
 
-Recommended maintainer command after importing the TAB set into a test Grafana:
+Recommended maintainer command after importing the TAB dashboards into a test Grafana:
 
 ```bash
-DASHBOARD_SET=tabs node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
+node scripts/test/run-suite.mjs --env=.env.local --screenshots=true --cleanup-final=true
 ```
 
 ## Update Policy

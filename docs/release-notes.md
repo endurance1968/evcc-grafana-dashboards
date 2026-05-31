@@ -28,14 +28,11 @@ The normal migration path is documented in [influx-to-vm-migration.md](./influx-
 6. connect Grafana to VictoriaMetrics and deploy dashboards
 7. schedule the daily rollup refresh for completed local days
 
-The release validation imported a real multi-year EVCC history into VictoriaMetrics, cleaned `host` labels, verified `db=0`, built rollups, and rendered the dashboard set against the migrated data.
+The release validation imported a real multi-year EVCC history into VictoriaMetrics, cleaned `host` labels, verified `db=0`, built rollups, and rendered the dashboards against the migrated data.
 
-## Dashboard Sets
+## Dashboard Set
 
-Two dashboard sets are available:
-
-- `DASHBOARD_SET=tabs`: recommended for Grafana 13.0.1 or newer
-- `DASHBOARD_SET=default`: classic row-based layout for older Grafana versions or users who prefer rows
+The deployed dashboards always use the Grafana 13 tab-navigation layout and require Grafana 13.0.1 or newer. The legacy row-based deploy path and dashboard set selection have been removed from the deploy manifest and scripts.
 
 The release screenshots document the German generated TAB set with one screenshot per active tab under [screenshots/tabs](./screenshots/tabs/README.md).
 
@@ -53,7 +50,7 @@ All deployers support the same core configuration:
 - VictoriaMetrics datasource UID
 - dashboard language
 - dashboard variant
-- dashboard set
+- dashboards
 - purge or update behavior
 - dashboard variable overrides such as EVCC URL, portal URL, blocklists, and installed peak power
 
