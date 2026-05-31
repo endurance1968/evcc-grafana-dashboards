@@ -1,8 +1,21 @@
-# Englische Original-Dashboards
+# Englischer VM-Dashboard-Quellimport
 
 Englische Version: [README_EN.md](./README_EN.md).
 
-Dieser Ordner enthaelt die englischen Quelldashboards. Sie sind die Basis fuer generierte lokalisierte Varianten.
+Diese Dateien wurden aus dem Maintainer-Branch `upstream/victoria-metrics` importiert.
+
+Importierte Dateien:
+
+- `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Details.json`
+- `VM_EVCC_Today-Mobile.json`
+- `VM_EVCC_TAB_All-time.json`
+
+Wichtiger Hinweis:
+
+- Der Maintainer-Branch stellt diese Dateien aktuell nicht als vollstaendig englische Dashboards bereit.
+- Sie enthalten gemischtsprachige Labels und Beschreibungen, mit einem merklichen Anteil deutscher UI-Texte.
+- Sie werden hier als importierter Upstream-Quell-Snapshot fuer weitere Lokalisierung und Review auf diesem Branch gespeichert.
 
 ## Bearbeitungsregel
 

@@ -1,16 +1,17 @@
-# Archiv
+# Archivierte Dokumentation
 
 Englische Version: [README_EN.md](./README_EN.md).
 
-Dieser Ordner enthaelt aeltere oder nicht mehr primaere Dokumente. Sie bleiben als Referenz erhalten, sind aber nicht der empfohlene Einstieg fuer neue Nutzer.
+Dieser Ordner enthaelt historische oder fortgeschrittene Dokumente, die nicht mehr Teil des empfohlenen Endnutzerpfads sind.
 
-## Aktueller Einstieg
+Nutze stattdessen die aktuellen Einstiegspunkte:
 
-- [../README.md](../README.md)
-- [../influx-to-vm-migration.md](../influx-to-vm-migration.md)
-- [../grafana-vm-dashboard-setup.md](../grafana-vm-dashboard-setup.md)
+- Migrationspfad: [../influx-to-vm-migration.md](../influx-to-vm-migration.md)
+- Migrationscheckliste: [../migration-checklist.md](../migration-checklist.md)
+- Troubleshooting: [../migration-troubleshooting.md](../migration-troubleshooting.md)
+- Dashboard-Deployment: [../grafana-vm-dashboard-setup.md](../grafana-vm-dashboard-setup.md)
 
-## Archivierte Themen
+Archivierte Dateien:
 
-- [telegraf-parallel-pipeline-howto.md](./telegraf-parallel-pipeline-howto.md)
-- [victoriametrics-aggregation-guide.md](./victoriametrics-aggregation-guide.md)
+- `victoriametrics-aggregation-guide.md`: ersetzt durch die aktuelle Migrationsanleitung und Checkliste.
+- `telegraf-parallel-pipeline-howto.md`: fortgeschrittenes Fan-out-Setup, nicht Teil des Standard-Dashboard-Migrationspfads.

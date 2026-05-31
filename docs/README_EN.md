@@ -74,4 +74,4 @@ Use these only when the normal migration path reports a problem or when you main
 ## Release Preparation
 
 - First end-user release checklist: [first-release-checklist.md](./first-release-checklist_EN.md)
-- Screenshot policy: [screenshots/README.md](./screenshots/README_EN.md)
+- Screenshot gallery: [screenshots/README.md](./screenshots/README_EN.md)

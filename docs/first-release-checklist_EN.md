@@ -1,5 +1,7 @@
 # First Release Checklist
 
+German version: [first-release-checklist.md](./first-release-checklist.md).
+
 This checklist is intended for the first public end-user release of the VictoriaMetrics-based EVCC dashboards.
 
 Use it as a release gate. If one of the items below is still open, the release should not be published as final.
@@ -92,16 +94,16 @@ At minimum, do not publish a first end-user release until all of these are true:
 
 ## Current Evidence Notes
 
-Last updated: 2026-05-30.
+Last updated: 2026-05-31.
 
-Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, and the local Windows Docker migration walkthrough on 2026-05-29 using Ole's real EVCC/Influx data.
+Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, the local Windows Docker migration walkthrough on 2026-05-29 using Ole's real EVCC/Influx data, and the manually refreshed release screenshots from 2026-05-31.
 
 Real-data migration evidence from 2026-05-29:
 
-- source InfluxDB v1 `http://192.168.1.183:8086`, database `evcc`, read-only access during the test
-- source EVCC API `http://192.168.1.197:7070`, used only for read-only topology verification
-- disposable target VictoriaMetrics on `http://127.0.0.1:18429`, Docker image `victoriametrics/victoria-metrics:v1.138.0`
-- disposable target Grafana on `http://127.0.0.1:13032`, Docker image `grafana/grafana`, Grafana `13.0.1+security-01`
+- source InfluxDB v1 database `evcc`, read-only access during the test
+- source EVCC API was used only for read-only topology verification
+- disposable target VictoriaMetrics used Docker image `victoriametrics/victoria-metrics:v1.138.0`
+- disposable target Grafana used Docker image `grafana/grafana`, Grafana `13.0.1+security-01`
 - `vmctl influx` imported 643 series, 267,886,076 samples, and 5.3 GB from the real Influx history for `2025-01-01T00:00:00Z` through the live import snapshot on 2026-05-29
 - real labels after import included 3 loadpoints (`Carport_Ecke`, `Carport_Treppe`, `Daikin-WP`), 3 vehicles (`Altherma-3`, `BMW i3`, `Schneeflittchen`), and 16 EXT titles
 - host-label cleanup dry-runs reported `GO FOR IT`; final `check_data.py` confirmed `host` series `0` and `db` series `0`
@@ -110,7 +112,7 @@ Real-data migration evidence from 2026-05-29:
 - `deploy.ps1` deployed the German generated TAB dashboards from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 - Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
-- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0` on port `18450`, fresh Grafana `13.0.1` on port `13050`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
+- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0`, fresh Grafana `13.0.1`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
 - Release screenshots from 2026-05-31 were manually refreshed and curated directly under `docs/screenshots` as one PNG per relevant dashboard or active TAB dashboard tab.
 - Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
 - Release notes were added in `docs/release-notes.md`, and root preview wording was removed from `README.md`.
@@ -135,5 +137,5 @@ Additional autonomous release-gate evidence from 2026-05-29:
 - `deploy-bash.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie`, completed `PURGE=true`, and then completed `PURGE=false` against the same disposable Grafana instance.
 - The Linux deployers now handle Grafana dashboard v2 JSON via `/apis/dashboard.grafana.app/v2/...`, including folder annotations and `metadata.resourceVersion` updates for existing dashboards.
 - Dashboard override validation queried Grafana after deployment and verified 46 override variable instances across all 6 dashboards, including v2 TAB dashboards and classic dashboards, with folder placement in `evcc-release-bash`.
-- Daily rollup refresh validation used the documented cron-style `date -d 'yesterday'` wrapper shape in blank `debian:trixie` against disposable VictoriaMetrics on port `18434`; a date shim fixed `yesterday` to the already-seeded February fixture month, and the run executed `backfill --replace-range --write` successfully after `rollup-e2e.py` had validated repeated replacement without duplicate daily samples.
+- Daily rollup refresh validation used the documented cron-style `date -d 'yesterday'` wrapper shape in blank `debian:trixie`; the run executed `backfill --replace-range --write` successfully after `rollup-e2e.py` had validated repeated replacement without duplicate daily samples.
 - Localization audit now reports `0` missing candidates for `de`, `fr`, `nl`, `es`, `it`, `zh`, and `hi`; generated localized dashboards were regenerated and `npm run test:localization-idempotency` passed.

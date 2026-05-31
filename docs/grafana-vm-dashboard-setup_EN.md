@@ -145,9 +145,9 @@ DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^Altherma-3$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
-DASHBOARD_EVCC_URL=http://192.168.1.197:7070/#/
+DASHBOARD_EVCC_URL=http://home:7070/#/
 DASHBOARD_PORTAL_TITLE=VRM
-DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/795774/dashboard
+DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/<id>/dashboard
 ```
 
 If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:

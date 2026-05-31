@@ -76,4 +76,4 @@ Diese Dokumente sind vor allem fuer Fehleranalyse, Betrieb und Maintainer releva
 ## Release-Vorbereitung
 
 - Erste Endnutzer-Release-Checkliste: [first-release-checklist.md](./first-release-checklist.md)
-- Screenshot-Regeln: [screenshots/README.md](./screenshots/README.md)
+- Screenshot-Galerie: [screenshots/README.md](./screenshots/README.md)

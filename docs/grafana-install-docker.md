@@ -2,72 +2,163 @@
 
 Englische Version: [grafana-install-docker_EN.md](./grafana-install-docker_EN.md).
 
-Diese Anleitung beschreibt eine einfache Grafana-Installation per Docker fuer die EVCC/VictoriaMetrics-Dashboards.
+Pruefe vor den Kommandos zuerst die zentrale Uebersicht der Voraussetzungen: [system-requirements.md](./system-requirements.md).
 
-Pruefe vor Beginn die zentralen Voraussetzungen: [system-requirements.md](./system-requirements.md).
+Diese Anleitung beschreibt eine einfache Grafana-Installation mit Docker.
 
-## Voraussetzungen
+Annahmen:
 
-- Docker oder Docker Compose
-- persistentes Volume fuer Grafana-Daten
-- Netzwerkzugriff von Grafana auf VictoriaMetrics
+- Docker ist bereits installiert.
+- Grafana soll lokal mit persistentem Speicher laufen.
+- Grafana nutzt spaeter VictoriaMetrics als Datasource.
 
-## Docker Compose Beispiel
+Nicht enthalten:
 
-```yaml
-services:
-  grafana:
-    image: grafana/grafana:13.0.1
-    container_name: grafana
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    volumes:
-      - grafana-data:/var/lib/grafana
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: change-me
+- Docker selbst installieren
+- VictoriaMetrics selbst installieren
+- Dashboards deployen
 
-volumes:
-  grafana-data:
-```
+Weiter mit:
 
-Start:
+- [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+
+## Docker-Image
+
+Grafana empfiehlt aktuell:
+
+- `grafana/grafana`
+
+Wichtig:
+
+- `grafana/grafana-oss` ist nicht mehr der zentrale gepflegte Image-Pfad.
+- `grafana/grafana` ist der aktuelle OSS-freundliche Docker-Image-Pfad.
+
+Referenz:
+
+- [Run Grafana Docker image](https://grafana.com/docs/grafana/latest/setup-grafana/installation/docker/)
+
+## Ziel
+
+Am Ende laeuft Grafana:
+
+- auf Port `3000`
+- mit persistentem Host-Speicher
+- erreichbar unter `http://<host>:3000`
+
+## 1. Datenverzeichnis erstellen
+
+Linux-Host:
 
 ```bash
-docker compose up -d
+mkdir -p /opt/grafana/data
+cd /opt/grafana
 ```
 
-Grafana ist danach unter `http://<host>:3000` erreichbar.
+Windows Docker Desktop Host:
 
-## VictoriaMetrics Datasource Plugin
-
-Installiere das VictoriaMetrics Datasource Plugin in Grafana. Je nach Setup geht das ueber die Grafana-Oberflaeche oder per Container-Environment:
-
-```yaml
-environment:
-  GF_INSTALL_PLUGINS: victoriametrics-metrics-datasource
+```powershell
+New-Item -ItemType Directory -Force C:\evcc\grafana\data
 ```
 
-Nach Plugin-Installation Grafana neu starten.
+Nutze diesen Windows-Pfad in der `-v`-Option, zum Beispiel `-v C:\evcc\grafana\data:/var/lib/grafana`.
 
-## Datasource anlegen
+## 2. Image ziehen
 
-1. In Grafana `Connections` / `Data sources` oeffnen.
-2. VictoriaMetrics Datasource auswaehlen.
-3. URL setzen, z. B. `http://victoriametrics:8428`.
-4. UID auf `vm-evcc` setzen.
-5. `Save & test` ausfuehren.
+```bash
+docker pull grafana/grafana
+```
 
-## Service-Account-Token
+## 3. Container starten
 
-Fuer die Deploy-Skripte wird ein Service-Account-Token empfohlen:
+```bash
+docker run -d \
+  --name grafana \
+  --restart unless-stopped \
+  -p 3000:3000 \
+  -v /opt/grafana/data:/var/lib/grafana \
+  -e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource \
+  grafana/grafana
+```
 
-1. `Administration` / `Service accounts` oeffnen.
-2. Service Account mit Rechten fuer Dashboard-Import anlegen.
-3. Token erzeugen.
-4. Token in `vm-dashboard-install.env` als `GRAFANA_API_TOKEN` setzen.
+Windows PowerShell Beispiel:
 
-## Dashboard Deployment
+```powershell
+docker run -d `
+  --name grafana `
+  --restart unless-stopped `
+  -p 3000:3000 `
+  -v C:\evcc\grafana\data:/var/lib/grafana `
+  -e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource `
+  grafana/grafana
+```
 
-Weiter mit [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md).
+## Wichtige Optionen
+
+- `-p 3000:3000`
+  - veroeffentlicht Grafana auf Port `3000`
+- `-v /opt/grafana/data:/var/lib/grafana`
+  - haelt Nutzer, Datasources und Dashboards persistent auf dem Host
+- `-e GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource`
+  - installiert das fuer diese Dashboards benoetigte Datasource Plugin
+- `--restart unless-stopped`
+  - startet Grafana nach Reboots automatisch wieder
+
+## 4. Installation pruefen
+
+Containerstatus:
+
+```bash
+docker ps | grep grafana
+```
+
+HTTP-Check:
+
+```bash
+curl -I http://127.0.0.1:3000
+```
+
+Browser:
+
+- `http://<dein-host>:3000`
+
+Eine frische Installation startet typischerweise mit:
+
+- Benutzername: `admin`
+- Passwort: `admin`
+
+Grafana erzwingt beim ersten Login normalerweise eine Passwortaenderung.
+
+## 5. Logs pruefen
+
+```bash
+docker logs --tail 100 grafana
+```
+
+## 6. Container spaeter aktualisieren
+
+```bash
+docker pull grafana/grafana
+docker stop grafana
+docker rm grafana
+```
+
+Danach dasselbe `docker run`-Kommando erneut ausfuehren.
+
+Wichtig:
+
+- Das Host-Verzeichnis `/opt/grafana/data` bleibt bestehen.
+- Nutzer, Datasources und Dashboards bleiben erhalten.
+
+## Haeufige Probleme
+
+- Port `3000` ist bereits belegt; waehle einen anderen Host-Port wie `-p 13030:3000` und setze `GRAFANA_URL` spaeter auf diesen Host-Port.
+- Volume fehlt, dadurch verschwinden Daten nach Container-Neuerstellung.
+- Default-Passwort wurde noch nicht geaendert.
+- Grafana laeuft, aber VictoriaMetrics-Datasource existiert noch nicht.
+
+## Naechster Schritt
+
+Wenn Grafana und VictoriaMetrics laufen, weiter mit:
+
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)

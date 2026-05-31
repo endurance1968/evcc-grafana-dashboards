@@ -110,7 +110,7 @@ Additional findings now include a short `Hint` so you can see whether they are l
 Only if the coverage check and the data check look good, rewrite host-tagged VM-only series:
 
 ```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://127.0.0.1:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
 ```
 
 The dry-run now prints a `Recommendation` section with a clear status (`GO FOR IT`, `REVIEW`, or `STOP`) and the exact write flags to append next. A clean run avoids target deletion and looks like this:
@@ -125,7 +125,7 @@ Recommended write flags:
 In that clean case, rerun the same command with those flags appended:
 
 ```bash
-python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --reset-cache --write
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://127.0.0.1:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --reset-cache --write
 ```
 
 Do not add `--merge-target` manually. When `--merge-target` is used, the script now checks whether the VictoriaMetrics delete selector would also remove existing hostless sibling series that are not rebuilt by this rewrite. If that happens, it returns `STOP` and refuses the write.
@@ -214,7 +214,7 @@ Verify Forgejo Actions wiring from a developer machine:
 npm run test:forgejo-actions
 ```
 
-The default Forgejo Web/API URL is `http://192.168.0.127:3000`, matching the local Forgejo instance used for this repository. Override it with `FORGEJO_BASE_URL` or `--base-url` if the instance moves. The check verifies that Actions are enabled and that the latest workflow run was picked up by a runner. `waiting` or `cancelled` with a never-started timestamp means no matching runner accepted the job. The CI workflow also starts with a `Runner Docker readiness` step, so a runner without Docker access fails before the Docker-backed query/readback, render, or rollup tests.
+The default Forgejo Web/API URL is `http://<forgejo-host>:3000`, matching the local Forgejo instance used for this repository. Override it with `FORGEJO_BASE_URL` or `--base-url` if the instance moves. The check verifies that Actions are enabled and that the latest workflow run was picked up by a runner. `waiting` or `cancelled` with a never-started timestamp means no matching runner accepted the job. The CI workflow also starts with a `Runner Docker readiness` step, so a runner without Docker access fails before the Docker-backed query/readback, render, or rollup tests.
 
 For browser-level Grafana rendering, run the suite with render smoke enabled after importing dashboards:
 

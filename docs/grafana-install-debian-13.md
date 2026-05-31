@@ -2,64 +2,236 @@
 
 Englische Version: [grafana-install-debian-13_EN.md](./grafana-install-debian-13_EN.md).
 
-Diese Anleitung beschreibt eine frische Grafana-Installation auf Debian 13 / Trixie fuer die EVCC/VictoriaMetrics-Dashboards.
+Pruefe vor den Kommandos zuerst die zentrale Uebersicht der Voraussetzungen: [system-requirements.md](./system-requirements.md).
 
-Pruefe vor Beginn die zentralen Voraussetzungen: [system-requirements.md](./system-requirements.md).
+Diese Anleitung beschreibt eine geradlinige Grafana-Installation auf einer Debian-13-VM oder einem Debian-13-LXC.
 
-## Voraussetzungen
+## Validierungsstatus
 
-- Debian 13 System
-- Root- oder sudo-Rechte
-- Netzwerkzugriff auf VictoriaMetrics
-- Grafana 13.0.1 oder neuer
+Aktueller Status:
 
-## Grafana installieren
+- Grafana-APT-Repository-Setup: am 2026-05-29 auf blankem `debian:trixie` Docker getestet
+- `grafana-enterprise`-Installation: getestet
+- Grafana HTTP/API Health Check: bestaetigt
+- VictoriaMetrics Datasource Plugin fuer diese Dashboards: getestet
 
-Folge der offiziellen Grafana-Paketinstallation fuer Debian. Danach den Dienst starten und aktivieren:
+Docker-Validierungshinweis:
+
+Ein Standard-`debian:trixie` Docker-Container laeuft nicht mit `systemd`. In dieser Umgebung kann die Paketinstallation geprueft werden, aber `systemctl enable --now grafana-server` muss uebersprungen werden. Fuer den Release-Check vom 2026-05-29 wurde Grafana manuell mit denselben Debian-Paketpfaden wie in der Service-Datei gestartet; `/api/health` meldete `database: ok`.
+
+Annahmen:
+
+- Debian 13 laeuft bereits.
+- Die Kommandos sind fuer einen Nutzer mit `sudo` geschrieben; wenn du als `root` angemeldet bist, lasse `sudo` weg.
+- Grafana soll lokal per `systemd` laufen.
+- Grafana verwendet spaeter VictoriaMetrics als Datasource.
+
+Nicht enthalten:
+
+- VictoriaMetrics selbst installieren
+- Migration von InfluxDB zu VictoriaMetrics
+- EVCC-Dashboards deployen
+
+Dafuer weiter mit:
+
+- [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
+- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+
+## Empfohlener Installationspfad
+
+Fuer Debian 13 ist das offizielle Grafana-APT-Repository der empfohlene Pfad.
+
+Vorteile:
+
+- einfache Updates ueber `apt`
+- kein manuelles `.deb`-Handling
+- sauberer `systemd`-Service
+
+Offizielle Referenz:
+
+- [Install Grafana on Debian or Ubuntu](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
+
+## Welche Edition?
+
+Grafana dokumentiert aktuell:
+
+- `grafana-enterprise` als Standardpaket
+- `grafana` als OSS-Paket
+
+Wichtig:
+
+- `grafana-enterprise` kann ohne bezahlte Lizenz genutzt werden.
+- Fuer normale EVCC-Setups ist das ueblicherweise in Ordnung.
+- Wenn du explizit nur OSS willst, installiere stattdessen `grafana`.
+
+Diese Anleitung nutzt:
+
+- `grafana-enterprise`
+
+## 1. Basispakete installieren
 
 ```bash
+sudo apt update
+sudo apt install -y apt-transport-https wget gnupg curl
+```
+
+## 2. Grafana-APT-Key hinzufuegen
+
+```bash
+sudo mkdir -p /etc/apt/keyrings
+sudo wget -O /etc/apt/keyrings/grafana.asc https://apt.grafana.com/gpg-full.key
+sudo chmod 644 /etc/apt/keyrings/grafana.asc
+```
+
+## 3. Grafana-Repository hinzufuegen
+
+Fuer stabile Releases:
+
+```bash
+echo "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+```
+
+Danach Paketindex aktualisieren:
+
+```bash
+sudo apt update
+```
+
+## 4. Grafana installieren
+
+Empfohlene Standardedition:
+
+```bash
+sudo apt install -y grafana-enterprise
+```
+
+Wenn du explizit das OSS-Paket willst:
+
+```bash
+sudo apt install -y grafana
+```
+
+## 5. VictoriaMetrics Datasource Plugin installieren
+
+Die EVCC-Dashboards verwenden das VictoriaMetrics Datasource Plugin. Installiere es, bevor du die Datasource anlegst:
+
+```bash
+sudo grafana cli \
+  --homepath=/usr/share/grafana \
+  --pluginsDir /var/lib/grafana/plugins \
+  plugins install victoriametrics-metrics-datasource
+```
+
+Die expliziten Flags `--homepath` und `--pluginsDir` sind fuer das Debian-Paketlayout wichtig. Ein schlichtes `grafana cli plugins install ...` kann scheitern, weil der gepackte Grafana-Homepath nicht gefunden wird.
+
+Grafana nach Plugin-Installation oder Plugin-Update neu starten.
+
+## 6. Grafana starten und aktivieren
+
+```bash
+sudo systemctl daemon-reload
 sudo systemctl enable --now grafana-server
+```
+
+Status pruefen:
+
+```bash
 sudo systemctl status grafana-server
 ```
 
-Grafana ist standardmaessig unter `http://<host>:3000` erreichbar.
+## 7. Installation pruefen
 
-## Admin-Zugang absichern
-
-Beim ersten Login das Standardpasswort aendern. Fuer automatisches Deployment einen Service Account statt eines persoenlichen Admin-Tokens verwenden.
-
-## VictoriaMetrics Datasource Plugin installieren
-
-Installiere das Plugin und starte Grafana neu:
+Lokaler Check:
 
 ```bash
-sudo grafana-cli plugins install victoriametrics-metrics-datasource
-sudo systemctl restart grafana-server
+curl -I http://127.0.0.1:3000
 ```
 
-## Datasource konfigurieren
+Browser:
 
-1. In Grafana `Connections` / `Data sources` oeffnen.
-2. VictoriaMetrics Datasource auswaehlen.
-3. URL setzen, z. B. `http://127.0.0.1:8428` oder die Adresse deines VM-Servers.
-4. UID auf `vm-evcc` setzen.
-5. `Save & test` ausfuehren.
+- `http://<dein-host>:3000`
 
-## Service-Account-Token erzeugen
+Eine frische Installation startet typischerweise mit:
 
-1. `Administration` / `Service accounts` oeffnen.
-2. Service Account fuer Dashboard-Deployment anlegen.
-3. Token erzeugen.
-4. Token in `vm-dashboard-install.env` setzen:
+- Benutzername: `admin`
+- Passwort: `admin`
 
-```env
-GRAFANA_API_TOKEN=<token>
+Grafana erzwingt beim ersten Login normalerweise eine Passwortaenderung.
+
+## 8. Netzwerkzugriff pruefen
+
+Wenn Grafana von einem anderen Host erreichbar sein soll:
+
+- Port `3000` muss offen sein.
+
+Pruefen:
+
+```bash
+ss -ltnp | grep 3000
 ```
 
-## Firewall
+Wenn du eine Firewall nutzt, erlaube Port `3000` auch dort.
 
-Wenn Grafana von anderen Hosts erreichbar sein soll, Port `3000/tcp` freigeben. In produktiven Setups Reverse Proxy und TLS verwenden.
+## 9. Updates
 
-## Naechster Schritt
+Wenn Grafana aus dem APT-Repository installiert wurde, laufen Updates ueber `apt`:
 
-Weiter mit [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md).
+```bash
+sudo apt update
+sudo apt upgrade
+```
+
+Nur Grafana aktualisieren:
+
+```bash
+sudo apt update
+sudo apt install grafana-enterprise
+```
+
+oder fuer OSS:
+
+```bash
+sudo apt update
+sudo apt install grafana
+```
+
+## 10. Fuer EVCC vorbereiten
+
+Sobald Grafana laeuft, ist der normale naechste Schritt:
+
+1. VictoriaMetrics-Datasource anlegen
+2. Grafana Service-Account-Token erstellen
+3. EVCC-Dashboards deployen
+
+Weiter mit:
+
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+
+## Hinweise fuer LXC
+
+In einem normalen Debian-LXC funktionieren dieselben Schritte meist unveraendert.
+
+Wichtig:
+
+- ausreichend RAM zuweisen
+- Port `3000` vom Host oder Netzwerk erreichbar machen
+- Zeit und Zeitzone im Container korrekt halten
+
+Grafana braucht typischerweise mindestens etwa:
+
+- 512 MB RAM empfohlen
+- 1 CPU-Kern empfohlen
+
+## Haeufige Probleme
+
+- Repository-Key fehlt oder ist falsch installiert
+- Port `3000` ist lokal offen, aber im Netzwerk blockiert
+- Default-Passwort wurde noch nicht geaendert
+- VictoriaMetrics-Datasource ist noch nicht angelegt
+- spaeterer Dashboard-Deploy scheitert, weil kein Service-Account-Token existiert
+
+## Quellen
+
+- [Install Grafana on Debian or Ubuntu](https://grafana.com/docs/grafana/latest/setup-grafana/installation/debian/)
+- [Grafana installation overview](https://grafana.com/docs/grafana/latest/setup-grafana/installation/)
