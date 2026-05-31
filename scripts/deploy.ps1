@@ -30,7 +30,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.8'
+$ScriptVersion = '2026.05.31.10'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -147,11 +147,17 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
   }
 }
 
+function Get-EffectiveDashboardLanguage() {
+  if ($settings.DASHBOARD_VARIANT -eq 'orig') { return 'en' }
+  return [string]$settings.DASHBOARD_LANGUAGE
+}
+
 function Get-SourceSubDir() {
+  $language = Get-EffectiveDashboardLanguage
   if ($settings.DASHBOARD_VARIANT -eq 'orig') {
-    return "dashboards/original/$($settings.DASHBOARD_LANGUAGE)"
+    return "dashboards/original/$language"
   }
-  return "dashboards/translation/$($settings.DASHBOARD_LANGUAGE)"
+  return "dashboards/translation/$language"
 }
 
 $FixedDashboardFiles = @(
@@ -360,7 +366,7 @@ function Get-DashboardBuildMarker() {
   } else {
     $source = "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
   }
-  return "deployed $timestamp | $($settings.DASHBOARD_LANGUAGE)/$($settings.DASHBOARD_VARIANT) | $source"
+  return "deployed $timestamp | $(Get-EffectiveDashboardLanguage)/$($settings.DASHBOARD_VARIANT) | $source"
 }
 
 function Get-DashboardOverrides() {
@@ -541,7 +547,7 @@ $settings = @{
   DASHBOARD_SOURCE_MODE = 'github'
   GITHUB_REPO = 'endurance1968/evcc-grafana-dashboards'
   GITHUB_REF = 'main'
-  DASHBOARD_LANGUAGE = 'en'
+  DASHBOARD_LANGUAGE = 'de'
   DASHBOARD_VARIANT = 'gen'
   DASHBOARD_RAW_BASE_URL = ''
   DASHBOARD_LOCAL_DIR = ''
@@ -656,6 +662,9 @@ if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
   }
   Write-Host "Language: $($settings.DASHBOARD_LANGUAGE)"
   Write-Host "Variant: $($settings.DASHBOARD_VARIANT)"
+  if ($settings.DASHBOARD_VARIANT -eq 'orig' -and $settings.DASHBOARD_LANGUAGE -ne 'en') {
+    Write-Host 'Effective source language: en (orig dashboards stay English)'
+  }
 }
 Write-Host "Build marker: $dashboardBuildMarker"
 Write-Host "Purge: $($settings.PURGE)"

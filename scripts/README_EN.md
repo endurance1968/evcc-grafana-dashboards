@@ -1,0 +1,292 @@
+# Script Tooling
+
+The `scripts` directory is split into these areas:
+
+- root: installer entry points
+- `rollup/`: VictoriaMetrics rollup tooling used for regular operation
+- `localization/`: translation generation and audit helpers
+- `helper/`: migration and helper scripts that are not part of the normal end-user path
+- `test/`: Grafana import, smoke-check, and screenshot tooling
+
+## Rollup tooling
+
+Current rollup files:
+
+- `rollup/evcc-vm-rollup.py`
+- `rollup/evcc-vm-rollup.conf.example`
+- `rollup/evcc-vm-rollup-prod.conf.example`
+- `helper/check_data.py`
+- `helper/compare_import_coverage.py`
+- `helper/compare_labelsets.py`
+- `helper/vm-rewrite-drop-label.py`
+
+The tool keeps the raw EVCC metrics untouched:
+
+- no writes unless `--write` is passed explicitly
+- no raw metric changes from the rollup engine
+- no dashboard rewiring
+
+## Main commands
+
+Detect dimensions:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example detect
+```
+
+Show the rollup plan:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example plan
+```
+
+Benchmark representative raw-data queries:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example benchmark
+```
+
+Dry-run backfill:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup.conf.example backfill --start-day 2026-02-20 --end-day 2026-03-22 --progress
+```
+
+Write `evcc_*` rollups:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2025-01-01 --end-day 2026-03-27 --progress --write
+```
+
+Run the disposable rollup end-to-end test before changing the rollup write/delete path:
+
+```bash
+python3 scripts/test/rollup-e2e.py --docker
+```
+
+The test imports a tiny raw fixture into an isolated VictoriaMetrics, runs `backfill --replace-range --write` twice, and verifies that repeated replacement does not leave duplicate daily rollup samples. If Docker is not available, use a local disposable VM only:
+
+```bash
+python3 scripts/test/rollup-e2e.py --base-url http://127.0.0.1:8428 --confirm-disposable
+```
+
+Replace a monthly rollup scope before writing it again:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example backfill --start-day 2026-04-01 --end-day 2026-04-10 --replace-range --progress --write
+```
+
+Delete a monthly rollup scope without rebuilding it:
+
+```bash
+python3 scripts/rollup/evcc-vm-rollup.py --config scripts/rollup/evcc-vm-rollup-prod.conf.example delete --start-day 2026-04-01 --end-day 2026-04-30
+```
+
+## VM cleanup and validation helpers
+
+Check whether raw EVCC metrics and expected daily rollups exist after import/backfill. In the default `auto` phase the script checks raw data first, then automatically includes rollups once they exist. It also reports whether `host` cleanup is recommended:
+
+```bash
+python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428
+
+# explicit raw-import phase
+python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --phase raw
+
+# historical import or benchmark VM
+python3 scripts/helper/check_data.py --base-url http://127.0.0.1:8428 --phase raw --end-time 2026-03-31T23:59:59Z
+```
+
+Compare Influx source coverage against the imported VM raw metrics right after `vmctl`. The default run now checks the full Influx measurement set, but splits the result into `repo-relevant` and `additional` groups so the conclusion clearly shows whether the active dashboard schema is blocked or only extra EVCC metadata families are affected:
+
+```bash
+python3 scripts/helper/compare_import_coverage.py --influx-url http://127.0.0.1:8086 --influx-db evcc --vm-base-url http://127.0.0.1:8428 --start 2026-03-21T00:00:00Z --end 2026-04-03T23:59:59Z --only-problems
+
+# optional: limit the check to repo-relevant measurements only
+python3 scripts/helper/compare_import_coverage.py --influx-url http://127.0.0.1:8086 --influx-db evcc --vm-base-url http://127.0.0.1:8428 --start 2026-03-21T00:00:00Z --end 2026-04-03T23:59:59Z --only-problems --repo-relevant-only
+```
+
+Additional findings now include a short `Hint` so you can see whether they are likely string/boolean metadata or a real extra import gap.
+
+Only if the coverage check and the data check look good, rewrite host-tagged VM-only series:
+
+```bash
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
+```
+
+The dry-run now prints a `Recommendation` section with a clear status (`GO FOR IT`, `REVIEW`, or `STOP`) and the exact write flags to append next. A clean run avoids target deletion and looks like this:
+
+```text
+GO FOR IT: Dry-run is clean. You can continue with the write step without deleting hostless target matchers.
+Recommended write flags:
+  --reset-cache \
+  --write
+```
+
+In that clean case, rerun the same command with those flags appended:
+
+```bash
+python3 scripts/helper/vm-rewrite-drop-label.py --base-url http://192.168.1.160:8428 --matcher '{host!=""}' --drop-label host --backup-jsonl backups/evcc-host-series.jsonl --rewritten-jsonl backups/evcc-host-series-without-host.jsonl --reset-cache --write
+```
+
+Do not add `--merge-target` manually. When `--merge-target` is used, the script now checks whether the VictoriaMetrics delete selector would also remove existing hostless sibling series that are not rebuilt by this rewrite. If that happens, it returns `STOP` and refuses the write.
+
+If the recommendation mentions conflicts, follow the printed conflict-safe flag set instead, for example `--keep-target-values-on-conflict`. After any cleanup write, rerun `compare_import_coverage.py` and `check_data.py --phase raw` before rollups.
+
+Compare labelsets between two import states or benchmark exports:
+
+```bash
+python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/target-stats.json --left-name before --right-json /tmp/after-cleanup/target-stats.json --right-name after
+
+# only one metric
+python3 scripts/helper/compare_labelsets.py --left-json /tmp/before-cleanup/target-stats.json --left-name before --right-json /tmp/after-cleanup/target-stats.json --right-name after --metric-regex '^pvPower_value$'
+```
+
+Validate cached external energy comparison snapshots after rollup or dashboard-cost changes:
+
+```bash
+npm run test:energy-validation
+```
+
+This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months `2025-04` and `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, and VRM cache summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals against live VM rollups.
+
+For a strict private validation job on a runner that has refreshed cache snapshots, use:
+
+```bash
+npm run test:energy-validation -- \
+  --require-cache tibber-vm \
+  --require-cache tibber-influx \
+  --require-cache vrm
+```
+
+Add `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` when the runner also has access to a VM instance with rollups. Without `--require-cache`, missing private caches are reported as `SKIP` so the command remains safe for public CI and fresh developer checkouts.
+
+The Forgejo workflow keeps the public/default path cache-optional, but can be switched into strict private validation by setting runner environment variables:
+
+- `ENERGY_VALIDATION_STRICT=1` requires Tibber-vs-VM, Tibber-vs-Influx, and VRM cache snapshots.
+- `ENERGY_VALIDATION_VM_BASE_URL=http://127.0.0.1:8428` additionally enables the live VM rollup comparison and requires the VRM-vs-VM cache path.
+
+Verify that generated dashboard translations are reproducible from `dashboards/original/` and that the localization scripts do not create diffs on a clean tree:
+
+```bash
+npm run test:localization-idempotency
+```
+
+This runs `generate-localized-dashboards.mjs` and `apply-safe-display-translations.mjs`, compares the generated translation files before/after, and checks that the source language output under `dashboards/translation/en/` is a JSON-equivalent copy of `dashboards/original/en/`.
+
+Execute every MetricsQL panel target from the VM originals against VictoriaMetrics after Grafana macro and variable substitution:
+
+```bash
+npm run test:query-readback
+```
+
+The default command starts a disposable empty VictoriaMetrics container. Empty data is intentional here: the check verifies query syntax, dashboard macros, and unsupported Influx/Grafana leftovers. Use `node scripts/test/dashboard-query-readback.mjs --base-url http://127.0.0.1:8428` to run against an existing VM instead.
+
+Run the complete deterministic rollup path after rollup, query, dashboard, or validation changes:
+
+```bash
+npm run test:rollup-path
+```
+
+This orchestrates `test:ci`, `test:energy-validation`, `test:query-readback`, `test:render-e2e`, and `test:rollup-e2e`. Use `-- --strict-energy` on a private runner with refreshed Tibber/Influx/VRM caches, and add `-- --vm-base-url http://127.0.0.1:8428` when a live rollup VM should be compared to the VRM cache.
+
+Cross-platform guard:
+
+```bash
+npm run test:cross-platform
+```
+
+This check blocks Windows-only npm entrypoints and unsafe `child_process` shell usage in Node scripts. `npm test` is intentionally mapped to the portable Node runner, not PowerShell.
+
+The Forgejo CI workflow runs the same deterministic checks as separate steps so failures stay easy to identify:
+
+```bash
+npm run test:ci
+npm run test:cross-platform
+npm run test:energy-validation
+npm run test:query-readback
+npm run test:render-e2e
+npm run test:rollup-e2e
+```
+
+Verify Forgejo Actions wiring from a developer machine:
+
+```bash
+npm run test:forgejo-actions
+```
+
+The default Forgejo Web/API URL is `http://192.168.0.127:3000`, matching the local Forgejo instance used for this repository. Override it with `FORGEJO_BASE_URL` or `--base-url` if the instance moves. The check verifies that Actions are enabled and that the latest workflow run was picked up by a runner. `waiting` or `cancelled` with a never-started timestamp means no matching runner accepted the job. The CI workflow also starts with a `Runner Docker readiness` step, so a runner without Docker access fails before the Docker-backed query/readback, render, or rollup tests.
+
+For browser-level Grafana rendering, run the suite with render smoke enabled after importing dashboards:
+
+```bash
+node scripts/test/run-suite.mjs --env=.env.local --render-smoke=true
+```
+
+`render-smoke-check.mjs` fails on Grafana datasource/query HTTP errors, known panel error texts, empty critical panels, stuck loading states, and critical panels that render without visual, table, or numeric content. Use `--fail-no-data=false` only when intentionally checking layout/rendering against incomplete test data.
+
+For a fully disposable render smoke run with fixture data, use:
+
+```bash
+npm run test:render-e2e
+```
+
+This starts temporary Grafana and VictoriaMetrics containers, imports minimal VM fixture data, creates the VM datasource, imports the original VM dashboards, and runs the hardened browser render smoke against critical panels. The Forgejo CI workflow runs this command after installing the Chromium browser for Playwright.
+
+To run the same browser render smoke against the Grafana 13 TAB dashboards:
+
+```bash
+npm run test:render-e2e:tabs
+```
+
+The rollup E2E test is not just a smoke test. It imports deterministic raw fixture data, runs `evcc-vm-rollup.py --replace-range --write` twice, then asserts expected daily energy, tariff, and cost values, duplicate-free daily timestamps, and identical required rollup output after the second replace run.
+
+## Configuration
+
+The example config uses INI format so it works with Python standard library only.
+
+Key settings:
+
+- `base_url`
+- `host_label`
+- `timezone`
+- `metric_prefix`
+- benchmark start and end range
+
+The repo assumes one VictoriaMetrics instance per EVCC instance. If you run multiple EVCC instances, run multiple VictoriaMetrics instances as well instead of multiplexing them via a shared `db` label.
+
+For the operator-facing workflow, installation steps, and cron examples, see `docs/influx-to-vm-migration.md` and `docs/migration-checklist.md`.
+
+## Safety model
+
+Rollups are written to the `evcc_*` namespace. Raw EVCC metrics remain untouched.
+
+## Current scope
+
+Implemented in the catalog:
+
+- PV daily energy
+- home daily energy
+- loadpoint daily energy
+- vehicle daily energy
+- vehicle daily distance
+- ext daily energy
+- aux daily energy
+- battery min and max SOC per day
+- grid import and export split
+- battery charge and discharge split
+- import price and cost rollups
+- export credit rollups
+
+Daily rollups carry `local_year` and `local_month` labels so month/year dashboards can filter on local calendar periods without repeating large timezone guard expressions in every query.
+
+Still deferred beyond the current baseline:
+
+- any optional monthly rollup layer
+
+## End-user install
+
+For end users, prefer:
+
+- `scripts/deploy.ps1`
+- `scripts/deploy-python.sh`
+- `docs/vm-dashboard-install.md`

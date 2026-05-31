@@ -1,162 +1,74 @@
-# Install VictoriaMetrics with Docker
+# VictoriaMetrics mit Docker installieren
 
-Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+Englische Version: [victoriametrics-install-docker_EN.md](./victoriametrics-install-docker_EN.md).
 
-This guide covers a simple single-node VictoriaMetrics installation with Docker.
+Diese Anleitung beschreibt eine einfache VictoriaMetrics-Single-Node-Installation mit Docker.
 
-Assumptions:
+Pruefe vor Beginn die zentralen Voraussetzungen: [system-requirements.md](./system-requirements.md).
 
-- Docker is already installed
-- you want a single VictoriaMetrics instance
-- the data should be stored persistently on the host
+## Voraussetzungen
 
-Not covered here:
+- Docker oder Docker Compose
+- persistentes Volume fuer VictoriaMetrics-Daten
+- Netzwerkzugriff von EVCC/Telegraf und Grafana auf VictoriaMetrics
 
-- installing Docker itself
-- migrating from InfluxDB to VictoriaMetrics
-- Grafana or dashboard deployment
+## Docker Compose Beispiel
 
-Continue with:
+```yaml
+services:
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.139.0
+    container_name: victoriametrics
+    restart: unless-stopped
+    ports:
+      - "8428:8428"
+    command:
+      - "-storageDataPath=/victoria-metrics-data"
+      - "-retentionPeriod=10y"
+    volumes:
+      - vm-data:/victoria-metrics-data
 
-- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
-- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+volumes:
+  vm-data:
+```
 
-## Docker image
-
-This guide uses:
-
-- `victoriametrics/victoria-metrics:v1.138.0`
-
-Important:
-
-- the version is pinned on purpose
-- check for newer releases when needed
-
-Sources:
-
-- [VictoriaMetrics Quick Start](https://docs.victoriametrics.com/victoriametrics/quick-start/)
-- [VictoriaMetrics Releases](https://github.com/VictoriaMetrics/VictoriaMetrics/releases)
-
-## Goal
-
-At the end, VictoriaMetrics runs:
-
-- on port `8428`
-- with persistent host storage
-- with browser access to `vmui`
-
-## 1. Create the data directory
-
-Linux host:
+Start:
 
 ```bash
-mkdir -p /opt/victoriametrics/data
-cd /opt/victoriametrics
+docker compose up -d
+curl -fsSL http://localhost:8428/health
 ```
 
-Windows Docker Desktop host:
+## Daten schreiben
 
-```powershell
-New-Item -ItemType Directory -Force C:\evcc\victoriametrics\data
+Influx-Line-Protocol kann nach VictoriaMetrics geschrieben werden:
+
+```text
+http://<vm-host>:8428/influx/write
 ```
 
-Use that Windows path in the `-v` option, for example `-v C:\evcc\victoriametrics\data:/victoria-metrics-data`.
+Beispiel fuer Telegraf:
 
-## 2. Pull the image
-
-```bash
-docker pull victoriametrics/victoria-metrics:v1.138.0
+```toml
+[[outputs.http]]
+  alias = "victoriametrics_evcc"
+  url = "http://<vm-host>:8428/influx/write"
+  method = "POST"
+  data_format = "influx"
+  timeout = "10s"
+  non_retryable_statuscodes = [400]
 ```
 
-## 3. Start the container
+## Grafana anbinden
 
-```bash
-docker run -d \
-  --name victoriametrics \
-  --restart unless-stopped \
-  -p 8428:8428 \
-  -v /opt/victoriametrics/data:/victoria-metrics-data \
-  victoriametrics/victoria-metrics:v1.138.0 \
-  --storageDataPath=/victoria-metrics-data \
-  --retentionPeriod=10y \
-  --selfScrapeInterval=10s
-```
+In Grafana die VictoriaMetrics Datasource mit URL `http://<vm-host>:8428` und UID `vm-evcc` anlegen.
 
-Windows PowerShell example:
+## Backup
 
-```powershell
-docker run -d `
-  --name victoriametrics `
-  --restart unless-stopped `
-  -p 8428:8428 `
-  -v C:\evcc\victoriametrics\data:/victoria-metrics-data `
-  victoriametrics/victoria-metrics:v1.138.0 `
-  --storageDataPath=/victoria-metrics-data `
-  --retentionPeriod=10y `
-  --selfScrapeInterval=10s
-```
+Das Volume `vm-data` enthaelt die Messdaten. Plane regelmaessige Backups und teste Restore-Prozesse, bevor du InfluxDB abschaltest.
 
-## Important options
+## Naechste Schritte
 
-- `-p 8428:8428`
-  - publishes VictoriaMetrics on port `8428`
-- `-v /opt/victoriametrics/data:/victoria-metrics-data`
-  - stores data persistently on the host
-- `--retentionPeriod=10y`
-  - keeps data for ten years
-- `--selfScrapeInterval=10s`
-  - collects VictoriaMetrics internal metrics every 10 seconds
-
-## 4. Verify the installation
-
-Container status:
-
-```bash
-docker ps | grep victoriametrics
-```
-
-Health check:
-
-```bash
-curl -fsSL http://127.0.0.1:8428/health
-```
-
-Browser:
-
-- `http://<your-host>:8428/vmui`
-
-## 5. Check logs
-
-```bash
-docker logs --tail 100 victoriametrics
-```
-
-## 6. Update the container later
-
-```bash
-docker pull victoriametrics/victoria-metrics:v1.138.0
-docker stop victoriametrics
-docker rm victoriametrics
-```
-
-Then run the same `docker run` command again.
-
-Important:
-
-- the host directory `/opt/victoriametrics/data` remains in place
-- the stored data remains available
-
-## Common issues
-
-- port `8428` is already in use; choose another host port such as `-p 18428:8428` and use that port in checks and datasource URLs
-- the host directory is not writable
-- no persistence because the volume was forgotten
-- the firewall blocks port `8428`
-
-## Next step
-
-Once VictoriaMetrics is running, continue with:
-
-- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
-- or, if you already have InfluxDB history, first:
-  - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- Neuer Stack: [grafana-install-docker.md](./grafana-install-docker.md)
+- Migration: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- Dashboards: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)

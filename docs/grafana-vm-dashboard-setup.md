@@ -1,107 +1,43 @@
-# Set Up Grafana With VictoriaMetrics Dashboards
+# Grafana VM Dashboard Setup
 
-Before running commands, review the central requirements overview: [system-requirements.md](./system-requirements.md).
+Englische Version: [grafana-vm-dashboard-setup_EN.md](./grafana-vm-dashboard-setup_EN.md).
 
-This is the canonical end-user deployment guide. It covers:
+Diese Anleitung installiert die EVCC-Dashboards in Grafana und verbindet sie mit einer VictoriaMetrics-Datasource.
 
-- creating the VictoriaMetrics datasource in Grafana
-- creating a Grafana service-account token
-- deploying the EVCC dashboards
-- updating dashboards later
+Pruefe vor Beginn die zentralen Voraussetzungen: [system-requirements.md](./system-requirements.md).
 
-If VictoriaMetrics data and rollups are not ready yet, finish [influx-to-vm-migration.md](./influx-to-vm-migration.md) first.
+## Voraussetzungen
 
-## Target State
+- Grafana 13.0.1 oder neuer
+- VictoriaMetrics Datasource Plugin
+- eine erreichbare VictoriaMetrics-Instanz mit EVCC-Daten
+- Datasource UID `vm-evcc` oder ein eigener UID-Wert in `GRAFANA_DS_VM_EVCC_UID`
+- Service-Account-Token fuer Grafana oder Basic Auth
 
-Grafana should have:
+`deploy-python.sh` ist der empfohlene Linux-Pfad. `deploy-bash.sh` bleibt fuer Systeme mit Bash und `jq` verfuegbar. Windows nutzt `deploy.ps1`.
 
-- a VictoriaMetrics datasource with UID `vm-evcc`
-- a folder called `EVCC`
-- the EVCC dashboards deployed into that folder
-
-`Today*` dashboards read raw VictoriaMetrics data. `Month`, `Year`, and `All-time` need the generated `evcc_*` rollups.
-
-## Prerequisites
-
-Required:
-
-- running Grafana instance
-- running VictoriaMetrics instance
-- Grafana service-account token
-- internet access to GitHub for the default deploy source
-
-Recommended:
-
-- Grafana 13.0.1 or newer. The deploy scripts always install the tab-navigation dashboards; dashboard set selection is no longer supported.
-- Linux deploys use `deploy-python.sh` as the primary path
-- Windows deploys use `deploy.ps1`
-
-Linux package minimum:
-
-```bash
-sudo apt update
-sudo apt install -y curl python3
-```
-
-`deploy-bash.sh` remains available for systems that prefer Bash + `jq`, but it is not the primary beginner path.
-
-## 1. Create The VictoriaMetrics Datasource
+## 1. Datasource anlegen
 
 In Grafana:
 
-1. Open `Connections` or `Administration`.
-2. Open `Data sources`.
-3. Add a VictoriaMetrics datasource.
-4. Set URL to `http://<your-vm-host>:8428`.
-5. Set access to `Server` or `Proxy`.
-6. Set UID to `vm-evcc`.
-7. Click `Save & test`.
+1. `Connections` / `Data sources` oeffnen.
+2. VictoriaMetrics Datasource auswaehlen.
+3. URL deiner VictoriaMetrics-Instanz setzen, z. B. `http://victoriametrics:8428`.
+4. UID auf `vm-evcc` setzen oder spaeter `GRAFANA_DS_VM_EVCC_UID` anpassen.
+5. `Save & test` ausfuehren.
 
-If the VictoriaMetrics datasource plugin is not available, install it first and restart Grafana.
+## 2. Deploy-Dateien herunterladen
 
-On a Debian package install, use:
-
-```bash
-sudo grafana cli \
-  --homepath=/usr/share/grafana \
-  --pluginsDir /var/lib/grafana/plugins \
-  plugins install victoriametrics-metrics-datasource
-sudo systemctl restart grafana-server
-```
-
-Docker note: if Grafana and VictoriaMetrics run as separate Docker containers, `localhost` inside Grafana points to the Grafana container, not to VictoriaMetrics. On Docker Desktop, use a datasource URL such as `http://host.docker.internal:8428`. On a user-defined Docker network, use the VictoriaMetrics container name, for example `http://victoriametrics:8428`.
-
-## 2. Create A Service-Account Token
-
-In Grafana:
-
-1. Open `Administration`.
-2. Open `Users and access`.
-3. Open `Service accounts`.
-4. Create `evcc-dashboard-deployer`.
-5. Add a service-account token.
-6. Copy the token immediately.
-
-For a simple local deployment, `Admin` in the current organization is usually enough. Grafana 13 supports service-account tokens for this deploy path.
-
-## 3. Download The Deployer
-
-Linux / Raspberry Pi:
+Linux:
 
 ```bash
 curl -fsSLo deploy-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-python.sh
 curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example
 chmod +x deploy-python.sh
+cp vm-dashboard-install.env.example vm-dashboard-install.env
 ```
 
-Windows / PowerShell:
-
-```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy.ps1 -OutFile deploy.ps1
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
-```
-
-Optional Bash deployer:
+Optionaler Bash-Deployer:
 
 ```bash
 curl -fsSLo deploy-bash.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-bash.sh
@@ -109,26 +45,22 @@ chmod +x deploy-bash.sh
 sudo apt install -y jq
 ```
 
-## 4. Create The Config File
-
-Linux:
-
-```bash
-cp vm-dashboard-install.env.example vm-dashboard-install.env
-```
-
 Windows:
 
 ```powershell
+Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy.ps1 -OutFile deploy.ps1
+Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
 Copy-Item vm-dashboard-install.env.example vm-dashboard-install.env
 ```
 
-Minimal config:
+## 3. Konfiguration bearbeiten
+
+Minimal:
 
 ```env
-GRAFANA_URL=http://<your-grafana-ip>:3000
+GRAFANA_URL=http://<grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
-GRAFANA_API_TOKEN=<your_token>
+GRAFANA_API_TOKEN=<service-account-token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
@@ -136,7 +68,9 @@ PURGE=false
 PURGE_ONLY=false
 ```
 
-Personal dashboard variable overrides can be kept in the same env file. For example:
+Der Default importiert die generierten deutschen Dashboards. `DASHBOARD_VARIANT=orig` ist nur fuer die englischen Original-Quelldashboards gedacht und bleibt unabhaengig von `DASHBOARD_LANGUAGE` Englisch.
+
+Persoenliche Dashboard-Overrides koennen in derselben Env-Datei stehen:
 
 ```env
 DASHBOARD_INSTALLED_WATT_PEAK=22
@@ -150,21 +84,27 @@ DASHBOARD_PORTAL_TITLE=VRM
 DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/795774/dashboard
 ```
 
-If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:
+Wenn die Dashboard-Dateien von einem selbst gehosteten Raw-Endpunkt statt GitHub kommen sollen:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
-The legacy row-based deploy path has been removed. Use Grafana 13.0.1 or newer; the deploy scripts always install the tab-navigation dashboards.
+Jeder Key darf nur einmal aktiv gesetzt sein. Kommentiere alte Alternativen aus.
 
-## 5. Run The Deployment
+## 4. Deployment ausfuehren
 
 Linux:
 
 ```bash
 ./deploy-python.sh
+```
+
+Bash-Variante:
+
+```bash
+./deploy-bash.sh
 ```
 
 Windows:
@@ -173,100 +113,42 @@ Windows:
 .\deploy.ps1
 ```
 
-The deployer shows a preflight summary and asks for confirmation before writing.
+Der Deployer zeigt zuerst eine Preflight-Zusammenfassung und fragt nach Bestaetigung.
 
-Direct one-time commands are also supported:
-
-```bash
-./deploy-python.sh --url http://<your-grafana-ip>:3000 --token <your_token> --purge false
-```
-
-```powershell
-.\deploy.ps1 -url http://<your-grafana-ip>:3000 -token <your_token> -purge false
-```
-
-## What The Deployer Does
-
-- verifies Grafana access
-- resolves the fixed dashboard file list from `dashboards/deploy-manifest.json`
-- shows which dashboards will be imported
-- updates embedded library panels before dashboard import
-- imports dashboards into the `EVCC` folder
-
-With `PURGE=false`, existing dashboards are overwritten by UID and library panels are updated in place.
-With `PURGE_ONLY=false`, the deployer stays in normal import mode.
-
-With `PURGE=true`, known EVCC dashboards are deleted first and then recreated. Use it only when you intentionally want a full rebuild.
-With `PURGE_ONLY=true`, known EVCC dashboards and referenced EVCC library panels are deleted, then the deployer stops without importing anything.
-
-## 6. Verify The Result
+## 5. Ergebnis pruefen
 
 In Grafana:
 
-- the `EVCC` folder exists
-- `Today` shows current raw data
-- `Today - Details` opens without datasource errors
-- `Month`, `Year`, and `All-time` show rollup values
-- the dashboard header build variable shows the selected language, variant, source ref, and deployment time
+- Ordner `EVCC` existiert.
+- Dashboards `Today`, `Today - Details Tabs`, `Month Tabs`, `Year Tabs`, `All-time Tabs` sind vorhanden.
+- `Today` zeigt aktuelle Rohdaten.
+- Langzeit-Dashboards zeigen Daten, sobald `evcc_*` Rollups vorhanden sind.
+- Keine Panels zeigen Datasource- oder Query-Fehler.
 
-If `Today` works but long-range dashboards are empty, rollups are missing. Return to [influx-to-vm-migration.md](./influx-to-vm-migration.md).
+## 6. Update und Neuaufbau
 
-## Update Later
-
-Normal update:
+Normales Update:
 
 ```bash
 ./deploy-python.sh --purge false
 ```
 
-Windows:
-
-```powershell
-.\deploy.ps1 -purge false
-```
-
-Full rebuild:
+Bewusster Neuaufbau:
 
 ```bash
 ./deploy-python.sh --purge true
 ```
 
-Windows:
+Nur loeschen, ohne Re-Import:
 
-```powershell
-.\deploy.ps1 -purge true
+```bash
+./deploy-python.sh --purge-only true
 ```
 
-## Common Errors
+PowerShell verwendet entsprechend `-purge false`, `-purge true` oder `-purgeonly true`.
 
-### `Missing GRAFANA_API_TOKEN`
+## Naechste Schritte
 
-Set `GRAFANA_API_TOKEN` in `vm-dashboard-install.env` or pass `--token` / `-token`.
-
-### 403 / Permission denied
-
-The service account lacks permissions to manage dashboards, folders, or library panels.
-
-### 401 / `Invalid API key`
-
-Create a fresh Grafana service-account token and set:
-
-```env
-GRAFANA_AUTH_MODE=auto
-GRAFANA_API_TOKEN=<new_service_account_token>
-```
-
-### Dashboards imported, but empty
-
-Check:
-
-- datasource URL points to VictoriaMetrics
-- datasource UID matches `GRAFANA_DS_VM_EVCC_UID`
-- raw data exists for `Today*`
-- `evcc_*` rollups exist for long-range dashboards
-
-## References
-
-- Quick deploy reference: [deployment-readme.md](./deployment-readme.md)
-- Full deployer option reference: [vm-dashboard-install.md](./vm-dashboard-install.md)
-- Migration checklist: [migration-checklist.md](./migration-checklist.md)
+- Rollup einrichten: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+- Deployer-Optionen: [vm-dashboard-install.md](./vm-dashboard-install.md)
+- Troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)

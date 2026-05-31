@@ -1,71 +1,43 @@
-# VM Dashboard Install Reference
+# VM Dashboard Installer
 
-For a first-time walkthrough, start with [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md). For a short command-only version, use [deployment-readme.md](./deployment-readme.md).
+Englische Version: [vm-dashboard-install_EN.md](./vm-dashboard-install_EN.md).
 
-This document is the deployer option reference.
+Diese Datei beschreibt die Optionen der Dashboard-Deployer fuer Grafana. Fuer den normalen Ablauf nutze zuerst [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md).
 
-## Deployer Goals
+## Unterstuetzte Deployer
 
-- no Node.js required for end users
-- import dashboards and embedded Grafana library panels
-- support Windows PowerShell, portable POSIX shell with Python, and Bash + `jq`
-- keep `PURGE=false` and `PURGE_ONLY=false` as the safe default
+- Windows PowerShell: `deploy.ps1`
+- Portable Linux/POSIX mit Python: `deploy-python.sh`
+- Bash + `jq`: `deploy-bash.sh`
 
-## Default Behavior
+Alle Deployer verwenden dieselbe Konfigurationsdatei `vm-dashboard-install.env`.
 
-Defaults:
+## Mindestanforderungen
 
-- source repo: `endurance1968/evcc-grafana-dashboards`
-- ref: `main`
-- language: `en`
-- variant: `gen`
-- dashboards: fixed Grafana 13 tab-navigation list from `dashboards/deploy-manifest.json`
-- folder UID/title: `evcc` / `EVCC`
-- datasource UID: `vm-evcc`
-- purge before import: `false`
+- Grafana 13.0.1 oder neuer
+- VictoriaMetrics Datasource Plugin
+- Grafana Service-Account-Token oder Basic Auth
+- Datasource UID fuer VictoriaMetrics, standardmaessig `vm-evcc`
 
-Grafana 13.0.1 or newer is required. Dashboard set selection is no longer supported; the deployers always use the fixed tab-navigation file list from `dashboards/deploy-manifest.json`.
+Dashboard-Set-Auswahl wird nicht mehr unterstuetzt. Es wird immer die feste Tab-Navigation-Dateiliste aus `dashboards/deploy-manifest.json` verwendet.
 
-## Required Config
-
-Copy `vm-dashboard-install.env.example` to `vm-dashboard-install.env` and set at least:
-
-```env
-GRAFANA_URL=http://<your-grafana-ip>:3000
-GRAFANA_AUTH_MODE=auto
-GRAFANA_API_TOKEN=<service_account_token>
-GRAFANA_DS_VM_EVCC_UID=vm-evcc
-```
-
-`GRAFANA_API_TOKEN` is the preferred setting for Grafana 13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty.
-
-Local recovery fallback when basic auth is enabled:
-
-```env
-GRAFANA_AUTH_MODE=basic
-GRAFANA_USER=admin
-GRAFANA_PASSWORD=<admin_password>
-```
-
-## Dashboard Selection
+## Sprache und Variante
 
 ```env
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
 ```
 
-Values:
+Werte:
 
 - `DASHBOARD_LANGUAGE`: `en`, `de`, `fr`, `es`, `it`, `nl`, `hi`, `zh`
-- `DASHBOARD_VARIANT`: `gen` for generated localized dashboards, `orig` for original source dashboards
-
-The deployable file lists are defined in `dashboards/deploy-manifest.json`.
+- `DASHBOARD_VARIANT`: `gen` fuer generierte lokalisierte Dashboards, `orig` fuer die englischen Original-Quelldashboards. `orig` bleibt immer Englisch und verwendet unabhaengig von `DASHBOARD_LANGUAGE` den Pfad `dashboards/original/en`.
 
 ## Source Selection
 
-`DASHBOARD_SOURCE_MODE` selects exactly where dashboard JSON files are loaded from. The deployer validates the variables required by the selected mode and ignores source variables from the other modes. Define each env key only once; duplicate keys are rejected because shell-style env files would otherwise let the last assignment win silently.
+`DASHBOARD_SOURCE_MODE` entscheidet, woher Dashboard-JSON-Dateien geladen werden. Der Deployer validiert nur die Variablen des gewaehlten Modus und ignoriert Quellenvariablen der anderen Modi. Jeder Env-Key darf nur einmal aktiv gesetzt sein; doppelte Keys werden abgelehnt.
 
-GitHub source:
+GitHub-Quelle:
 
 ```env
 DASHBOARD_SOURCE_MODE=github
@@ -73,21 +45,21 @@ GITHUB_REPO=endurance1968/evcc-grafana-dashboards
 GITHUB_REF=main
 ```
 
-Raw URL source. The value must point at the repository root raw path, typically `<server:port>/<reponame>/raw/branch/main`; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
+Raw-URL-Quelle. Der Wert muss auf den Repository-Root-Raw-Pfad zeigen, typischerweise `<server:port>/<reponame>/raw/branch/main`; der Deployer haengt Pfade wie `dashboards/deploy-manifest.json`, `dashboards/translation/de/...` oder bei `DASHBOARD_VARIANT=orig` `dashboards/original/en/...` an:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
-Local dashboard directory source. The directory must contain the six deployable dashboard JSON files for the selected language/variant; the deployer does not read a repository manifest in this mode:
+Lokales Dashboard-Verzeichnis. Das Verzeichnis muss die sechs deploybaren Dashboard-JSON-Dateien der gewaehlten Sprache/Variante enthalten; in diesem Modus wird kein Repository-Manifest gelesen:
 
 ```env
 DASHBOARD_SOURCE_MODE=localdir
 DASHBOARD_LOCAL_DIR=/path/to/evcc-grafana-dashboards/dashboards/translation/de
 ```
 
-## Folder And Datasource
+## Ordner und Datasource
 
 ```env
 GRAFANA_FOLDER_UID=evcc
@@ -95,33 +67,32 @@ GRAFANA_FOLDER_TITLE=EVCC
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 ```
 
-If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before deployment.
+Wenn deine Grafana-Datasource nicht `vm-evcc` heisst, setze `GRAFANA_DS_VM_EVCC_UID` vor dem Deployment.
 
-## Update Behavior
+## Update-Verhalten
 
 ```env
 PURGE=false
 PURGE_ONLY=false
 ```
 
-`PURGE=false` overwrites known dashboards by UID and updates referenced library panels in place.
-`PURGE_ONLY=false` keeps the deployer in normal import mode.
+`PURGE=false` ueberschreibt bekannte Dashboards per UID und aktualisiert referenzierte Library Panels. `PURGE_ONLY=false` ist der normale Importmodus.
 
 ```env
 PURGE=true
 ```
 
-`PURGE=true` deletes known EVCC dashboards first and then recreates dashboards and embedded library panels. Use this for a deliberate full rebuild.
+`PURGE=true` loescht bekannte EVCC-Dashboards zuerst und erstellt Dashboards und eingebettete Library Panels danach neu. Nutze das nur fuer einen bewussten Neuaufbau.
 
 ```env
 PURGE_ONLY=true
 ```
 
-`PURGE_ONLY=true` deletes known EVCC dashboards and referenced EVCC library panels, then stops without importing anything. Use this only when you intentionally want to remove the deployed dashboards from Grafana.
+`PURGE_ONLY=true` loescht bekannte EVCC-Dashboards und referenzierte EVCC Library Panels und beendet danach ohne Import. Das ist die reine Aufraeumfunktion.
 
-## Optional Dashboard Variable Overrides
+## Optionale Dashboard-Variablen
 
-These values let you set hidden dashboard variables and header buttons without editing dashboard JSON files:
+Diese Werte setzen versteckte Dashboard-Variablen und Header-Buttons, ohne Dashboard-JSON-Dateien manuell zu bearbeiten:
 
 ```env
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
@@ -144,33 +115,31 @@ DASHBOARD_PORTAL_TITLE=Solarman
 DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-Quote regex values containing `|`, `(`, `)`, spaces, or non-ASCII characters so the Bash deployer can source the env file safely.
+Regex-Werte mit `|`, Klammern, Leerzeichen oder Nicht-ASCII-Zeichen sollten gequotet werden, damit der Bash-Deployer die Env-Datei sauber lesen kann.
 
-Backward-compatible aliases are still accepted:
+Rueckwaertskompatible Alias-Namen werden weiterhin akzeptiert:
 
 - `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL`
 - `DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL`
-- `DASHBOARD_ICE_CONSUMPTION_L_PER_100KM` for `DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM`
-- `DASHBOARD_FUEL_PRICE_PER_L` for `DASHBOARD_FUEL_COST_PER_L`
-- `DASHBOARD_BATTERY_CAPACITY_WH` for `DASHBOARD_STORAGE_CAPACITY_WH`
+- `DASHBOARD_ICE_CONSUMPTION_L_PER_100KM` fuer `DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM`
+- `DASHBOARD_FUEL_PRICE_PER_L` fuer `DASHBOARD_FUEL_COST_PER_L`
+- `DASHBOARD_BATTERY_CAPACITY_WH` fuer `DASHBOARD_STORAGE_CAPACITY_WH`
 
-Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see deployment timestamp, selected language/variant, and source ref.
+Jedes deployte Dashboard enthaelt eine sichtbare `Build`-Variable im Header. Der Tooltip zeigt Deployment-Zeitpunkt, Sprache/Variante und Quelle.
 
-## Runtime Arguments
+## Laufzeitargumente
 
 PowerShell:
 
 ```powershell
 .\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false
-# Delete only, no re-import:
 .\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purgeonly true
 ```
 
-Portable shell with Python:
+Portable Shell mit Python:
 
 ```bash
 ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false
-# Delete only, no re-import:
 ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge-only true
 ```
 
@@ -178,22 +147,17 @@ Bash + `jq`:
 
 ```bash
 ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false
-# Delete only, no re-import:
 ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge-only true
 ```
 
-Runtime arguments override the config file for that run.
+Laufzeitargumente ueberschreiben die Konfigurationsdatei fuer diesen Lauf.
 
-## User Customization
+## Anpassungen
 
-The deployer is intentionally import-only. Recommended customization paths:
+Der Deployer ist bewusst importorientiert. Empfohlene Anpassungswege:
 
-- change dashboard variables in Grafana and save the dashboard
-- set deploy-time dashboard variable overrides in `vm-dashboard-install.env`
-- deploy from a local dashboard directory with `DASHBOARD_SOURCE_MODE=localdir`
+- Dashboard-Variablen in Grafana aendern und Dashboard speichern
+- Deploy-Time-Overrides in `vm-dashboard-install.env` setzen
+- aus lokalem Dashboard-Verzeichnis mit `DASHBOARD_SOURCE_MODE=localdir` deployen
 
-The deployer intentionally does not rewrite colors or arbitrary panel settings.
-
-## Maintainer Note
-
-Node.js scripts under `scripts/test` remain the maintainer workflow for localization generation, test-folder imports, screenshot automation, and smoke checks. End users should prefer the deploy scripts above.
+Der Deployer schreibt keine Farben oder beliebige Panel-Optionen um.

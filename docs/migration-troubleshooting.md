@@ -1,193 +1,98 @@
 # Migration Troubleshooting
 
-Use this document only when the normal path in [influx-to-vm-migration.md](./influx-to-vm-migration.md) reports a problem.
+Englische Version: [migration-troubleshooting_EN.md](./migration-troubleshooting_EN.md).
 
-## First Rule: Verify Raw Data Before Rollups
+Diese Datei hilft bei typischen Problemen nach Import, Rollup und Dashboard-Deployment.
 
-Most long-range dashboard problems start in one of two places:
+## Keine Daten in `Today`
 
-- raw data did not import completely
-- rollups were built from already-broken raw data
+Pruefe:
 
-Check in this order:
+- Schreibt EVCC/Telegraf wirklich nach VictoriaMetrics?
+- Ist die VictoriaMetrics URL korrekt?
+- Nutzt Grafana die richtige Datasource UID (`vm-evcc` oder konfiguriert via `GRAFANA_DS_VM_EVCC_UID`)?
+- Sind Zeitbereich und Zeitzone in Grafana korrekt?
 
-1. VictoriaMetrics health
-2. raw metric presence
-3. Influx-to-VM coverage
-4. host-label hygiene
-5. rollup output
-6. Grafana datasource and dashboard variables
-
-## Raw Metric Presence
-
-Example raw series check:
+Schnelltest:
 
 ```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=pvPower_value' \
-  --data-urlencode 'start=2026-03-28T00:00:00Z' \
-  --data-urlencode 'end=2026-03-30T00:00:00Z'
+curl -G http://<vm-host>:8428/api/v1/series --data-urlencode 'match[]=grid_power'
 ```
 
-If this returns no series for a time range where InfluxDB has data, re-check the `vmctl influx` command, database name, time range, and credentials.
+## Langzeit-Dashboards leer
 
-## Coverage Check Reports Problems
+`Month`, `Year` und `All-time` verwenden `evcc_*` Rollups. Wenn diese Dashboards leer sind, fehlen meist Rollup-Daten.
 
-Run the coverage check directly after `vmctl` and before any cleanup:
+Pruefe:
 
 ```bash
-python3 compare_import_coverage.py \
-  --influx-url http://<influx-host>:8086 \
-  --influx-db evcc \
-  --vm-base-url http://localhost:8428 \
-  --start 2026-03-21T00:00:00Z \
-  --end 2026-04-03T23:59:59Z \
-  --only-problems
+curl -G http://<vm-host>:8428/api/v1/series --data-urlencode 'match[]=evcc_*'
 ```
 
-Interpretation:
+Danach Rollup neu ausfuehren und Logs pruefen.
 
-- `Repo-relevant problems: 0` means the active dashboard schema is not blocked.
-- `Additional` findings can be extra EVCC metadata or non-dashboard measurements.
-- `Critical energy problems` must be resolved before rollups are trusted.
+## PV, Batterie oder Ladepunkte fehlen
 
-To inspect one measurement:
+Moegliche Ursachen:
 
-```bash
-python3 compare_import_coverage.py \
-  --influx-url http://<influx-host>:8086 \
-  --influx-db evcc \
-  --vm-base-url http://localhost:8428 \
-  --start 2026-03-21T00:00:00Z \
-  --end 2026-04-03T23:59:59Z \
-  --measurement-regex '^batterySoc$' \
-  --only-problems
+- EVCC liefert andere Labelnamen als erwartet.
+- Blocklist-Variablen blenden Reihen aus.
+- Import hat bestimmte Measurements nicht uebernommen.
+- Der aktuelle Zeitraum enthaelt keine Daten.
+
+Pruefe die Dashboard-Variablen in Grafana und die Overrides in `vm-dashboard-install.env`, besonders:
+
+```env
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST
+DASHBOARD_FILTER_EXT_BLOCKLIST
+DASHBOARD_FILTER_AUX_BLOCKLIST
+DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX
 ```
 
-## PV Import Drift Or Missing `pvPower`
+## Deployer liest falsche Quelle
 
-If the critical PV parity check fails, repair raw `pvPower` before rebuilding rollups.
+`DASHBOARD_SOURCE_MODE` darf nur einmal aktiv gesetzt sein. Wenn derselbe Key mehrfach in der Env-Datei vorkommt, brechen die Deployer ab.
 
-1. Delete the affected raw `pvPower_value` family in VictoriaMetrics.
-2. Re-import only `pvPower` with `vmctl influx --influx-filter-series`.
-3. Rerun coverage for `pvPower`.
-4. Rebuild `evcc_*` rollups.
+Gueltige Modi:
 
-Example:
-
-```bash
-curl -fsS -X POST 'http://localhost:8428/api/v1/admin/tsdb/delete_series' \
-  --data-urlencode 'match[]=pvPower_value'
-
-yes | vmctl influx \
-  --influx-addr='http://<influx-host>:8086' \
-  --influx-user='<user>' \
-  --influx-password='<password>' \
-  --influx-database='evcc' \
-  --influx-filter-series "on evcc from pvPower" \
-  --influx-filter-time-start='2025-01-01T00:00:00Z' \
-  --influx-filter-time-end='2026-03-31T23:59:59Z' \
-  --influx-skip-database-label \
-  --vm-addr='http://localhost:8428'
+```env
+DASHBOARD_SOURCE_MODE=github
+DASHBOARD_SOURCE_MODE=rawurl
+DASHBOARD_SOURCE_MODE=localdir
 ```
 
-## `host` Cleanup Reports Conflicts
+Nur eine dieser Zeilen darf aktiv sein.
 
-Check whether `host` exists:
+## Grafana 401 Unauthorized
 
-```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]={host!=""}' \
-  --data-urlencode 'start=2024-01-01T00:00:00Z' \
-  --data-urlencode 'end=2026-03-30T23:59:59Z'
+Grafana 13 unterstuetzt die alten API-Routen weiterhin, API Keys sind aber veraltet. Nutze einen Service-Account-Token:
+
+```env
+GRAFANA_AUTH_MODE=auto
+GRAFANA_API_TOKEN=<service-account-token>
 ```
 
-Dry-run:
+Alternativ fuer lokale Recovery:
 
-```bash
-python3 vm-rewrite-drop-label.py \
-  --base-url http://localhost:8428 \
-  --matcher '{host!=""}' \
-  --drop-label host \
-  --backup-jsonl backups/evcc-host-series.jsonl \
-  --rewritten-jsonl backups/evcc-host-series-without-host.jsonl
+```env
+GRAFANA_AUTH_MODE=basic
+GRAFANA_USER=admin
+GRAFANA_PASSWORD=<passwort>
 ```
 
-Follow the exact recommendation printed by the tool.
+## Rollup-Werte wirken falsch
 
-Clean case:
+Pruefe:
 
-```bash
-python3 vm-rewrite-drop-label.py \
-  --base-url http://localhost:8428 \
-  --matcher '{host!=""}' \
-  --drop-label host \
-  --backup-jsonl backups/evcc-host-series.jsonl \
-  --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
-  --reset-cache \
-  --write
-```
+- Start- und Enddatum des Rollups
+- `--replace-range` bei Wiederholungslauf
+- Zeitzone des Hosts
+- Import-Abdeckung gegen InfluxDB
+- bekannte Ausnahmen in [migration-validation-notes.md](./migration-validation-notes.md)
 
-If the tool reports that a target delete would remove unmanaged hostless sibling series, stop. Re-import or validate the affected measurement family first; otherwise detail dashboards can lose PV string or battery detail series even though aggregate panels still show values.
+## Weitere Diagnose
 
-Conflict-preserving case, when hostless target values should remain authoritative:
-
-```bash
-python3 vm-rewrite-drop-label.py \
-  --base-url http://localhost:8428 \
-  --matcher '{host!=""}' \
-  --drop-label host \
-  --backup-jsonl backups/evcc-host-series.jsonl \
-  --rewritten-jsonl backups/evcc-host-series-without-host.jsonl \
-  --merge-target \
-  --keep-target-values-on-conflict \
-  --reset-cache \
-  --write
-```
-
-Do not blindly drop these labels:
-
-- `loadpoint`
-- `vehicle`
-- `id`
-- `title`
-
-They carry EVCC business meaning.
-
-## Historical Business Label Rename
-
-Use `vm-rewrite-label-value.py` only for deliberate business-label renames, for example after changing a PV title in EVCC. Change the live EVCC configuration first, otherwise new samples will keep using the old label.
-
-Dry-run:
-
-```bash
-python3 vm-rewrite-label-value.py \
-  --base-url http://localhost:8428 \
-  --matcher '{title="Balkon PV"}' \
-  --label title \
-  --from "Balkon PV" \
-  --to "Balkon Sued" \
-  --backup-jsonl backups/rename-balkon-pv.jsonl \
-  --rewritten-jsonl backups/rename-balkon-sued.jsonl
-```
-
-For PV devices, prefer `title` as the stable business key. EVCC can renumber PV `id` values when devices are added, removed, or reordered.
-
-## Empty Grafana Dashboards
-
-`Today` empty usually means raw data or datasource problems:
-
-- Grafana datasource points to the wrong host.
-- Datasource UID does not match `vm-evcc` or the deploy override.
-- EVCC is not writing current raw data to VictoriaMetrics.
-
-`Month`, `Year`, or `All-time` empty usually means rollups are missing:
-
-```bash
-curl -fsG 'http://localhost:8428/api/v1/series' \
-  --data-urlencode 'match[]=evcc_pv_energy_daily_wh' \
-  --data-urlencode 'start=2026-01-01T00:00:00Z' \
-  --data-urlencode 'end=2026-03-31T23:59:59Z'
-```
-
-If no `evcc_*` series exist, rerun the rollup backfill and scheduler setup from [influx-to-vm-migration.md](./influx-to-vm-migration.md).
+- [migration-validation-notes.md](./migration-validation-notes.md)
+- [migration-checklist.md](./migration-checklist.md)
+- [vm-dashboard-install.md](./vm-dashboard-install.md)

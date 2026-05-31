@@ -1,16 +1,17 @@
-# English VM Dashboard Source Import
+# Englische Original-Dashboards
 
-These files were imported from the maintainer branch `upstream/victoria-metrics`.
+Englische Version: [README_EN.md](./README_EN.md).
 
-Imported files:
+Dieser Ordner enthaelt die englischen Quelldashboards. Sie sind die Basis fuer generierte lokalisierte Varianten.
 
-- `VM_EVCC_Today.json`
-- `VM_EVCC_Today-Details.json`
-- `VM_EVCC_Today-Mobile.json`
-- `VM_EVCC_TAB_All-time.json`
+## Bearbeitungsregel
 
-Important note:
+Dashboard-JSON-Dateien werden nur unter `dashboards/original/` manuell bearbeitet. Dateien unter `dashboards/translation/` werden generiert.
 
-- The maintainer branch does not currently provide these files as fully English dashboards.
-- They contain mixed-language labels and descriptions, with a noticeable amount of German UI text.
-- They are stored here as the imported upstream source snapshot for further localization and review on this branch.
+## Nach Aenderungen
+
+```bash
+node scripts/localization/generate-localized-dashboards.mjs
+node scripts/localization/apply-safe-display-translations.mjs
+npm test
+```

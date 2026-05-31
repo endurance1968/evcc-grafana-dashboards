@@ -1,15 +1,16 @@
-# Archived Documentation
+# Archiv
 
-This directory contains historical or advanced documents that are no longer part of the recommended end-user path.
+Englische Version: [README_EN.md](./README_EN.md).
 
-Use the current entry points instead:
+Dieser Ordner enthaelt aeltere oder nicht mehr primaere Dokumente. Sie bleiben als Referenz erhalten, sind aber nicht der empfohlene Einstieg fuer neue Nutzer.
 
-- migration path: [../influx-to-vm-migration.md](../influx-to-vm-migration.md)
-- migration checklist: [../migration-checklist.md](../migration-checklist.md)
-- troubleshooting: [../migration-troubleshooting.md](../migration-troubleshooting.md)
-- dashboard deployment: [../grafana-vm-dashboard-setup.md](../grafana-vm-dashboard-setup.md)
+## Aktueller Einstieg
 
-Archived files:
+- [../README.md](../README.md)
+- [../influx-to-vm-migration.md](../influx-to-vm-migration.md)
+- [../grafana-vm-dashboard-setup.md](../grafana-vm-dashboard-setup.md)
 
-- `victoriametrics-aggregation-guide.md`: replaced by the current migration guide and checklist.
-- `telegraf-parallel-pipeline-howto.md`: advanced fan-out setup, not part of the standard dashboard migration path.
+## Archivierte Themen
+
+- [telegraf-parallel-pipeline-howto.md](./telegraf-parallel-pipeline-howto.md)
+- [victoriametrics-aggregation-guide.md](./victoriametrics-aggregation-guide.md)

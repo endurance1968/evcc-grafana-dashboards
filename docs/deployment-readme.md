@@ -1,8 +1,10 @@
-# Dashboard Deployment Quick Start
+# Dashboard Deployment Kurzstart
 
-This is the short deployment reference. For the full walkthrough, use [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md). For every config option, use [vm-dashboard-install.md](./vm-dashboard-install.md).
+Dies ist die kurze Deployment-Referenz. Fuer die vollstaendige Anleitung nutze [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md). Fuer alle Konfigurationsoptionen nutze [vm-dashboard-install.md](./vm-dashboard-install.md).
 
-## Recommended Path
+Englische Version: [deployment-readme_EN.md](./deployment-readme_EN.md).
+
+## Empfohlener Pfad
 
 Linux / Raspberry Pi:
 
@@ -21,12 +23,12 @@ Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-d
 Copy-Item vm-dashboard-install.env.example vm-dashboard-install.env
 ```
 
-Minimal `vm-dashboard-install.env`:
+Minimale `vm-dashboard-install.env`:
 
 ```env
-GRAFANA_URL=http://<your-grafana-ip>:3000
+GRAFANA_URL=http://<deine-grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
-GRAFANA_API_TOKEN=<your_service_account_token>
+GRAFANA_API_TOKEN=<dein_service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
@@ -34,26 +36,26 @@ PURGE=false
 PURGE_ONLY=false
 ```
 
-Grafana 13.0.1 or newer is required. The deployers always install the tab-navigation dashboards; the legacy row-based deploy path and dashboard set selection are no longer available.
+Grafana 13.0.1 oder neuer ist erforderlich. Die Deployer installieren immer die Tab-Navigation-Dashboards; der alte Row-Modus und Dashboard-Set-Auswahl sind entfernt. Der Default ist `DASHBOARD_LANGUAGE=de` mit `DASHBOARD_VARIANT=gen`; `DASHBOARD_VARIANT=orig` bleibt bewusst Englisch.
 
-## Source And Settings
+## Quelle und Einstellungen
 
-`DASHBOARD_SOURCE_MODE` decides where dashboard JSON files are imported from:
+`DASHBOARD_SOURCE_MODE` entscheidet, woher Dashboard-JSON-Dateien importiert werden:
 
 ```env
 DASHBOARD_SOURCE_MODE=github
-# or: DASHBOARD_SOURCE_MODE=rawurl
-# or: DASHBOARD_SOURCE_MODE=localdir
+# oder: DASHBOARD_SOURCE_MODE=rawurl
+# oder: DASHBOARD_SOURCE_MODE=localdir
 ```
 
-For a self-hosted raw endpoint use the repository root raw URL pattern:
+Fuer einen selbst gehosteten Raw-Endpunkt nutze das Repository-Root-Raw-URL-Muster:
 
 ```env
 DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
-Common dashboard variable overrides can also be set in `vm-dashboard-install.env`:
+Wichtige Dashboard-Variablen koennen ebenfalls in `vm-dashboard-install.env` gesetzt werden:
 
 ```env
 DASHBOARD_INSTALLED_WATT_PEAK=22
@@ -70,9 +72,9 @@ DASHBOARD_PORTAL_TITLE=Solarman
 DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 ```
 
-The full option list is in [vm-dashboard-install.md](./vm-dashboard-install.md) and the commented template is `vm-dashboard-install.env.example`. Define each env key only once; duplicate keys are rejected.
+Die vollstaendige Liste steht in [vm-dashboard-install.md](./vm-dashboard-install.md) und in `vm-dashboard-install.env.example`. Jeder Env-Key darf nur einmal aktiv gesetzt sein; doppelte Keys werden abgelehnt.
 
-## Run
+## Ausfuehren
 
 Linux:
 
@@ -86,20 +88,20 @@ Windows:
 .\deploy.ps1
 ```
 
-The deployer prints a preflight summary and asks for confirmation before importing dashboards.
+Der Deployer zeigt eine Preflight-Zusammenfassung und fragt vor dem Import nach Bestaetigung.
 
-## Verify
+## Pruefen
 
-After deployment:
+Nach dem Deployment:
 
-- Grafana folder `EVCC` exists.
-- `Today` shows raw data.
-- `Month`, `Year`, and `All-time` show `evcc_*` rollup data.
-- No panel shows datasource or query errors.
+- Der Grafana-Ordner `EVCC` existiert.
+- `Today` zeigt Rohdaten.
+- `Month`, `Year` und `All-time` zeigen `evcc_*` Rollup-Daten.
+- Kein Panel zeigt Datasource- oder Query-Fehler.
 
-## Optional Bash Deployer
+## Optionaler Bash-Deployer
 
-`deploy-bash.sh` is still supported for Linux systems that prefer Bash and `jq`:
+`deploy-bash.sh` bleibt fuer Linux-Systeme unterstuetzt, die Bash und `jq` bevorzugen:
 
 ```bash
 curl -fsSLo deploy-bash.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-bash.sh
@@ -108,4 +110,4 @@ sudo apt install -y jq
 ./deploy-bash.sh
 ```
 
-For beginners, prefer `deploy-python.sh` because the migration and rollup path already require Python.
+Fuer Einsteiger ist `deploy-python.sh` der bevorzugte Pfad, weil Migration und Rollup ohnehin Python nutzen.

@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.9"
+SCRIPT_VERSION="2026.05.31.11"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -80,7 +80,7 @@ DASHBOARD_SOURCE_MODE="github"
 GITHUB_REPO="endurance1968/evcc-grafana-dashboards"
 GITHUB_REF="main"
 DASHBOARD_RAW_BASE_URL=""
-DASHBOARD_LANGUAGE="en"
+DASHBOARD_LANGUAGE="de"
 DASHBOARD_VARIANT="gen"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
@@ -310,6 +310,14 @@ load_dashboard_files() {
   fi
   mapfile -t DASHBOARD_FILES < <(jq -r '.files[]' "$manifest_file")
 }
+effective_dashboard_language() {
+  if [[ "$DASHBOARD_VARIANT" == "orig" ]]; then
+    printf 'en'
+  else
+    printf '%s' "$DASHBOARD_LANGUAGE"
+  fi
+}
+
 fetch_source() {
   local filename="$1"
   local out_file="$2"
@@ -318,10 +326,12 @@ fetch_source() {
     return
   fi
   local subdir
+  local language
+  language="$(effective_dashboard_language)"
   if [[ "$DASHBOARD_VARIANT" == "orig" ]]; then
-    subdir="dashboards/original/$DASHBOARD_LANGUAGE"
+    subdir="dashboards/original/$language"
   else
-    subdir="dashboards/translation/$DASHBOARD_LANGUAGE"
+    subdir="dashboards/translation/$language"
   fi
   local relative_path="$subdir/$filename"
   local url
@@ -409,7 +419,7 @@ dashboard_build_marker() {
   else
     source="github:$GITHUB_REPO@$GITHUB_REF"
   fi
-  printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$DASHBOARD_LANGUAGE" "$DASHBOARD_VARIANT" "$source"
+  printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$(effective_dashboard_language)" "$DASHBOARD_VARIANT" "$source"
 }
 
 apply_dashboard_build_description() {
@@ -560,6 +570,9 @@ else
   fi
   echo "Language: $DASHBOARD_LANGUAGE"
   echo "Variant: $DASHBOARD_VARIANT"
+  if [[ "$DASHBOARD_VARIANT" == "orig" && "$DASHBOARD_LANGUAGE" != "en" ]]; then
+    echo "Effective source language: en (orig dashboards stay English)"
+  fi
 fi
 echo "Build marker: $DASHBOARD_BUILD_MARKER"
 echo "Purge: $PURGE"

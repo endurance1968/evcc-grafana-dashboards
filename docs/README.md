@@ -1,77 +1,79 @@
-# EVCC with VictoriaMetrics and Grafana
+# EVCC mit VictoriaMetrics und Grafana
 
-This is the main entry point for users who want EVCC dashboards on VictoriaMetrics.
+Dies ist der zentrale Einstieg fuer Nutzer, die EVCC-Dashboards mit VictoriaMetrics betreiben moechten.
 
-Start with the central requirements overview: [system-requirements.md](./system-requirements.md).
+Die englische Version dieser Seite ist hier: [README_EN.md](./README_EN.md).
 
-## Pick Your Path
+Beginne mit der zentralen Uebersicht der Voraussetzungen: [system-requirements.md](./system-requirements.md).
 
-### I already use EVCC with InfluxDB
+## Welcher Pfad passt?
 
-Use this path when you want to keep your history and move the dashboard backend to VictoriaMetrics:
+### Ich nutze EVCC bereits mit InfluxDB
 
-1. Install VictoriaMetrics.
-2. Install or reuse Grafana.
-3. Import historic InfluxDB raw data into VictoriaMetrics.
-4. Build the daily `evcc_*` rollups.
-5. Connect Grafana to VictoriaMetrics.
-6. Deploy the dashboards.
-7. Schedule the daily rollup refresh.
+Nutze diesen Pfad, wenn du deine Historie behalten und das Dashboard-Backend auf VictoriaMetrics umstellen moechtest:
 
-Start here:
+1. VictoriaMetrics installieren.
+2. Grafana installieren oder eine bestehende Instanz weiterverwenden.
+3. Historische InfluxDB-Rohdaten nach VictoriaMetrics importieren.
+4. Taegliche `evcc_*` Rollups erzeugen.
+5. Grafana mit VictoriaMetrics verbinden.
+6. Dashboards deployen.
+7. Taegliche Rollup-Aktualisierung planen.
 
-- [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration.md)
-- [Migration checklist](./migration-checklist.md)
+Starte hier:
 
-### I am setting up a new VictoriaMetrics stack
+- [Migration von InfluxDB nach VictoriaMetrics](./influx-to-vm-migration.md)
+- [Migrations-Checkliste](./migration-checklist.md)
 
-Install the runtime first, then deploy dashboards:
+### Ich baue einen neuen VictoriaMetrics-Stack auf
 
-- VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
-- VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
-- Grafana on Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13.md)
-- Grafana with Docker: [grafana-install-docker.md](./grafana-install-docker.md)
-- Dashboard setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+Installiere zuerst die Laufzeitumgebung und danach die Dashboards:
 
-### I only want to update dashboards
+- VictoriaMetrics auf Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
+- VictoriaMetrics mit Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
+- Grafana auf Debian 13: [grafana-install-debian-13.md](./grafana-install-debian-13.md)
+- Grafana mit Docker: [grafana-install-docker.md](./grafana-install-docker.md)
+- Dashboard-Setup: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-Use the deployment guide directly:
+### Ich moechte nur Dashboards aktualisieren
 
-- [Grafana dashboard setup](./grafana-vm-dashboard-setup.md)
-- Quick deploy reference: [deployment-readme.md](./deployment-readme.md)
-- Full deployer option reference: [vm-dashboard-install.md](./vm-dashboard-install.md)
+Nutze direkt die Deployment-Dokumentation:
 
-## Data Model At A Glance
+- [Grafana Dashboard Setup](./grafana-vm-dashboard-setup.md)
+- Kurzreferenz: [deployment-readme.md](./deployment-readme.md)
+- Vollstaendige Deployer-Optionen: [vm-dashboard-install.md](./vm-dashboard-install.md)
+
+## Datenmodell im Ueberblick
 
 ```mermaid
 flowchart LR
-  EVCC["EVCC"] --> Raw["VictoriaMetrics raw metrics"]
-  Influx["InfluxDB history"] --> Import["vmctl influx import"] --> Raw
-  Raw --> Today["Today dashboards"]
+  EVCC["EVCC"] --> Raw["VictoriaMetrics Rohmetriken"]
+  Influx["InfluxDB Historie"] --> Import["vmctl influx import"] --> Raw
+  Raw --> Today["Today Dashboards"]
   Raw --> Rollup["evcc-vm-rollup.py"]
-  Rollup --> Daily["evcc_* daily rollups"]
-  Daily --> LongRange["Month / Year / All-time dashboards"]
-  Grafana["Grafana datasource vm-evcc"] --> Today
+  Rollup --> Daily["evcc_* Tages-Rollups"]
+  Daily --> LongRange["Month / Year / All-time Dashboards"]
+  Grafana["Grafana Datasource vm-evcc"] --> Today
   Grafana --> LongRange
 ```
 
-Key point: `Today`, `Today - Mobile`, and `Today - Details` use raw VictoriaMetrics data. `Month`, `Year`, and `All-time` use daily `evcc_*` rollups.
+Wichtig: `Today`, `Today - Mobile` und `Today - Details` verwenden VictoriaMetrics-Rohdaten. `Month`, `Year` und `All-time` verwenden taegliche `evcc_*` Rollups.
 
-## Supported Dashboards
+## Unterstuetzte Dashboards
 
-The deployable dashboards require Grafana 13.0.1 or newer and use Grafana tab navigation for the long dashboard views. Dashboard set selection is no longer supported; the deployers use the fixed manifest file list.
+Die deploybaren Dashboards benoetigen Grafana 13.0.1 oder neuer und verwenden Grafana Tab Navigation fuer die langen Dashboard-Ansichten. Eine Dashboard-Set-Auswahl gibt es nicht mehr; die Deployer verwenden die feste Manifest-Dateiliste.
 
-## Advanced Docs
+## Weiterfuehrende Dokumente
 
-Use these only when the normal migration path reports a problem or when you maintain the repository:
+Diese Dokumente sind vor allem fuer Fehleranalyse, Betrieb und Maintainer relevant:
 
-- Migration troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
-- Migration validation notes: [migration-validation-notes.md](./migration-validation-notes.md)
-- Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
-- Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
-- Localization maintainer workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow.md)
+- Migration Troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
+- Migrations-Validierungsnotizen: [migration-validation-notes.md](./migration-validation-notes.md)
+- Rollup-Design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
+- Schema-Referenz: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
+- Lokalisierungs-Workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow.md)
 
-## Release Preparation
+## Release-Vorbereitung
 
-- First end-user release checklist: [first-release-checklist.md](./first-release-checklist.md)
-- Screenshot policy: [screenshots/README.md](./screenshots/README.md)
+- Erste Endnutzer-Release-Checkliste: [first-release-checklist.md](./first-release-checklist.md)
+- Screenshot-Regeln: [screenshots/README.md](./screenshots/README.md)

@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.9"
+SCRIPT_VERSION="2026.05.31.11"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -89,7 +89,7 @@ settings = {
     "GITHUB_REPO": "endurance1968/evcc-grafana-dashboards",
     "GITHUB_REF": "main",
     "DASHBOARD_RAW_BASE_URL": "",
-    "DASHBOARD_LANGUAGE": "en",
+    "DASHBOARD_LANGUAGE": "de",
     "DASHBOARD_VARIANT": "gen",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
@@ -285,10 +285,15 @@ def api(method, path, body=None, allow_404=False):
             )
         raise RuntimeError(f"{method} {path} failed ({exc.code}): {response}")
 
+def effective_dashboard_language():
+    return "en" if settings["DASHBOARD_VARIANT"] == "orig" else settings["DASHBOARD_LANGUAGE"]
+
+
 def get_source_subdir():
+    language = effective_dashboard_language()
     if settings["DASHBOARD_VARIANT"] == "orig":
-        return f"dashboards/original/{settings['DASHBOARD_LANGUAGE']}"
-    return f"dashboards/translation/{settings['DASHBOARD_LANGUAGE']}"
+        return f"dashboards/original/{language}"
+    return f"dashboards/translation/{language}"
 
 
 def get_source_text(filename):
@@ -367,7 +372,7 @@ def build_dashboard_marker(settings):
         source = f"rawurl:{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}"
     else:
         source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
-    return f"deployed {timestamp} | {settings['DASHBOARD_LANGUAGE']}/{settings['DASHBOARD_VARIANT']} | {source}"
+    return f"deployed {timestamp} | {effective_dashboard_language()}/{settings['DASHBOARD_VARIANT']} | {source}"
 
 
 
@@ -559,6 +564,8 @@ else:
         print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
     print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
     print(f"Variant: {settings['DASHBOARD_VARIANT']}")
+    if settings["DASHBOARD_VARIANT"] == "orig" and settings["DASHBOARD_LANGUAGE"] != "en":
+        print("Effective source language: en (orig dashboards stay English)")
 print(f"Build marker: {dashboard_build_marker}")
 print(f"Purge: {settings['PURGE']}")
 print(f"Purge only: {settings['PURGE_ONLY']}")

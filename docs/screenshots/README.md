@@ -1,17 +1,16 @@
 # Screenshots
 
-This directory is for curated release documentation screenshots only.
+Englische Version: [README_EN.md](./README_EN.md).
 
-Test runs, render-smoke screenshots, temporary dashboard imports, performance traces, and debugging captures belong under `tests/artifacts/` and are intentionally ignored by Git.
+Dieser Ordner enthaelt Screenshot-Dokumentation fuer die EVCC-Dashboards.
 
-Rules for adding screenshots here:
+## Regeln
 
-- Add only screenshots that document the current released dashboard state.
-- Prefer the TAB dashboards when documenting Grafana 13 navigation.
-- Update only screenshots for dashboards that visibly changed in the release.
-- Avoid committing full test screenshot batches or language matrix output.
-- Keep filenames stable and descriptive so diffs remain reviewable.
+- Alte Screenshot-Dateien vor einer Regenerierung loeschen.
+- Screenshots nicht still in-place ersetzen.
+- Screenshots sollen die relevante Navigation zeigen, insbesondere Tabs, wenn ein Dashboard Tabs verwendet.
+- Fuer Release-Dokumentation bevorzugt die Grafana-13-TAB-Dashboards verwenden.
 
-Current release screenshot set:
+## Unterordner
 
-- [TAB dashboards](./tabs/README.md)
+- [tabs/README.md](./tabs/README.md) beschreibt die TAB-Screenshot-Serie.
