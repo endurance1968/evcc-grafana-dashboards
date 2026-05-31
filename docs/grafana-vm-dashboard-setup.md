@@ -134,6 +134,7 @@ DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
 DASHBOARD_SET=tabs
 PURGE=false
+PURGE_ONLY=false
 ```
 
 Personal dashboard variable overrides can be kept in the same env file. For example:
@@ -193,8 +194,10 @@ Direct one-time commands are also supported:
 - imports dashboards into the `EVCC` folder
 
 With `PURGE=false`, existing dashboards are overwritten by UID and library panels are updated in place.
+With `PURGE_ONLY=false`, the deployer stays in normal import mode.
 
 With `PURGE=true`, known EVCC dashboards are deleted first and then recreated. Use it only when you intentionally want a full rebuild.
+With `PURGE_ONLY=true`, known EVCC dashboards and referenced EVCC library panels are deleted, then the deployer stops without importing anything.
 
 ## 6. Verify The Result
 

@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.3"
+SCRIPT_VERSION="2026.05.31.4"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -12,6 +12,7 @@ CONFIG_PATH="./vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
+CLI_PURGE_ONLY=""
 CLI_DASHBOARD_SET=""
 
 while [[ $# -gt 0 ]]; do
@@ -32,13 +33,17 @@ while [[ $# -gt 0 ]]; do
       CLI_PURGE="$2"
       shift 2
       ;;
+    --purge-only)
+      CLI_PURGE_ONLY="$2"
+      shift 2
+      ;;
     --dashboard-set)
       CLI_DASHBOARD_SET="$2"
       shift 2
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--dashboard-set <name>]
+Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--dashboard-set <name>]
 Requires: bash, curl, jq
 EOF
       exit 0
@@ -85,6 +90,7 @@ DASHBOARD_VARIANT="gen"
 DASHBOARD_SET="default"
 DASHBOARD_LOCAL_DIR=""
 PURGE="false"
+PURGE_ONLY="false"
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=""
 DASHBOARD_ENERGY_SAMPLE_INTERVAL=""
 DASHBOARD_TARIFF_PRICE_INTERVAL=""
@@ -125,11 +131,25 @@ fi
 if [[ -n "$CLI_PURGE" ]]; then
   PURGE="$CLI_PURGE"
 fi
+if [[ -n "$CLI_PURGE_ONLY" ]]; then
+  PURGE_ONLY="$CLI_PURGE_ONLY"
+fi
 if [[ -n "$CLI_DASHBOARD_SET" ]]; then
   DASHBOARD_SET="$CLI_DASHBOARD_SET"
 fi
 if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
   PURGE="$DEPLOY_PURGE"
+fi
+if [[ -n "${DEPLOY_PURGE_ONLY:-}" && "${PURGE_ONLY,,}" == "false" ]]; then
+  PURGE_ONLY="$DEPLOY_PURGE_ONLY"
+fi
+truthy() {
+  case "${1,,}" in 1|true|yes|on) return 0 ;; *) return 1 ;; esac
+}
+if truthy "$PURGE_ONLY"; then
+  PURGE_EFFECTIVE="true"
+else
+  PURGE_EFFECTIVE="$PURGE"
 fi
 
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" && -z "$DASHBOARD_LOCAL_DIR" ]]; then
@@ -511,9 +531,14 @@ else
 fi
 echo "Build marker: $DASHBOARD_BUILD_MARKER"
 echo "Purge: $PURGE"
+echo "Purge only: $PURGE_ONLY"
 print_dashboard_overrides
 echo
-echo "Will import dashboards:"
+if truthy "$PURGE_ONLY"; then
+  echo "Will inspect dashboards for purge-only deletion:"
+else
+  echo "Will import dashboards:"
+fi
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
   echo "- $(dashboard_title "$raw_file") [$(dashboard_uid "$raw_file")]"
@@ -539,7 +564,7 @@ for lib_file in "$LIB_DIR"/*.json; do
   fi
 done
 
-if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
+if ! truthy "$PURGE_EFFECTIVE" && [[ ${#existing_library[@]} -gt 0 ]]; then
   echo
   echo "Existing library panels already present and will be updated because purge=false:"
   for item in "${existing_library[@]}"; do
@@ -548,9 +573,13 @@ if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo "Dashboard import will use the updated embedded __elements definitions."
 fi
 
-if [[ "${PURGE,,}" == "true" ]]; then
+if truthy "$PURGE_EFFECTIVE"; then
   echo
-  echo "Will delete existing dashboards before import:"
+  if truthy "$PURGE_ONLY"; then
+    echo "Will delete existing dashboards without import:"
+  else
+    echo "Will delete existing dashboards before import:"
+  fi
   found=0
   for file_name in "${DASHBOARD_FILES[@]}"; do
     raw_file="$TMP_DIR/$file_name"
@@ -569,7 +598,11 @@ if [[ "${PURGE,,}" == "true" ]]; then
   [[ "$found" -eq 1 ]] || echo "- none"
 
   echo
-  echo "Will ensure referenced library panels before import:"
+  if truthy "$PURGE_ONLY"; then
+    echo "Will delete referenced library panels after dashboard deletion:"
+  else
+    echo "Will ensure referenced library panels before import:"
+  fi
   found=0
   for lib_file in "$LIB_DIR"/*.json; do
     [[ -e "$lib_file" ]] || continue
@@ -584,11 +617,19 @@ if [[ "${PURGE,,}" == "true" ]]; then
       exit 1
     fi
   done
-  [[ "$found" -eq 1 ]] || echo "- none found yet; missing panels will be created"
+  if truthy "$PURGE_ONLY"; then
+    [[ "$found" -eq 1 ]] || echo "- none"
+  else
+    [[ "$found" -eq 1 ]] || echo "- none found yet; missing panels will be created"
+  fi
 fi
 
 echo
-printf 'Proceed with dashboard deployment? [y/N] '
+if truthy "$PURGE_ONLY"; then
+  printf 'Proceed with purge-only deletion? [y/N] '
+else
+  printf 'Proceed with dashboard deployment? [y/N] '
+fi
 read -r answer
 case "${answer:-}" in
   y|Y|yes|YES|Yes) ;;
@@ -597,6 +638,44 @@ case "${answer:-}" in
     exit 0
     ;;
 esac
+
+if truthy "$PURGE_EFFECTIVE"; then
+  for file_name in "${DASHBOARD_FILES[@]}"; do
+    raw_file="$TMP_DIR/$file_name"
+    uid=$(dashboard_uid "$raw_file")
+    if [[ -n "$uid" ]]; then
+      purge_out="$TMP_DIR/purge-dashboard.json"
+      status=$(api DELETE "$(dashboard_api_path "$raw_file")" "" "$purge_out")
+      if [[ "$status" == "404" ]]; then
+        echo "Skipping dashboard delete (not found): $(dashboard_title "$raw_file") [$uid]"
+      elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+        echo "Failed to purge dashboard $uid: $(cat "$purge_out")" >&2
+        exit 1
+      else
+        echo "Deleted dashboard: $(dashboard_title "$raw_file") [$uid]"
+      fi
+    fi
+  done
+  if truthy "$PURGE_ONLY"; then
+    for lib_file in "$LIB_DIR"/*.json; do
+      [[ -e "$lib_file" ]] || continue
+      uid=$(jq -r '.uid' "$lib_file")
+      purge_out="$TMP_DIR/purge-library-$uid.json"
+      status=$(api DELETE "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
+      if [[ "$status" == "404" ]]; then
+        echo "Skipping library panel delete (not found): $(jq -r '.name' "$lib_file") [$uid]"
+      elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+        echo "Failed to purge library panel $uid: $(cat "$purge_out")" >&2
+        exit 1
+      else
+        echo "Deleted library panel: $(jq -r '.name' "$lib_file") [$uid]"
+      fi
+    done
+    echo
+    echo "Purge-only finished. No dashboards imported."
+    exit 0
+  fi
+fi
 
 folder_resp="$TMP_DIR/folder.json"
 folder_status=$(api GET "/api/folders/$(urlencode "$GRAFANA_FOLDER_UID")" "" "$folder_resp")
@@ -628,7 +707,7 @@ for lib_file in "$LIB_DIR"/*.json; do
   fi
 done
 
-if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
+if ! truthy "$PURGE_EFFECTIVE" && [[ ${#existing_library[@]} -gt 0 ]]; then
   echo
   echo "Existing library panels already present and will be updated because purge=false:"
   for item in "${existing_library[@]}"; do
@@ -637,24 +716,6 @@ if [[ "${PURGE,,}" != "true" && ${#existing_library[@]} -gt 0 ]]; then
   echo "Dashboard import will use the updated embedded __elements definitions."
 fi
 
-if [[ "${PURGE,,}" == "true" ]]; then
-  for file_name in "${DASHBOARD_FILES[@]}"; do
-    raw_file="$TMP_DIR/$file_name"
-    uid=$(dashboard_uid "$raw_file")
-    if [[ -n "$uid" ]]; then
-      purge_out="$TMP_DIR/purge-dashboard.json"
-      status=$(api DELETE "$(dashboard_api_path "$raw_file")" "" "$purge_out")
-      if [[ "$status" == "404" ]]; then
-        echo "Skipping dashboard delete (not found): $(dashboard_title "$raw_file") [$uid]"
-      elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
-        echo "Failed to purge dashboard $uid: $(cat "$purge_out")" >&2
-        exit 1
-      else
-        echo "Deleted dashboard: $(dashboard_title "$raw_file") [$uid]"
-      fi
-    fi
-  done
-fi
 
 for lib_file in "$LIB_DIR"/*.json; do
   [[ -e "$lib_file" ]] || continue

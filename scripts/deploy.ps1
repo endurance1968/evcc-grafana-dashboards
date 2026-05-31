@@ -11,6 +11,7 @@ param(
   [string]$url,
   [string]$token,
   [string]$purge = "",
+  [string]$purgeonly = "",
   [string]$datasourceuid,
   [string]$language,
   [string]$variant,
@@ -29,7 +30,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.2'
+$ScriptVersion = '2026.05.31.3'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -549,9 +550,12 @@ function Import-V2Dashboard($Dashboard) {
   }
   Invoke-GrafanaApi POST '/apis/dashboard.grafana.app/v2/namespaces/default/dashboards' $raw | Out-Null
 }
-function Confirm-Apply() {
-  $answer = Read-Host 'Proceed with dashboard deployment? [y/N]'
+function Confirm-Apply([string]$Prompt = 'Proceed with dashboard deployment? [y/N]') {
+  $answer = Read-Host $Prompt
   return $answer -match '^(y|yes)$'
+}
+function Test-Truthy($Value) {
+  return [string]$Value -match '^(?i:1|true|yes|on)$'
 }
 
 $settings = @{
@@ -572,6 +576,7 @@ $settings = @{
   DASHBOARD_SET = 'default'
   DASHBOARD_LOCAL_DIR = ''
   PURGE = 'false'
+  PURGE_ONLY = 'false'
   DASHBOARD_FILTER_PEAK_POWER_LIMIT = ''
   DASHBOARD_ENERGY_SAMPLE_INTERVAL = ''
   DASHBOARD_TARIFF_PRICE_INTERVAL = ''
@@ -596,7 +601,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_SET','DASHBOARD_LOCAL_DIR','PURGE','DEPLOY_PURGE','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_SET','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -617,10 +622,14 @@ Merge-Setting $settings 'DASHBOARD_LOCAL_DIR' $localdir
 Merge-Setting $settings 'GRAFANA_FOLDER_UID' $folderuid
 Merge-Setting $settings 'GRAFANA_FOLDER_TITLE' $foldertitle
 if ($settings.ContainsKey('DEPLOY_PURGE') -and -not $settings.ContainsKey('PURGE')) { $settings['PURGE'] = $settings['DEPLOY_PURGE'] }
+if ($settings.ContainsKey('DEPLOY_PURGE_ONLY') -and -not (Test-Truthy $settings.PURGE_ONLY)) { $settings['PURGE_ONLY'] = $settings['DEPLOY_PURGE_ONLY'] }
 if (-not [string]::IsNullOrWhiteSpace($purge)) { $settings['PURGE'] = if ($purge -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
+if (-not [string]::IsNullOrWhiteSpace($purgeonly)) { $settings['PURGE_ONLY'] = if ($purgeonly -match '^(1|true|yes|on)$') { 'true' } else { 'false' } }
 if (-not $settings.GRAFANA_API_TOKEN -and $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN) { $settings.GRAFANA_API_TOKEN = $settings.GRAFANA_SERVICE_ACCOUNT_TOKEN }
 $dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
+$purgeOnlyEnabled = Test-Truthy $settings.PURGE_ONLY
+$purgeEnabled = (Test-Truthy $settings.PURGE) -or $purgeOnlyEnabled
 
 if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 12/13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'local' -and -not $settings.DASHBOARD_LOCAL_DIR) { throw 'DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.' }
@@ -660,6 +669,7 @@ if ($settings.DASHBOARD_SOURCE_MODE -eq 'local') {
 }
 Write-Host "Build marker: $dashboardBuildMarker"
 Write-Host "Purge: $($settings.PURGE)"
+Write-Host "Purge only: $($settings.PURGE_ONLY)"
 $activeDashboardOverrides = @($dashboardOverrides.GetEnumerator() | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Value) })
 if ($activeDashboardOverrides.Count -gt 0) {
   Write-Host ''
@@ -669,7 +679,7 @@ if ($activeDashboardOverrides.Count -gt 0) {
   }
 }
 Write-Host ''
-Write-Host 'Will import dashboards:'
+if ($purgeOnlyEnabled) { Write-Host 'Will inspect dashboards for purge-only deletion:' } else { Write-Host 'Will import dashboards:' }
 foreach ($dashboard in $dashboards) { Write-Host "- $(Get-DashboardTitle $dashboard.raw) [$(Get-DashboardUid $dashboard.raw)]" }
 Write-Host ''
 Write-Host 'Dashboards embed these library panels:'
@@ -681,14 +691,14 @@ foreach ($element in $libraryElements.Values) {
   $existing = Invoke-GrafanaApi GET "/api/library-elements/$([Uri]::EscapeDataString($element.uid))" -Allow404
   if ($null -ne $existing) { $existingLibrary[$element.uid] = $existing.result }
 }
-if ($settings.PURGE -ne 'true' -and $existingLibrary.Count -gt 0) {
+if (-not $purgeEnabled -and $existingLibrary.Count -gt 0) {
   Write-Host ''
   Write-Host 'Existing library panels already present and will be updated because purge=false:' -ForegroundColor Yellow
   foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" }
   Write-Host 'Dashboard import will use the updated embedded __elements definitions.' -ForegroundColor Yellow
 }
 
-if ($settings.PURGE -eq 'true') {
+if ($purgeEnabled) {
   $existingDashboards = @()
   foreach ($dashboard in $dashboards) {
     $path = Get-DashboardPath $dashboard.raw
@@ -702,29 +712,39 @@ if ($settings.PURGE -eq 'true') {
     }
   }
   Write-Host ''
-  Write-Host 'Will delete existing dashboards before import:'
+  if ($purgeOnlyEnabled) { Write-Host 'Will delete existing dashboards without import:' } else { Write-Host 'Will delete existing dashboards before import:' }
   if ($existingDashboards.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingDashboards) { Write-Host "- $(Get-DashboardTitle $item) [$(Get-DashboardUid $item)]" } }
   Write-Host ''
-  Write-Host 'Will ensure referenced library panels before import:'
-  if ($existingLibrary.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
+  if ($purgeOnlyEnabled) { Write-Host 'Will delete referenced library panels after dashboard deletion:' } else { Write-Host 'Will ensure referenced library panels before import:' }
+  if ($existingLibrary.Count -eq 0) { if ($purgeOnlyEnabled) { Write-Host '- none' } else { Write-Host '- none found yet; missing panels will be created' } } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
 }
 
 Write-Host ''
-if (-not (Confirm-Apply)) {
+$confirmPrompt = if ($purgeOnlyEnabled) { 'Proceed with purge-only deletion? [y/N]' } else { 'Proceed with dashboard deployment? [y/N]' }
+if (-not (Confirm-Apply $confirmPrompt)) {
   Write-Host 'Aborted. No changes applied.' -ForegroundColor Yellow
   exit 0
 }
 
-Ensure-Folder
-if ($settings.PURGE -eq 'true') {
+if ($purgeEnabled) {
   foreach ($dashboard in $dashboards) {
     $uid = Get-DashboardUid $dashboard.raw
     if ($uid) {
       Remove-And-Report 'dashboard' (Get-DashboardTitle $dashboard.raw) $uid (Get-DashboardPath $dashboard.raw)
     }
   }
+  if ($purgeOnlyEnabled) {
+    foreach ($uid in ($libraryElements.Keys | Sort-Object)) {
+      $element = $libraryElements[$uid]
+      Remove-And-Report 'library panel' $element.name $uid "/api/library-elements/$([Uri]::EscapeDataString($uid))"
+    }
+    Write-Host ''
+    Write-Host 'Purge-only finished. No dashboards imported.' -ForegroundColor Green
+    exit 0
+  }
 }
 
+Ensure-Folder
 foreach ($uid in ($libraryElements.Keys | Sort-Object)) {
   if ($existingLibrary.ContainsKey($uid)) {
     Update-LibraryPanel $libraryElements[$uid] $existingLibrary[$uid]

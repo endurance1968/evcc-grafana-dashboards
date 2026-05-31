@@ -9,7 +9,7 @@ This document is the deployer option reference.
 - no Node.js required for end users
 - import dashboards and embedded Grafana library panels
 - support Windows PowerShell, portable POSIX shell with Python, and Bash + `jq`
-- keep `PURGE=false` as the safe default
+- keep `PURGE=false` and `PURGE_ONLY=false` as the safe default
 
 ## Default Behavior
 
@@ -105,15 +105,23 @@ If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before dep
 
 ```env
 PURGE=false
+PURGE_ONLY=false
 ```
 
 `PURGE=false` overwrites known dashboards by UID and updates referenced library panels in place.
+`PURGE_ONLY=false` keeps the deployer in normal import mode.
 
 ```env
 PURGE=true
 ```
 
 `PURGE=true` deletes known EVCC dashboards first and then recreates dashboards and embedded library panels. Use this for a deliberate full rebuild.
+
+```env
+PURGE_ONLY=true
+```
+
+`PURGE_ONLY=true` deletes known EVCC dashboards and referenced EVCC library panels, then stops without importing anything. Use this only when you intentionally want to remove the deployed dashboards from Grafana.
 
 ## Optional Dashboard Variable Overrides
 
@@ -155,18 +163,24 @@ PowerShell:
 
 ```powershell
 .\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purge false -dashboardset tabs
+# Delete only, no re-import:
+.\deploy.ps1 -url http://<grafana-host>:3000 -token <token> -purgeonly true -dashboardset tabs
 ```
 
 Portable shell with Python:
 
 ```bash
 ./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+# Delete only, no re-import:
+./deploy-python.sh --url http://<grafana-host>:3000 --token <token> --purge-only true --dashboard-set tabs
 ```
 
 Bash + `jq`:
 
 ```bash
 ./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge false --dashboard-set tabs
+# Delete only, no re-import:
+./deploy-bash.sh --url http://<grafana-host>:3000 --token <token> --purge-only true --dashboard-set tabs
 ```
 
 Runtime arguments override the config file for that run.

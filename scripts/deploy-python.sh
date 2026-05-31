@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.3"
+SCRIPT_VERSION="2026.05.31.4"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -12,6 +12,7 @@ CONFIG_PATH="$SCRIPT_DIR/vm-dashboard-install.env"
 CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
+CLI_PURGE_ONLY=""
 CLI_DASHBOARD_SET=""
 CLI_YES="false"
 
@@ -33,6 +34,10 @@ while [ "$#" -gt 0 ]; do
       CLI_PURGE="$2"
       shift 2
       ;;
+    --purge-only)
+      CLI_PURGE_ONLY="$2"
+      shift 2
+      ;;
     --dashboard-set)
       CLI_DASHBOARD_SET="$2"
       shift 2
@@ -43,7 +48,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--dashboard-set <name>] [--yes]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--dashboard-set <name>] [--yes]
 EOF
       exit 0
       ;;
@@ -61,7 +66,7 @@ done
 
 printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_DASHBOARD_SET CLI_YES SCRIPT_DIR
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_DASHBOARD_SET CLI_YES SCRIPT_DIR
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -94,6 +99,7 @@ settings = {
     "DASHBOARD_SET": "default",
     "DASHBOARD_LOCAL_DIR": "",
     "PURGE": "false",
+    "PURGE_ONLY": "false",
     "DASHBOARD_FILTER_PEAK_POWER_LIMIT": "",
     "DASHBOARD_ENERGY_SAMPLE_INTERVAL": "",
     "DASHBOARD_TARIFF_PRICE_INTERVAL": "",
@@ -134,12 +140,19 @@ if os.environ.get("CLI_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = os.environ["CLI_TOKEN"]
 if os.environ.get("CLI_PURGE"):
     settings["PURGE"] = os.environ["CLI_PURGE"]
+if os.environ.get("CLI_PURGE_ONLY"):
+    settings["PURGE_ONLY"] = os.environ["CLI_PURGE_ONLY"]
 if os.environ.get("CLI_DASHBOARD_SET"):
     settings["DASHBOARD_SET"] = os.environ["CLI_DASHBOARD_SET"]
 if os.environ.get("CLI_YES"):
     settings["CLI_YES"] = os.environ["CLI_YES"]
+def is_truthy(value):
+    return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
 if "DEPLOY_PURGE" in settings and "PURGE" not in settings:
     settings["PURGE"] = settings["DEPLOY_PURGE"]
+if "DEPLOY_PURGE_ONLY" in settings and not is_truthy(settings.get("PURGE_ONLY", "false")):
+    settings["PURGE_ONLY"] = settings["DEPLOY_PURGE_ONLY"]
 
 if not settings["GRAFANA_API_TOKEN"] and settings.get("GRAFANA_SERVICE_ACCOUNT_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = settings["GRAFANA_SERVICE_ACCOUNT_TOKEN"]
@@ -403,12 +416,14 @@ def apply_dashboard_filter_overrides(raw, overrides):
         if "options" in variable:
             variable["options"] = [{"selected": True, "text": value, "value": value}]
     return raw
-def confirm_apply():
+
+
+def confirm_apply(prompt):
     if settings.get("CLI_YES", "").lower() == "true":
         return True
     try:
         with open("/dev/tty", "r", encoding="utf-8", errors="replace") as tty:
-            sys.stdout.write("Proceed with dashboard deployment? [y/N] ")
+            sys.stdout.write(prompt)
             sys.stdout.flush()
             answer = tty.readline()
     except OSError:
@@ -485,6 +500,8 @@ DASHBOARD_FILES = load_dashboard_files()
 
 dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
+purge_only = is_truthy(settings.get("PURGE_ONLY", "false"))
+purge_enabled = is_truthy(settings.get("PURGE", "false")) or purge_only
 
 dashboards = []
 library = {}
@@ -517,6 +534,7 @@ else:
     print(f"Variant: {settings['DASHBOARD_VARIANT']}")
 print(f"Build marker: {dashboard_build_marker}")
 print(f"Purge: {settings['PURGE']}")
+print(f"Purge only: {settings['PURGE_ONLY']}")
 active_dashboard_overrides = {k: v for k, v in dashboard_overrides.items() if str(v).strip()}
 if active_dashboard_overrides:
     print()
@@ -524,7 +542,10 @@ if active_dashboard_overrides:
     for key, value in active_dashboard_overrides.items():
         print(f"- {key} = {value}")
 print()
-print("Will import dashboards:")
+if purge_only:
+    print("Will inspect dashboards for purge-only deletion:")
+else:
+    print("Will import dashboards:")
 for dashboard in dashboards:
     print(f"- {dashboard_title(dashboard['raw'])} [{dashboard_uid(dashboard['raw'])}]")
 print()
@@ -541,14 +562,14 @@ for element in library.values():
     if existing is not None:
         existing_library[uid] = existing["result"]
 
-if settings["PURGE"].lower() != "true" and existing_library:
+if not purge_enabled and existing_library:
     print()
     print("Existing library panels already present and will be updated because purge=false:")
     for item in existing_library.values():
         print(f"- {item.get('name')} [{item.get('uid')}]")
     print("Dashboard import will use the updated embedded __elements definitions.")
 
-if settings["PURGE"].lower() == "true":
+if purge_enabled:
     existing_dashboards = []
     for dashboard in dashboards:
         uid = dashboard_uid(dashboard["raw"])
@@ -559,34 +580,52 @@ if settings["PURGE"].lower() == "true":
             existing_dashboards.append(existing.get("dashboard") or existing)
 
     print()
-    print("Will delete existing dashboards before import:")
+    if purge_only:
+        print("Will delete existing dashboards without import:")
+    else:
+        print("Will delete existing dashboards before import:")
     if not existing_dashboards:
         print("- none")
     else:
         for item in existing_dashboards:
             print(f"- {dashboard_title(item)} [{dashboard_uid(item)}]")
     print()
-    print("Will ensure referenced library panels before import:")
-    if not existing_library:
-        print("- none found yet; missing panels will be created")
+    if purge_only:
+        print("Will delete referenced library panels after dashboard deletion:")
+        if not existing_library:
+            print("- none")
+        else:
+            for item in existing_library.values():
+                print(f"- {item.get('name')} [{item.get('uid')}]")
     else:
-        for item in existing_library.values():
-            print(f"- {item.get('name')} [{item.get('uid')}]")
+        print("Will ensure referenced library panels before import:")
+        if not existing_library:
+            print("- none found yet; missing panels will be created")
+        else:
+            for item in existing_library.values():
+                print(f"- {item.get('name')} [{item.get('uid')}]")
 
 print()
-if not confirm_apply():
+confirm_prompt = "Proceed with purge-only deletion? [y/N] " if purge_only else "Proceed with dashboard deployment? [y/N] "
+if not confirm_apply(confirm_prompt):
     print("Aborted. No changes applied.")
     raise SystemExit(0)
 
-folder_uid = urllib.parse.quote(settings["GRAFANA_FOLDER_UID"])
-if api("GET", f"/api/folders/{folder_uid}", allow_404=True) is None:
-    api("POST", "/api/folders", {"uid": settings["GRAFANA_FOLDER_UID"], "title": settings["GRAFANA_FOLDER_TITLE"]})
-
-if settings["PURGE"].lower() == "true":
+if purge_enabled:
     for dashboard in dashboards:
         uid = dashboard_uid(dashboard["raw"])
         if uid:
             delete_and_report("dashboard", dashboard_title(dashboard["raw"]) or uid, uid, dashboard_path(dashboard["raw"]))
+    if purge_only:
+        for uid, element in sorted(library.items()):
+            delete_and_report("library panel", element.get("name") or uid, uid, f"/api/library-elements/{urllib.parse.quote(uid)}")
+        print()
+        print("Purge-only finished. No dashboards imported.")
+        raise SystemExit(0)
+
+folder_uid = urllib.parse.quote(settings["GRAFANA_FOLDER_UID"])
+if api("GET", f"/api/folders/{folder_uid}", allow_404=True) is None:
+    api("POST", "/api/folders", {"uid": settings["GRAFANA_FOLDER_UID"], "title": settings["GRAFANA_FOLDER_TITLE"]})
 
 for uid, element in sorted(library.items()):
     if uid in existing_library:
