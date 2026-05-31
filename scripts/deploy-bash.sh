@@ -3,8 +3,8 @@
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.29.1"
-SCRIPT_LAST_MODIFIED="2026-05-29"
+SCRIPT_VERSION="2026.05.31.1"
+SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -78,6 +78,7 @@ GRAFANA_FOLDER_TITLE="EVCC"
 DASHBOARD_SOURCE_MODE="github"
 GITHUB_REPO="endurance1968/evcc-grafana-dashboards"
 GITHUB_REF="main"
+DASHBOARD_RAW_BASE_URL=""
 DASHBOARD_LANGUAGE="en"
 DASHBOARD_VARIANT="gen"
 DASHBOARD_SET="default"
@@ -203,13 +204,32 @@ urlencode() {
   jq -rn --arg v "$1" '$v|@uri'
 }
 
+remote_source_url() {
+  local relative_path="$1"
+  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
+    printf '%s/%s' "${DASHBOARD_RAW_BASE_URL%/}" "$relative_path"
+    return
+  fi
+  printf 'https://raw.githubusercontent.com/%s/%s/%s' "$GITHUB_REPO" "$GITHUB_REF" "$relative_path"
+}
+
+fetch_remote_content() {
+  local relative_path="$1"
+  local url
+  url="$(remote_source_url "$relative_path")"
+  if ! curl -fsSL "$url"; then
+    echo "Failed to download $relative_path from $url" >&2
+    return 1
+  fi
+}
+
 repo_file_content() {
   local relative_path="$1"
   if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
     cat "$SCRIPT_DIR/../$relative_path"
     return
   fi
-  curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_REF/$relative_path"
+  fetch_remote_content "$relative_path"
 }
 
 load_dashboard_files() {
@@ -242,7 +262,13 @@ fetch_source() {
   else
     subdir="dashboards/translation/$DASHBOARD_LANGUAGE"
   fi
-  curl -fsSL "https://raw.githubusercontent.com/$GITHUB_REPO/$GITHUB_REF/$subdir/$(urlencode "$filename")" -o "$out_file"
+  local relative_path="$subdir/$filename"
+  local url
+  url="$(remote_source_url "$relative_path")"
+  if ! curl -fsSL "$url" -o "$out_file"; then
+    echo "Failed to download $relative_path from $url" >&2
+    return 1
+  fi
 }
 
 dashboard_is_v2() {
@@ -317,7 +343,11 @@ dashboard_build_marker() {
     printf 'deployed %s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$source"
     return
   fi
-  source="github:$GITHUB_REPO@$GITHUB_REF"
+  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
+    source="raw:${DASHBOARD_RAW_BASE_URL%/}"
+  else
+    source="github:$GITHUB_REPO@$GITHUB_REF"
+  fi
   printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$DASHBOARD_LANGUAGE" "$DASHBOARD_VARIANT" "$source"
 }
 
@@ -449,7 +479,11 @@ echo "Dashboard set: $DASHBOARD_SET"
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
   echo "Source: local / $DASHBOARD_LOCAL_DIR"
 else
-  echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
+    echo "Source: raw-url / ${DASHBOARD_RAW_BASE_URL%/}"
+  else
+    echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+  fi
   echo "Language: $DASHBOARD_LANGUAGE"
   echo "Variant: $DASHBOARD_VARIANT"
 fi
@@ -701,5 +735,9 @@ echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 if [[ "$DASHBOARD_SOURCE_MODE" == "local" ]]; then
   echo "Source: local / $DASHBOARD_LOCAL_DIR"
 else
-  echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+  if [[ -n "${DASHBOARD_RAW_BASE_URL:-}" ]]; then
+    echo "Source: raw-url / ${DASHBOARD_RAW_BASE_URL%/}"
+  else
+    echo "Source: github / $GITHUB_REPO / $GITHUB_REF"
+  fi
 fi

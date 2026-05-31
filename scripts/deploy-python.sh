@@ -2,8 +2,8 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the source set and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.29.1"
-SCRIPT_LAST_MODIFIED="2026-05-29"
+SCRIPT_VERSION="2026.05.31.1"
+SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -87,6 +87,7 @@ settings = {
     "DASHBOARD_SOURCE_MODE": "github",
     "GITHUB_REPO": "endurance1968/evcc-grafana-dashboards",
     "GITHUB_REF": "main",
+    "DASHBOARD_RAW_BASE_URL": "",
     "DASHBOARD_LANGUAGE": "en",
     "DASHBOARD_VARIANT": "gen",
     "DASHBOARD_SET": "default",
@@ -138,13 +139,30 @@ if settings["DASHBOARD_SOURCE_MODE"] == "local" and not settings["DASHBOARD_LOCA
     raise SystemExit("DASHBOARD_LOCAL_DIR is required when DASHBOARD_SOURCE_MODE=local.")
 
 
+def remote_source_url(relative_path):
+    quoted = "/".join(urllib.parse.quote(part) for part in str(relative_path).split("/"))
+    raw_base_url = (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip().rstrip("/")
+    if raw_base_url:
+        return f"{raw_base_url}/{quoted}"
+    return f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{quoted}"
+
+
+def fetch_remote_text(relative_path):
+    url = remote_source_url(relative_path)
+    try:
+        with urllib.request.urlopen(url) as resp:
+            return resp.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"Failed to download {relative_path} from {url} ({exc.code} {exc.reason})") from exc
+    except urllib.error.URLError as exc:
+        raise RuntimeError(f"Failed to download {relative_path} from {url}: {exc.reason}") from exc
+
+
 def repo_file_text(relative_path):
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
         repo_root = Path(os.environ["SCRIPT_DIR"]).resolve().parent
         return (repo_root / Path(relative_path)).read_text(encoding="utf-8")
-    url = f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{relative_path}"
-    with urllib.request.urlopen(url) as resp:
-        return resp.read().decode("utf-8")
+    return fetch_remote_text(relative_path)
 
 
 def load_dashboard_files():
@@ -227,10 +245,7 @@ def get_source_subdir():
 def get_source_text(filename):
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
         return (Path(settings["DASHBOARD_LOCAL_DIR"]) / filename).read_text(encoding="utf-8")
-    quoted = "/".join(urllib.parse.quote(part) for part in filename.split("/"))
-    url = f"https://raw.githubusercontent.com/{settings['GITHUB_REPO']}/{settings['GITHUB_REF']}/{get_source_subdir()}/{quoted}"
-    with urllib.request.urlopen(url) as resp:
-        return resp.read().decode("utf-8")
+    return fetch_remote_text(f"{get_source_subdir()}/{filename}")
 
 def replace_ds(node):
     if isinstance(node, str):
@@ -299,7 +314,10 @@ def build_dashboard_marker(settings):
     if settings["DASHBOARD_SOURCE_MODE"] == "local":
         source = f"local:{settings['DASHBOARD_LOCAL_DIR']}"
         return f"deployed {timestamp} | {source}"
-    source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
+    if (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip():
+        source = f"raw:{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}"
+    else:
+        source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
     return f"deployed {timestamp} | {settings['DASHBOARD_LANGUAGE']}/{settings['DASHBOARD_VARIANT']} | {source}"
 
 
@@ -476,7 +494,10 @@ print(f"Dashboard set: {settings['DASHBOARD_SET']}")
 if settings["DASHBOARD_SOURCE_MODE"] == "local":
     print(f"Source: local / {settings['DASHBOARD_LOCAL_DIR']}")
 else:
-    print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
+    if (settings.get("DASHBOARD_RAW_BASE_URL") or "").strip():
+        print(f"Source: raw-url / {settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}")
+    else:
+        print(f"Source: github / {settings['GITHUB_REPO']} / {settings['GITHUB_REF']}")
     print(f"Language: {settings['DASHBOARD_LANGUAGE']}")
     print(f"Variant: {settings['DASHBOARD_VARIANT']}")
 print(f"Build marker: {dashboard_build_marker}")

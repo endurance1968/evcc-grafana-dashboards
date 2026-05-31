@@ -77,6 +77,13 @@ GITHUB_REPO=endurance1968/evcc-grafana-dashboards
 GITHUB_REF=main
 ```
 
+Local Forgejo or another raw file endpoint can be used without changing the source mode. The value must point at the repository root raw path; the deployer appends paths such as `dashboards/deploy-manifest.json` and `dashboards/translation/de/...`:
+
+```env
+DASHBOARD_SOURCE_MODE=github
+DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+```
+
 Local checkout source:
 
 ```env

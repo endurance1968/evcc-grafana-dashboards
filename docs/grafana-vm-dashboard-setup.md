@@ -136,6 +136,12 @@ DASHBOARD_SET=tabs
 PURGE=false
 ```
 
+If the dashboard files should come from the local Forgejo mirror instead of GitHub, add:
+
+```env
+DASHBOARD_RAW_BASE_URL=http://192.168.1.222:3000/olaf-krause/evcc-grafana-dashboards/raw/branch/main
+```
+
 Use `DASHBOARD_SET=default` if Grafana is older than 13.0.1 or if you explicitly prefer the classic row-based dashboards.
 
 ## 5. Run The Deployment
