@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.8"
+SCRIPT_VERSION="2026.05.31.9"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -120,12 +120,17 @@ settings = {
 }
 
 if config_path.exists():
-    for raw_line in config_path.read_text(encoding="utf-8").splitlines():
+    seen_config_keys = set()
+    for line_number, raw_line in enumerate(config_path.read_text(encoding="utf-8").splitlines(), start=1):
         line = raw_line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        settings[key.strip()] = value.strip().strip('"\'')
+        key = key.strip()
+        if key in seen_config_keys:
+            raise SystemExit(f"Duplicate key in {config_path} line {line_number}: {key}. Define each key only once; comment out old alternatives.")
+        seen_config_keys.add(key)
+        settings[key] = value.strip().strip('"\'')
 
 for key in list(settings):
     if os.environ.get(key):
@@ -182,6 +187,7 @@ else:
     raise SystemExit("Unsupported DASHBOARD_SOURCE_MODE. Use github, rawurl, or localdir.")
 
 
+
 def remote_source_url(relative_path):
     quoted = "/".join(urllib.parse.quote(part) for part in str(relative_path).split("/"))
     if settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
@@ -210,10 +216,11 @@ def load_dashboard_files():
         if missing:
             raise RuntimeError("DASHBOARD_LOCAL_DIR is missing required dashboard files: " + ", ".join(missing))
         return list(FIXED_DASHBOARD_FILES)
-    manifest = json.loads(repo_file_text("dashboards/deploy-manifest.json"))
+    manifest_path = "dashboards/deploy-manifest.json"
+    manifest = json.loads(repo_file_text(manifest_path))
     files = manifest.get("files") or []
     if not isinstance(files, list) or not files:
-        raise RuntimeError("dashboards/deploy-manifest.json is missing a non-empty files array.")
+        raise RuntimeError(f"{manifest_path} from {remote_source_url(manifest_path)} is missing a non-empty files array. Check DASHBOARD_SOURCE_MODE={settings['DASHBOARD_SOURCE_MODE']} and the selected source variables.")
     return [str(file) for file in files]
 
 def auth_mode():

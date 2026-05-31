@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.8"
+SCRIPT_VERSION="2026.05.31.9"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -110,6 +110,22 @@ DASHBOARD_PORTAL_TITLE=""
 DASHBOARD_PORTAL_URL=""
 
 if [[ -f "$CONFIG_PATH" ]]; then
+  duplicate_keys=$(awk -F= '
+    /^[[:space:]]*($|#)/ { next }
+    /^[[:space:]]*[A-Za-z_][A-Za-z0-9_]*[[:space:]]*=/ {
+      key=$1
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+      count[key]++
+      if (count[key] == 2) duplicates[++n]=key
+    }
+    END { for (i=1; i<=n; i++) print duplicates[i] }
+  ' "$CONFIG_PATH")
+  if [[ -n "$duplicate_keys" ]]; then
+    echo "Duplicate keys in $CONFIG_PATH:" >&2
+    printf '%s\n' "$duplicate_keys" | sed 's/^/- /' >&2
+    echo "Define each key only once; comment out old alternatives." >&2
+    exit 1
+  fi
   set -a
   # shellcheck disable=SC1090
   . "$CONFIG_PATH"
@@ -172,6 +188,7 @@ case "$DASHBOARD_SOURCE_MODE" in
     exit 1
     ;;
 esac
+
 
 auth_mode() {
   local mode="${GRAFANA_AUTH_MODE,,}"
@@ -284,12 +301,14 @@ load_dashboard_files() {
     return
   fi
   local manifest_file="$TMP_DIR/deploy-manifest.json"
-  repo_file_content "dashboards/deploy-manifest.json" > "$manifest_file"
-  mapfile -t DASHBOARD_FILES < <(jq -r '.files[]?' "$manifest_file")
-  if [[ ${#DASHBOARD_FILES[@]} -eq 0 ]]; then
-    echo "dashboards/deploy-manifest.json is missing a non-empty files array." >&2
+  local manifest_path="dashboards/deploy-manifest.json"
+  repo_file_content "$manifest_path" > "$manifest_file"
+  if ! jq -e '.files | type == "array" and length > 0' "$manifest_file" >/dev/null; then
+    echo "$manifest_path from $(remote_source_url "$manifest_path") is missing a non-empty files array." >&2
+    echo "Check DASHBOARD_SOURCE_MODE=$DASHBOARD_SOURCE_MODE and the selected source variables." >&2
     exit 1
   fi
+  mapfile -t DASHBOARD_FILES < <(jq -r '.files[]' "$manifest_file")
 }
 fetch_source() {
   local filename="$1"

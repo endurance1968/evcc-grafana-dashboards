@@ -63,7 +63,7 @@ The deployable file lists are defined in `dashboards/deploy-manifest.json`.
 
 ## Source Selection
 
-`DASHBOARD_SOURCE_MODE` selects exactly where dashboard JSON files are loaded from. The deployer validates the variables required by the selected mode and ignores source variables from the other modes.
+`DASHBOARD_SOURCE_MODE` selects exactly where dashboard JSON files are loaded from. The deployer validates the variables required by the selected mode and ignores source variables from the other modes. Define each env key only once; duplicate keys are rejected because shell-style env files would otherwise let the last assignment win silently.
 
 GitHub source:
 

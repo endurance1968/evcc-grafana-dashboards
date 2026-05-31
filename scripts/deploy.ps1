@@ -30,7 +30,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.7'
+$ScriptVersion = '2026.05.31.8'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -44,6 +44,9 @@ function Load-DotEnv([string]$Path) {
     $idx = $trimmed.IndexOf('=')
     if ($idx -lt 1) { continue }
     $key = $trimmed.Substring(0, $idx).Trim()
+    if ($map.ContainsKey($key)) {
+      throw "Duplicate key in $Path: $key. Define each key only once; comment out old alternatives."
+    }
     $value = $trimmed.Substring($idx + 1).Trim()
     if (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'"))) {
       $value = $value.Substring(1, $value.Length - 2)
@@ -211,13 +214,14 @@ function Get-DashboardFilesFromManifest() {
     }
     return $FixedDashboardFiles
   }
-  $manifest = Parse-JsonDocument (Get-RepoFileContent 'dashboards/deploy-manifest.json')
+  $manifestPath = 'dashboards/deploy-manifest.json'
+  $manifest = Parse-JsonDocument (Get-RepoFileContent $manifestPath)
   if ($null -eq $manifest.PSObject.Properties['files'] -or $null -eq $manifest.files) {
-    throw 'dashboards/deploy-manifest.json is missing a files array.'
+    throw "$manifestPath from $(Get-RemoteSourceUrl $manifestPath) is missing a files array. Check DASHBOARD_SOURCE_MODE=$($settings.DASHBOARD_SOURCE_MODE) and the selected source variables."
   }
   $files = @($manifest.files | ForEach-Object { [string]$_ })
   if ($files.Count -eq 0) {
-    throw 'dashboards/deploy-manifest.json has an empty files array.'
+    throw "$manifestPath from $(Get-RemoteSourceUrl $manifestPath) has an empty files array. Check DASHBOARD_SOURCE_MODE=$($settings.DASHBOARD_SOURCE_MODE) and the selected source variables."
   }
   return $files
 }
@@ -610,6 +614,7 @@ switch ($settings.DASHBOARD_SOURCE_MODE) {
   }
   default { throw 'Unsupported DASHBOARD_SOURCE_MODE. Use github, rawurl, or localdir.' }
 }
+
 $dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
 $purgeOnlyEnabled = Test-Truthy $settings.PURGE_ONLY
