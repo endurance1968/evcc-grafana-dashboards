@@ -331,10 +331,10 @@
     "Regex for vehicles that should not be shown. Use ^none$ when nothing should be filtered. For multiple exact names use ^(Vehicle A|Vehicle B)$.": "Regex fuer Fahrzeuge, die nicht angezeigt werden sollen. Verwende ^none$, wenn nichts gefiltert werden soll. Fuer mehrere exakte Namen verwende ^(Fahrzeug A|Fahrzeug B)$.",
     "Tariffs": "Tarife",
     "Vehicles shown by the repeated driving-cost panels. Keep multi-select enabled so users can choose one or more vehicles.": "Fahrzeuge, die in den wiederholten Fahrtkosten-Panels angezeigt werden. Mehrfachauswahl aktiviert lassen, damit Benutzer ein oder mehrere Fahrzeuge auswaehlen koennen.",
-    "15 min import avg": "15 min Bezug Ø",
-    "15 min feed-in avg": "15 min Einspeisung Ø",
-    "Grid: 15 min import/export (MSB approximation)": "Netz: 15 min Bezug/Einspeisung (MSB-Naeherung)",
-    "15-minute directional grid averages from EVCC grid power. Positive values are grid import, negative values are feed-in; import and feed-in are separated before averaging to approximate separate metering operator registers.": "Richtungsgetrennte 15-Minuten-Netzmittelwerte aus der EVCC-Netzleistung. Positive Werte sind Netzbezug, negative Werte sind Einspeisung; Bezug und Einspeisung werden vor der Mittelung getrennt, um getrennte Register eines Messstellenbetreibers anzunaehern."
+    "15 min import energy": "15 min Bezug Energie",
+    "15 min feed-in energy": "15 min Einspeisung Energie",
+    "Grid: 15 min import/export energy (MSB approximation)": "Netz: 15 min Bezugs-/Einspeiseenergie (MSB-Naeherung)",
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers.": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunaehern."
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

@@ -4611,8 +4611,8 @@
         "kind": "Panel",
         "spec": {
           "id": 43,
-          "title": "Grid: 15 min import/export (MSB approximation)",
-          "description": "15-minute directional grid averages from EVCC grid power. Positive values are grid import, negative values are feed-in; import and feed-in are separated before averaging to approximate separate metering operator registers.",
+          "title": "Grid: 15 min import/export energy (MSB approximation)",
+          "description": "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4627,9 +4627,9 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(avg_over_time(clamp_min(gridPower_value, 0)[15m:]))",
+                        "expr": "avg(integrate(clamp_min(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min import avg",
+                        "legendFormat": "15 min import energy",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4650,9 +4650,9 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(avg_over_time(clamp_max(gridPower_value, 0)[15m:]))",
+                        "expr": "avg(integrate(clamp_max(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min feed-in avg",
+                        "legendFormat": "15 min feed-in energy",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4745,13 +4745,13 @@
                       }
                     ]
                   },
-                  "unit": "watt"
+                  "unit": "watth"
                 },
                 "overrides": [
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min import avg"
+                      "options": "15 min import energy"
                     },
                     "properties": [
                       {
@@ -4766,7 +4766,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min feed-in avg"
+                      "options": "15 min feed-in energy"
                     },
                     "properties": [
                       {

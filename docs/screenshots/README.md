@@ -2,7 +2,7 @@
 
 Englische Version: [English README](./README_EN.md).
 
-Dieser Ordner enthaelt die kuratierte Screenshot-Serie fuer die aktuelle EVCC/VictoriaMetrics-Dashboard-Version. Die PNG-Dateien liegen direkt in diesem Verzeichnis; das fruehere Unterverzeichnis `tabs/` wird nicht mehr verwendet.
+Dieser Ordner zeigt Beispiele der aktuellen EVCC/VictoriaMetrics-Dashboards.
 
 ## All-Time Tabs
 

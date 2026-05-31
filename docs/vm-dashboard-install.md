@@ -99,6 +99,18 @@ GRAFANA_DS_VM_EVCC_UID=vm-evcc
 
 Wenn deine Datasource-UID nicht `vm-evcc` ist, setze `GRAFANA_DS_VM_EVCC_UID` vor dem Deployment.
 
+### Grafana-Theme optional setzen
+
+Der Deployer kann die Grafana-Organisations-Preference fuer das Theme setzen:
+
+```env
+GRAFANA_THEME=dark
+# oder
+GRAFANA_THEME=light
+```
+
+Akzeptierte Werte sind `dark`, `light`, `bright` als Alias fuer `light` und `default`, um wieder den Grafana-Default zu verwenden. Leer lassen bedeutet: keine Grafana-Preference aendern. Persoenliche User-Preferences in Grafana koennen die Organisations-Preference weiterhin uebersteuern. Im `PURGE_ONLY`-Modus wird das Theme nicht gesetzt.
+
 ## Update-Verhalten
 
 ```env
@@ -195,7 +207,3 @@ Der Deployer ist absichtlich import-only. Empfohlene Anpassungswege:
 - aus einem lokalen Dashboard-Verzeichnis mit `DASHBOARD_SOURCE_MODE=localdir` deployen
 
 Der Deployer schreibt absichtlich keine Farben oder beliebigen Panel-Einstellungen um.
-
-## Maintainer-Hinweis
-
-Node.js-Skripte unter `scripts/test` bleiben der Maintainer-Workflow fuer Lokalisierungserzeugung, Testordner-Importe, Screenshot-Automation und Smoke-Checks. Endnutzer sollten die oben beschriebenen Deploy-Skripte bevorzugen.

@@ -1,6 +1,6 @@
 # EVCC Grafana Dashboards
 
-Deutsch: Dieses Repository stellt EVCC-Dashboards fuer VictoriaMetrics und Grafana bereit. Es richtet sich an Nutzer, die von bestehenden InfluxDB-basierten EVCC-Dashboards auf VictoriaMetrics wechseln moechten, ohne die gewohnten Auswertungen fuer PV, Netz, Hausverbrauch, Batterie, Fahrzeuge, Ladepunkte, Energiefluesse und Kosten zu verlieren.
+Deutsch: Dieses Repository stellt EVCC-Dashboards fuer VictoriaMetrics und Grafana bereit. Es richtet sich an neue EVCC-Nutzer mit VictoriaMetrics ebenso wie an Nutzer, die von bestehenden InfluxDB-basierten EVCC-Dashboards auf VictoriaMetrics wechseln moechten, ohne die gewohnten Auswertungen fuer PV, Netz, Hausverbrauch, Batterie, Fahrzeuge, Ladepunkte, Energiefluesse und Kosten zu verlieren.
 
 English: This repository contains VictoriaMetrics-based Grafana dashboards for EVCC. The English version of this README is available here: [README_EN.md](./README_EN.md).
 

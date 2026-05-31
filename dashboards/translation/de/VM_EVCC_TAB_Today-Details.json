@@ -4611,8 +4611,8 @@
         "kind": "Panel",
         "spec": {
           "id": 43,
-          "title": "Netz: 15 min Bezug/Einspeisung (MSB-Naeherung)",
-          "description": "Richtungsgetrennte 15-Minuten-Netzmittelwerte aus der EVCC-Netzleistung. Positive Werte sind Netzbezug, negative Werte sind Einspeisung; Bezug und Einspeisung werden vor der Mittelung getrennt, um getrennte Register eines Messstellenbetreibers anzunaehern.",
+          "title": "Netz: 15 min Bezugs-/Einspeiseenergie (MSB-Naeherung)",
+          "description": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunaehern.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4627,9 +4627,9 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(avg_over_time(clamp_min(gridPower_value, 0)[15m:]))",
+                        "expr": "avg(integrate(clamp_min(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min Bezug Ø",
+                        "legendFormat": "15 min Bezug Energie",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4650,9 +4650,9 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(avg_over_time(clamp_max(gridPower_value, 0)[15m:]))",
+                        "expr": "avg(integrate(clamp_max(gridPower_value, 0)[15m:$energySampleInterval]) / 3600)",
                         "format": "time_series",
-                        "legendFormat": "15 min Einspeisung Ø",
+                        "legendFormat": "15 min Einspeisung Energie",
                         "range": true,
                         "interval": "15m"
                       },
@@ -4745,13 +4745,13 @@
                       }
                     ]
                   },
-                  "unit": "watt"
+                  "unit": "watth"
                 },
                 "overrides": [
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min Bezug Ø"
+                      "options": "15 min Bezug Energie"
                     },
                     "properties": [
                       {
@@ -4766,7 +4766,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "15 min Einspeisung Ø"
+                      "options": "15 min Einspeisung Energie"
                     },
                     "properties": [
                       {

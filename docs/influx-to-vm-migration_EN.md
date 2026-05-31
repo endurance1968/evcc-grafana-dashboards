@@ -304,7 +304,7 @@ Run the refresh only once per day after the previous local day is complete.
 
 ## 11. Configure EVCC/Telegraf Live Ingest
 
-After import, cleanup, rollups, and scheduling, the next step is the current EVCC write path to VictoriaMetrics. This replaces the earlier direct jump to Grafana dashboard deployment at this point.
+After import, cleanup, rollups, and scheduling, the next step is the current EVCC write path to VictoriaMetrics.
 
 Continue with [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md). That guide sets up the live write path and then links to Grafana installation and dashboard deployment.
 

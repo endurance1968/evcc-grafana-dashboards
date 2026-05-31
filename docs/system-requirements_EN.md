@@ -23,7 +23,7 @@ Do not multiplex multiple EVCC systems into one VictoriaMetrics instance with a 
 | Grafana plugin | `victoriametrics-metrics-datasource` | Required for the `vm-evcc` datasource. |
 | Python | 3.11 or newer | Needed for migration checks, label cleanup, and rollups. |
 | Docker | current Docker Engine or Docker Desktop | Only needed for the Docker install path or disposable validation containers. |
-| Debian | Debian 13 for the Debian install guides | Debian 13 is the validated Linux baseline for the current release preparation. |
+| Debian | Debian 13 for the Debian install guides | Debian 13 is the validated Linux baseline for the install guides. |
 
 ## Hardware Sizing
 

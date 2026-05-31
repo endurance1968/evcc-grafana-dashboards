@@ -97,6 +97,18 @@ GRAFANA_DS_VM_EVCC_UID=vm-evcc
 
 If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before deployment.
 
+### Optionally Set The Grafana Theme
+
+The deployer can set the Grafana organization preference for the theme:
+
+```env
+GRAFANA_THEME=dark
+# or
+GRAFANA_THEME=light
+```
+
+Accepted values are `dark`, `light`, `bright` as an alias for `light`, and `default` to use Grafana's default again. Leave it empty to avoid changing Grafana preferences. Personal user preferences in Grafana can still override the organization preference. In `PURGE_ONLY` mode the theme is not changed.
+
 ## Update Behavior
 
 ```env
@@ -193,7 +205,3 @@ The deployer is intentionally import-only. Recommended customization paths:
 - deploy from a local dashboard directory with `DASHBOARD_SOURCE_MODE=localdir`
 
 The deployer intentionally does not rewrite colors or arbitrary panel settings.
-
-## Maintainer Note
-
-Node.js scripts under `scripts/test` remain the maintainer workflow for localization generation, test-folder imports, screenshot automation, and smoke checks. End users should prefer the deploy scripts above.

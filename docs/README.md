@@ -63,16 +63,13 @@ Die deploybaren Dashboards benoetigen Grafana 13.0.1 oder neuer und verwenden Gr
 
 ## Weiterfuehrende Dokumente
 
-Diese Dokumente sind vor allem fuer Fehleranalyse, Betrieb und Maintainer relevant:
+Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 
 - Migration Troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
 - Migrations-Validierungsnotizen: [migration-validation-notes.md](./migration-validation-notes.md)
 - Rollup-Design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
 - Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Schema-Referenz: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
-- Lokalisierungs-Workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow.md)
+## Screenshots
 
-## Release-Vorbereitung
-
-- Erste Endnutzer-Release-Checkliste: [first-release-checklist.md](./first-release-checklist.md)
 - Screenshot-Galerie: [screenshots/README.md](./screenshots/README.md)

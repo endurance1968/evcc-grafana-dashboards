@@ -1,10 +1,11 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.05.31.1
+ * Version: 2026.05.31.3
  * Last modified: 2026-05-31
  */
 import { spawnSync } from "node:child_process";
+import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import net from "node:net";
 import path from "node:path";
@@ -14,6 +15,7 @@ const defaultGrafanaImage = "grafana/grafana:13.0.1";
 const defaultVmImage = "victoriametrics/victoria-metrics:v1.110.0";
 const datasourceUid = "vm-evcc";
 const datasourceName = "VM-EVCC";
+const renderE2eLabel = "evcc.render-e2e=true";
 
 function parseArg(name, fallback = "") {
   const prefix = `--${name}=`;
@@ -78,6 +80,33 @@ function run(command, args, options = {}) {
     throw new Error(`${command} failed with exit code ${result.status}${details ? `: ${details}` : ""}`);
   }
   return result;
+}
+
+function runBestEffort(command, args) {
+  try {
+    run(command, args, { capture: true });
+  } catch (error) {
+    console.warn(`Cleanup warning: ${error.message || String(error)}`);
+  }
+}
+
+function dockerLines(args) {
+  const result = run("docker", args, { capture: true });
+  return (result.stdout || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function cleanupStaleDockerResources() {
+  const containers = dockerLines(["ps", "-aq", "--filter", `label=${renderE2eLabel}`]);
+  if (containers.length > 0) {
+    runBestEffort("docker", ["rm", "-f", ...containers]);
+  }
+  const networks = dockerLines(["network", "ls", "-q", "--filter", `label=${renderE2eLabel}`]);
+  for (const network of networks) {
+    runBestEffort("docker", ["network", "rm", network]);
+  }
 }
 
 async function waitForHttp(url, timeoutMs = 90000) {
@@ -340,45 +369,58 @@ async function importVmFixture(baseUrl, now) {
 }
 
 function startDockerEnvironment(args) {
-  const suffix = `${process.pid}`;
-  const networkName = `evcc-render-e2e-${suffix}`;
-  const vmContainerName = `evcc-render-vm-${suffix}`;
-  const grafanaContainerName = `evcc-render-grafana-${suffix}`;
+  const suffix = `${process.pid}-${randomUUID().slice(0, 8)}`;
+  const env = {
+    networkName: `evcc-render-e2e-${suffix}`,
+    vmContainerName: `evcc-render-vm-${suffix}`,
+    grafanaContainerName: `evcc-render-grafana-${suffix}`,
+  };
 
-  run("docker", ["network", "create", networkName]);
-  run("docker", [
-    "run",
-    "--rm",
-    "-d",
-    "--name",
-    vmContainerName,
-    "--network",
-    networkName,
-    "-p",
-    `${args.dockerBindAddress}:${args.vmPort}:8428`,
-    args.vmImage,
-    "-retentionPeriod=100y",
-  ]);
-  run("docker", [
-    "run",
-    "--rm",
-    "-d",
-    "--name",
-    grafanaContainerName,
-    "--network",
-    networkName,
-    "-p",
-    `${args.dockerBindAddress}:${args.grafanaPort}:3000`,
-    "-e",
-    `GF_SECURITY_ADMIN_USER=${args.grafanaUser}`,
-    "-e",
-    `GF_SECURITY_ADMIN_PASSWORD=${args.grafanaPassword}`,
-    "-e",
-    "GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource",
-    args.grafanaImage,
-  ]);
-
-  return { networkName, vmContainerName, grafanaContainerName };
+  try {
+    if (!args.keepDocker) {
+      cleanupStaleDockerResources();
+    }
+    run("docker", ["network", "create", "--label", renderE2eLabel, env.networkName]);
+    run("docker", [
+      "run",
+      "--rm",
+      "-d",
+      "--name",
+      env.vmContainerName,
+      "--label",
+      renderE2eLabel,
+      "--network",
+      env.networkName,
+      "-p",
+      `${args.dockerBindAddress}:${args.vmPort}:8428`,
+      args.vmImage,
+      "-retentionPeriod=100y",
+    ]);
+    run("docker", [
+      "run",
+      "--rm",
+      "-d",
+      "--name",
+      env.grafanaContainerName,
+      "--label",
+      renderE2eLabel,
+      "--network",
+      env.networkName,
+      "-p",
+      `${args.dockerBindAddress}:${args.grafanaPort}:3000`,
+      "-e",
+      `GF_SECURITY_ADMIN_USER=${args.grafanaUser}`,
+      "-e",
+      `GF_SECURITY_ADMIN_PASSWORD=${args.grafanaPassword}`,
+      "-e",
+      "GF_INSTALL_PLUGINS=victoriametrics-metrics-datasource",
+      args.grafanaImage,
+    ]);
+    return env;
+  } catch (error) {
+    stopDockerEnvironment(env, false);
+    throw error;
+  }
 }
 
 function stopDockerEnvironment(env, keepDocker) {
@@ -386,13 +428,13 @@ function stopDockerEnvironment(env, keepDocker) {
     return;
   }
   if (env.grafanaContainerName) {
-    run("docker", ["stop", env.grafanaContainerName], { capture: true });
+    runBestEffort("docker", ["rm", "-f", env.grafanaContainerName]);
   }
   if (env.vmContainerName) {
-    run("docker", ["stop", env.vmContainerName], { capture: true });
+    runBestEffort("docker", ["rm", "-f", env.vmContainerName]);
   }
   if (env.networkName) {
-    run("docker", ["network", "rm", env.networkName], { capture: true });
+    runBestEffort("docker", ["network", "rm", env.networkName]);
   }
 }
 
@@ -458,7 +500,7 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.05.31.1");
+    console.log("Version:       2026.05.31.3");
     console.log("Last modified: 2026-05-31");
     console.log("");
     console.log("Result");

@@ -6,7 +6,7 @@ This guide covers the installation of a current single-node VictoriaMetrics inst
 
 ## Validation status
 
-This guide was manually executed and validated on a Debian 13 VM/LXC as part of the first end-user release preparation.
+This guide was manually executed and validated on a Debian 13 VM/LXC.
 
 Current status:
 

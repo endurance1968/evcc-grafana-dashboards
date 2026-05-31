@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.11"
+SCRIPT_VERSION="2026.05.31.12"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -13,6 +13,7 @@ CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
 CLI_PURGE_ONLY=""
+CLI_THEME=""
 CLI_YES="false"
 
 while [ "$#" -gt 0 ]; do
@@ -37,13 +38,17 @@ while [ "$#" -gt 0 ]; do
       CLI_PURGE_ONLY="$2"
       shift 2
       ;;
+    --theme)
+      CLI_THEME="$2"
+      shift 2
+      ;;
     --yes|-y)
       CLI_YES="true"
       shift 1
       ;;
     --help|-h)
       cat <<'EOF'
-Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false] [--yes]
+Usage: sh ./deploy-python.sh [--config <path>] [--url <url>] [--token <token>] [--theme dark|light|bright|default] [--purge true|false] [--purge-only true|false] [--yes]
 EOF
       exit 0
       ;;
@@ -61,7 +66,7 @@ done
 
 printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_YES SCRIPT_DIR
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_THEME CLI_YES SCRIPT_DIR
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -85,6 +90,7 @@ settings = {
     "GRAFANA_DS_VM_EVCC_UID": "vm-evcc",
     "GRAFANA_FOLDER_UID": "evcc",
     "GRAFANA_FOLDER_TITLE": "EVCC",
+    "GRAFANA_THEME": "",
     "DASHBOARD_SOURCE_MODE": "github",
     "GITHUB_REPO": "endurance1968/evcc-grafana-dashboards",
     "GITHUB_REF": "main",
@@ -144,6 +150,8 @@ if os.environ.get("CLI_PURGE"):
     settings["PURGE"] = os.environ["CLI_PURGE"]
 if os.environ.get("CLI_PURGE_ONLY"):
     settings["PURGE_ONLY"] = os.environ["CLI_PURGE_ONLY"]
+if os.environ.get("CLI_THEME"):
+    settings["GRAFANA_THEME"] = os.environ["CLI_THEME"]
 if os.environ.get("CLI_YES"):
     settings["CLI_YES"] = os.environ["CLI_YES"]
 def is_truthy(value):
@@ -284,6 +292,36 @@ def api(method, path, body=None, allow_404=False):
                 "GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD."
             )
         raise RuntimeError(f"{method} {path} failed ({exc.code}): {response}")
+
+
+def normalize_grafana_theme():
+    raw = str(settings.get("GRAFANA_THEME", "") or "").strip().lower()
+    if not raw:
+        return None
+    if raw in {"dark", "light"}:
+        return raw
+    if raw in {"bright", "bright-mode", "brightmode"}:
+        return "light"
+    if raw in {"default", "grafana-default", "system"}:
+        return ""
+    raise SystemExit("Unsupported GRAFANA_THEME. Use dark, light, bright, or default.")
+
+
+def grafana_theme_display(theme):
+    if theme == "":
+        return "default"
+    return theme
+
+
+def apply_grafana_theme(theme):
+    preferences = api("GET", "/api/org/preferences") or {}
+    body = {}
+    for key in ("homeDashboardId", "homeDashboardUID", "timezone", "weekStart"):
+        if key in preferences and preferences.get(key) is not None:
+            body[key] = preferences.get(key)
+    body["theme"] = theme
+    api("PUT", "/api/org/preferences", body)
+    print(f"Grafana org theme set: {grafana_theme_display(theme)}")
 
 def effective_dashboard_language():
     return "en" if settings["DASHBOARD_VARIANT"] == "orig" else settings["DASHBOARD_LANGUAGE"]
@@ -535,6 +573,7 @@ dashboard_build_marker = build_dashboard_marker(settings)
 dashboard_overrides = build_dashboard_overrides(settings)
 purge_only = is_truthy(settings.get("PURGE_ONLY", "false"))
 purge_enabled = is_truthy(settings.get("PURGE", "false")) or purge_only
+grafana_theme = normalize_grafana_theme()
 
 dashboards = []
 library = {}
@@ -555,6 +594,9 @@ print(f"Grafana version: {grafana_version()}")
 print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
+if grafana_theme is not None:
+    action = "not applied in purge-only mode" if purge_only else "will update org preference"
+    print(f"Grafana theme: {grafana_theme_display(grafana_theme)} ({action})")
 if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
     print(f"Source: localdir / {settings['DASHBOARD_LOCAL_DIR']}")
 else:
@@ -644,6 +686,9 @@ confirm_prompt = "Proceed with purge-only deletion? [y/N] " if purge_only else "
 if not confirm_apply(confirm_prompt):
     print("Aborted. No changes applied.")
     raise SystemExit(0)
+
+if grafana_theme is not None and not purge_only:
+    apply_grafana_theme(grafana_theme)
 
 if purge_enabled:
     for dashboard in dashboards:

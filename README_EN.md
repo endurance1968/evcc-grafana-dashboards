@@ -1,6 +1,6 @@
 # EVCC Grafana Dashboards
 
-This repository provides VictoriaMetrics-based dashboards for [EVCC](https://evcc.io/). It is intended for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
+This repository provides VictoriaMetrics-based dashboards for [EVCC](https://evcc.io/). It is intended both for new EVCC users starting with VictoriaMetrics and for users who want to move away from an InfluxDB-based EVCC dashboard setup without losing the familiar views for PV, grid, home consumption, battery, vehicles, charging points, energy flows, and costs.
 
 It builds on the earlier InfluxDB-based EVCC dashboard work by Carsten:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).

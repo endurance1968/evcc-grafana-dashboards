@@ -25,7 +25,7 @@ Mehrere EVCC-Systeme sollten nicht ueber ein kuenstliches `db`-Label in eine gem
 | Grafana-Plugin | `victoriametrics-metrics-datasource` | Erforderlich fuer die Datasource `vm-evcc`. |
 | Python | 3.11 oder neuer | Benoetigt fuer Migrationschecks, Label-Bereinigung und Rollups. |
 | Docker | aktuelle Docker Engine oder Docker Desktop | Nur fuer den Docker-Installationspfad oder disposable Validierungscontainer benoetigt. |
-| Debian | Debian 13 fuer die Debian-Installationsanleitungen | Debian 13 ist die validierte Linux-Basis fuer die aktuelle Release-Vorbereitung. |
+| Debian | Debian 13 fuer die Debian-Installationsanleitungen | Debian 13 ist die validierte Linux-Basis fuer die Installationsanleitungen. |
 
 ## Hardware-Groesse
 

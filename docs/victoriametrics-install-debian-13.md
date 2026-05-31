@@ -8,7 +8,7 @@ Diese Anleitung beschreibt die Installation einer aktuellen Single-Node-Victoria
 
 ## Validierungsstatus
 
-Diese Anleitung wurde im Rahmen der ersten Endnutzer-Release-Vorbereitung manuell ausgefuehrt und validiert.
+Diese Anleitung wurde manuell ausgefuehrt und validiert.
 
 Aktueller Status:
 

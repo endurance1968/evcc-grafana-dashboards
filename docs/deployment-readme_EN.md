@@ -28,6 +28,7 @@ GRAFANA_URL=http://<your-grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
 GRAFANA_API_TOKEN=<your_service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# optional: GRAFANA_THEME=dark or GRAFANA_THEME=light
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen
 PURGE=false

@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.05.31.11"
+SCRIPT_VERSION="2026.05.31.12"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-05-31"
 SCRIPT_NAME="${0##*/}"
@@ -13,6 +13,7 @@ CLI_URL=""
 CLI_TOKEN=""
 CLI_PURGE=""
 CLI_PURGE_ONLY=""
+CLI_THEME=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -36,9 +37,13 @@ while [[ $# -gt 0 ]]; do
       CLI_PURGE_ONLY="$2"
       shift 2
       ;;
+    --theme)
+      CLI_THEME="$2"
+      shift 2
+      ;;
     --help|-h)
       cat <<'EOF'
-Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--purge true|false] [--purge-only true|false]
+Usage: ./deploy-bash.sh [--config <path>] [--url <url>] [--token <token>] [--theme dark|light|bright|default] [--purge true|false] [--purge-only true|false]
 Requires: bash, curl, jq
 EOF
       exit 0
@@ -76,6 +81,7 @@ GRAFANA_PASSWORD=""
 GRAFANA_DS_VM_EVCC_UID="vm-evcc"
 GRAFANA_FOLDER_UID="evcc"
 GRAFANA_FOLDER_TITLE="EVCC"
+GRAFANA_THEME=""
 DASHBOARD_SOURCE_MODE="github"
 GITHUB_REPO="endurance1968/evcc-grafana-dashboards"
 GITHUB_REF="main"
@@ -147,6 +153,9 @@ fi
 if [[ -n "$CLI_PURGE_ONLY" ]]; then
   PURGE_ONLY="$CLI_PURGE_ONLY"
 fi
+if [[ -n "$CLI_THEME" ]]; then
+  GRAFANA_THEME="$CLI_THEME"
+fi
 if [[ -n "${DEPLOY_PURGE:-}" && -z "${PURGE:-}" ]]; then
   PURGE="$DEPLOY_PURGE"
 fi
@@ -161,6 +170,7 @@ if truthy "$PURGE_ONLY"; then
 else
   PURGE_EFFECTIVE="$PURGE"
 fi
+
 
 DASHBOARD_SOURCE_MODE="${DASHBOARD_SOURCE_MODE,,}"
 FIXED_DASHBOARD_FILES=(
@@ -261,6 +271,51 @@ api() {
   printf '%s' "$status"
 }
 
+
+normalize_grafana_theme() {
+  local raw="${GRAFANA_THEME,,}"
+  raw="${raw//[[:space:]]/}"
+  case "$raw" in
+    "") return 1 ;;
+    dark|light) printf '%s' "$raw" ;;
+    bright|bright-mode|brightmode) printf 'light' ;;
+    default|grafana-default|system) printf '' ;;
+    *) echo "Unsupported GRAFANA_THEME. Use dark, light, bright, or default." >&2; exit 1 ;;
+  esac
+}
+
+grafana_theme_display() {
+  if [[ -z "$1" ]]; then
+    printf 'default'
+  else
+    printf '%s' "$1"
+  fi
+}
+
+apply_grafana_theme() {
+  local prefs_file="$TMP_DIR/org-preferences.json"
+  local body_file="$TMP_DIR/org-preferences-body.json"
+  local out_file="$TMP_DIR/org-preferences-update.json"
+  local status
+  status=$(api GET "/api/org/preferences" "" "$prefs_file")
+  if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+    echo "Failed to query Grafana org preferences: $(cat "$prefs_file")" >&2
+    exit 1
+  fi
+  jq --arg theme "$GRAFANA_THEME_NORMALIZED" '
+    {theme:$theme}
+    + (if has("homeDashboardId") and .homeDashboardId != null then {homeDashboardId:.homeDashboardId} else {} end)
+    + (if has("homeDashboardUID") and .homeDashboardUID != null then {homeDashboardUID:.homeDashboardUID} else {} end)
+    + (if has("timezone") and .timezone != null then {timezone:.timezone} else {} end)
+    + (if has("weekStart") and .weekStart != null then {weekStart:.weekStart} else {} end)
+  ' "$prefs_file" > "$body_file"
+  status=$(api PUT "/api/org/preferences" "$body_file" "$out_file")
+  if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+    echo "Failed to update Grafana org theme: $(cat "$out_file")" >&2
+    exit 1
+  fi
+  echo "Grafana org theme set: $(grafana_theme_display "$GRAFANA_THEME_NORMALIZED")"
+}
 urlencode() {
   jq -rn --arg v "$1" '$v|@uri'
 }
@@ -487,6 +542,12 @@ LIB_DIR="$TMP_DIR/library"
 mkdir -p "$LIB_DIR"
 load_dashboard_files
 DASHBOARD_BUILD_MARKER="$(dashboard_build_marker)"
+GRAFANA_THEME_CONFIGURED="false"
+GRAFANA_THEME_NORMALIZED=""
+if [[ -n "${GRAFANA_THEME//[[:space:]]/}" ]]; then
+  GRAFANA_THEME_CONFIGURED="true"
+  GRAFANA_THEME_NORMALIZED="$(normalize_grafana_theme)"
+fi
 
 for file_name in "${DASHBOARD_FILES[@]}"; do
   raw_file="$TMP_DIR/$file_name"
@@ -560,6 +621,13 @@ echo "Grafana version: $(grafana_version)"
 echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
+if [[ "$GRAFANA_THEME_CONFIGURED" == "true" ]]; then
+  if truthy "$PURGE_ONLY"; then
+    echo "Grafana theme: $(grafana_theme_display "$GRAFANA_THEME_NORMALIZED") (not applied in purge-only mode)"
+  else
+    echo "Grafana theme: $(grafana_theme_display "$GRAFANA_THEME_NORMALIZED") (will update org preference)"
+  fi
+fi
 if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
   echo "Source: localdir / $DASHBOARD_LOCAL_DIR"
 else
@@ -683,6 +751,10 @@ case "${answer:-}" in
     exit 0
     ;;
 esac
+
+if [[ "$GRAFANA_THEME_CONFIGURED" == "true" ]] && ! truthy "$PURGE_ONLY"; then
+  apply_grafana_theme
+fi
 
 if truthy "$PURGE_EFFECTIVE"; then
   for file_name in "${DASHBOARD_FILES[@]}"; do

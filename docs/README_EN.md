@@ -61,16 +61,13 @@ The deployable dashboards require Grafana 13.0.1 or newer and use Grafana tab na
 
 ## Advanced Docs
 
-Use these only when the normal migration path reports a problem or when you maintain the repository:
+Use these when the normal migration path reports a problem or when you need operational background:
 
 - Migration troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting_EN.md)
 - Migration validation notes: [migration-validation-notes.md](./migration-validation-notes_EN.md)
 - Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design_EN.md)
 - Live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference_EN.md)
-- Localization maintainer workflow: [design/localization-maintainer-workflow.md](./design/localization-maintainer-workflow_EN.md)
+## Screenshots
 
-## Release Preparation
-
-- First end-user release checklist: [first-release-checklist.md](./first-release-checklist_EN.md)
 - Screenshot gallery: [screenshots/README.md](./screenshots/README_EN.md)

@@ -24,13 +24,14 @@ param(
   [string]$foldertitle,
   [string]$authmode,
   [string]$user,
-  [string]$password
+  [string]$password,
+  [string]$theme
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.10'
+$ScriptVersion = '2026.05.31.11'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-05-31'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -45,7 +46,7 @@ function Load-DotEnv([string]$Path) {
     if ($idx -lt 1) { continue }
     $key = $trimmed.Substring(0, $idx).Trim()
     if ($map.ContainsKey($key)) {
-      throw "Duplicate key in $Path: $key. Define each key only once; comment out old alternatives."
+      throw "Duplicate key in ${Path}: $key. Define each key only once; comment out old alternatives."
     }
     $value = $trimmed.Substring($idx + 1).Trim()
     if (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'"))) {
@@ -147,6 +148,33 @@ function Invoke-GrafanaApi([string]$Method, [string]$Path, $Body = $null, [switc
   }
 }
 
+
+function Resolve-GrafanaTheme {
+  $raw = ([string]$settings.GRAFANA_THEME).Trim().ToLowerInvariant()
+  if ([string]::IsNullOrWhiteSpace($raw)) { return $null }
+  if ($raw -in @('dark','light')) { return $raw }
+  if ($raw -in @('bright','bright-mode','brightmode')) { return 'light' }
+  if ($raw -in @('default','grafana-default','system')) { return '' }
+  throw 'Unsupported GRAFANA_THEME. Use dark, light, bright, or default.'
+}
+
+function Get-GrafanaThemeDisplay([AllowEmptyString()][string]$ThemeValue) {
+  if ($ThemeValue -eq '') { return 'default' }
+  return $ThemeValue
+}
+
+function Set-GrafanaOrgTheme([AllowEmptyString()][string]$ThemeValue) {
+  $preferences = Invoke-GrafanaApi GET '/api/org/preferences'
+  $body = @{}
+  foreach ($key in @('homeDashboardId','homeDashboardUID','timezone','weekStart')) {
+    if ($null -ne $preferences -and $null -ne $preferences.PSObject.Properties[$key] -and $null -ne $preferences.$key) {
+      $body[$key] = $preferences.$key
+    }
+  }
+  $body['theme'] = $ThemeValue
+  Invoke-GrafanaApi PUT '/api/org/preferences' $body | Out-Null
+  Write-Host "Grafana org theme set: $(Get-GrafanaThemeDisplay -ThemeValue $ThemeValue)" -ForegroundColor Green
+}
 function Get-EffectiveDashboardLanguage() {
   if ($settings.DASHBOARD_VARIANT -eq 'orig') { return 'en' }
   return [string]$settings.DASHBOARD_LANGUAGE
@@ -544,6 +572,7 @@ $settings = @{
   GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'
   GRAFANA_FOLDER_UID = 'evcc'
   GRAFANA_FOLDER_TITLE = 'EVCC'
+  GRAFANA_THEME = ''
   DASHBOARD_SOURCE_MODE = 'github'
   GITHUB_REPO = 'endurance1968/evcc-grafana-dashboards'
   GITHUB_REF = 'main'
@@ -580,7 +609,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_RAW_BASE_URL','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','GRAFANA_THEME','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_RAW_BASE_URL','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -590,6 +619,7 @@ Merge-Setting $settings 'GRAFANA_AUTH_MODE' $authmode
 Merge-Setting $settings 'GRAFANA_API_TOKEN' $token
 Merge-Setting $settings 'GRAFANA_USER' $user
 Merge-Setting $settings 'GRAFANA_PASSWORD' $password
+Merge-Setting $settings 'GRAFANA_THEME' $theme
 Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_UID' $datasourceuid
 Merge-Setting $settings 'DASHBOARD_LANGUAGE' $language
 Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
@@ -625,6 +655,8 @@ $dashboardBuildMarker = Get-DashboardBuildMarker
 $dashboardOverrides = Get-DashboardOverrides
 $purgeOnlyEnabled = Test-Truthy $settings.PURGE_ONLY
 $purgeEnabled = (Test-Truthy $settings.PURGE) -or $purgeOnlyEnabled
+$grafanaThemeConfigured = -not [string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_THEME)
+$grafanaTheme = Resolve-GrafanaTheme
 
 if ((Resolve-GrafanaAuthMode) -eq 'token' -and -not $settings.GRAFANA_API_TOKEN) { throw 'Missing GRAFANA_API_TOKEN. For Grafana 13 set a service-account token in GRAFANA_API_TOKEN, or use GRAFANA_AUTH_MODE=basic with GRAFANA_USER and GRAFANA_PASSWORD.' }
 
@@ -652,6 +684,10 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
+if ($grafanaThemeConfigured) {
+  $action = if ($purgeOnlyEnabled) { 'not applied in purge-only mode' } else { 'will update org preference' }
+  Write-Host "Grafana theme: $(Get-GrafanaThemeDisplay -ThemeValue $grafanaTheme) ($action)"
+}
 if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
   Write-Host "Source: localdir / $($settings.DASHBOARD_LOCAL_DIR)"
 } else {
@@ -723,6 +759,10 @@ $confirmPrompt = if ($purgeOnlyEnabled) { 'Proceed with purge-only deletion? [y/
 if (-not (Confirm-Apply $confirmPrompt)) {
   Write-Host 'Aborted. No changes applied.' -ForegroundColor Yellow
   exit 0
+}
+
+if ($grafanaThemeConfigured -and -not $purgeOnlyEnabled) {
+  Set-GrafanaOrgTheme -ThemeValue $grafanaTheme
 }
 
 if ($purgeEnabled) {

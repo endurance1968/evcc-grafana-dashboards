@@ -2,9 +2,7 @@
 
 German version: [German README](./README.md).
 
-This directory contains the curated screenshot set for the current EVCC/VictoriaMetrics dashboard release. PNG files live directly in this directory; the former `tabs/` subdirectory is no longer used.
-
-Test runs, render-smoke screenshots, temporary dashboard imports, performance traces, and debugging captures belong under `tests/artifacts/` and are intentionally ignored by Git.
+This directory shows examples of the current EVCC/VictoriaMetrics dashboards.
 
 ## All-Time Tabs
 

@@ -306,7 +306,7 @@ Die Aktualisierung nur einmal pro Tag ausfuehren, nachdem der vorherige lokale T
 
 ## 11. EVCC/Telegraf Live-Ingest einrichten
 
-Nach Import, Bereinigung, Rollups und Scheduler ist der naechste Schritt der aktuelle EVCC-Schreibpfad nach VictoriaMetrics. Das ersetzt an dieser Stelle den frueheren direkten Sprung zum Grafana-Dashboard-Deployment.
+Nach Import, Bereinigung, Rollups und Scheduler ist der naechste Schritt der aktuelle EVCC-Schreibpfad nach VictoriaMetrics.
 
 Weiter mit [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md). Dort wird der Live-Schreibpfad eingerichtet und anschliessend auf Grafana-Installation und Dashboard-Deployment verwiesen.
 
