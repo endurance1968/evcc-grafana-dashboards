@@ -254,15 +254,15 @@ For EVCC and the dashboards, you normally need after this installation:
 - a current EVCC raw-data pipeline to VictoriaMetrics
 - later, a Grafana datasource pointing to this VictoriaMetrics URL
 
-Set up live ingest next:
+Set up EVCC/Telegraf live ingest next:
 
 - [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 
-If you migrate from InfluxDB, first verify that live ingest works for new data. Then import history and build rollups:
+If you migrate from InfluxDB, use that guide for preparation only at first: configure the Telegraf listener, the old InfluxDB output, and the VictoriaMetrics target, but keep the VictoriaMetrics write path disabled until cutover. Then import the InfluxDB history and enable the write path only at the end of the migration:
 
 - [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
 
-If you start without history, continue with Grafana once the first raw data arrives.
+If you start without old InfluxDB history, enable the write path immediately and continue with Grafana once the first raw data arrives.
 
 ## Common issues
 

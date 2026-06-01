@@ -25,6 +25,21 @@ The rollup engine does not overwrite raw EVCC metrics. It writes additional dail
 
 If VictoriaMetrics or Grafana is not installed yet, start at [docs/README.md](./README_EN.md).
 
+## Recommended Order To Minimize Data Gaps
+
+The simple and safe sequence is:
+
+1. Install VictoriaMetrics.
+2. Prepare EVCC/Telegraf according to [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md), but keep the VictoriaMetrics output disabled.
+3. During the migration, EVCC continues to write to InfluxDB as before.
+4. Import history from InfluxDB to VictoriaMetrics.
+5. Build rollups for the imported history.
+6. Shortly before cutover, run a final delta import for the last InfluxDB data.
+7. If the delta import contains newly completed days, refresh those rollups with `--replace-range --write`.
+8. Then enable the VictoriaMetrics output in Telegraf and verify current data.
+
+This avoids two common problems: a long data gap between import and live operation, or duplicate data because the same time range was imported and written live at the same time.
+
 ## 1. Download The Migration Files
 
 Create a working directory:
@@ -106,7 +121,7 @@ Important:
 
 - Keep `--influx-skip-database-label` for this repository's default model.
 - Do not use a synthetic `db` label to multiplex multiple EVCC instances into one VictoriaMetrics instance.
-- During transition, EVCC may still write to InfluxDB in parallel.
+- During transition, EVCC should continue to write to InfluxDB. If Telegraf is already prepared, keep the VictoriaMetrics output disabled until cutover.
 - `-s --disable-progress-bar` makes the import non-interactive and also works when `vmctl` runs in Docker or another non-TTY environment.
 - If `vmctl` runs in a Docker container on Docker Desktop while InfluxDB or VictoriaMetrics are published on the host, use `host.docker.internal` in `--influx-addr` and `--vm-addr`.
 
@@ -302,11 +317,47 @@ Add:
 
 Run the refresh only once per day after the previous local day is complete.
 
-## 11. Configure EVCC/Telegraf Live Ingest
+## 11. Run The Final Delta Import And Enable Live Ingest
 
-After import, cleanup, rollups, and scheduling, the next step is the current EVCC write path to VictoriaMetrics.
+After import, cleanup, rollups, and scheduling, switch over the current data path.
 
-Continue with [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md). That guide sets up the live write path and then links to Grafana installation and dashboard deployment.
+If EVCC/Telegraf has not been prepared yet, do that now:
+
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
+
+Then run a final delta import. Use the time directly after your first import end as the start time and a deliberate cutover time as the end time.
+
+Example without InfluxDB authentication:
+
+```bash
+vmctl influx \
+  -s \
+  --disable-progress-bar \
+  --influx-addr='http://<influx-host>:8086' \
+  --influx-database='evcc' \
+  --influx-filter-time-start='2026-03-31T00:00:00Z' \
+  --influx-filter-time-end='2026-06-01T12:00:00Z' \
+  --influx-skip-database-label \
+  --vm-addr='http://localhost:8428'
+```
+
+If the final delta import contains completed local days that were not covered by the initial backfill, refresh those rollups before dashboard deployment:
+
+```bash
+python3 evcc-vm-rollup.py \
+  --config /etc/evcc-vm-rollup.conf \
+  backfill \
+  --start-day 2026-03-31 \
+  --end-day 2026-05-31 \
+  --replace-range \
+  --write
+```
+
+Use only a completed local day as `--end-day`, normally yesterday. Today is handled later by the daily scheduler once the day is complete.
+
+If you do not want to risk even a few seconds of missing data, use a short maintenance window: stop EVCC briefly, run the final delta import, refresh rollups for completed days if needed, enable the VictoriaMetrics output in Telegraf, start Telegraf, and start EVCC again.
+
+After that, enable the prepared VictoriaMetrics write path in [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md) and verify that current raw data arrives in VictoriaMetrics. Continue with Grafana and dashboard deployment only after that.
 
 ## Quick Completion Check
 

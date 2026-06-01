@@ -158,11 +158,14 @@ Wichtig:
 
 ## Naechster Schritt
 
-Wenn VictoriaMetrics laeuft, richte zuerst den aktuellen EVCC-Schreibpfad ein:
+Wenn VictoriaMetrics laeuft, richte zuerst EVCC/Telegraf ein:
 
 - [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 
-Danach:
+Bei einer InfluxDB-Migration bereitest du den VictoriaMetrics-Schreibpfad dort nur vor und laesst ihn noch deaktiviert. Danach migrierst du die Historie und aktivierst den Schreibpfad erst am Cutover:
 
-- bei vorhandener InfluxDB-Historie: [influx-to-vm-migration.md](./influx-to-vm-migration.md)
-- ohne Historie oder nach abgeschlossener Migration: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
+- [influx-to-vm-migration.md](./influx-to-vm-migration.md)
+
+Ohne alte Historie kannst du den Schreibpfad sofort aktivieren und danach Grafana einrichten:
+
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)

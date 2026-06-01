@@ -2,7 +2,14 @@
 
 German version: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
 
-This guide explains how current EVCC metrics are written to VictoriaMetrics. It belongs at the end of the VictoriaMetrics installation or at the end of the InfluxDB migration. From here, continue to Grafana and dashboard deployment.
+This guide explains how current EVCC metrics are written to VictoriaMetrics.
+
+For a new installation, enable the write path immediately. For an InfluxDB migration, prepare it first and enable it only after the final delta import. This lets you test the configuration early while avoiding a period that is written to VictoriaMetrics both by live ingest and by import.
+
+In short:
+
+- new stack: configure, enable, verify, then continue to Grafana
+- migration: configure, keep the VictoriaMetrics output disabled, migrate history, run the final delta import, then enable and verify
 
 ## Which Path Should I Use?
 
@@ -21,6 +28,8 @@ EVCC -> Telegraf -> InfluxDB v1 + VictoriaMetrics
 ```
 
 This is the recommended migration path because EVCC writes to one target and Telegraf distributes the data to old and new backends.
+
+Important for migrations: set up Telegraf early, but enable the VictoriaMetrics output only at cutover. Until then, Telegraf continues to write only to InfluxDB. The old environment stays stable, and the VictoriaMetrics history is populated in a controlled way by the InfluxDB import.
 
 ## Prerequisites
 
@@ -101,7 +110,7 @@ Important:
 - `omit_hostname = true` prevents Telegraf from adding an infrastructure-only `host` label.
 - The old `[[inputs.influxdb_listener]]` for `/write` is only needed when you explicitly run InfluxDB-v1 write clients through Telegraf.
 
-### 3. Configure The VictoriaMetrics Output
+### 3. Prepare The VictoriaMetrics Output
 
 Write to VictoriaMetrics through `outputs.http`:
 
@@ -113,6 +122,18 @@ Write to VictoriaMetrics through `outputs.http`:
   data_format = "influx"
   timeout = "10s"
   non_retryable_statuscodes = [400]
+```
+
+For a new installation, keep this block active. For a migration, comment out the block until cutover or keep it prepared and enable it only after the final delta import:
+
+```toml
+# [[outputs.http]]
+#   alias = "victoriametrics_evcc"
+#   url = "http://<victoriametrics-host>:8428/influx/write"
+#   method = "POST"
+#   data_format = "influx"
+#   timeout = "10s"
+#   non_retryable_statuscodes = [400]
 ```
 
 Do not use `[[outputs.influxdb]]` for VictoriaMetrics. That plugin can create a synthetic `db` label. The dashboards and rollups expect a dedicated VictoriaMetrics instance without shared `db` multiplexing.
@@ -145,6 +166,22 @@ Check logs:
 ```bash
 journalctl -u telegraf -n 100 --no-pager
 ```
+
+During a migration, this restart is also useful in preparation mode. Verify that EVCC still writes through Telegraf to InfluxDB. The VictoriaMetrics output remains disabled at this point.
+
+## Enable The VictoriaMetrics Write Path During Migration
+
+Run this section only after the InfluxDB history has been imported, checked, and the final delta import has completed.
+
+A simple cutover for non-experts:
+
+1. Note the cutover time.
+2. Import the last missing InfluxDB data up to that time into VictoriaMetrics.
+3. Enable the prepared `[[outputs.http]]` block in Telegraf.
+4. Restart Telegraf.
+5. Verify that current series arrive in VictoriaMetrics.
+
+If you must avoid even a few seconds of missing data, plan a short maintenance window: stop EVCC briefly, run the final delta import, enable the VictoriaMetrics output, start Telegraf, and start EVCC again. That is easier and cleaner than intentionally overlapping import and live-ingest time ranges.
 
 ## Verify Live Ingest
 
@@ -208,7 +245,7 @@ Once current EVCC raw data arrives in VictoriaMetrics, continue with Grafana:
 - install Grafana if you do not already have a suitable instance: [grafana-install-debian-13.md](./grafana-install-debian-13_EN.md) or [grafana-install-docker.md](./grafana-install-docker_EN.md)
 - create the Grafana datasource and deploy dashboards: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
 
-If you want to keep existing InfluxDB history and the migration is not complete yet, go back to [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) first. The normal migration path calls this live ingest guide at the end.
+If you used this guide only to prepare an InfluxDB migration, go back to [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md) now. Enable the VictoriaMetrics write path only after the final delta import.
 
 ## Sources
 

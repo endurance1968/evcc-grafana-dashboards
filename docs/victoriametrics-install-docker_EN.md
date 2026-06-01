@@ -156,11 +156,14 @@ Important:
 
 ## Next Step
 
-Once VictoriaMetrics is running, configure the current EVCC write path first:
+Once VictoriaMetrics is running, configure EVCC/Telegraf first:
 
 - [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 
-Then continue with:
+For an InfluxDB migration, prepare the VictoriaMetrics write path there but leave it disabled. Then migrate the history and enable the write path only at cutover:
 
-- existing InfluxDB history: [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
-- no history, or after migration: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)
+- [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md)
+
+Without old history, enable the write path immediately and then configure Grafana:
+
+- [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup_EN.md)

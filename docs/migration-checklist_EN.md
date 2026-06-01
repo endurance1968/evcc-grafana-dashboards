@@ -16,6 +16,13 @@ Expected:
 OK
 ```
 
+## Live Ingest Prepared But Not Active Yet
+
+- [ ] EVCC/Telegraf is prepared; see [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md).
+- [ ] During a migration, EVCC continues to write to InfluxDB while the import runs.
+- [ ] The VictoriaMetrics output in Telegraf remains disabled until the final delta import.
+- [ ] If Telegraf is used, `omit_hostname = true` is set.
+
 ## Raw Import
 
 - [ ] `vmctl influx` completed for the intended time range.
@@ -120,9 +127,11 @@ tail -n 80 /var/log/evcc-vm-rollup.log
 
 ## Live Ingest
 
+- [ ] Final delta import up to the cutover time has completed.
+- [ ] If the delta import contained newly completed days, those rollups were refreshed with `--replace-range --write`.
+- [ ] The VictoriaMetrics output in Telegraf was enabled after the final delta import.
 - [ ] EVCC writes current raw data directly or through Telegraf to VictoriaMetrics; see [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md).
 - [ ] Current raw series exist in VictoriaMetrics, for example `gridPower_value`, `pvPower_value`, or `batteryPower_value` for the last few minutes.
-- [ ] If Telegraf is used, `omit_hostname = true` is set.
 - [ ] VictoriaMetrics has no synthetic `db` label for this dashboard stack.
 - [ ] If InfluxDB is still written in parallel, the planned legacy-path shutdown is documented.
 
@@ -139,6 +148,8 @@ tail -n 80 /var/log/evcc-vm-rollup.log
 ## Cutover
 
 Only remove InfluxDB from the active dashboard path after all previous sections are checked.
+
+Pay special attention to the gap between the end of the last import and the first live samples in VictoriaMetrics. If even a small gap matters to you, repeat the final delta import for a cleanly completed time window before live ingest started.
 
 Safe final state:
 

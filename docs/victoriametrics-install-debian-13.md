@@ -256,15 +256,15 @@ Fuer EVCC und die Dashboards brauchst du nach dieser Installation normalerweise:
 - eine aktuelle EVCC-Rohdatenpipeline nach VictoriaMetrics
 - spaeter eine Grafana-Datasource auf diese VictoriaMetrics-URL
 
-Richte als naechsten Schritt den Live-Ingest ein:
+Richte als naechsten Schritt den EVCC/Telegraf-Live-Ingest ein:
 
 - [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 
-Wenn du von InfluxDB migrierst, pruefe zuerst, dass der Live-Ingest fuer neue Daten funktioniert. Importiere danach die Historie und erzeuge Rollups:
+Wenn du von InfluxDB migrierst, nutze diese Anleitung zuerst nur zur Vorbereitung: Telegraf-Listener, alter InfluxDB-Output und VictoriaMetrics-Ziel werden konfiguriert, aber der VictoriaMetrics-Schreibpfad bleibt bis zum Cutover deaktiviert. Danach importierst du die InfluxDB-Historie und aktivierst den Schreibpfad erst am Ende der Migration:
 
 - [influx-to-vm-migration.md](./influx-to-vm-migration.md)
 
-Wenn du ohne Historie neu startest, kannst du nach den ersten eingehenden Rohdaten direkt mit Grafana fortfahren.
+Wenn du ohne alte InfluxDB-Historie neu startest, kannst du den Schreibpfad sofort aktivieren und nach den ersten eingehenden Rohdaten direkt mit Grafana fortfahren.
 
 ## Haeufige Probleme
 

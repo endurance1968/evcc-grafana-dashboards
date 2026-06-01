@@ -22,13 +22,14 @@ Start with [system-requirements.md](./system-requirements_EN.md), then follow [R
 The normal migration path is documented in [influx-to-vm-migration.md](./influx-to-vm-migration_EN.md):
 
 1. install or prepare VictoriaMetrics
-2. import raw EVCC history from InfluxDB v1 with `vmctl influx`
-3. validate raw coverage with `check_data.py` and `compare_import_coverage.py`
-4. normalize infrastructure labels such as `host` when the checker requires it
-5. run `evcc-vm-rollup.py` dry-run and write backfill for daily `evcc_*` metrics
-6. schedule the daily rollup refresh for completed local days
-7. configure or verify current EVCC/Telegraf live ingest to VictoriaMetrics
-8. from the live ingest guide, connect Grafana to VictoriaMetrics and deploy dashboards
+2. prepare EVCC/Telegraf live ingest, but keep the VictoriaMetrics write path disabled during migrations
+3. import raw EVCC history from InfluxDB v1 with `vmctl influx`
+4. validate raw coverage with `check_data.py` and `compare_import_coverage.py`
+5. normalize infrastructure labels such as `host` when the checker requires it
+6. run `evcc-vm-rollup.py` dry-run and write backfill for daily `evcc_*` metrics
+7. schedule the daily rollup refresh for completed local days
+8. run the final delta import, refresh rollups for newly completed days if needed, and then enable the VictoriaMetrics write path
+9. connect Grafana to VictoriaMetrics and deploy dashboards
 
 The release validation checked the live-ingest path, imported a real multi-year EVCC history into VictoriaMetrics, cleaned `host` labels, verified `db=0`, built rollups, and rendered the dashboards against the migrated data.
 

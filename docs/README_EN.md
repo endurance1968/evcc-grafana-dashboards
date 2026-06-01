@@ -11,21 +11,23 @@ Start with the central requirements overview: [system-requirements.md](./system-
 Use this path when you want to keep your history and move the dashboard backend to VictoriaMetrics:
 
 1. Install VictoriaMetrics.
-2. Import historic InfluxDB raw data into VictoriaMetrics.
-3. Build the daily `evcc_*` rollups.
-4. Schedule the daily rollup refresh.
-5. Configure EVCC/Telegraf live ingest to VictoriaMetrics.
-6. From the live ingest guide, install/connect Grafana and deploy the dashboards.
+2. Prepare EVCC/Telegraf live ingest, but keep the VictoriaMetrics write path disabled for now.
+3. Import historic InfluxDB raw data into VictoriaMetrics.
+4. Build the daily `evcc_*` rollups for the imported history and schedule the daily rollup refresh.
+5. Shortly before cutover, run a final delta import for the last InfluxDB data and refresh rollups for newly completed days.
+6. Enable the VictoriaMetrics write path and verify that current EVCC data arrives.
+7. Then install/connect Grafana and deploy the dashboards.
 
 Start here:
 
+- [VictoriaMetrics on Debian 13](./victoriametrics-install-debian-13_EN.md) or [VictoriaMetrics with Docker](./victoriametrics-install-docker_EN.md)
+- [Prepare EVCC/Telegraf live ingest](./evcc-telegraf-live-ingest_EN.md)
 - [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration_EN.md)
 - [Migration checklist](./migration-checklist_EN.md)
-- [EVCC/Telegraf live ingest to VictoriaMetrics](./evcc-telegraf-live-ingest_EN.md)
 
 ### I am setting up a new VictoriaMetrics stack
 
-Install VictoriaMetrics first. At the end of the VictoriaMetrics guide, continue with EVCC/Telegraf; at the end of the EVCC/Telegraf guide, continue with Grafana and dashboard deployment.
+Install VictoriaMetrics first. Then configure EVCC/Telegraf and enable the write path immediately, because there is no old InfluxDB history. Once current raw data arrives in VictoriaMetrics, continue with Grafana and dashboard deployment.
 
 - VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13_EN.md)
 - VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker_EN.md)

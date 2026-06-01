@@ -2,7 +2,14 @@
 
 Englische Version: [evcc-telegraf-live-ingest_EN.md](./evcc-telegraf-live-ingest_EN.md).
 
-Diese Anleitung beschreibt, wie aktuelle EVCC-Messwerte nach VictoriaMetrics geschrieben werden. Sie gehoert ans Ende der VictoriaMetrics-Installation oder ans Ende der InfluxDB-Migration. Von hier aus geht es anschliessend weiter zu Grafana und zum Dashboard-Deployment.
+Diese Anleitung beschreibt, wie aktuelle EVCC-Messwerte nach VictoriaMetrics geschrieben werden.
+
+Bei einer neuen Installation wird der Schreibpfad sofort aktiviert. Bei einer InfluxDB-Migration wird er zuerst nur vorbereitet und erst nach dem finalen Delta-Import aktiviert. Dadurch kannst du die Konfiguration frueh testen und trotzdem vermeiden, dass derselbe Zeitraum gleichzeitig per Live-Ingest und per Import in VictoriaMetrics landet.
+
+Kurz gesagt:
+
+- neuer Stack: konfigurieren, aktivieren, pruefen, danach Grafana
+- Migration: konfigurieren, VictoriaMetrics-Output noch deaktiviert lassen, Historie migrieren, finalen Delta-Import ausfuehren, dann aktivieren und pruefen
 
 ## Wann welcher Pfad?
 
@@ -21,6 +28,8 @@ EVCC -> Telegraf -> InfluxDB v1 + VictoriaMetrics
 ```
 
 Das ist der empfohlene Umsteigerpfad, weil EVCC nur ein Ziel beschreiben muss und Telegraf die Daten an alte und neue Backends verteilt.
+
+Wichtig fuer Migrationen: Richte Telegraf frueh ein, aber aktiviere den VictoriaMetrics-Output erst am Cutover. Bis dahin schreibt Telegraf weiter nur nach InfluxDB. So bleibt die alte Umgebung stabil, und die VictoriaMetrics-Historie kommt kontrolliert aus dem InfluxDB-Import.
 
 ## Voraussetzungen
 
@@ -101,7 +110,7 @@ Wichtig:
 - `omit_hostname = true` verhindert, dass Telegraf ein Infrastruktur-Label `host` hinzufuegt.
 - Der alte `[[inputs.influxdb_listener]]` fuer `/write` ist nur noetig, wenn du explizit InfluxDB-v1-Schreibclients an Telegraf betreibst.
 
-### 3. VictoriaMetrics-Output konfigurieren
+### 3. VictoriaMetrics-Output vorbereiten
 
 VictoriaMetrics ueber `outputs.http` beschreiben:
 
@@ -113,6 +122,18 @@ VictoriaMetrics ueber `outputs.http` beschreiben:
   data_format = "influx"
   timeout = "10s"
   non_retryable_statuscodes = [400]
+```
+
+Bei einer neuen Installation bleibt dieser Block aktiv. Bei einer Migration kommentierst du den Block bis zum Cutover aus oder legst ihn vorbereitet ab und aktivierst ihn erst nach dem finalen Delta-Import:
+
+```toml
+# [[outputs.http]]
+#   alias = "victoriametrics_evcc"
+#   url = "http://<victoriametrics-host>:8428/influx/write"
+#   method = "POST"
+#   data_format = "influx"
+#   timeout = "10s"
+#   non_retryable_statuscodes = [400]
 ```
 
 Nicht `[[outputs.influxdb]]` fuer VictoriaMetrics verwenden. Dieses Plugin kann ein synthetisches `db`-Label erzeugen. Die Dashboards und Rollups erwarten stattdessen eine dedizierte VictoriaMetrics-Instanz ohne gemeinsames `db`-Multiplexing.
@@ -145,6 +166,22 @@ Logs pruefen:
 ```bash
 journalctl -u telegraf -n 100 --no-pager
 ```
+
+Bei einer Migration ist dieser Neustart auch im Vorbereitungsmodus sinnvoll. Dann pruefst du, dass EVCC weiter ueber Telegraf nach InfluxDB schreibt. Der VictoriaMetrics-Output bleibt dabei noch deaktiviert.
+
+## VictoriaMetrics-Schreibpfad bei einer Migration aktivieren
+
+Fuehre diesen Abschnitt erst aus, wenn die InfluxDB-Historie importiert, geprueft und der finale Delta-Import abgeschlossen ist.
+
+Ein einfacher Cutover fuer Nicht-Experten:
+
+1. Merke dir den Umschaltzeitpunkt.
+2. Importiere die letzten noch fehlenden InfluxDB-Daten bis zu diesem Zeitpunkt nach VictoriaMetrics.
+3. Aktiviere den vorbereiteten `[[outputs.http]]`-Block in Telegraf.
+4. Starte Telegraf neu.
+5. Pruefe, dass aktuelle Serien in VictoriaMetrics ankommen.
+
+Wenn du eine Datenluecke von wenigen Sekunden unbedingt vermeiden willst, plane ein kurzes Wartungsfenster: EVCC kurz anhalten, finalen Delta-Import ausfuehren, VictoriaMetrics-Output aktivieren, Telegraf starten, EVCC wieder starten. Das ist einfacher und sauberer als absichtlich ueberlappende Import- und Live-Zeitraeume.
 
 ## Live-Ingest pruefen
 
@@ -208,7 +245,7 @@ Wenn aktuelle EVCC-Rohdaten in VictoriaMetrics ankommen, kommt danach Grafana:
 - Grafana installieren, falls noch keine passende Instanz vorhanden ist: [grafana-install-debian-13.md](./grafana-install-debian-13.md) oder [grafana-install-docker.md](./grafana-install-docker.md)
 - Grafana-Datasource anlegen und Dashboards deployen: [grafana-vm-dashboard-setup.md](./grafana-vm-dashboard-setup.md)
 
-Wenn du eine vorhandene InfluxDB-Historie uebernehmen willst und die Migration noch nicht abgeschlossen ist, gehe zuerst zurueck zu [influx-to-vm-migration.md](./influx-to-vm-migration.md). Der normale Migrationspfad ruft diese Live-Ingest-Anleitung am Ende auf.
+Wenn du diese Anleitung nur zur Vorbereitung einer InfluxDB-Migration genutzt hast, gehe jetzt zurueck zu [influx-to-vm-migration.md](./influx-to-vm-migration.md). Erst nach dem finalen Delta-Import wird der VictoriaMetrics-Schreibpfad aktiviert.
 
 ## Quellen
 

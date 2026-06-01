@@ -27,6 +27,21 @@ Die Rollup-Engine ueberschreibt keine EVCC-Rohmetriken. Sie schreibt zusaetzlich
 
 Wenn VictoriaMetrics oder Grafana noch nicht installiert sind, starte mit [docs/README.md](./README.md).
 
+## Empfohlene Reihenfolge fuer moeglichst wenige Datenluecken
+
+Der einfache und sichere Ablauf ist:
+
+1. VictoriaMetrics installieren.
+2. EVCC/Telegraf nach [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md) vorbereiten, aber den VictoriaMetrics-Output noch deaktiviert lassen.
+3. EVCC schreibt waehrend der Migration weiter wie bisher nach InfluxDB.
+4. Historie aus InfluxDB nach VictoriaMetrics importieren.
+5. Rollups fuer die importierte Historie erzeugen.
+6. Kurz vor der Umschaltung einen finalen Delta-Import fuer die letzten InfluxDB-Daten ausfuehren.
+7. Falls der Delta-Import neu abgeschlossene Tage enthaelt, diese Rollups mit `--replace-range --write` aktualisieren.
+8. Danach den VictoriaMetrics-Output in Telegraf aktivieren und aktuelle Daten pruefen.
+
+So vermeidest du zwei typische Probleme: eine lange Datenluecke zwischen Import und Live-Betrieb oder doppelte Daten, weil derselbe Zeitraum gleichzeitig importiert und live geschrieben wurde.
+
 ## 1. Migrationsdateien herunterladen
 
 Arbeitsverzeichnis anlegen:
@@ -108,7 +123,7 @@ Wichtig:
 
 - Behalte `--influx-skip-database-label` fuer das Standardmodell dieses Repositorys bei.
 - Nutze kein synthetisches `db`-Label, um mehrere EVCC-Instanzen in eine VictoriaMetrics-Instanz zu multiplexen.
-- Waehrend der Uebergangsphase kann EVCC weiter parallel nach InfluxDB schreiben.
+- Waehrend der Uebergangsphase sollte EVCC weiter nach InfluxDB schreiben. Wenn Telegraf schon vorbereitet ist, bleibt der VictoriaMetrics-Output bis zum Cutover deaktiviert.
 - `-s --disable-progress-bar` macht den Import nicht-interaktiv und funktioniert auch, wenn `vmctl` in Docker oder einer anderen Non-TTY-Umgebung laeuft.
 - Wenn `vmctl` in einem Docker-Container auf Docker Desktop laeuft und InfluxDB oder VictoriaMetrics auf dem Host veroeffentlicht sind, nutze `host.docker.internal` in `--influx-addr` und `--vm-addr`.
 
@@ -304,11 +319,47 @@ Eintragen:
 
 Die Aktualisierung nur einmal pro Tag ausfuehren, nachdem der vorherige lokale Tag abgeschlossen ist.
 
-## 11. EVCC/Telegraf Live-Ingest einrichten
+## 11. Finalen Delta-Import und Live-Ingest aktivieren
 
-Nach Import, Bereinigung, Rollups und Scheduler ist der naechste Schritt der aktuelle EVCC-Schreibpfad nach VictoriaMetrics.
+Nach Import, Bereinigung, Rollups und Scheduler folgt die eigentliche Umschaltung fuer aktuelle Daten.
 
-Weiter mit [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md). Dort wird der Live-Schreibpfad eingerichtet und anschliessend auf Grafana-Installation und Dashboard-Deployment verwiesen.
+Wenn du EVCC/Telegraf noch nicht vorbereitet hast, hole das jetzt nach:
+
+- [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
+
+Fuehre danach einen finalen Delta-Import aus. Nutze als Startzeit den Zeitpunkt direkt nach deinem ersten Importende und als Endzeit einen bewusst gewaehlten Cutover-Zeitpunkt.
+
+Beispiel ohne InfluxDB-Authentifizierung:
+
+```bash
+vmctl influx \
+  -s \
+  --disable-progress-bar \
+  --influx-addr='http://<influx-host>:8086' \
+  --influx-database='evcc' \
+  --influx-filter-time-start='2026-03-31T00:00:00Z' \
+  --influx-filter-time-end='2026-06-01T12:00:00Z' \
+  --influx-skip-database-label \
+  --vm-addr='http://localhost:8428'
+```
+
+Wenn der finale Delta-Import abgeschlossene lokale Tage enthaelt, die noch nicht im initialen Backfill enthalten waren, aktualisiere diese Rollups vor dem Dashboard-Deployment:
+
+```bash
+python3 evcc-vm-rollup.py \
+  --config /etc/evcc-vm-rollup.conf \
+  backfill \
+  --start-day 2026-03-31 \
+  --end-day 2026-05-31 \
+  --replace-range \
+  --write
+```
+
+Nutze als `--end-day` nur einen abgeschlossenen lokalen Tag, normalerweise gestern. Heute wird spaeter vom taeglichen Scheduler verarbeitet, sobald der Tag abgeschlossen ist.
+
+Wenn du keine Datenluecke von wenigen Sekunden riskieren willst, nutze fuer die Umschaltung ein kurzes Wartungsfenster: EVCC kurz anhalten, finalen Delta-Import ausfuehren, bei Bedarf Rollups fuer abgeschlossene Tage aktualisieren, VictoriaMetrics-Output in Telegraf aktivieren, Telegraf starten, EVCC wieder starten.
+
+Danach in [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md) den vorbereiteten VictoriaMetrics-Schreibpfad aktivieren und pruefen, dass aktuelle Rohdaten in VictoriaMetrics ankommen. Erst danach mit Grafana und Dashboard-Deployment fortfahren.
 
 ## Schneller Abschlusscheck
 

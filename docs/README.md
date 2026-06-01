@@ -13,21 +13,23 @@ Beginne mit der zentralen Uebersicht der Voraussetzungen: [system-requirements.m
 Nutze diesen Pfad, wenn du deine Historie behalten und das Dashboard-Backend auf VictoriaMetrics umstellen moechtest:
 
 1. VictoriaMetrics installieren.
-2. Historische InfluxDB-Rohdaten nach VictoriaMetrics importieren.
-3. Taegliche `evcc_*` Rollups erzeugen.
-4. Taegliche Rollup-Aktualisierung planen.
-5. EVCC/Telegraf Live-Ingest nach VictoriaMetrics einrichten.
-6. Von der Live-Ingest-Anleitung aus Grafana installieren, verbinden und Dashboards deployen.
+2. EVCC/Telegraf Live-Ingest vorbereiten, aber den VictoriaMetrics-Schreibpfad noch deaktiviert lassen.
+3. Historische InfluxDB-Rohdaten nach VictoriaMetrics importieren.
+4. Taegliche `evcc_*` Rollups fuer die importierte Historie erzeugen und die taegliche Rollup-Aktualisierung planen.
+5. Kurz vor der Umschaltung einen finalen Delta-Import fuer die letzten InfluxDB-Daten ausfuehren und Rollups fuer neu abgeschlossene Tage aktualisieren.
+6. Den VictoriaMetrics-Schreibpfad aktivieren und pruefen, dass aktuelle EVCC-Daten ankommen.
+7. Danach Grafana installieren, verbinden und Dashboards deployen.
 
 Starte hier:
 
+- [VictoriaMetrics auf Debian 13](./victoriametrics-install-debian-13.md) oder [VictoriaMetrics mit Docker](./victoriametrics-install-docker.md)
+- [EVCC/Telegraf Live-Ingest vorbereiten](./evcc-telegraf-live-ingest.md)
 - [Migration von InfluxDB nach VictoriaMetrics](./influx-to-vm-migration.md)
 - [Migrations-Checkliste](./migration-checklist.md)
-- [EVCC/Telegraf Live-Ingest nach VictoriaMetrics](./evcc-telegraf-live-ingest.md)
 
 ### Ich baue einen neuen VictoriaMetrics-Stack auf
 
-Installiere zuerst VictoriaMetrics. Am Ende der VictoriaMetrics-Anleitung geht es weiter mit EVCC/Telegraf; am Ende der EVCC/Telegraf-Anleitung geht es weiter mit Grafana und dem Dashboard-Deployment.
+Installiere zuerst VictoriaMetrics. Danach richtest du EVCC/Telegraf ein und aktivierst den Schreibpfad sofort, weil es keine alte InfluxDB-Historie gibt. Sobald aktuelle Rohdaten in VictoriaMetrics ankommen, geht es weiter mit Grafana und dem Dashboard-Deployment.
 
 - VictoriaMetrics auf Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
 - VictoriaMetrics mit Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)

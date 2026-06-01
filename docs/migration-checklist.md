@@ -18,6 +18,13 @@ Erwartet:
 OK
 ```
 
+## Live-Ingest vorbereitet, aber noch nicht aktiv
+
+- [ ] EVCC/Telegraf ist vorbereitet, siehe [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
+- [ ] Bei einer Migration schreibt EVCC waehrend des Imports weiter nach InfluxDB.
+- [ ] Der VictoriaMetrics-Output in Telegraf ist bis zum finalen Delta-Import noch deaktiviert.
+- [ ] Bei Telegraf ist `omit_hostname = true` gesetzt.
+
 ## Rohimport
 
 - [ ] `vmctl influx` ist fuer den vorgesehenen Zeitraum abgeschlossen.
@@ -122,9 +129,11 @@ tail -n 80 /var/log/evcc-vm-rollup.log
 
 ## Live-Ingest
 
+- [ ] Finaler Delta-Import bis zum Cutover-Zeitpunkt wurde ausgefuehrt.
+- [ ] Falls der Delta-Import neu abgeschlossene Tage enthielt, wurden diese Rollups mit `--replace-range --write` aktualisiert.
+- [ ] Der VictoriaMetrics-Output in Telegraf wurde nach dem finalen Delta-Import aktiviert.
 - [ ] EVCC schreibt aktuelle Rohdaten direkt oder ueber Telegraf nach VictoriaMetrics, siehe [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md).
 - [ ] Aktuelle Rohserien existieren in VictoriaMetrics, zum Beispiel `gridPower_value`, `pvPower_value` oder `batteryPower_value` fuer die letzten Minuten.
-- [ ] Bei Telegraf ist `omit_hostname = true` gesetzt.
 - [ ] VictoriaMetrics enthaelt kein kuenstliches `db`-Label fuer diesen Dashboard-Stack.
 - [ ] Falls InfluxDB noch parallel beschrieben wird, ist klar dokumentiert, wann dieser Legacy-Pfad abgeschaltet wird.
 
@@ -141,6 +150,8 @@ tail -n 80 /var/log/evcc-vm-rollup.log
 ## Umschalten
 
 Entferne InfluxDB erst aus dem aktiven Dashboard-Pfad, wenn alle vorherigen Abschnitte abgehakt sind.
+
+Pruefe besonders, dass keine grosse Luecke zwischen dem Ende des letzten Imports und den ersten Live-Samples in VictoriaMetrics entstanden ist. Wenn eine kleine Luecke fuer dich kritisch ist, wiederhole den finalen Delta-Import fuer ein sauber abgeschlossenes Zeitfenster vor dem Live-Start.
 
 Sicherer Zielzustand:
 
