@@ -7,6 +7,7 @@ English: This repository contains VictoriaMetrics-based Grafana dashboards for E
 Die Arbeit baut auf den frueheren InfluxDB-basierten EVCC-Dashboards von Carsten auf:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
 Vielen Dank an Carsten fuer die starke Vorarbeit. Dieses Repository liefert den VictoriaMetrics-Pfad mit Migration, Tages-Rollups, lokalisierten Dashboard-Varianten und Deploy-Skripten fuer Grafana.
+Ich werde versuchen, den Stand mit dem von Carsten synchron zu halten - von daher kann es immer mal zu breaking changes kommen. evtl. lasst Ihr als via Telegraf weiterhin auch Eure Influx befüllen. Quasi als Fallback falls neu migriert werden muss.
 
 Beispiel-Dashboard:
 
