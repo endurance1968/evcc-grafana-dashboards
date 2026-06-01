@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-month-tab-en-orig",
+    "name": "vm-month-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -5033,7 +5033,7 @@
         "title": "Mois",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5045,7 +5045,7 @@
         "title": "Mois précédent",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5057,7 +5057,7 @@
         "title": "Il y a 2 mois",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -5122,7 +5122,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM : EVCC : Mois - Onglets",
+    "title": "VM : EVCC : Mois",
     "variables": [
       {
         "kind": "ConstantVariable",

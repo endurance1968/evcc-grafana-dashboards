@@ -79,8 +79,7 @@
         "fieldConfig": {
           "defaults": {
             "color": {
-              "fixedColor": "orange",
-              "mode": "fixed"
+              "mode": "palette-classic"
             },
             "custom": {
               "axisBorderShow": false,
@@ -498,8 +497,7 @@
         "fieldConfig": {
           "defaults": {
             "color": {
-              "fixedColor": "red",
-              "mode": "fixed"
+              "mode": "palette-classic"
             },
             "custom": {
               "axisBorderShow": false,
@@ -1275,8 +1273,7 @@
         "fieldConfig": {
           "defaults": {
             "color": {
-              "fixedColor": "red",
-              "mode": "fixed"
+              "mode": "palette-classic"
             },
             "custom": {
               "axisBorderShow": false,
@@ -1746,8 +1743,7 @@
         "fieldConfig": {
           "defaults": {
             "color": {
-              "fixedColor": "orange",
-              "mode": "fixed"
+              "mode": "palette-classic"
             },
             "custom": {
               "axisBorderShow": false,
@@ -2466,7 +2462,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
+            "mode": "palette-classic"
           },
           "custom": {
             "neutral": 0

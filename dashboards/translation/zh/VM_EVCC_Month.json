@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-month-tab-en-orig",
+    "name": "vm-month-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -39,7 +39,7 @@
         "kind": "Panel",
         "spec": {
           "id": 19,
-          "title": "Totali energia mensili",
+          "title": "每月能源总计",
           "description": "",
           "links": [],
           "data": {
@@ -57,7 +57,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Casa",
+                        "legendFormat": "家庭",
                         "range": true,
                         "interval": "1d"
                       },
@@ -80,7 +80,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "PV",
+                        "legendFormat": "光伏发电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -103,7 +103,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Prelievo rete",
+                        "legendFormat": "电网输入",
                         "range": true,
                         "interval": "1d"
                       },
@@ -126,7 +126,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Immissione",
+                        "legendFormat": "馈电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -334,7 +334,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "光伏发电"
                       }
                     ]
                   },
@@ -346,7 +346,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete"
+                        "value": "电网输入"
                       }
                     ]
                   },
@@ -358,7 +358,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Casa"
+                        "value": "家庭"
                       }
                     ]
                   },
@@ -370,7 +370,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Immissione"
+                        "value": "馈电"
                       }
                     ]
                   },
@@ -389,7 +389,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "光伏发电"
                     },
                     "properties": [
                       {
@@ -404,7 +404,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete"
+                      "options": "电网输入"
                     },
                     "properties": [
                       {
@@ -419,7 +419,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "家庭"
                     },
                     "properties": [
                       {
@@ -479,7 +479,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Immissione"
+                      "options": "馈电"
                     },
                     "properties": [
                       {
@@ -487,6 +487,21 @@
                         "value": {
                           "mode": "fixed",
                           "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
                         }
                       }
                     ]
@@ -546,7 +561,7 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "Energia",
+          "title": "能源",
           "description": "",
           "links": [],
           "data": {
@@ -564,7 +579,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Casa",
+                        "legendFormat": "家庭",
                         "range": true,
                         "interval": "1d"
                       },
@@ -587,7 +602,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "PV",
+                        "legendFormat": "光伏发电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -610,7 +625,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Prelievo rete",
+                        "legendFormat": "电网输入",
                         "range": true,
                         "interval": "1d"
                       },
@@ -633,7 +648,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Immissione",
+                        "legendFormat": "馈电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -761,7 +776,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "光伏发电"
                     },
                     "properties": [
                       {
@@ -776,7 +791,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete"
+                      "options": "电网输入"
                     },
                     "properties": [
                       {
@@ -791,7 +806,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "家庭"
                     },
                     "properties": [
                       {
@@ -851,7 +866,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Immissione"
+                      "options": "馈电"
                     },
                     "properties": [
                       {
@@ -859,6 +874,21 @@
                         "value": {
                           "mode": "fixed",
                           "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
                         }
                       }
                     ]
@@ -918,7 +948,7 @@
         "kind": "Panel",
         "spec": {
           "id": 22,
-          "title": "Resa specifica",
+          "title": "单位收益",
           "description": "",
           "links": [],
           "data": {
@@ -936,7 +966,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "PV",
+                        "legendFormat": "光伏发电",
                         "range": false
                       },
                       "datasource": {
@@ -1025,7 +1055,7 @@
         "kind": "Panel",
         "spec": {
           "id": 24,
-          "title": "Indicatori",
+          "title": "指标仪表",
           "description": "",
           "links": [],
           "data": {
@@ -1352,7 +1382,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autarchia"
+                      "options": "自给率"
                     },
                     "properties": [
                       {
@@ -1373,14 +1403,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarchia"
+                        "value": "自给率"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autoconsumo"
+                      "options": "自耗"
                     },
                     "properties": [
                       {
@@ -1401,7 +1431,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autoconsumo"
+                        "value": "自耗"
                       }
                     ]
                   },
@@ -1429,7 +1459,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarchia"
+                        "value": "自给率"
                       }
                     ]
                   },
@@ -1457,7 +1487,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autoconsumo"
+                        "value": "自耗"
                       }
                     ]
                   }
@@ -1471,7 +1501,7 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "Metriche",
+          "title": "指标",
           "description": "",
           "links": [],
           "data": {
@@ -1489,7 +1519,7 @@
                         "editorMode": "code",
                         "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
                         "format": "time_series",
-                        "legendFormat": "Autosufficienza",
+                        "legendFormat": "自给率",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1580,7 +1610,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autosufficienza"
+                      "options": "自给率"
                     },
                     "properties": [
                       {
@@ -1592,7 +1622,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autosufficienza"
+                        "value": "自给自足"
                       }
                     ]
                   },
@@ -1623,7 +1653,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autosufficienza"
+                        "value": "自给自足"
                       }
                     ]
                   }
@@ -1637,7 +1667,7 @@
         "kind": "Panel",
         "spec": {
           "id": 32,
-          "title": "Casa: distribuzione energia",
+          "title": "家庭：能源分配",
           "description": "",
           "links": [],
           "data": {
@@ -1655,7 +1685,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale EXT",
+                        "legendFormat": "EXT 总计",
                         "range": false
                       },
                       "datasource": {
@@ -1677,7 +1707,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale AUX",
+                        "legendFormat": "AUX 总计",
                         "range": false
                       },
                       "datasource": {
@@ -1699,7 +1729,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale casa",
+                        "legendFormat": "家庭总计",
                         "range": false
                       },
                       "datasource": {
@@ -1816,7 +1846,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Altro"
+                      "options": "其他"
                     },
                     "properties": [
                       {
@@ -1853,7 +1883,7 @@
         "kind": "Panel",
         "spec": {
           "id": 31,
-          "title": "Casa: consumo energetico",
+          "title": "家庭：能源消耗",
           "description": "",
           "links": [],
           "data": {
@@ -1871,7 +1901,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Totale casa",
+                        "legendFormat": "家庭总计",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1894,7 +1924,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Totale EXT",
+                        "legendFormat": "EXT 总计",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1917,7 +1947,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Totale AUX",
+                        "legendFormat": "AUX 总计",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1940,7 +1970,7 @@
                         "expression": "$homeTotalDaily - $extTotalDaily",
                         "type": "math",
                         "settings": {
-                          "displayName": "Altro"
+                          "displayName": "其他"
                         }
                       },
                       "datasource": {
@@ -2093,7 +2123,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Altro"
+                        "value": "其他"
                       },
                       {
                         "id": "color",
@@ -2114,7 +2144,7 @@
         "kind": "Panel",
         "spec": {
           "id": 36,
-          "title": "Totale: distribuzione energia",
+          "title": "总计：能源分配",
           "description": "",
           "links": [],
           "data": {
@@ -2132,7 +2162,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Casa",
+                        "legendFormat": "家庭",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2178,7 +2208,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Carica batteria",
+                        "legendFormat": "电池充电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2201,7 +2231,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Scarica batteria",
+                        "legendFormat": "电池放电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2290,7 +2320,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Casa"
+                        "value": "家庭"
                       }
                     ]
                   },
@@ -2319,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "Totale: distribuzione energia",
+          "title": "总计：能源分配",
           "description": "",
           "links": [],
           "data": {
@@ -2440,14 +2470,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Casa"
+                        "value": "家庭"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Carica batteria"
+                      "options": "电池充电"
                     },
                     "properties": [
                       {
@@ -2459,14 +2489,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "电池充电"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Scarica batteria"
+                      "options": "电池放电"
                     },
                     "properties": [
                       {
@@ -2478,7 +2508,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "电池放电"
                       },
                       {
                         "id": "custom.stacking",
@@ -2516,7 +2546,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "电池充电"
                       }
                     ]
                   },
@@ -2535,7 +2565,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "电池放电"
                       },
                       {
                         "id": "custom.stacking",
@@ -2556,7 +2586,7 @@
         "kind": "Panel",
         "spec": {
           "id": 30,
-          "title": "Bilancio elettrico",
+          "title": "功率平衡",
           "description": "",
           "links": [],
           "data": {
@@ -2574,7 +2604,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "prezzo medio giornaliero",
+                        "legendFormat": "日均价格",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2643,7 +2673,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Energia acquistata giornaliera",
+                        "legendFormat": "每日购入能源",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2689,7 +2719,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Acquistato giornaliero",
+                        "legendFormat": "每日购入",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2811,7 +2841,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Venduto giornaliero grezzo",
+                        "legendFormat": "每日售出原始值",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2967,7 +2997,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prezzo rete: media aritmetica"
+                        "value": "电网电价：算术平均值"
                       },
                       {
                         "id": "unit",
@@ -2990,7 +3020,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prezzo effettivo, din."
+                        "value": "实际价格，动态"
                       },
                       {
                         "id": "unit",
@@ -3013,7 +3043,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Risparmiato vs arit."
+                        "value": "相对算术价节省"
                       },
                       {
                         "id": "unit",
@@ -3036,7 +3066,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Potenziale al prezzo arit."
+                        "value": "按算术价的潜力"
                       },
                       {
                         "id": "unit",
@@ -3059,7 +3089,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquistato, dinamico"
+                        "value": "购入，动态"
                       },
                       {
                         "id": "unit",
@@ -3082,7 +3112,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Risparmio din."
+                        "value": "动态节省"
                       },
                       {
                         "id": "unit",
@@ -3105,7 +3135,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Venduto (immissione)"
+                        "value": "售出（馈电）"
                       },
                       {
                         "id": "unit",
@@ -3128,7 +3158,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Bilancio"
+                        "value": "平衡"
                       },
                       {
                         "id": "unit",
@@ -3153,7 +3183,7 @@
         "kind": "Panel",
         "spec": {
           "id": 26,
-          "title": "Prezzo dinamico dell’elettricità (ct/kWh)",
+          "title": "动态电价 (ct/kWh)",
           "description": "",
           "links": [],
           "data": {
@@ -3194,7 +3224,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Media",
+                        "legendFormat": "平均值",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3217,7 +3247,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Prezzo effettivo dell’elettricità",
+                        "legendFormat": "实际电价",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3343,7 +3373,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Media"
+                      "options": "平均值"
                     },
                     "properties": [
                       {
@@ -3358,7 +3388,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prezzo effettivo dell’elettricità"
+                      "options": "实际电价"
                     },
                     "properties": [
                       {
@@ -3425,7 +3455,7 @@
         "kind": "Panel",
         "spec": {
           "id": 28,
-          "title": "Costi elettrici",
+          "title": "电力成本",
           "description": "",
           "links": [],
           "data": {
@@ -3443,7 +3473,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Acquistato",
+                        "legendFormat": "购入",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3536,12 +3566,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Acquistato"
+                      "options": "购入"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquistato"
+                        "value": "购入"
                       }
                     ]
                   },
@@ -3565,7 +3595,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquistato"
+                        "value": "购入"
                       }
                     ]
                   }
@@ -3579,7 +3609,7 @@
         "kind": "Panel",
         "spec": {
           "id": 16,
-          "title": "Batteria",
+          "title": "电池摘要",
           "description": "",
           "links": [],
           "data": {
@@ -3597,7 +3627,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Carica batteria giornaliera",
+                        "legendFormat": "每日电池充电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3620,7 +3650,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Scarica batteria giornaliera",
+                        "legendFormat": "每日电池放电",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3708,7 +3738,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Serie SOC max",
+                        "legendFormat": "最高 SOC 序列",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3731,7 +3761,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Serie SOC min",
+                        "legendFormat": "最低 SOC 序列",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3847,7 +3877,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "电池充电"
                       },
                       {
                         "id": "unit",
@@ -3867,7 +3897,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "电池放电"
                       },
                       {
                         "id": "unit",
@@ -3887,7 +3917,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Efficienza batteria"
+                        "value": "电池效率"
                       },
                       {
                         "id": "unit",
@@ -3907,7 +3937,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "SOC max medio"
+                        "value": "平均最高 SOC"
                       },
                       {
                         "id": "unit",
@@ -3927,7 +3957,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "SOC min medio"
+                        "value": "平均最低 SOC"
                       },
                       {
                         "id": "unit",
@@ -3949,7 +3979,7 @@
         "kind": "Panel",
         "spec": {
           "id": 11,
-          "title": "Livelli batteria casa",
+          "title": "家庭电池水平",
           "description": "",
           "links": [],
           "data": {
@@ -3967,7 +3997,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC max",
+                        "legendFormat": "SOC 最高",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3990,7 +4020,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC min",
+                        "legendFormat": "SOC 最低",
                         "range": true,
                         "interval": "1d"
                       },
@@ -4081,6 +4111,56 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "SOC 最高"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "电池最大值"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "SOC 最低"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#686868",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "电池最小值"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Time"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "time:MM/DD"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "SOC max"
                     },
                     "properties": [
@@ -4093,7 +4173,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Batteria max"
+                        "value": "电池最大值"
                       }
                     ]
                   },
@@ -4112,19 +4192,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Batteria min"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Time"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "time:MM/DD"
+                        "value": "电池最小值"
                       }
                     ]
                   }
@@ -4138,8 +4206,8 @@
         "kind": "Panel",
         "spec": {
           "id": 39,
-          "title": "Totale pompa di calore",
-          "description": "Energia annuale della pompa di calore sui punti di ricarica corrispondenti.",
+          "title": "热泵总量",
+          "description": "匹配负载点上的年度热泵能耗。",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4280,8 +4348,8 @@
         "kind": "Panel",
         "spec": {
           "id": 40,
-          "title": "Mix di alimentazione della pompa di calore",
-          "description": "Quota stimata di FV, scarica batteria e rete per il punto di ricarica della pompa di calore.",
+          "title": "热泵来源占比",
+          "description": "热泵负载点的光伏、电池放电和电网供电估算占比。",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4479,12 +4547,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "光伏发电"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "光伏发电"
                       },
                       {
                         "id": "color",
@@ -4498,12 +4566,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batteria"
+                      "options": "电池"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "电池"
                       },
                       {
                         "id": "color",
@@ -4517,12 +4585,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Rete"
+                      "options": "电网"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "电网"
                       },
                       {
                         "id": "color",
@@ -4536,12 +4604,31 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "光伏发电"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Battery"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "电池"
                       },
                       {
                         "id": "color",
@@ -4560,7 +4647,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "电网"
                       },
                       {
                         "id": "color",
@@ -4581,8 +4668,8 @@
         "kind": "Panel",
         "spec": {
           "id": 41,
-          "title": "Totale stazioni di ricarica",
-          "description": "Energia di ricarica annuale sui punti di ricarica visibili, escluso il punto di ricarica della pompa di calore.",
+          "title": "充电桩总量",
+          "description": "可见充电负载点的年度充电能耗，不含热泵负载点。",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4723,8 +4810,8 @@
         "kind": "Panel",
         "spec": {
           "id": 42,
-          "title": "Mix di alimentazione delle stazioni di ricarica",
-          "description": "Quota stimata di FV, scarica batteria e rete per i punti di ricarica visibili, esclusa la pompa di calore.",
+          "title": "充电桩来源占比",
+          "description": "可见充电负载点的光伏、电池放电和电网供电估算占比，不含热泵。",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4922,12 +5009,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "光伏发电"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "光伏发电"
                       },
                       {
                         "id": "color",
@@ -4941,12 +5028,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batteria"
+                      "options": "电池"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "电池"
                       },
                       {
                         "id": "color",
@@ -4960,12 +5047,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Rete"
+                      "options": "电网"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "电网"
                       },
                       {
                         "id": "color",
@@ -4979,12 +5066,31 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "光伏发电"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Battery"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "电池"
                       },
                       {
                         "id": "color",
@@ -5003,7 +5109,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "电网"
                       },
                       {
                         "id": "color",
@@ -5030,10 +5136,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Mese",
+        "title": "月份",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5042,10 +5148,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Mese precedente",
+        "title": "上个月",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5054,10 +5160,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Due mesi fa",
+        "title": "两个月前",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -5068,7 +5174,7 @@
           "EVCC"
         ],
         "targetBlank": false,
-        "title": "Cruscotti",
+        "title": "仪表板",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -5080,7 +5186,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "EVCC",
+        "title": "电动汽车控制中心",
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
@@ -5092,7 +5198,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "$inverterPortalTitolo",
+        "title": "$inverterPortalTitle",
         "tooltip": "",
         "type": "link",
         "url": "$inverterPortalUrl"
@@ -5122,7 +5228,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Mese - Schede",
+    "title": "VM: EVCC: 月",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -5134,10 +5240,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "构建",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Le informazioni di build vengono impostate durante il deploy."
+          "description": "构建信息在部署期间设置。"
         }
       },
       {
@@ -5149,7 +5255,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco punto di ricarica",
+          "label": "充电点屏蔽列表",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -5163,7 +5269,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Corrispondenza del punto di ricarica della pompa di calore",
+          "label": "热泵负载点匹配",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -5178,7 +5284,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco EXT",
+          "label": "EXT 屏蔽列表",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -5192,7 +5298,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco AUX",
+          "label": "AUX 屏蔽列表",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -5222,10 +5328,10 @@
             "text": "http://home:7070/#/",
             "selected": false
           },
-          "label": "URL dell'EVCC",
+          "label": "EVCC 网址",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL utilizzato per aprire EVCC."
+          "description": "用于打开 EVCC 的 URL。"
         }
       },
       {
@@ -5238,10 +5344,10 @@
             "text": "Solarman",
             "selected": false
           },
-          "label": "Nome portale inverter",
+          "label": "逆变器门户名称",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Nome del portale inverter per il collegamento al portale."
+          "description": "门户链接使用的逆变器门户名称。"
         }
       },
       {
@@ -5254,10 +5360,10 @@
             "text": "https://globalhome.solarmanpv.com/plant/infos/data",
             "selected": false
           },
-          "label": "URL portale inverter",
+          "label": "逆变器门户网址",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL utilizzato per aprire il portale inverter."
+          "description": "用于打开逆变器门户的 URL。"
         }
       }
     ],
@@ -5268,7 +5374,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "PV",
+              "title": "PV - 光伏发电",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5346,7 +5452,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Casa",
+              "title": "Home - 家庭",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5411,7 +5517,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consumatori",
+              "title": "Consumers - 用能设备",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5515,7 +5621,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Batteria",
+              "title": "Battery - 电池",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

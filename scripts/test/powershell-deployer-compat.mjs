@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.05.31.2
- * Last modified: 2026-05-31
+ * Version: 2026.06.01.1
+ * Last modified: 2026-06-01
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -12,8 +12,8 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.05.31.2";
-const lastModified = "2026-05-31";
+const version = "2026.06.01.1";
+const lastModified = "2026-06-01";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
 const defaultDashboardFiles = resolveDashboardFiles(manifest);
@@ -126,7 +126,7 @@ function buildHarness(functionSources) {
     `$dashboardPath = '${dashboardPath.replace(/'/g, "''")}'`,
     `$localDashboardDir = '${localDashboardDir.replace(/'/g, "''")}'`,
     "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'localdir'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
-    "$FixedDashboardFiles = @('VM_EVCC_TAB_All-time.json','VM_EVCC_TAB_Jahr.json','VM_EVCC_TAB_Monat.json','VM_EVCC_TAB_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Mobile.json')",
+    "$FixedDashboardFiles = @('VM_EVCC_All-time.json','VM_EVCC_Year.json','VM_EVCC_Month.json','VM_EVCC_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Mobile.json')",
     "$raw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $dashboardPath)",
     "$rewritten = Replace-DatasourcePlaceholders $raw",
     "$dashboardFiles = @(Get-DashboardFilesFromManifest)",
@@ -212,4 +212,3 @@ try {
   console.error(`\n${scriptName} failed: ${error.message || error}`);
   process.exit(1);
 }
-

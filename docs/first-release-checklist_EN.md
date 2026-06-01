@@ -65,7 +65,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 
 - [x] `node scripts/localization/audit-localization.mjs` reports `0` missing candidates
 - [x] localized dashboards are regenerated from the current `orig/en` source
-- [x] release documentation screenshots under [docs/screenshots](./screenshots/README_EN.md) are updated only for dashboards that visibly changed, and TAB screenshots show the active Grafana tab bar
+- [x] release documentation screenshots under [docs/screenshots](./screenshots/README_EN.md) are updated only for dashboards that visibly changed, and tab-navigation screenshots show the active Grafana tab bar
 - [x] spot-check at least `de`, `fr`, and one non-Latin target (`zh` or `hi`) in Grafana
 
 ## 6. Release packaging
@@ -89,7 +89,7 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] daily rollup refresh tested
 - [x] Windows and Linux deployers tested
 - [x] localization audit at `0`
-- [x] curated release screenshot set under [docs/screenshots](./screenshots/README_EN.md) reflects the final visible dashboard state, including TAB navigation state
+- [x] curated release screenshot set under [docs/screenshots](./screenshots/README_EN.md) reflects the final visible dashboard state, including tab navigation state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
 
 ## Current Evidence Notes
@@ -109,11 +109,11 @@ Real-data migration evidence from 2026-05-29:
 - host-label cleanup dry-runs reported `GO FOR IT`; final `check_data.py` confirmed `host` series `0` and `db` series `0`
 - `compare_import_coverage.py` over the completed window `2026-05-22T00:00:00Z` through `2026-05-28T23:59:59Z` reported 0 repo-relevant problems and 0 critical energy problems
 - rollup `detect`, `plan`, and `benchmark` succeeded; full backfill from `2025-01-01` through `2026-05-28` wrote 36 rollup metrics, 1,154 series, and 30,013 samples
-- `deploy.ps1` deployed the German generated TAB dashboards from the local checkout with `PURGE=true`
+- `deploy.ps1` deployed the German generated tab-navigation dashboards from the local checkout with `PURGE=true`
 - `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
 - Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
-- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0`, fresh Grafana `13.0.1`, datasource UID `vm-evcc`, and German generated TAB deployment via `deploy-python.sh`.
-- Release screenshots from 2026-05-31 were manually refreshed and curated directly under `docs/screenshots` as one PNG per relevant dashboard or active TAB dashboard tab.
+- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0`, fresh Grafana `13.0.1`, datasource UID `vm-evcc`, and German generated tab-navigation deployment via `deploy-python.sh`.
+- Release screenshots from 2026-05-31 were manually refreshed and curated directly under `docs/screenshots` as one PNG per relevant dashboard or active dashboard tab.
 - Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
 - Release notes were added in `docs/release-notes.md`, and root preview wording was removed from `README.md`.
 
@@ -133,9 +133,9 @@ Debian 13 install evidence from 2026-05-29:
 
 Additional autonomous release-gate evidence from 2026-05-29:
 
-- `deploy-python.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie` and completed a clean Linux deployment (`PURGE=true`) of the German generated TAB set against Grafana `13.0.1` on disposable Docker port `13035`.
+- `deploy-python.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie` and completed a clean Linux deployment (`PURGE=true`) of the German generated tab-navigation dashboard set against Grafana `13.0.1` on disposable Docker port `13035`.
 - `deploy-bash.sh` v2026.05.29.1 was syntax-checked in blank `debian:trixie`, completed `PURGE=true`, and then completed `PURGE=false` against the same disposable Grafana instance.
 - The Linux deployers now handle Grafana dashboard v2 JSON via `/apis/dashboard.grafana.app/v2/...`, including folder annotations and `metadata.resourceVersion` updates for existing dashboards.
-- Dashboard override validation queried Grafana after deployment and verified 46 override variable instances across all 6 dashboards, including v2 TAB dashboards and classic dashboards, with folder placement in `evcc-release-bash`.
+- Dashboard override validation queried Grafana after deployment and verified 46 override variable instances across all 6 dashboards, including v2 tab-navigation dashboards and classic dashboards, with folder placement in `evcc-release-bash`.
 - Daily rollup refresh validation used the documented cron-style `date -d 'yesterday'` wrapper shape in blank `debian:trixie`; the run executed `backfill --replace-range --write` successfully after `rollup-e2e.py` had validated repeated replacement without duplicate daily samples.
 - Localization audit now reports `0` missing candidates for `de`, `fr`, `nl`, `es`, `it`, `zh`, and `hi`; generated localized dashboards were regenerated and `npm run test:localization-idempotency` passed.

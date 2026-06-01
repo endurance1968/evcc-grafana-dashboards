@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.04.22.1
- * Last modified: 2026-04-22
+ * Version: 2026.06.01.2
+ * Last modified: 2026-06-01
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -54,7 +54,10 @@ function readJson(filePath) {
 
 function writeJson(filePath, jsonData) {
   const content = `${JSON.stringify(jsonData, null, 2)}\n`;
-  fs.writeFileSync(filePath, content, "utf8");
+  const tmpPath = `${filePath}.tmp-${process.pid}`;
+  fs.writeFileSync(tmpPath, content, "utf8");
+  fs.rmSync(filePath, { force: true });
+  fs.renameSync(tmpPath, filePath);
 }
 
 function readMapping(sourceLanguage, targetLanguage) {
@@ -111,6 +114,77 @@ function translateJsonNode(node, mapping) {
   return node;
 }
 
+function grafanaTabSlug(title) {
+  return String(title || "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function stabilizeTabTitle(sourceTitle, localizedTitle, seenSlugs) {
+  const localizedSlug = grafanaTabSlug(localizedTitle);
+  if (localizedSlug && !seenSlugs.has(localizedSlug)) {
+    seenSlugs.add(localizedSlug);
+    return localizedTitle;
+  }
+
+  const sourceSlug = grafanaTabSlug(sourceTitle);
+  const fallbackBase =
+    sourceTitle && sourceTitle !== localizedTitle
+      ? `${sourceTitle} - ${localizedTitle}`
+      : `${localizedTitle || sourceTitle || "Tab"} ${seenSlugs.size + 1}`;
+  let fallback = fallbackBase;
+  let fallbackSlug = grafanaTabSlug(fallback);
+  let suffix = 2;
+
+  while (!fallbackSlug || seenSlugs.has(fallbackSlug)) {
+    fallback = sourceSlug ? `${sourceTitle} ${suffix} - ${localizedTitle}` : `${fallbackBase} ${suffix}`;
+    fallbackSlug = grafanaTabSlug(fallback);
+    suffix += 1;
+  }
+
+  seenSlugs.add(fallbackSlug);
+  return fallback;
+}
+
+function stabilizeLocalizedTabTitles(sourceNode, localizedNode) {
+  if (Array.isArray(sourceNode) && Array.isArray(localizedNode)) {
+    for (let i = 0; i < Math.min(sourceNode.length, localizedNode.length); i += 1) {
+      stabilizeLocalizedTabTitles(sourceNode[i], localizedNode[i]);
+    }
+    return;
+  }
+
+  if (!sourceNode || !localizedNode || typeof sourceNode !== "object" || typeof localizedNode !== "object") {
+    return;
+  }
+
+  if (
+    sourceNode.kind === "TabsLayout" &&
+    localizedNode.kind === "TabsLayout" &&
+    Array.isArray(sourceNode.spec?.tabs) &&
+    Array.isArray(localizedNode.spec?.tabs)
+  ) {
+    const seenSlugs = new Set();
+    for (let i = 0; i < Math.min(sourceNode.spec.tabs.length, localizedNode.spec.tabs.length); i += 1) {
+      const sourceTab = sourceNode.spec.tabs[i];
+      const localizedTab = localizedNode.spec.tabs[i];
+      if (typeof localizedTab?.spec?.title === "string") {
+        localizedTab.spec.title = stabilizeTabTitle(sourceTab?.spec?.title, localizedTab.spec.title, seenSlugs);
+      }
+      stabilizeLocalizedTabTitles(sourceTab?.spec?.layout, localizedTab?.spec?.layout);
+    }
+    return;
+  }
+
+  for (const [key, value] of Object.entries(sourceNode)) {
+    if (Object.hasOwn(localizedNode, key)) {
+      stabilizeLocalizedTabTitles(value, localizedNode[key]);
+    }
+  }
+}
+
 function main() {
   const { sourceLanguage, targetLanguages } = readLanguagesConfig(family);
   const sourceDir = familySourceDir(family, sourceLanguage);
@@ -144,6 +218,10 @@ function main() {
         targetLanguage === sourceLanguage
           ? sourceJson
           : translateJsonNode(sourceJson, mapping);
+
+      if (targetLanguage !== sourceLanguage) {
+        stabilizeLocalizedTabTitles(sourceJson, localizedJson);
+      }
 
       writeJson(targetFile, localizedJson);
       count += 1;

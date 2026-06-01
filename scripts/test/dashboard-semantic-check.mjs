@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.04.24.1
- * Last modified: 2026-04-24
+ * Version: 2026.06.01.3
+ * Last modified: 2026-06-01
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,128 +24,276 @@ const forbiddenTexts = [
 ];
 
 const expectedTimes = {
-  "VM_EVCC_All-time.json": { from: "2024-12-31T23:00:00Z", to: "now" },
-  "VM_EVCC_TAB_All-time.json": { from: "2024-12-31T23:00:00Z", to: "now" },
-  "VM_EVCC_Jahr.json": { from: "now/y", to: "now/y" },
-  "VM_EVCC_TAB_Jahr.json": { from: "now/y", to: "now/y" },
-  "VM_EVCC_Monat.json": { from: "now/M", to: "now/M" },
-  "VM_EVCC_TAB_Monat.json": { from: "now/M", to: "now/M" },
-  "VM_EVCC_Today-Details.json": { from: "now/d", to: "now/d" },
-  "VM_EVCC_TAB_Today-Details.json": { from: "now/d", to: "now/d" },
-  "VM_EVCC_Today-Mobile.json": { from: "now/d", to: "now/d" },
-  "VM_EVCC_Today.json": { from: "now/d", to: "now/d" },
+  "VM_EVCC_All-time.json": {
+    "from": "2024-12-31T23:00:00Z",
+    "to": "now"
+  },
+  "VM_EVCC_Year.json": {
+    "from": "now/y",
+    "to": "now/y"
+  },
+  "VM_EVCC_Month.json": {
+    "from": "now/M",
+    "to": "now/M"
+  },
+  "VM_EVCC_Today-Details.json": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "VM_EVCC_Today-Mobile.json": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "VM_EVCC_Today.json": {
+    "from": "now/d",
+    "to": "now/d"
+  }
 };
 
 const expectedLinks = {
   "VM_EVCC_All-time.json": [
-    { title: "Year", from: "now%2Fy", to: "now" },
-    { title: "Month", from: "now%2FM", to: "now" },
+    {
+      "title": "Year",
+      "from": "now%2Fy",
+      "to": "now"
+    },
+    {
+      "title": "Month",
+      "from": "now%2FM",
+      "to": "now"
+    }
   ],
-  "VM_EVCC_TAB_All-time.json": [
-    { title: "Year", from: "now%2Fy", to: "now" },
-    { title: "Month", from: "now%2FM", to: "now" },
+  "VM_EVCC_Year.json": [
+    {
+      "title": "Year",
+      "from": "now%2Fy",
+      "to": "now%2Fy"
+    },
+    {
+      "title": "Previous year",
+      "from": "now-1y%2Fy",
+      "to": "now-1y%2Fy"
+    },
+    {
+      "title": "2 years ago",
+      "from": "now-2y%2Fy",
+      "to": "now-2y%2Fy"
+    }
   ],
-  "VM_EVCC_Jahr.json": [
-    { title: "Year", from: "now%2Fy", to: "now%2Fy" },
-    { title: "Previous year", from: "now-1y%2Fy", to: "now-1y%2Fy" },
-    { title: "2 years ago", from: "now-2y%2Fy", to: "now-2y%2Fy" },
-  ],
-  "VM_EVCC_TAB_Jahr.json": [
-    { title: "Year", from: "now%2Fy", to: "now%2Fy" },
-    { title: "Previous year", from: "now-1y%2Fy", to: "now-1y%2Fy" },
-    { title: "2 years ago", from: "now-2y%2Fy", to: "now-2y%2Fy" },
-  ],
-  "VM_EVCC_Monat.json": [
-    { title: "Month", from: "now%2FM", to: "now%2FM" },
-    { title: "Previous month", from: "now-1M%2FM", to: "now-1M%2FM" },
-    { title: "2 months ago", from: "now-2M%2FM", to: "now-2M%2FM" },
-  ],
-  "VM_EVCC_TAB_Monat.json": [
-    { title: "Month", from: "now%2FM", to: "now%2FM" },
-    { title: "Previous month", from: "now-1M%2FM", to: "now-1M%2FM" },
-    { title: "2 months ago", from: "now-2M%2FM", to: "now-2M%2FM" },
+  "VM_EVCC_Month.json": [
+    {
+      "title": "Month",
+      "from": "now%2FM",
+      "to": "now%2FM"
+    },
+    {
+      "title": "Previous month",
+      "from": "now-1M%2FM",
+      "to": "now-1M%2FM"
+    },
+    {
+      "title": "2 months ago",
+      "from": "now-2M%2FM",
+      "to": "now-2M%2FM"
+    }
   ],
   "VM_EVCC_Today-Details.json": [
-    { title: "Today", from: "now%2Fd", to: "now%2Fd" },
-    { title: "Yesterday", from: "now-1d%2Fd", to: "now-1d%2Fd" },
-    { title: "Day before yesterday", from: "now-2d%2Fd", to: "now-2d%2Fd" },
-  ],
-  "VM_EVCC_TAB_Today-Details.json": [
-    { title: "Today", from: "now%2Fd", to: "now%2Fd" },
-    { title: "Yesterday", from: "now-1d%2Fd", to: "now-1d%2Fd" },
-    { title: "Day before yesterday", from: "now-2d%2Fd", to: "now-2d%2Fd" },
+    {
+      "title": "Today",
+      "from": "now%2Fd",
+      "to": "now%2Fd"
+    },
+    {
+      "title": "Yesterday",
+      "from": "now-1d%2Fd",
+      "to": "now-1d%2Fd"
+    },
+    {
+      "title": "Day before yesterday",
+      "from": "now-2d%2Fd",
+      "to": "now-2d%2Fd"
+    }
   ],
   "VM_EVCC_Today-Mobile.json": [
-    { title: "Today", from: "now%2Fd", to: "now%2Fd" },
-    { title: "Yesterday", from: "now-1d%2Fd", to: "now-1d%2Fd" },
-    { title: "Day before yesterday", from: "now-2d%2Fd", to: "now-2d%2Fd" },
+    {
+      "title": "Today",
+      "from": "now%2Fd",
+      "to": "now%2Fd"
+    },
+    {
+      "title": "Yesterday",
+      "from": "now-1d%2Fd",
+      "to": "now-1d%2Fd"
+    },
+    {
+      "title": "Day before yesterday",
+      "from": "now-2d%2Fd",
+      "to": "now-2d%2Fd"
+    }
   ],
   "VM_EVCC_Today.json": [
-    { title: "Today", from: "now%2Fd", to: "now%2Fd" },
-    { title: "Yesterday", from: "now-1d%2Fd", to: "now-1d%2Fd" },
-    { title: "Day before yesterday", from: "now-2d%2Fd", to: "now-2d%2Fd" },
-  ],
+    {
+      "title": "Today",
+      "from": "now%2Fd",
+      "to": "now%2Fd"
+    },
+    {
+      "title": "Yesterday",
+      "from": "now-1d%2Fd",
+      "to": "now-1d%2Fd"
+    },
+    {
+      "title": "Day before yesterday",
+      "from": "now-2d%2Fd",
+      "to": "now-2d%2Fd"
+    }
+  ]
 };
 
 const criticalPanels = {
   "VM_EVCC_All-time.json": [
-    { id: 12, title: "Energy totals", type: "bargauge", minTargets: 5 },
-    { id: 24, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 1 },
-    { id: 38, title: "Days with highest yield", type: "table", minTargets: 1 },
+    {
+      "id": 12,
+      "title": "Energy totals",
+      "type": "bargauge",
+      "minTargets": 5
+    },
+    {
+      "id": 24,
+      "title": "Metric gauges",
+      "type": "gauge",
+      "minTargets": 7
+    },
+    {
+      "id": 28,
+      "title": "Monthly costs",
+      "type": "barchart",
+      "minTargets": 1
+    },
+    {
+      "id": 38,
+      "title": "Days with highest yield",
+      "type": "table",
+      "minTargets": 1
+    }
   ],
-  "VM_EVCC_TAB_All-time.json": [
-    { id: 12, title: "Energy totals", type: "bargauge", minTargets: 5 },
-    { id: 24, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 28, title: "Monthly costs", type: "barchart", minTargets: 1 },
-    { id: 38, title: "Days with highest yield", type: "table", minTargets: 1 },
+  "VM_EVCC_Year.json": [
+    {
+      "id": 41,
+      "title": "Energy totals",
+      "type": "bargauge",
+      "minTargets": 5
+    },
+    {
+      "id": 44,
+      "title": "Metric gauges",
+      "type": "gauge",
+      "minTargets": 7
+    },
+    {
+      "id": 47,
+      "title": "Energy",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "month"
+    },
+    {
+      "id": 66,
+      "title": "Home: Energy consumption",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "month",
+      "monthLabels": true
+    },
+    {
+      "id": 70,
+      "title": "Home: Energy distribution",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "month",
+      "batterySplit": true
+    }
   ],
-  "VM_EVCC_Jahr.json": [
-    { id: 41, title: "Energy totals", type: "bargauge", minTargets: 5 },
-    { id: 44, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 47, title: "Energy", type: "barchart", minTargets: 1, xField: "month" },
-    { id: 66, title: "Home: Energy consumption", type: "barchart", minTargets: 1, xField: "month", monthLabels: true },
-    { id: 70, title: "Home: Energy distribution", type: "barchart", minTargets: 1, xField: "month", batterySplit: true },
-  ],
-  "VM_EVCC_TAB_Jahr.json": [
-    { id: 41, title: "Energy totals", type: "bargauge", minTargets: 5 },
-    { id: 44, title: "Metric gauges", type: "gauge", minTargets: 7 },
-    { id: 47, title: "Energy", type: "barchart", minTargets: 1, xField: "month" },
-    { id: 66, title: "Home: Energy consumption", type: "barchart", minTargets: 1, xField: "month", monthLabels: true },
-    { id: 70, title: "Home: Energy distribution", type: "barchart", minTargets: 1, xField: "month", batterySplit: true },
-  ],
-  "VM_EVCC_Monat.json": [
-    { id: 19, title: "Monthly energy totals", type: "bargauge", minTargets: 10 },
-    { id: 24, title: "Metric gauges", type: "gauge", minTargets: 12 },
-    { id: 25, title: "Energy", type: "barchart", minTargets: 5, xField: "Time" },
-    { id: 31, title: "Home: Energy consumption", type: "barchart", minTargets: 6, xField: "Time" },
-    { id: 37, title: "Total: Energy distribution", type: "barchart", minTargets: 1, xField: "Time", batterySplit: true },
-  ],
-  "VM_EVCC_TAB_Monat.json": [
-    { id: 19, title: "Monthly energy totals", type: "bargauge", minTargets: 10 },
-    { id: 24, title: "Metric gauges", type: "gauge", minTargets: 12 },
-    { id: 25, title: "Energy", type: "barchart", minTargets: 5, xField: "Time" },
-    { id: 31, title: "Home: Energy consumption", type: "barchart", minTargets: 6, xField: "Time" },
-    { id: 37, title: "Total: Energy distribution", type: "barchart", minTargets: 1, xField: "Time", batterySplit: true },
+  "VM_EVCC_Month.json": [
+    {
+      "id": 19,
+      "title": "Monthly energy totals",
+      "type": "bargauge",
+      "minTargets": 10
+    },
+    {
+      "id": 24,
+      "title": "Metric gauges",
+      "type": "gauge",
+      "minTargets": 12
+    },
+    {
+      "id": 25,
+      "title": "Energy",
+      "type": "barchart",
+      "minTargets": 5,
+      "xField": "Time"
+    },
+    {
+      "id": 31,
+      "title": "Home: Energy consumption",
+      "type": "barchart",
+      "minTargets": 6,
+      "xField": "Time"
+    },
+    {
+      "id": 37,
+      "title": "Total: Energy distribution",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "Time",
+      "batterySplit": true
+    }
   ],
   "VM_EVCC_Today-Details.json": [
-    { id: 2, title: "PV energy", type: "barchart", minTargets: 3, xField: "__panel_axis" },
-    { id: 35, title: "Forecast", type: "barchart", minTargets: 3, xField: "__panel_axis" },
-    { id: 11, title: "Charge currents/phase: $loadpoint", type: "stat", minTargets: 3 },
-    { id: 15, title: "Phases: $loadpoint", type: "timeseries", minTargets: 1 },
-  ],
-  "VM_EVCC_TAB_Today-Details.json": [
-    { id: 2, title: "PV energy", type: "barchart", minTargets: 3, xField: "__panel_axis" },
-    { id: 35, title: "Forecast", type: "barchart", minTargets: 3, xField: "__panel_axis" },
-    { id: 11, title: "Charge currents/phase: $loadpoint", type: "stat", minTargets: 3 },
-    { id: 15, title: "Phases: $loadpoint", type: "timeseries", minTargets: 1 },
+    {
+      "id": 2,
+      "title": "PV energy",
+      "type": "barchart",
+      "minTargets": 3,
+      "xField": "__panel_axis"
+    },
+    {
+      "id": 35,
+      "title": "Forecast",
+      "type": "barchart",
+      "minTargets": 3,
+      "xField": "__panel_axis"
+    },
+    {
+      "id": 11,
+      "title": "Charge currents/phase: $loadpoint",
+      "type": "stat",
+      "minTargets": 3
+    },
+    {
+      "id": 15,
+      "title": "Phases: $loadpoint",
+      "type": "timeseries",
+      "minTargets": 1
+    }
   ],
   "VM_EVCC_Today-Mobile.json": [
-    { id: 74, title: "Power", type: "stat", minTargets: 5 },
+    {
+      "id": 74,
+      "title": "Power",
+      "type": "stat",
+      "minTargets": 5
+    }
   ],
   "VM_EVCC_Today.json": [
-    { id: 74, title: "Power", type: "gauge", minTargets: 5 },
-  ],
+    {
+      "id": 74,
+      "title": "Power",
+      "type": "gauge",
+      "minTargets": 5
+    }
+  ]
 };
 
 function isRenderablePanel(panel) {
@@ -250,14 +398,78 @@ function validateDeployManifest(manifest) {
   }
 
   const deployFiles = new Set(files || []);
-  assert(deployFiles.has("VM_EVCC_TAB_All-time.json"), failures, "deploy manifest: must include TAB All-time dashboard");
-  assert(deployFiles.has("VM_EVCC_TAB_Jahr.json"), failures, "deploy manifest: must include TAB Year dashboard");
-  assert(deployFiles.has("VM_EVCC_TAB_Monat.json"), failures, "deploy manifest: must include TAB Month dashboard");
-  assert(deployFiles.has("VM_EVCC_TAB_Today-Details.json"), failures, "deploy manifest: must include TAB Today Details dashboard");
+  assert(deployFiles.has("VM_EVCC_All-time.json"), failures, "deploy manifest: must include All-time dashboard");
+  assert(deployFiles.has("VM_EVCC_Year.json"), failures, "deploy manifest: must include Year dashboard");
+  assert(deployFiles.has("VM_EVCC_Month.json"), failures, "deploy manifest: must include Month dashboard");
+  assert(deployFiles.has("VM_EVCC_Today-Details.json"), failures, "deploy manifest: must include Today Details dashboard");
   assert(deployFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: must keep the normal Today dashboard");
   assert(deployFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: must keep the normal Today Mobile dashboard");
 
   return failures;
+}
+
+function grafanaTabSlug(title) {
+  return String(title || "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function validateGrafanaTabSlugs(fileName, layout, failures, pathLabel = "layout") {
+  if (!layout || typeof layout !== "object") {
+    return;
+  }
+
+  if (layout.kind === "TabsLayout") {
+    const tabs = layout.spec?.tabs || [];
+    const seen = new Map();
+    tabs.forEach((tab, index) => {
+      const title = tab?.spec?.title || "";
+      const slug = grafanaTabSlug(title);
+      const tabLabel = `${pathLabel}.tabs[${index}] '${title}'`;
+      assert(Boolean(slug), failures, `${fileName}: ${tabLabel} produces an empty Grafana URL slug`);
+      if (slug) {
+        assert(!seen.has(slug), failures, `${fileName}: ${tabLabel} duplicates Grafana URL slug '${slug}' from '${seen.get(slug)}'`);
+        seen.set(slug, title);
+      }
+      validateGrafanaTabSlugs(fileName, tab?.spec?.layout, failures, `${tabLabel}.layout`);
+    });
+    return;
+  }
+
+  if (layout.kind === "RowsLayout") {
+    for (const row of layout.spec?.rows || []) {
+      validateGrafanaTabSlugs(fileName, row?.spec?.layout, failures, `${pathLabel}.row`);
+    }
+    return;
+  }
+
+  for (const item of layout.spec?.items || []) {
+    validateGrafanaTabSlugs(fileName, item?.spec?.layout, failures, `${pathLabel}.item`);
+  }
+}
+
+function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
+  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+    return;
+  }
+
+  const dynamicColorPanels = [
+    { label: "Power", panel: dashboard.panels?.find((panel) => panel.id === 74) },
+    { label: "Power history", panel: dashboard.__elements?.afc1nq1oy29s0a?.model },
+    { label: "Battery levels", panel: dashboard.__elements?.ffc1nfxu4it4wd?.model },
+    { label: "Energy", panel: dashboard.__elements?.dfc1nml5oazuoc?.model },
+    { label: "Power distribution", panel: dashboard.__elements?.afc1nrf3k9hc0e?.model },
+  ];
+
+  for (const item of dynamicColorPanels) {
+    assert(
+      item.panel?.fieldConfig?.defaults?.color?.mode === "palette-classic",
+      failures,
+      `${fileName}: ${item.label} must use palette-classic as default color fallback for dynamic labels`,
+    );
+  }
 }
 
 function validateDashboard(fileName, dashboard) {
@@ -277,12 +489,15 @@ function validateDashboard(fileName, dashboard) {
     assert(timeSettings?.to === expectedTime.to, failures, `${fileName}: expected time.to=${expectedTime.to}, got ${timeSettings?.to}`);
   }
 
-  if (["VM_EVCC_TAB_All-time.json", "VM_EVCC_TAB_Monat.json", "VM_EVCC_TAB_Jahr.json", "VM_EVCC_TAB_Today-Details.json"].includes(fileName)) {
+  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_Today-Details.json"].includes(fileName)) {
     assert(isV2Dashboard(dashboard), failures, `${fileName}: expected a Grafana v2 dashboard resource`);
     assert(dashboardLayoutKind(dashboard) === "TabsLayout", failures, `${fileName}: expected layout.kind=TabsLayout, got ${dashboardLayoutKind(dashboard)}`);
   }
 
-  if (fileName === "VM_EVCC_TAB_Today-Details.json") {
+  validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
+  validateTodayPaletteFallbacks(fileName, dashboard, failures);
+
+  if (fileName === "VM_EVCC_Today-Details.json") {
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];
     assert(loadpointTab?.spec?.layout?.kind === "RowsLayout", failures, `${fileName}: loadpoint tab must use RowsLayout so panels repeat as a group`);
@@ -386,6 +601,21 @@ function main() {
     panelCount += panels.length;
     targetCount += panels.reduce((sum, panel) => sum + panelTargetCount(panel), 0);
     allFailures.push(...validateDashboard(fileName, dashboard));
+  }
+
+  const translationRoot = path.join(repoRoot, "dashboards", "translation");
+  if (fs.existsSync(translationRoot)) {
+    for (const language of fs.readdirSync(translationRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()) {
+      for (const fileName of files) {
+        const dashboardPath = path.join(translationRoot, language, fileName);
+        if (!fs.existsSync(dashboardPath)) {
+          allFailures.push(`${language}/${fileName}: dashboard file is missing from dashboards/translation`);
+          continue;
+        }
+        const dashboard = JSON.parse(fs.readFileSync(dashboardPath, "utf8"));
+        validateGrafanaTabSlugs(`${language}/${fileName}`, dashboard.spec?.layout, allFailures);
+      }
+    }
   }
 
   console.log(`Dashboard semantic check: files=${files.length}, panels=${panelCount}, targets=${targetCount}`);

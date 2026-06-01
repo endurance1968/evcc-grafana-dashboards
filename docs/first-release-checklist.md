@@ -109,11 +109,11 @@ Real-Daten-Migrationsnachweise vom 2026-05-29:
 - Host-Label-Cleanup-Dry-Runs meldeten `GO FOR IT`; finales `check_data.py` bestaetigte `host`-Serien `0` und `db`-Serien `0`
 - `compare_import_coverage.py` ueber das abgeschlossene Fenster `2026-05-22T00:00:00Z` bis `2026-05-28T23:59:59Z` meldete 0 repo-relevante Probleme und 0 kritische Energieprobleme
 - Rollup `detect`, `plan` und `benchmark` liefen erfolgreich; kompletter Backfill von `2025-01-01` bis `2026-05-28` schrieb 36 Rollup-Metriken, 1.154 Serien und 30.013 Samples
-- `deploy.ps1` deployte die deutschen generierten TAB-Dashboards aus dem lokalen Checkout mit `PURGE=true`
+- `deploy.ps1` deployte die deutschen generierten Dashboards mit Tab-Navigation aus dem lokalen Checkout mit `PURGE=true`
 - `render-smoke-check.mjs` bestand strikt fuer alle 6 Dashboards und 49 kritische Panels gegen die Real-Daten-Test-VM
 - Manuelle Dashboard-Sicherheitspruefung vom 2026-05-30 erfolgreich abgeschlossen: Navigation zwischen Today, Month, Year und All-time, Jahres-Zeitnavigation, Einheiten, Dezimalstellen, Hintergrund-Styling und Panel-Layout wurden akzeptiert
-- Sauberer New-User-Docker-Dry-Run vom 2026-05-30 anhand des veroeffentlichten Doku-Pfads abgeschlossen: frische VictoriaMetrics `v1.139.0`, frische Grafana `13.0.1`, Datasource UID `vm-evcc`, deutsches generiertes TAB-Deployment via `deploy-python.sh`
-- Release-Screenshots vom 2026-05-31 wurden manuell aktualisiert und direkt unter `docs/screenshots` kuratiert, jeweils als PNG pro relevantem Dashboard bzw. aktivem TAB-Dashboard-Tab
+- Sauberer New-User-Docker-Dry-Run vom 2026-05-30 anhand des veroeffentlichten Doku-Pfads abgeschlossen: frische VictoriaMetrics `v1.139.0`, frische Grafana `13.0.1`, Datasource UID `vm-evcc`, deutsches generiertes Deployment mit Tab-Navigation via `deploy-python.sh`
+- Release-Screenshots vom 2026-05-31 wurden manuell aktualisiert und direkt unter `docs/screenshots` kuratiert, jeweils als PNG pro relevantem Dashboard bzw. aktivem Dashboard-Tab
 - Lokalisierungs-Grafana-Stichproben vom 2026-05-30 bestanden fuer `de`, `fr` und `zh`; franzoesische und chinesische Deployments zeigten lokalisierte Dashboard- und Panel-Titel in Grafana
 - Release Notes wurden in `docs/release-notes.md` ergaenzt, und Preview-Formulierungen im Root-`README.md` wurden entfernt
 
@@ -133,9 +133,9 @@ Debian-13-Installationsnachweise vom 2026-05-29:
 
 Weitere autonome Release-Gate-Nachweise vom 2026-05-29:
 
-- `deploy-python.sh` v2026.05.29.1 wurde in blankem `debian:trixie` syntaxgeprueft und fuehrte ein sauberes Linux-Deployment (`PURGE=true`) des deutschen generierten TAB-Sets gegen Grafana `13.0.1` aus
+- `deploy-python.sh` v2026.05.29.1 wurde in blankem `debian:trixie` syntaxgeprueft und fuehrte ein sauberes Linux-Deployment (`PURGE=true`) des deutschen generierten Dashboard-Sets mit Tab-Navigation gegen Grafana `13.0.1` aus
 - `deploy-bash.sh` v2026.05.29.1 wurde in blankem `debian:trixie` syntaxgeprueft, fuehrte `PURGE=true` und anschliessend `PURGE=false` gegen dieselbe Disposable-Grafana-Instanz aus
 - Linux-Deployer verarbeiten nun Grafana-Dashboard-v2-JSON ueber `/apis/dashboard.grafana.app/v2/...`, inklusive Folder-Annotations und `metadata.resourceVersion`-Updates fuer bestehende Dashboards
-- Dashboard-Override-Validierung fragte Grafana nach Deployment ab und verifizierte 46 Override-Variableninstanzen ueber alle 6 Dashboards, inklusive v2-TAB-Dashboards und klassischen Dashboards
+- Dashboard-Override-Validierung fragte Grafana nach Deployment ab und verifizierte 46 Override-Variableninstanzen ueber alle 6 Dashboards, inklusive v2-Dashboards mit Tab-Navigation und klassischen Dashboards
 - Taegliche Rollup-Refresh-Validierung nutzte die dokumentierte Cron-Form mit `date -d 'yesterday'` in blankem `debian:trixie`; der Lauf fuehrte `backfill --replace-range --write` erfolgreich aus, nachdem `rollup-e2e.py` wiederholtes Ersetzen ohne doppelte Tages-Samples validiert hatte
 - Lokalisierungs-Audit meldet nun `0` fehlende Kandidaten fuer `de`, `fr`, `nl`, `es`, `it`, `zh` und `hi`; generierte lokalisierte Dashboards wurden regeneriert und `npm run test:localization-idempotency` bestand

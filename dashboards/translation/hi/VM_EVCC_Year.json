@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-year-tab-en-orig",
+    "name": "vm-year-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -39,7 +39,7 @@
         "kind": "Panel",
         "spec": {
           "id": 41,
-          "title": "能源总计",
+          "title": "ऊर्जा कुल",
           "description": "",
           "links": [],
           "data": {
@@ -57,7 +57,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "家庭",
+                        "legendFormat": "घर",
                         "instant": true,
                         "range": false
                       },
@@ -80,7 +80,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "光伏发电",
+                        "legendFormat": "पीवी",
                         "instant": true,
                         "range": false
                       },
@@ -103,7 +103,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "电网输入",
+                        "legendFormat": "ग्रिड आयात",
                         "instant": true,
                         "range": false
                       },
@@ -126,7 +126,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "馈电",
+                        "legendFormat": "ग्रिड में आपूर्ति",
                         "instant": true,
                         "range": false
                       },
@@ -214,12 +214,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏发电"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -233,12 +233,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电网输入"
+                      "options": "ग्रिड आयात"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网输入"
+                        "value": "ग्रिड आयात"
                       },
                       {
                         "id": "color",
@@ -252,12 +252,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "家庭"
+                      "options": "घर"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "家庭"
+                        "value": "घर"
                       },
                       {
                         "id": "color",
@@ -271,12 +271,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "馈电"
+                      "options": "ग्रिड में आपूर्ति"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "馈电"
+                        "value": "ग्रिड में आपूर्ति"
                       },
                       {
                         "id": "color",
@@ -340,7 +340,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -359,7 +359,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网输入"
+                        "value": "ग्रिड आयात"
                       },
                       {
                         "id": "color",
@@ -378,7 +378,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "家庭"
+                        "value": "घर"
                       },
                       {
                         "id": "color",
@@ -397,7 +397,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "馈电"
+                        "value": "ग्रिड में आपूर्ति"
                       },
                       {
                         "id": "color",
@@ -418,7 +418,7 @@
         "kind": "Panel",
         "spec": {
           "id": 47,
-          "title": "能源",
+          "title": "ऊर्जा",
           "description": "",
           "links": [],
           "data": {
@@ -597,7 +597,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       },
                       {
                         "id": "decimals",
@@ -608,7 +608,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏发电"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
@@ -623,7 +623,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电网输入"
+                      "options": "ग्रिड आयात"
                     },
                     "properties": [
                       {
@@ -638,7 +638,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "家庭"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -653,7 +653,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "馈电"
+                      "options": "ग्रिड में आपूर्ति"
                     },
                     "properties": [
                       {
@@ -780,7 +780,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "单位收益",
+          "title": "विशिष्ट उपज",
           "description": "",
           "links": [],
           "data": {
@@ -798,7 +798,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "光伏发电",
+                        "legendFormat": "पीवी",
                         "range": false
                       },
                       "datasource": {
@@ -887,7 +887,7 @@
         "kind": "Panel",
         "spec": {
           "id": 44,
-          "title": "指标仪表",
+          "title": "मेट्रिक गेज",
           "description": "",
           "links": [],
           "data": {
@@ -904,7 +904,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "光伏发电",
+                        "legendFormat": "पीवी",
                         "instant": true,
                         "range": false
                       },
@@ -926,7 +926,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "电网输入",
+                        "legendFormat": "ग्रिड आयात",
                         "instant": true,
                         "range": false
                       },
@@ -948,7 +948,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "馈电",
+                        "legendFormat": "ग्रिड में आपूर्ति",
                         "instant": true,
                         "range": false
                       },
@@ -970,7 +970,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "家庭",
+                        "legendFormat": "घर",
                         "instant": true,
                         "range": false
                       },
@@ -992,7 +992,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "充电点",
+                        "legendFormat": "लोडपॉइंट",
                         "instant": true,
                         "range": false
                       },
@@ -1096,7 +1096,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "自给率"
+                      "options": "आत्मनिर्भरता"
                     },
                     "properties": [
                       {
@@ -1117,14 +1117,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "自给率"
+                        "value": "आत्मनिर्भरता"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "自耗"
+                      "options": "स्व-उपभोग"
                     },
                     "properties": [
                       {
@@ -1145,7 +1145,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "自耗"
+                        "value": "स्व-उपभोग"
                       }
                     ]
                   },
@@ -1173,7 +1173,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "自给率"
+                        "value": "आत्मनिर्भरता"
                       }
                     ]
                   },
@@ -1201,7 +1201,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "自耗"
+                        "value": "स्व-उपभोग"
                       }
                     ]
                   }
@@ -1215,7 +1215,7 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "指标",
+          "title": "मेट्रिक्स",
           "description": "",
           "links": [],
           "data": {
@@ -1394,14 +1394,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "自给率"
+                      "options": "आत्मनिर्भरता"
                     },
                     "properties": [
                       {
@@ -1416,7 +1416,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "自耗"
+                      "options": "स्व-उपभोग"
                     },
                     "properties": [
                       {
@@ -1468,7 +1468,7 @@
         "kind": "Panel",
         "spec": {
           "id": 3,
-          "title": "日均能量",
+          "title": "दैनिक औसत ऊर्जा",
           "description": "",
           "links": [],
           "data": {
@@ -1597,12 +1597,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏/日"
+                      "options": "PV/दिन"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏/日"
+                        "value": "PV/दिन"
                       },
                       {
                         "id": "color",
@@ -1616,12 +1616,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "日消耗"
+                      "options": "खपत/दिन"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "日消耗"
+                        "value": "खपत/दिन"
                       },
                       {
                         "id": "color",
@@ -1635,12 +1635,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "每日电网输入"
+                      "options": "ग्रिड आयात/दिन"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "每日电网输入"
+                        "value": "ग्रिड आयात/दिन"
                       },
                       {
                         "id": "color",
@@ -1659,7 +1659,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏/日"
+                        "value": "PV/दिन"
                       },
                       {
                         "id": "color",
@@ -1678,7 +1678,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "日消耗"
+                        "value": "खपत/दिन"
                       },
                       {
                         "id": "color",
@@ -1697,7 +1697,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "每日电网输入"
+                        "value": "ग्रिड आयात/दिन"
                       },
                       {
                         "id": "color",
@@ -1718,7 +1718,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "每日能源",
+          "title": "ऊर्जा/दिन",
           "description": "",
           "links": [],
           "data": {
@@ -1736,7 +1736,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_year,local_month)(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "光伏发电",
+                        "legendFormat": "पीवी",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1760,7 +1760,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_year,local_month)(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "家庭",
+                        "legendFormat": "घर",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1784,7 +1784,7 @@
                         "editorMode": "code",
                         "expr": "sum without(local_year,local_month,loadpoint)(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "充电点",
+                        "legendFormat": "लोडपॉइंट्स",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1827,7 +1827,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_year,local_month)(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "电网输入",
+                        "legendFormat": "ग्रिड आयात",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1926,7 +1926,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏发电"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
@@ -1938,14 +1938,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电网输入"
+                      "options": "ग्रिड आयात"
                     },
                     "properties": [
                       {
@@ -1957,14 +1957,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电网输入"
+                        "value": "ग्रिड आयात"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "日消耗"
+                      "options": "खपत/दिन"
                     },
                     "properties": [
                       {
@@ -1976,7 +1976,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "消耗"
+                        "value": "खपत"
                       }
                     ]
                   },
@@ -1995,7 +1995,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       }
                     ]
                   },
@@ -2014,7 +2014,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电网输入"
+                        "value": "ग्रिड आयात"
                       }
                     ]
                   },
@@ -2033,7 +2033,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "消耗"
+                        "value": "खपत"
                       }
                     ]
                   }
@@ -2047,7 +2047,7 @@
         "kind": "Panel",
         "spec": {
           "id": 67,
-          "title": "家庭：能源分配",
+          "title": "घर: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -2065,7 +2065,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "EXT 总计",
+                        "legendFormat": "EXT कुल",
                         "instant": true,
                         "range": false
                       },
@@ -2088,7 +2088,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "AUX 总计",
+                        "legendFormat": "AUX कुल",
                         "instant": true,
                         "range": false
                       },
@@ -2111,7 +2111,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "家庭总计",
+                        "legendFormat": "घर कुल",
                         "instant": true,
                         "range": false
                       },
@@ -2232,7 +2232,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "其他"
+                      "options": "अन्य"
                     },
                     "properties": [
                       {
@@ -2247,7 +2247,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "家庭"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -2299,7 +2299,7 @@
         "kind": "Panel",
         "spec": {
           "id": 66,
-          "title": "家庭：能源消耗",
+          "title": "घर: ऊर्जा खपत",
           "description": "",
           "links": [],
           "data": {
@@ -2557,7 +2557,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "其他"
+                        "value": "अन्य"
                       },
                       {
                         "id": "color",
@@ -2578,7 +2578,7 @@
         "kind": "Panel",
         "spec": {
           "id": 69,
-          "title": "总计：能源分配",
+          "title": "कुल: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -2596,7 +2596,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "家庭",
+                        "legendFormat": "घर",
                         "instant": true,
                         "range": false
                       },
@@ -2642,7 +2642,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "电池充电",
+                        "legendFormat": "बैटरी चार्ज",
                         "instant": true,
                         "range": false
                       },
@@ -2665,7 +2665,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "电池放电",
+                        "legendFormat": "बैटरी डिस्चार्ज",
                         "instant": true,
                         "range": false
                       },
@@ -2688,7 +2688,7 @@
                         "expression": "$chargeEnergy - $dischargeEnergy",
                         "type": "math",
                         "settings": {
-                          "displayName": "电池"
+                          "displayName": "बैटरी"
                         }
                       },
                       "datasource": {
@@ -2746,7 +2746,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "家庭"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -2761,7 +2761,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电池"
+                      "options": "बैटरी"
                     },
                     "properties": [
                       {
@@ -2813,7 +2813,7 @@
         "kind": "Panel",
         "spec": {
           "id": 70,
-          "title": "家庭：能源分配",
+          "title": "घर: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -3066,7 +3066,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "家庭"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -3081,7 +3081,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电池放电"
+                      "options": "बैटरी डिस्चार्ज"
                     },
                     "properties": [
                       {
@@ -3093,7 +3093,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电池放电"
+                        "value": "बैटरी डिस्चार्ज"
                       },
                       {
                         "id": "custom.stacking",
@@ -3107,7 +3107,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电池充电"
+                      "options": "बैटरी चार्ज"
                     },
                     "properties": [
                       {
@@ -3119,14 +3119,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电池充电"
+                        "value": "बैटरी चार्ज"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "其他"
+                      "options": "अन्य"
                     },
                     "properties": [
                       {
@@ -3168,7 +3168,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电池放电"
+                        "value": "बैटरी डिस्चार्ज"
                       },
                       {
                         "id": "custom.stacking",
@@ -3194,7 +3194,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "电池充电"
+                        "value": "बैटरी चार्ज"
                       }
                     ]
                   },
@@ -3223,7 +3223,7 @@
         "kind": "Panel",
         "spec": {
           "id": 65,
-          "title": "功率平衡",
+          "title": "शक्ति संतुलन",
           "description": "",
           "links": [],
           "data": {
@@ -3283,7 +3283,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) * -1",
-                        "legendFormat": "购电",
+                        "legendFormat": "खरीदा गया",
                         "instant": true,
                         "range": false
                       },
@@ -3385,7 +3385,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
-                        "legendFormat": "售电",
+                        "legendFormat": "बेचा गया",
                         "instant": true,
                         "range": false
                       },
@@ -3479,7 +3479,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电价：算术平均值"
+                        "value": "बिजली कीमत: अंकगणितीय औसत"
                       },
                       {
                         "id": "color",
@@ -3502,7 +3502,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "实际电价（动态）"
+                        "value": "प्रभावी बिजली कीमत, गतिशील"
                       },
                       {
                         "id": "color",
@@ -3525,7 +3525,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "通过动态电价节省的电价"
+                        "value": "गतिशील टैरिफ से बचाई गई बिजली कीमत"
                       },
                       {
                         "id": "unit",
@@ -3541,19 +3541,19 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "按算术价格的潜在购电"
+                        "value": "अंकगणितीय कीमत पर संभावित खरीद"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "购电"
+                      "options": "खरीदा गया"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "购入，动态"
+                        "value": "खरीदा गया, गतिशील"
                       }
                     ]
                   },
@@ -3565,19 +3565,19 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "动态电价节省"
+                        "value": "गतिशील टैरिफ से बचत"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "售电"
+                      "options": "बेचा गया"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "售出（馈电）"
+                        "value": "बेचा गया (आपूर्ति)"
                       },
                       {
                         "id": "color",
@@ -3596,7 +3596,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "平衡"
+                        "value": "संतुलन"
                       }
                     ]
                   },
@@ -3608,7 +3608,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "购入，动态"
+                        "value": "खरीदा गया, गतिशील"
                       }
                     ]
                   },
@@ -3620,7 +3620,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "售出（馈电）"
+                        "value": "बेचा गया (आपूर्ति)"
                       },
                       {
                         "id": "color",
@@ -3641,7 +3641,7 @@
         "kind": "Panel",
         "spec": {
           "id": 54,
-          "title": "动态电价",
+          "title": "गतिशील बिजली कीमत",
           "description": "",
           "links": [],
           "data": {
@@ -3683,7 +3683,7 @@
                         "editorMode": "code",
                         "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[1d])))",
                         "format": "time_series",
-                        "legendFormat": "平均值",
+                        "legendFormat": "औसत",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -3707,7 +3707,7 @@
                         "editorMode": "code",
                         "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[1d])))",
                         "format": "time_series",
-                        "legendFormat": "实际电价",
+                        "legendFormat": "प्रभावी बिजली कीमत",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -3835,7 +3835,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "平均值"
+                      "options": "औसत"
                     },
                     "properties": [
                       {
@@ -3850,7 +3850,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "实际电价"
+                      "options": "प्रभावी बिजली कीमत"
                     },
                     "properties": [
                       {
@@ -3917,7 +3917,7 @@
         "kind": "Panel",
         "spec": {
           "id": 63,
-          "title": "电力成本",
+          "title": "बिजली लागत",
           "description": "",
           "links": [],
           "data": {
@@ -4117,14 +4117,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "购入"
+                      "options": "खरीदा गया"
                     },
                     "properties": [
                       {
@@ -4139,7 +4139,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "售电"
+                      "options": "बेचा गया"
                     },
                     "properties": [
                       {
@@ -4191,7 +4191,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "电池摘要",
+          "title": "बैटरी सारांश",
           "description": "",
           "links": [],
           "data": {
@@ -4365,7 +4365,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池充电"
+                        "value": "बैटरी चार्ज"
                       },
                       {
                         "id": "unit",
@@ -4385,7 +4385,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池放电"
+                        "value": "बैटरी डिस्चार्ज"
                       },
                       {
                         "id": "unit",
@@ -4405,7 +4405,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池效率"
+                        "value": "बैटरी दक्षता"
                       },
                       {
                         "id": "unit",
@@ -4432,7 +4432,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "平均最高 SOC"
+                        "value": "औसत अधिकतम SOC"
                       },
                       {
                         "id": "unit",
@@ -4452,7 +4452,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "平均最低 SOC"
+                        "value": "औसत न्यूनतम SOC"
                       },
                       {
                         "id": "unit",
@@ -4474,7 +4474,7 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "电池：最大值",
+          "title": "बैटरी: अधिकतम मान",
           "description": "",
           "links": [],
           "data": {
@@ -4492,7 +4492,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_month)(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "最高 SOC",
+                        "legendFormat": "अधिकतम SOC",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -4589,7 +4589,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "电池充电",
+          "title": "बैटरी चार्ज",
           "description": "",
           "links": [],
           "data": {
@@ -4855,7 +4855,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "充电"
+                      "options": "चार्ज"
                     },
                     "properties": [
                       {
@@ -4867,14 +4867,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "充电"
+                        "value": "चार्ज"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "放电"
+                      "options": "डिस्चार्ज"
                     },
                     "properties": [
                       {
@@ -4886,7 +4886,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "放电"
+                        "value": "डिस्चार्ज"
                       }
                     ]
                   },
@@ -4905,7 +4905,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "充电"
+                        "value": "चार्ज"
                       }
                     ]
                   },
@@ -4924,7 +4924,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "放电"
+                        "value": "डिस्चार्ज"
                       }
                     ]
                   }
@@ -4938,7 +4938,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "电池：最小值",
+          "title": "बैटरी: न्यूनतम मान",
           "description": "",
           "links": [],
           "data": {
@@ -4956,7 +4956,7 @@
                         "editorMode": "code",
                         "expr": "min without(local_month)(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "最低 SOC",
+                        "legendFormat": "न्यूनतम SOC",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -5053,7 +5053,7 @@
         "kind": "Panel",
         "spec": {
           "id": 49,
-          "title": "电池效率",
+          "title": "बैटरी दक्षता",
           "description": "",
           "links": [],
           "data": {
@@ -5303,7 +5303,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池效率"
+                        "value": "बैटरी दक्षता"
                       },
                       {
                         "id": "unit",
@@ -5321,8 +5321,8 @@
         "kind": "Panel",
         "spec": {
           "id": 72,
-          "title": "热泵总量",
-          "description": "匹配负载点上的年度热泵能耗。",
+          "title": "हीट पंप कुल",
+          "description": "मेल खाते लोडपॉइंट्स पर वार्षिक हीट पंप ऊर्जा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5463,8 +5463,8 @@
         "kind": "Panel",
         "spec": {
           "id": 73,
-          "title": "热泵来源占比",
-          "description": "热泵负载点的光伏、电池放电和电网供电估算占比。",
+          "title": "हीट पंप स्रोत मिश्रण",
+          "description": "हीट पंप लोडपॉइंट के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5662,12 +5662,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏发电"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -5681,12 +5681,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电池"
+                      "options": "बैटरी"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -5700,12 +5700,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电网"
+                      "options": "ग्रिड"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -5724,7 +5724,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -5743,7 +5743,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -5762,7 +5762,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -5783,8 +5783,8 @@
         "kind": "Panel",
         "spec": {
           "id": 74,
-          "title": "充电桩总量",
-          "description": "可见充电负载点的年度充电能耗，不含热泵负载点。",
+          "title": "चार्जिंग स्टेशनों का कुल",
+          "description": "हीट पंप लोडपॉइंट को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स की वार्षिक चार्जिंग ऊर्जा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5925,8 +5925,8 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "充电桩来源占比",
-          "description": "可见充电负载点的光伏、电池放电和电网供电估算占比，不含热泵。",
+          "title": "चार्जिंग स्टेशनों का स्रोत मिश्रण",
+          "description": "हीट पंप को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6124,12 +6124,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "光伏发电"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -6143,12 +6143,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电池"
+                      "options": "बैटरी"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -6162,12 +6162,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "电网"
+                      "options": "ग्रिड"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -6186,7 +6186,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "光伏发电"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -6205,7 +6205,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电池"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -6224,7 +6224,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "电网"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -6245,8 +6245,8 @@
         "kind": "Panel",
         "spec": {
           "id": 59,
-          "title": "车辆",
-          "description": "消费数据需要数月后才有意义。外部充电被忽略，会扭曲结果。",
+          "title": "वाहन",
+          "description": "उपभोग कई महीनों बाद ही सार्थक होता है। बाहरी चार्जिंग को अनदेखा किया जाता है और परिणाम विकृत हो जाता है।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6263,7 +6263,7 @@
                         "editorMode": "code",
                         "expr": "sort_by_label(max by (vehicle) (max_over_time(vehicleOdometer_value{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}[10y])), \"vehicle\")",
                         "format": "time_series",
-                        "legendFormat": "最大里程表：{{vehicle}}",
+                        "legendFormat": "अधिकतम ओडोमीटर: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6286,7 +6286,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle)",
                         "format": "time_series",
-                        "legendFormat": "已行驶：{{vehicle}}",
+                        "legendFormat": "चला हुआ: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6309,7 +6309,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle) / 1000",
                         "format": "time_series",
-                        "legendFormat": "能量：{{vehicle}}",
+                        "legendFormat": "ऊर्जा: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6500,8 +6500,8 @@
         "kind": "Panel",
         "spec": {
           "id": 58,
-          "title": "每月行驶公里",
-          "description": "只有在车辆接入时才会记录公里数。如果接入频率较低，公里数可能会缺失。",
+          "title": "मासिक चले हुए किलोमीटर",
+          "description": "किलोमीटर केवल तब दर्ज होते हैं जब वाहन प्लग इन हो। यदि कम बार प्लग इन किया जाता है, तो किलोमीटर छूट सकते हैं।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6672,7 +6672,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       }
                     ]
                   }
@@ -6686,7 +6686,7 @@
         "kind": "Panel",
         "spec": {
           "id": 60,
-          "title": "每月充电能量",
+          "title": "मासिक चार्ज की गई ऊर्जा",
           "description": "",
           "links": [],
           "data": {
@@ -6858,7 +6858,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       }
                     ]
                   }
@@ -6872,8 +6872,8 @@
         "kind": "Panel",
         "spec": {
           "id": 61,
-          "title": "能耗 (kWh/100km)",
-          "description": "这些值为近似值。不包含外部充电，记录到的公里数取决于车辆接入的频率。",
+          "title": "खपत (kWh/100km)",
+          "description": "मान अनुमानित हैं। बाहरी चार्जिंग शामिल नहीं है और दर्ज किलोमीटर इस पर निर्भर करते हैं कि वाहन कितनी बार प्लग इन किया जाता है।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -7044,7 +7044,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "月份"
+                        "value": "माह"
                       }
                     ]
                   }
@@ -7064,10 +7064,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "年",
+        "title": "वर्ष",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now%2Fy&to=now%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now%2Fy&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -7076,10 +7076,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "去年",
+        "title": "पिछला वर्ष",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now-1y%2Fy&to=now-1y%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now-1y%2Fy&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -7088,10 +7088,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "两年前",
+        "title": "2 साल पहले",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now-2y%2Fy&to=now-2y%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-2y%2Fy&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -7102,7 +7102,7 @@
           "EVCC"
         ],
         "targetBlank": false,
-        "title": "仪表板",
+        "title": "डैशबोर्ड",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -7114,7 +7114,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "电动汽车控制中心",
+        "title": "ईवीसीसी",
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
@@ -7126,7 +7126,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "$inverterPortalTitle",
+        "title": "$इन्वर्टरपोर्टलटाइटल",
         "tooltip": "",
         "type": "link",
         "url": "$inverterPortalUrl"
@@ -7156,7 +7156,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: 年 标签页",
+    "title": "VM: EVCC: वर्ष",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -7168,10 +7168,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "构建",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "构建信息在部署期间设置。",
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।",
           "options": [
             {
               "text": "info",
@@ -7190,7 +7190,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "充电点屏蔽列表",
+          "label": "लोडपॉइंट ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7211,10 +7211,10 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "车辆屏蔽列表",
+          "label": "वाहन ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false,
-          "description": "用于隐藏车辆的正则表达式。无需过滤时使用 ^none$。多个精确名称可使用 ^(车辆 A|车辆 B)$。",
+          "description": "उन वाहनों के लिए Regex जिन्हें नहीं दिखाना है। कुछ भी फिल्टर न करना हो तो ^none$ इस्तेमाल करें। कई सटीक नामों के लिए ^(वाहन A|वाहन B)$ इस्तेमाल करें।",
           "options": [
             {
               "text": "^none$",
@@ -7234,7 +7234,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "EXT 屏蔽列表",
+          "label": "EXT ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7255,7 +7255,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "AUX 屏蔽列表",
+          "label": "AUX ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7276,7 +7276,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "热泵负载点匹配",
+          "label": "हीट पंप लोडपॉइंट मिलान",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -7312,10 +7312,10 @@
             "text": "http://home:7070/#/",
             "selected": false
           },
-          "label": "EVCC 网址",
+          "label": "ईवीसीसी यूआरएल",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "用于打开 EVCC 的 URL。",
+          "description": "EVCC खोलने के लिए प्रयुक्त URL।",
           "options": [
             {
               "value": "http://home:7070/#/",
@@ -7335,10 +7335,10 @@
             "text": "Solarman",
             "selected": false
           },
-          "label": "逆变器门户名称",
+          "label": "इन्वर्टर पोर्टल नाम",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "门户链接使用的逆变器门户名称。",
+          "description": "पोर्टल लिंक के लिए इन्वर्टर पोर्टल का नाम।",
           "options": [
             {
               "value": "Solarman",
@@ -7358,10 +7358,10 @@
             "text": "https://globalhome.solarmanpv.com/plant/infos/data",
             "selected": false
           },
-          "label": "逆变器门户网址",
+          "label": "इन्वर्टर पोर्टल URL",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "用于打开逆变器门户的 URL。",
+          "description": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।",
           "options": [
             {
               "value": "https://globalhome.solarmanpv.com/plant/infos/data",
@@ -7379,7 +7379,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "光伏发电",
+              "title": "PV - पीवी",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7483,7 +7483,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "家庭",
+              "title": "Home - घर",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7548,7 +7548,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "电池",
+              "title": "Battery - बैटरी",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7626,7 +7626,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "用能设备",
+              "title": "Consumers - उपभोक्ता",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7730,7 +7730,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "车辆",
+              "title": "Vehicles - वाहन",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

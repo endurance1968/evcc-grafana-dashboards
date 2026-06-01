@@ -4,7 +4,7 @@ German version: [German README](./README.md).
 
 This directory shows examples of the current EVCC/VictoriaMetrics dashboards.
 
-## All-Time Tabs
+## All-Time
 
 ### All-Time Energy
 
@@ -30,7 +30,7 @@ All-time finance view with cost and savings metrics.
 
 All-time plant-health view with long-range indicators.
 
-## Year Tabs
+## Year
 
 ### Year PV
 
@@ -72,7 +72,7 @@ Yearly consumer view.
 
 Yearly vehicle and charging energy view.
 
-## Month Tabs
+## Month
 
 ### Month PV
 
@@ -106,7 +106,7 @@ Monthly battery, SOC, and storage flow view.
 
 Monthly consumers and load distribution.
 
-## Today - Details Tabs
+## Today - Details
 
 ### Today Details PV
 

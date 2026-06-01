@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.05.31.12"
+SCRIPT_VERSION="2026.06.01.2"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-05-31"
+SCRIPT_LAST_MODIFIED="2026-06-01"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -66,7 +66,8 @@ done
 
 printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_THEME CLI_YES SCRIPT_DIR
+PYTHONIOENCODING="${PYTHONIOENCODING:-utf-8}"
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_THEME CLI_YES SCRIPT_DIR PYTHONIOENCODING
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -167,10 +168,10 @@ if not settings["GRAFANA_API_TOKEN"] and settings.get("GRAFANA_SERVICE_ACCOUNT_T
 
 settings["DASHBOARD_SOURCE_MODE"] = (settings.get("DASHBOARD_SOURCE_MODE") or "github").strip().lower()
 FIXED_DASHBOARD_FILES = [
-    "VM_EVCC_TAB_All-time.json",
-    "VM_EVCC_TAB_Jahr.json",
-    "VM_EVCC_TAB_Monat.json",
-    "VM_EVCC_TAB_Today-Details.json",
+    "VM_EVCC_All-time.json",
+    "VM_EVCC_Year.json",
+    "VM_EVCC_Month.json",
+    "VM_EVCC_Today-Details.json",
     "VM_EVCC_Today.json",
     "VM_EVCC_Today-Mobile.json",
 ]
@@ -372,6 +373,7 @@ def dashboard_path(raw):
     if is_v2_dashboard(raw):
         return f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
     return f"/api/dashboards/uid/{urllib.parse.quote(uid)}"
+
 
 
 def ensure_v2_folder_annotation(raw):

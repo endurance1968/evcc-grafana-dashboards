@@ -31,9 +31,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.05.31.11'
+$ScriptVersion = '2026.06.01.1'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-05-31'
+$ScriptLastModified = '2026-06-01'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -189,13 +189,14 @@ function Get-SourceSubDir() {
 }
 
 $FixedDashboardFiles = @(
-  'VM_EVCC_TAB_All-time.json',
-  'VM_EVCC_TAB_Jahr.json',
-  'VM_EVCC_TAB_Monat.json',
-  'VM_EVCC_TAB_Today-Details.json',
+  'VM_EVCC_All-time.json',
+  'VM_EVCC_Year.json',
+  'VM_EVCC_Month.json',
+  'VM_EVCC_Today-Details.json',
   'VM_EVCC_Today.json',
   'VM_EVCC_Today-Mobile.json'
 )
+
 
 function Get-RemoteSourceUrl([string]$RelativePath) {
   $segments = New-Object System.Collections.Generic.List[string]
@@ -346,6 +347,7 @@ function Get-DashboardPath([object]$Raw) {
   }
   return "/api/dashboards/uid/$([Uri]::EscapeDataString($uid))"
 }
+
 
 function Ensure-V2DashboardMetadata($Raw) {
   if (-not (Is-V2Dashboard $Raw)) { return $Raw }
@@ -807,4 +809,3 @@ foreach ($dashboard in $dashboards) {
 Write-Host ''
 Write-Host 'Install finished.' -ForegroundColor Green
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
-

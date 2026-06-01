@@ -4,7 +4,7 @@ Englische Version: [English README](./README_EN.md).
 
 Dieser Ordner zeigt Beispiele der aktuellen EVCC/VictoriaMetrics-Dashboards.
 
-## All-Time Tabs
+## All-Time
 
 ### All-Time Energie
 
@@ -30,7 +30,7 @@ All-Time-Finanzansicht mit Kosten- und Ersparniskennzahlen.
 
 All-Time-Anlagengesundheit mit Langzeitindikatoren.
 
-## Year Tabs
+## Year
 
 ### Year PV
 
@@ -72,7 +72,7 @@ Jahresansicht fuer Verbraucher.
 
 Jahresansicht fuer Fahrzeuge und Ladeenergie.
 
-## Month Tabs
+## Month
 
 ### Month PV
 
@@ -106,7 +106,7 @@ Monatsansicht fuer Batterie, SOC und Speicherfluesse.
 
 Monatsansicht fuer Verbraucher und Lastverteilung.
 
-## Today - Details Tabs
+## Today - Details
 
 ### Today Details PV
 

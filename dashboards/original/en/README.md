@@ -9,7 +9,9 @@ Importierte Dateien:
 - `VM_EVCC_Today.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today-Mobile.json`
-- `VM_EVCC_TAB_All-time.json`
+- `VM_EVCC_All-time.json`
+- `VM_EVCC_Month.json`
+- `VM_EVCC_Year.json`
 
 Wichtiger Hinweis:
 

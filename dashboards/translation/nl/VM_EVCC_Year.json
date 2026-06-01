@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-year-tab-en-orig",
+    "name": "vm-year-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -39,7 +39,7 @@
         "kind": "Panel",
         "spec": {
           "id": 41,
-          "title": "Totali energia",
+          "title": "Energietotalen",
           "description": "",
           "links": [],
           "data": {
@@ -57,7 +57,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Casa",
+                        "legendFormat": "Thuis",
                         "instant": true,
                         "range": false
                       },
@@ -103,7 +103,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Prelievo rete",
+                        "legendFormat": "Netafname",
                         "instant": true,
                         "range": false
                       },
@@ -126,7 +126,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Immissione",
+                        "legendFormat": "Teruglevering",
                         "instant": true,
                         "range": false
                       },
@@ -233,12 +233,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete"
+                      "options": "Netafname"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete"
+                        "value": "Netafname"
                       },
                       {
                         "id": "color",
@@ -252,12 +252,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "Thuis"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Casa"
+                        "value": "Thuis"
                       },
                       {
                         "id": "color",
@@ -271,12 +271,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Immissione"
+                      "options": "Teruglevering"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Immissione"
+                        "value": "Teruglevering"
                       },
                       {
                         "id": "color",
@@ -340,7 +340,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete"
+                        "value": "Netafname"
                       },
                       {
                         "id": "color",
@@ -359,7 +359,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Casa"
+                        "value": "Thuis"
                       },
                       {
                         "id": "color",
@@ -378,7 +378,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Immissione"
+                        "value": "Teruglevering"
                       },
                       {
                         "id": "color",
@@ -399,7 +399,7 @@
         "kind": "Panel",
         "spec": {
           "id": 47,
-          "title": "Energia",
+          "title": "Energie",
           "description": "",
           "links": [],
           "data": {
@@ -578,7 +578,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       },
                       {
                         "id": "decimals",
@@ -604,7 +604,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete"
+                      "options": "Netafname"
                     },
                     "properties": [
                       {
@@ -619,7 +619,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "Thuis"
                     },
                     "properties": [
                       {
@@ -634,7 +634,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Immissione"
+                      "options": "Teruglevering"
                     },
                     "properties": [
                       {
@@ -746,7 +746,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Resa specifica",
+          "title": "Specifieke opbrengst",
           "description": "",
           "links": [],
           "data": {
@@ -853,7 +853,7 @@
         "kind": "Panel",
         "spec": {
           "id": 44,
-          "title": "Indicatori",
+          "title": "Kengetallen",
           "description": "",
           "links": [],
           "data": {
@@ -892,7 +892,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "Prelievo rete",
+                        "legendFormat": "Netafname",
                         "instant": true,
                         "range": false
                       },
@@ -914,7 +914,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "Immissione",
+                        "legendFormat": "Teruglevering",
                         "instant": true,
                         "range": false
                       },
@@ -936,7 +936,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "Casa",
+                        "legendFormat": "Thuis",
                         "instant": true,
                         "range": false
                       },
@@ -958,7 +958,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "legendFormat": "Punti di ricarica",
+                        "legendFormat": "Laadpunten",
                         "instant": true,
                         "range": false
                       },
@@ -1062,7 +1062,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autarchia"
+                      "options": "Autarkie"
                     },
                     "properties": [
                       {
@@ -1083,14 +1083,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarchia"
+                        "value": "Zelfvoorziening"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autoconsumo"
+                      "options": "Eigenverbruik"
                     },
                     "properties": [
                       {
@@ -1111,7 +1111,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autoconsumo"
+                        "value": "Eigenverbruik"
                       }
                     ]
                   },
@@ -1139,7 +1139,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarchia"
+                        "value": "Zelfvoorziening"
                       }
                     ]
                   },
@@ -1167,7 +1167,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autoconsumo"
+                        "value": "Eigenverbruik"
                       }
                     ]
                   }
@@ -1181,7 +1181,7 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "Metriche",
+          "title": "Kengetallen",
           "description": "",
           "links": [],
           "data": {
@@ -1360,14 +1360,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autarchia"
+                      "options": "Autarkie"
                     },
                     "properties": [
                       {
@@ -1382,7 +1382,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autoconsumo"
+                      "options": "Eigenverbruik"
                     },
                     "properties": [
                       {
@@ -1434,7 +1434,7 @@
         "kind": "Panel",
         "spec": {
           "id": 3,
-          "title": "Energia media giornaliera",
+          "title": "Gemiddelde energie per dag",
           "description": "",
           "links": [],
           "data": {
@@ -1563,12 +1563,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "FV/giorno"
+                      "options": "PV/dag"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "FV/giorno"
+                        "value": "PV/dag"
                       },
                       {
                         "id": "color",
@@ -1582,12 +1582,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Consumo/giorno"
+                      "options": "Verbruik/dag"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Consumo/giorno"
+                        "value": "Verbruik/dag"
                       },
                       {
                         "id": "color",
@@ -1601,12 +1601,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete/giorno"
+                      "options": "Netafname/dag"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete/giorno"
+                        "value": "Netafname/dag"
                       },
                       {
                         "id": "color",
@@ -1625,7 +1625,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "FV/giorno"
+                        "value": "PV/dag"
                       },
                       {
                         "id": "color",
@@ -1644,7 +1644,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Consumo/giorno"
+                        "value": "Verbruik/dag"
                       },
                       {
                         "id": "color",
@@ -1663,7 +1663,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete/giorno"
+                        "value": "Netafname/dag"
                       },
                       {
                         "id": "color",
@@ -1684,7 +1684,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Energia/giorno",
+          "title": "Energie/dag",
           "description": "",
           "links": [],
           "data": {
@@ -1726,7 +1726,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_year,local_month)(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "Casa",
+                        "legendFormat": "Huis",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1750,7 +1750,7 @@
                         "editorMode": "code",
                         "expr": "sum without(local_year,local_month,loadpoint)(evcc_loadpoint_energy_daily_wh{loadpoint!~\"$loadpointBlocklist\",local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "Punti di ricarica",
+                        "legendFormat": "Laadpunten",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1793,7 +1793,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_year,local_month)(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "Prelievo rete",
+                        "legendFormat": "Netafname",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -1911,7 +1911,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prelievo rete"
+                      "options": "Netafname"
                     },
                     "properties": [
                       {
@@ -1923,14 +1923,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete"
+                        "value": "Netafname"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Consumo/giorno"
+                      "options": "Verbruik/dag"
                     },
                     "properties": [
                       {
@@ -1942,7 +1942,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Consumo"
+                        "value": "Verbruik"
                       }
                     ]
                   },
@@ -1961,7 +1961,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Prelievo rete"
+                        "value": "Netafname"
                       }
                     ]
                   },
@@ -1980,7 +1980,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Consumo"
+                        "value": "Verbruik"
                       }
                     ]
                   }
@@ -1994,7 +1994,7 @@
         "kind": "Panel",
         "spec": {
           "id": 67,
-          "title": "Casa: distribuzione energia",
+          "title": "Thuis: energieverdeling",
           "description": "",
           "links": [],
           "data": {
@@ -2012,7 +2012,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale EXT",
+                        "legendFormat": "EXT totaal",
                         "instant": true,
                         "range": false
                       },
@@ -2035,7 +2035,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale AUX",
+                        "legendFormat": "AUX totaal",
                         "instant": true,
                         "range": false
                       },
@@ -2058,7 +2058,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Totale casa",
+                        "legendFormat": "Totaal thuis",
                         "instant": true,
                         "range": false
                       },
@@ -2179,7 +2179,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Altro"
+                      "options": "Overig"
                     },
                     "properties": [
                       {
@@ -2194,7 +2194,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "Thuis"
                     },
                     "properties": [
                       {
@@ -2246,7 +2246,7 @@
         "kind": "Panel",
         "spec": {
           "id": 66,
-          "title": "Casa: consumo energetico",
+          "title": "Thuis: energieverbruik",
           "description": "",
           "links": [],
           "data": {
@@ -2504,7 +2504,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Altro"
+                        "value": "Overig"
                       },
                       {
                         "id": "color",
@@ -2525,7 +2525,7 @@
         "kind": "Panel",
         "spec": {
           "id": 69,
-          "title": "Totale: distribuzione energia",
+          "title": "Totaal: energieverdeling",
           "description": "",
           "links": [],
           "data": {
@@ -2543,7 +2543,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Casa",
+                        "legendFormat": "Thuis",
                         "instant": true,
                         "range": false
                       },
@@ -2589,7 +2589,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Carica batteria",
+                        "legendFormat": "Batterij laden",
                         "instant": true,
                         "range": false
                       },
@@ -2612,7 +2612,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Scarica batteria",
+                        "legendFormat": "Batterij ontladen",
                         "instant": true,
                         "range": false
                       },
@@ -2635,7 +2635,7 @@
                         "expression": "$chargeEnergy - $dischargeEnergy",
                         "type": "math",
                         "settings": {
-                          "displayName": "Batteria"
+                          "displayName": "Batterij"
                         }
                       },
                       "datasource": {
@@ -2693,7 +2693,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "Thuis"
                     },
                     "properties": [
                       {
@@ -2708,7 +2708,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batteria"
+                      "options": "Batterij"
                     },
                     "properties": [
                       {
@@ -2760,7 +2760,7 @@
         "kind": "Panel",
         "spec": {
           "id": 70,
-          "title": "Casa: distribuzione energia",
+          "title": "Thuis: energieverdeling",
           "description": "",
           "links": [],
           "data": {
@@ -3013,7 +3013,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Casa"
+                      "options": "Thuis"
                     },
                     "properties": [
                       {
@@ -3028,7 +3028,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Scarica batteria"
+                      "options": "Batterij ontladen"
                     },
                     "properties": [
                       {
@@ -3040,7 +3040,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "Batterij ontladen"
                       },
                       {
                         "id": "custom.stacking",
@@ -3054,7 +3054,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Carica batteria"
+                      "options": "Batterij laden"
                     },
                     "properties": [
                       {
@@ -3066,14 +3066,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "Batterij laden"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Altro"
+                      "options": "Overig"
                     },
                     "properties": [
                       {
@@ -3115,7 +3115,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "Batterij ontladen"
                       },
                       {
                         "id": "custom.stacking",
@@ -3141,7 +3141,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "Batterij laden"
                       }
                     ]
                   },
@@ -3170,7 +3170,7 @@
         "kind": "Panel",
         "spec": {
           "id": 65,
-          "title": "Bilancio elettrico",
+          "title": "Stroombalans",
           "description": "",
           "links": [],
           "data": {
@@ -3230,7 +3230,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) * -1",
-                        "legendFormat": "Acquistato",
+                        "legendFormat": "Ingekocht",
                         "instant": true,
                         "range": false
                       },
@@ -3332,7 +3332,7 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d]))",
-                        "legendFormat": "Venduto",
+                        "legendFormat": "Verkocht",
                         "instant": true,
                         "range": false
                       },
@@ -3426,7 +3426,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prezzo elettricità: media aritmetica"
+                        "value": "Elektriciteitsprijs: rekenkundig gemiddelde"
                       },
                       {
                         "id": "color",
@@ -3449,7 +3449,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prezzo effettivo dell’elettricità, dinamico"
+                        "value": "Effectieve elektriciteitsprijs, dynamisch"
                       },
                       {
                         "id": "color",
@@ -3472,7 +3472,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Prezzo risparmiato grazie alla tariffa dinamica"
+                        "value": "Bespaarde elektriciteitsprijs via dynamisch tarief"
                       },
                       {
                         "id": "unit",
@@ -3488,19 +3488,19 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquisto potenziale al prezzo aritmetico"
+                        "value": "Potentiële aankoop tegen rekenprijs"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Acquistato"
+                      "options": "Ingekocht"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquistato, dinamico"
+                        "value": "Aangekocht, dynamisch"
                       }
                     ]
                   },
@@ -3512,19 +3512,19 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Risparmio grazie alla tariffa dinamica"
+                        "value": "Besparing via dynamisch tarief"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Venduto"
+                      "options": "Verkocht"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Venduto (immissione)"
+                        "value": "Verkocht (teruglevering)"
                       },
                       {
                         "id": "color",
@@ -3543,7 +3543,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Bilancio"
+                        "value": "Balans"
                       }
                     ]
                   },
@@ -3555,7 +3555,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Acquistato, dinamico"
+                        "value": "Aangekocht, dynamisch"
                       }
                     ]
                   },
@@ -3567,7 +3567,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Venduto (immissione)"
+                        "value": "Verkocht (teruglevering)"
                       },
                       {
                         "id": "color",
@@ -3588,7 +3588,7 @@
         "kind": "Panel",
         "spec": {
           "id": 54,
-          "title": "Prezzo dinamico dell’elettricità",
+          "title": "Dynamische elektriciteitsprijs",
           "description": "",
           "links": [],
           "data": {
@@ -3630,7 +3630,7 @@
                         "editorMode": "code",
                         "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[1d])))",
                         "format": "time_series",
-                        "legendFormat": "Media",
+                        "legendFormat": "Gemiddelde",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -3654,7 +3654,7 @@
                         "editorMode": "code",
                         "expr": "sum without (local_month) ((last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[1d])))",
                         "format": "time_series",
-                        "legendFormat": "Prezzo effettivo dell’elettricità",
+                        "legendFormat": "Effectieve elektriciteitsprijs",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -3782,7 +3782,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Media"
+                      "options": "Gemiddelde"
                     },
                     "properties": [
                       {
@@ -3797,7 +3797,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Prezzo effettivo dell’elettricità"
+                      "options": "Effectieve elektriciteitsprijs"
                     },
                     "properties": [
                       {
@@ -3864,7 +3864,7 @@
         "kind": "Panel",
         "spec": {
           "id": 63,
-          "title": "Costi elettrici",
+          "title": "Elektriciteitskosten",
           "description": "",
           "links": [],
           "data": {
@@ -4064,14 +4064,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Acquistato"
+                      "options": "Aangekocht"
                     },
                     "properties": [
                       {
@@ -4086,7 +4086,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Venduto"
+                      "options": "Verkocht"
                     },
                     "properties": [
                       {
@@ -4138,7 +4138,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "Batteria",
+          "title": "Batterij",
           "description": "",
           "links": [],
           "data": {
@@ -4312,7 +4312,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Carica batteria"
+                        "value": "Batterij laden"
                       },
                       {
                         "id": "unit",
@@ -4332,7 +4332,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Scarica batteria"
+                        "value": "Batterij ontladen"
                       },
                       {
                         "id": "unit",
@@ -4352,7 +4352,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Efficienza batteria"
+                        "value": "Batterij efficiëntie"
                       },
                       {
                         "id": "unit",
@@ -4379,7 +4379,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "SOC max medio"
+                        "value": "Gem. Max SOC"
                       },
                       {
                         "id": "unit",
@@ -4399,7 +4399,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "SOC min medio"
+                        "value": "Gem. Min SOC"
                       },
                       {
                         "id": "unit",
@@ -4421,7 +4421,7 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "Batteria: valori massimi",
+          "title": "Batterij: maximumwaarden",
           "description": "",
           "links": [],
           "data": {
@@ -4439,7 +4439,7 @@
                         "editorMode": "code",
                         "expr": "max without(local_month)(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "SOC max",
+                        "legendFormat": "Max SOC",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -4536,7 +4536,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "Carica batteria",
+          "title": "Batterij laden",
           "description": "",
           "links": [],
           "data": {
@@ -4802,7 +4802,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Carica"
+                      "options": "Laden"
                     },
                     "properties": [
                       {
@@ -4814,14 +4814,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica"
+                        "value": "Laden"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Scarica"
+                      "options": "Ontladen"
                     },
                     "properties": [
                       {
@@ -4833,7 +4833,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica"
+                        "value": "Ontladen"
                       }
                     ]
                   },
@@ -4852,7 +4852,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Carica"
+                        "value": "Laden"
                       }
                     ]
                   },
@@ -4871,7 +4871,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Scarica"
+                        "value": "Ontladen"
                       }
                     ]
                   }
@@ -4885,7 +4885,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Batteria: valori minimi",
+          "title": "Batterij: minimumwaarden",
           "description": "",
           "links": [],
           "data": {
@@ -4903,7 +4903,7 @@
                         "editorMode": "code",
                         "expr": "min without(local_month)(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\"})",
                         "format": "time_series",
-                        "legendFormat": "SOC min",
+                        "legendFormat": "Min SOC",
                         "interval": "1d",
                         "instant": false,
                         "range": true
@@ -5000,7 +5000,7 @@
         "kind": "Panel",
         "spec": {
           "id": 49,
-          "title": "Efficienza batteria",
+          "title": "Batterij efficiëntie",
           "description": "",
           "links": [],
           "data": {
@@ -5250,7 +5250,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Efficienza batteria"
+                        "value": "Batterij efficiëntie"
                       },
                       {
                         "id": "unit",
@@ -5268,8 +5268,8 @@
         "kind": "Panel",
         "spec": {
           "id": 72,
-          "title": "Totale pompa di calore",
-          "description": "Energia annuale della pompa di calore sui punti di ricarica corrispondenti.",
+          "title": "Warmtepomp totaal",
+          "description": "Jaarlijkse warmtepompenergie over overeenkomende laadpunten.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5410,8 +5410,8 @@
         "kind": "Panel",
         "spec": {
           "id": 73,
-          "title": "Mix di alimentazione della pompa di calore",
-          "description": "Quota stimata di FV, scarica batteria e rete per il punto di ricarica della pompa di calore.",
+          "title": "Bronnenmix warmtepomp",
+          "description": "Geschat aandeel van PV, batterijontlading en netstroom voor het warmtepomp-laadpunt.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5628,12 +5628,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batteria"
+                      "options": "Batterij"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "Batterij"
                       },
                       {
                         "id": "color",
@@ -5647,12 +5647,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Rete"
+                      "options": "Net"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "Net"
                       },
                       {
                         "id": "color",
@@ -5671,7 +5671,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "Batterij"
                       },
                       {
                         "id": "color",
@@ -5690,7 +5690,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "Net"
                       },
                       {
                         "id": "color",
@@ -5711,8 +5711,8 @@
         "kind": "Panel",
         "spec": {
           "id": 74,
-          "title": "Totale stazioni di ricarica",
-          "description": "Energia di ricarica annuale sui punti di ricarica visibili, escluso il punto di ricarica della pompa di calore.",
+          "title": "Laadstations totaal",
+          "description": "Jaarlijkse laadenergie over zichtbare laadpunten, exclusief het warmtepomp-laadpunt.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5853,8 +5853,8 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Mix di alimentazione delle stazioni di ricarica",
-          "description": "Quota stimata di FV, scarica batteria e rete per i punti di ricarica visibili, esclusa la pompa di calore.",
+          "title": "Bronnenmix laadstations",
+          "description": "Geschat aandeel van PV, batterijontlading en netstroom voor zichtbare laadpunten, exclusief de warmtepomp.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6071,12 +6071,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batteria"
+                      "options": "Batterij"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "Batterij"
                       },
                       {
                         "id": "color",
@@ -6090,12 +6090,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Rete"
+                      "options": "Net"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "Net"
                       },
                       {
                         "id": "color",
@@ -6114,7 +6114,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Batteria"
+                        "value": "Batterij"
                       },
                       {
                         "id": "color",
@@ -6133,7 +6133,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Rete"
+                        "value": "Net"
                       },
                       {
                         "id": "color",
@@ -6154,8 +6154,8 @@
         "kind": "Panel",
         "spec": {
           "id": 59,
-          "title": "Veicoli",
-          "description": "Il consumo diventa significativo solo dopo diversi mesi. La ricarica esterna viene ignorata e distorce il risultato.",
+          "title": "Voertuigen",
+          "description": "Het verbruik wordt pas na meerdere maanden betekenisvol. Extern laden wordt genegeerd en vertekent het resultaat.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6172,7 +6172,7 @@
                         "editorMode": "code",
                         "expr": "sort_by_label(max by (vehicle) (max_over_time(vehicleOdometer_value{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\"}[10y])), \"vehicle\")",
                         "format": "time_series",
-                        "legendFormat": "Chilometraggio max: {{vehicle}}",
+                        "legendFormat": "Max kilometerstand: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6195,7 +6195,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_distance_daily_km{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle)",
                         "format": "time_series",
-                        "legendFormat": "Percorsi: {{vehicle}}",
+                        "legendFormat": "Gereden: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6218,7 +6218,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time((last_over_time(evcc_vehicle_energy_daily_wh{vehicle!=\"\",vehicle!~\"$vehicleBlocklist\",local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (vehicle) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Energia: {{vehicle}}",
+                        "legendFormat": "Energie: {{vehicle}}",
                         "instant": true,
                         "range": false
                       },
@@ -6409,8 +6409,8 @@
         "kind": "Panel",
         "spec": {
           "id": 58,
-          "title": "Chilometri mensili",
-          "description": "I chilometri vengono registrati solo mentre un veicolo è collegato. Se viene collegato raramente, alcuni chilometri possono mancare.",
+          "title": "Maandelijks gereden kilometers",
+          "description": "Kilometers worden alleen geregistreerd terwijl een voertuig is aangesloten. Bij zelden aansluiten kunnen kilometers ontbreken.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6581,7 +6581,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       }
                     ]
                   }
@@ -6595,7 +6595,7 @@
         "kind": "Panel",
         "spec": {
           "id": 60,
-          "title": "Energia caricata mensile",
+          "title": "Maandelijks geladen energie",
           "description": "",
           "links": [],
           "data": {
@@ -6767,7 +6767,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       }
                     ]
                   }
@@ -6781,8 +6781,8 @@
         "kind": "Panel",
         "spec": {
           "id": 61,
-          "title": "Consumo (kWh/100km)",
-          "description": "I valori sono approssimativi. La ricarica esterna non è inclusa e i chilometri registrati dipendono da quanto spesso un veicolo viene collegato.",
+          "title": "Verbruik (kWh/100km)",
+          "description": "Waarden zijn benaderingen. Extern laden is niet inbegrepen en geregistreerde kilometers hangen af van hoe vaak een voertuig is aangesloten.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6953,7 +6953,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Mese"
+                        "value": "Maand"
                       }
                     ]
                   }
@@ -6973,10 +6973,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Anno",
+        "title": "Jaar",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now%2Fy&to=now%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now%2Fy&to=now%2Fy&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -6985,10 +6985,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Anno precedente",
+        "title": "Vorig jaar",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now-1y%2Fy&to=now-1y%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now-1y%2Fy&to=now-1y%2Fy&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -6997,10 +6997,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Due anni fa",
+        "title": "2 jaar geleden",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-year-tab-en-orig?orgId=1&from=now-2y%2Fy&to=now-2y%2Fy&timezone=browser"
+        "url": "/d/vm-year-en-orig?orgId=1&from=now-2y%2Fy&to=now-2y%2Fy&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -7011,7 +7011,7 @@
           "EVCC"
         ],
         "targetBlank": false,
-        "title": "Cruscotti",
+        "title": "Dashboards",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -7035,7 +7035,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "$inverterPortalTitolo",
+        "title": "$inverterPortalTitle",
         "tooltip": "",
         "type": "link",
         "url": "$inverterPortalUrl"
@@ -7065,7 +7065,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Anno - Schede",
+    "title": "VM: EVCC: Jaar",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -7080,7 +7080,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Le informazioni di build vengono impostate durante il deploy.",
+          "description": "Build-informatie wordt tijdens de deployment ingesteld.",
           "options": [
             {
               "text": "info",
@@ -7099,7 +7099,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco punto di ricarica",
+          "label": "Laadpunt blokkeerlijst",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7120,10 +7120,10 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocklist veicoli",
+          "label": "Blokkeerlijst voertuigen",
           "hide": "hideVariable",
           "skipUrlSync": false,
-          "description": "Regex per i veicoli da non mostrare. Usa ^none$ quando non deve essere filtrato nulla. Per piu nomi esatti usa ^(Veicolo A|Veicolo B)$.",
+          "description": "Regex voor voertuigen die niet getoond moeten worden. Gebruik ^none$ als er niets gefilterd moet worden. Gebruik voor meerdere exacte namen ^(Voertuig A|Voertuig B)$.",
           "options": [
             {
               "text": "^none$",
@@ -7143,7 +7143,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco EXT",
+          "label": "EXT blokkeerlijst",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7164,7 +7164,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Blocco AUX",
+          "label": "AUX blokkeerlijst",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "options": [
@@ -7185,7 +7185,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Corrispondenza del punto di ricarica della pompa di calore",
+          "label": "Warmtepomp-laadpuntmatch",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -7221,10 +7221,10 @@
             "text": "http://home:7070/#/",
             "selected": false
           },
-          "label": "URL dell'EVCC",
+          "label": "EVCC-URL",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL utilizzato per aprire EVCC.",
+          "description": "URL die wordt gebruikt om EVCC te openen.",
           "options": [
             {
               "value": "http://home:7070/#/",
@@ -7244,10 +7244,10 @@
             "text": "Solarman",
             "selected": false
           },
-          "label": "Nome portale inverter",
+          "label": "Naam omvormerportaal",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Nome del portale inverter per il collegamento al portale.",
+          "description": "Naam van het omvormerportaal voor de portaallink.",
           "options": [
             {
               "value": "Solarman",
@@ -7267,10 +7267,10 @@
             "text": "https://globalhome.solarmanpv.com/plant/infos/data",
             "selected": false
           },
-          "label": "URL portale inverter",
+          "label": "URL omvormerportaal",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL utilizzato per aprire il portale inverter.",
+          "description": "URL die wordt gebruikt om het omvormerportaal te openen.",
           "options": [
             {
               "value": "https://globalhome.solarmanpv.com/plant/infos/data",
@@ -7392,7 +7392,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Casa",
+              "title": "Thuis",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7457,7 +7457,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Batteria",
+              "title": "Batterij",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7535,7 +7535,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consumatori",
+              "title": "Verbruikers",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -7639,7 +7639,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Veicoli",
+              "title": "Voertuigen",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

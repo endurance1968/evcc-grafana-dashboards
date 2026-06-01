@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-month-tab-en-orig",
+    "name": "vm-month-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -39,7 +39,7 @@
         "kind": "Panel",
         "spec": {
           "id": 19,
-          "title": "Monatliche Gesamtenergie",
+          "title": "Monthly energy totals",
           "description": "",
           "links": [],
           "data": {
@@ -57,7 +57,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Haus",
+                        "legendFormat": "Home",
                         "range": true,
                         "interval": "1d"
                       },
@@ -103,7 +103,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Grid import",
                         "range": true,
                         "interval": "1d"
                       },
@@ -126,7 +126,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Einspeisung",
+                        "legendFormat": "Feed-in",
                         "range": true,
                         "interval": "1d"
                       },
@@ -346,7 +346,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Netzbezug"
+                        "value": "Grid import"
                       }
                     ]
                   },
@@ -358,7 +358,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Haus"
+                        "value": "Home"
                       }
                     ]
                   },
@@ -370,7 +370,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Einspeisung"
+                        "value": "Feed-in"
                       }
                     ]
                   },
@@ -404,7 +404,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Grid import"
                     },
                     "properties": [
                       {
@@ -419,7 +419,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Haus"
+                      "options": "Home"
                     },
                     "properties": [
                       {
@@ -479,51 +479,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Einspeisung"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Feed-in"
                     },
                     "properties": [
@@ -546,7 +501,7 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "Energie",
+          "title": "Energy",
           "description": "",
           "links": [],
           "data": {
@@ -564,7 +519,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Haus",
+                        "legendFormat": "Home",
                         "range": true,
                         "interval": "1d"
                       },
@@ -610,7 +565,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Grid import",
                         "range": true,
                         "interval": "1d"
                       },
@@ -633,7 +588,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Einspeisung",
+                        "legendFormat": "Feed-in",
                         "range": true,
                         "interval": "1d"
                       },
@@ -776,7 +731,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Grid import"
                     },
                     "properties": [
                       {
@@ -791,7 +746,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Haus"
+                      "options": "Home"
                     },
                     "properties": [
                       {
@@ -851,51 +806,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Einspeisung"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Feed-in"
                     },
                     "properties": [
@@ -918,7 +828,7 @@
         "kind": "Panel",
         "spec": {
           "id": 22,
-          "title": "Spezifischer Ertrag",
+          "title": "Specific yield",
           "description": "",
           "links": [],
           "data": {
@@ -1025,7 +935,7 @@
         "kind": "Panel",
         "spec": {
           "id": 24,
-          "title": "Kennzahlen Gauges",
+          "title": "Metric gauges",
           "description": "",
           "links": [],
           "data": {
@@ -1352,62 +1262,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autarkie"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "green",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autarkie"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Eigenverbrauch"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "purple",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Eigenverbrauch"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Autarky"
                     },
                     "properties": [
@@ -1429,7 +1283,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarkie"
+                        "value": "Autarky"
                       }
                     ]
                   },
@@ -1457,7 +1311,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Eigenverbrauch"
+                        "value": "Self-consumption"
                       }
                     ]
                   }
@@ -1471,7 +1325,7 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "Kennzahlen",
+          "title": "Metrics",
           "description": "",
           "links": [],
           "data": {
@@ -1592,7 +1446,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarkie"
+                        "value": "Self-sufficiency"
                       }
                     ]
                   },
@@ -1618,7 +1472,7 @@
         "kind": "Panel",
         "spec": {
           "id": 32,
-          "title": "Haus: Energieverteilung",
+          "title": "Home: Energy distribution",
           "description": "",
           "links": [],
           "data": {
@@ -1636,7 +1490,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "EXT Gesamt",
+                        "legendFormat": "Ext total",
                         "range": false
                       },
                       "datasource": {
@@ -1658,7 +1512,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "AUX Gesamt",
+                        "legendFormat": "Aux total",
                         "range": false
                       },
                       "datasource": {
@@ -1680,7 +1534,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Haus Gesamt",
+                        "legendFormat": "Home total",
                         "range": false
                       },
                       "datasource": {
@@ -1797,21 +1651,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Sonstiges"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#9FA7B3"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Other"
                     },
                     "properties": [
@@ -1834,7 +1673,7 @@
         "kind": "Panel",
         "spec": {
           "id": 31,
-          "title": "Haus: Energieverbrauch",
+          "title": "Home: Energy consumption",
           "description": "",
           "links": [],
           "data": {
@@ -1852,7 +1691,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Haus Gesamt",
+                        "legendFormat": "Home total",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1875,7 +1714,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "EXT Gesamt",
+                        "legendFormat": "Ext total",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1898,7 +1737,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "AUX Gesamt",
+                        "legendFormat": "Aux total",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1921,7 +1760,7 @@
                         "expression": "$homeTotalDaily - $extTotalDaily",
                         "type": "math",
                         "settings": {
-                          "displayName": "Sonstiges"
+                          "displayName": "Other"
                         }
                       },
                       "datasource": {
@@ -2074,7 +1913,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Sonstiges"
+                        "value": "Other"
                       },
                       {
                         "id": "color",
@@ -2095,7 +1934,7 @@
         "kind": "Panel",
         "spec": {
           "id": 36,
-          "title": "Gesamt: Energieverteilung",
+          "title": "Total: Energy distribution",
           "description": "",
           "links": [],
           "data": {
@@ -2113,7 +1952,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Haus",
+                        "legendFormat": "Home",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2159,7 +1998,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Speicher laden",
+                        "legendFormat": "Battery charge",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2182,7 +2021,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Speicher entladen",
+                        "legendFormat": "Battery discharge",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2271,7 +2110,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Haus"
+                        "value": "Home"
                       }
                     ]
                   },
@@ -2300,7 +2139,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "Gesamt: Energieverteilung",
+          "title": "Total: Energy distribution",
           "description": "",
           "links": [],
           "data": {
@@ -2421,14 +2260,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Haus"
+                        "value": "Home"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Speicher laden"
+                      "options": "Battery charge"
                     },
                     "properties": [
                       {
@@ -2440,14 +2279,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Speicher laden"
+                        "value": "Battery charge"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Speicher entladen"
+                      "options": "Battery discharge"
                     },
                     "properties": [
                       {
@@ -2459,7 +2298,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Speicher entladen"
+                        "value": "Battery discharge"
                       },
                       {
                         "id": "custom.stacking",
@@ -2481,51 +2320,6 @@
                         "value": "time:MM/DD"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery charge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Speicher laden"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery discharge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Speicher entladen"
-                      },
-                      {
-                        "id": "custom.stacking",
-                        "value": {
-                          "group": "batteryNegative",
-                          "mode": "normal"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -2537,7 +2331,7 @@
         "kind": "Panel",
         "spec": {
           "id": 30,
-          "title": "Strombilanz",
+          "title": "Power balance",
           "description": "",
           "links": [],
           "data": {
@@ -2555,7 +2349,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Durchschnittspreis täglich",
+                        "legendFormat": "avg price daily",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2624,7 +2418,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Eingekaufte Energie täglich",
+                        "legendFormat": "Purchased energy daily",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2670,7 +2464,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Einkauf täglich",
+                        "legendFormat": "Purchased daily",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2792,7 +2586,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Verkauf täglich roh",
+                        "legendFormat": "Sold daily raw",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2948,7 +2742,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Netzpreis: Arithmetisches Mittel"
+                        "value": "Grid price: arithmetic mean"
                       },
                       {
                         "id": "unit",
@@ -2971,7 +2765,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Effektiver Preis, dyn."
+                        "value": "Effective price, dyn."
                       },
                       {
                         "id": "unit",
@@ -2994,7 +2788,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Gespart vs Arith."
+                        "value": "Saved vs arith."
                       },
                       {
                         "id": "unit",
@@ -3017,7 +2811,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Potential bei Arith."
+                        "value": "Potential at arith."
                       },
                       {
                         "id": "unit",
@@ -3040,7 +2834,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Einkauf, dynamisch"
+                        "value": "Purchased, dynamic"
                       },
                       {
                         "id": "unit",
@@ -3063,7 +2857,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Ersparnis dyn."
+                        "value": "Savings dyn."
                       },
                       {
                         "id": "unit",
@@ -3086,7 +2880,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Verkauf (Einspeisung)"
+                        "value": "Sold (feed-in)"
                       },
                       {
                         "id": "unit",
@@ -3109,7 +2903,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Bilanz"
+                        "value": "Balance"
                       },
                       {
                         "id": "unit",
@@ -3134,7 +2928,7 @@
         "kind": "Panel",
         "spec": {
           "id": 26,
-          "title": "Dynamischer Strompreis (ct/kWh)",
+          "title": "Dynamic electricity price (ct/kWh)",
           "description": "",
           "links": [],
           "data": {
@@ -3175,7 +2969,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Durchschnitt",
+                        "legendFormat": "Average",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3198,7 +2992,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Effektiver Strompreis",
+                        "legendFormat": "Effective electricity price",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3324,51 +3118,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Durchschnitt"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Effektiver Strompreis"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Min"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Average"
                     },
                     "properties": [
@@ -3395,6 +3144,21 @@
                         }
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Min"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
                   }
                 ]
               }
@@ -3406,7 +3170,7 @@
         "kind": "Panel",
         "spec": {
           "id": 28,
-          "title": "Stromkosten",
+          "title": "Electricity costs",
           "description": "",
           "links": [],
           "data": {
@@ -3424,7 +3188,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Einkauf",
+                        "legendFormat": "Purchased",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3517,12 +3281,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Einkauf"
+                      "options": "Purchased"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Einkauf"
+                        "value": "Purchased"
                       }
                     ]
                   },
@@ -3537,18 +3301,6 @@
                         "value": "time:MM/DD"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Einkauf"
-                      }
-                    ]
                   }
                 ]
               }
@@ -3560,7 +3312,7 @@
         "kind": "Panel",
         "spec": {
           "id": 16,
-          "title": "Speicher",
+          "title": "Battery summary",
           "description": "",
           "links": [],
           "data": {
@@ -3578,7 +3330,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Batterieladung täglich",
+                        "legendFormat": "Battery charge daily",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3601,7 +3353,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Batterieentladung täglich",
+                        "legendFormat": "Battery discharge daily",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3689,7 +3441,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Max SOC Reihe",
+                        "legendFormat": "Max SOC series",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3712,7 +3464,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Min SOC Reihe",
+                        "legendFormat": "Min SOC series",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3828,7 +3580,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Speicher laden"
+                        "value": "Battery charge"
                       },
                       {
                         "id": "unit",
@@ -3848,7 +3600,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Speicher entladen"
+                        "value": "Battery discharge"
                       },
                       {
                         "id": "unit",
@@ -3868,7 +3620,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Speicher Effizienz"
+                        "value": "Battery efficiency"
                       },
                       {
                         "id": "unit",
@@ -3888,7 +3640,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Durchschnitt Max SOC"
+                        "value": "Avg Max SOC"
                       },
                       {
                         "id": "unit",
@@ -3908,7 +3660,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Durchschnitt Min SOC"
+                        "value": "Avg Min SOC"
                       },
                       {
                         "id": "unit",
@@ -3930,7 +3682,7 @@
         "kind": "Panel",
         "spec": {
           "id": 11,
-          "title": "Batteriestände",
+          "title": "Home battery levels",
           "description": "",
           "links": [],
           "data": {
@@ -3948,7 +3700,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC Max",
+                        "legendFormat": "SOC max",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3971,7 +3723,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC Min",
+                        "legendFormat": "SOC min",
                         "range": true,
                         "interval": "1d"
                       },
@@ -4062,56 +3814,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "SOC Max"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterie max"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC Min"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#686868",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterie min"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Time"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "SOC max"
                     },
                     "properties": [
@@ -4124,7 +3826,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Batterie max"
+                        "value": "Battery max"
                       }
                     ]
                   },
@@ -4143,7 +3845,19 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Batterie min"
+                        "value": "Battery min"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Time"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "time:MM/DD"
                       }
                     ]
                   }
@@ -4157,8 +3871,8 @@
         "kind": "Panel",
         "spec": {
           "id": 39,
-          "title": "Wärmepumpe gesamt",
-          "description": "Jährliche Wärmepumpenenergie über passende Loadpoints.",
+          "title": "Heat pump total",
+          "description": "Yearly heat pump energy across matching loadpoints.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4299,8 +4013,8 @@
         "kind": "Panel",
         "spec": {
           "id": 40,
-          "title": "Versorgungsmix Wärmepumpe",
-          "description": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für den Wärmepumpen-Loadpoint.",
+          "title": "Heat pump source mix",
+          "description": "Estimated share of PV, battery discharge and grid supply for the heat pump loadpoint.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4517,50 +4231,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Speicher"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Speicher"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Netz"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Netz"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Battery"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Speicher"
+                        "value": "Battery"
                       },
                       {
                         "id": "color",
@@ -4579,7 +4255,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Netz"
+                        "value": "Grid"
                       },
                       {
                         "id": "color",
@@ -4600,8 +4276,8 @@
         "kind": "Panel",
         "spec": {
           "id": 41,
-          "title": "Ladestationen gesamt",
-          "description": "Jährliche Ladeenergie über sichtbare Lade-Loadpoints ohne den Wärmepumpen-Loadpoint.",
+          "title": "Charging stations total",
+          "description": "Yearly charging energy across visible charging loadpoints, excluding the heat pump loadpoint.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4742,8 +4418,8 @@
         "kind": "Panel",
         "spec": {
           "id": 42,
-          "title": "Versorgungsmix Ladestationen",
-          "description": "Geschätzter Anteil von PV, Batterieentladung und Netzversorgung für sichtbare Lade-Loadpoints ohne Wärmepumpe.",
+          "title": "Charging stations source mix",
+          "description": "Estimated share of PV, battery discharge and grid supply for visible charging loadpoints, excluding the heat pump.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4960,50 +4636,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Speicher"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Speicher"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Netz"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Netz"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Battery"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Speicher"
+                        "value": "Battery"
                       },
                       {
                         "id": "color",
@@ -5022,7 +4660,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Netz"
+                        "value": "Grid"
                       },
                       {
                         "id": "color",
@@ -5049,10 +4687,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Monat",
+        "title": "Month",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5061,10 +4699,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Vormonat",
+        "title": "Previous month",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -5073,10 +4711,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Vor 2 Monaten",
+        "title": "2 months ago",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -5141,7 +4779,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Monat Tabs",
+    "title": "VM: EVCC: Month",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -5156,7 +4794,7 @@
           "label": "Build",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build-Information wird beim Deployment gesetzt."
+          "description": "Build information is set during deployment."
         }
       },
       {
@@ -5182,7 +4820,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Wärmepumpen-Loadpoint-Muster",
+          "label": "Heat pump loadpoint match",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -5244,7 +4882,7 @@
           "label": "EVCC URL",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL, unter der EVCC geöffnet wird."
+          "description": "URL used to open EVCC."
         }
       },
       {
@@ -5257,10 +4895,10 @@
             "text": "Solarman",
             "selected": false
           },
-          "label": "Name, Wechselrichterportal",
+          "label": "Inverter portal name",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Name des Wechselrichterportals für den Portal-Link."
+          "description": "Name of the inverter portal for the portal link."
         }
       },
       {
@@ -5273,10 +4911,10 @@
             "text": "https://globalhome.solarmanpv.com/plant/infos/data",
             "selected": false
           },
-          "label": "URL, Wechselrichterportal",
+          "label": "Inverter portal URL",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL, unter der das Wechselrichterportal geöffnet wird."
+          "description": "URL used to open the inverter portal."
         }
       }
     ],
@@ -5365,7 +5003,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Haus",
+              "title": "Home",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5430,7 +5068,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Verbraucher",
+              "title": "Consumers",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5534,7 +5172,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Speicher",
+              "title": "Battery",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

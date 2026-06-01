@@ -2,7 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "vm-month-tab-en-orig",
+    "name": "vm-month-en-orig",
     "annotations": {
       "grafana.app/folder": "evcc"
     }
@@ -39,7 +39,7 @@
         "kind": "Panel",
         "spec": {
           "id": 19,
-          "title": "Monthly energy totals",
+          "title": "मासिक ऊर्जा कुल",
           "description": "",
           "links": [],
           "data": {
@@ -57,7 +57,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Home",
+                        "legendFormat": "घर",
                         "range": true,
                         "interval": "1d"
                       },
@@ -80,7 +80,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "PV",
+                        "legendFormat": "पीवी",
                         "range": true,
                         "interval": "1d"
                       },
@@ -103,7 +103,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Grid import",
+                        "legendFormat": "ग्रिड आयात",
                         "range": true,
                         "interval": "1d"
                       },
@@ -126,7 +126,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Feed-in",
+                        "legendFormat": "ग्रिड में आपूर्ति",
                         "range": true,
                         "interval": "1d"
                       },
@@ -334,7 +334,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "पीवी"
                       }
                     ]
                   },
@@ -346,7 +346,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Grid import"
+                        "value": "ग्रिड आयात"
                       }
                     ]
                   },
@@ -358,7 +358,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Home"
+                        "value": "घर"
                       }
                     ]
                   },
@@ -370,7 +370,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Feed-in"
+                        "value": "ग्रिड में आपूर्ति"
                       }
                     ]
                   },
@@ -389,7 +389,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
@@ -404,7 +404,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Grid import"
+                      "options": "ग्रिड आयात"
                     },
                     "properties": [
                       {
@@ -419,7 +419,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Home"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -479,6 +479,66 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "ग्रिड में आपूर्ति"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Grid import"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E24D42"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Home"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#5794F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Feed-in"
                     },
                     "properties": [
@@ -501,7 +561,7 @@
         "kind": "Panel",
         "spec": {
           "id": 25,
-          "title": "Energy",
+          "title": "ऊर्जा",
           "description": "",
           "links": [],
           "data": {
@@ -519,7 +579,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Home",
+                        "legendFormat": "घर",
                         "range": true,
                         "interval": "1d"
                       },
@@ -542,7 +602,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "PV",
+                        "legendFormat": "पीवी",
                         "range": true,
                         "interval": "1d"
                       },
@@ -565,7 +625,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Grid import",
+                        "legendFormat": "ग्रिड आयात",
                         "range": true,
                         "interval": "1d"
                       },
@@ -588,7 +648,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / -1000",
                         "format": "time_series",
-                        "legendFormat": "Feed-in",
+                        "legendFormat": "ग्रिड में आपूर्ति",
                         "range": true,
                         "interval": "1d"
                       },
@@ -716,7 +776,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "PV"
+                      "options": "पीवी"
                     },
                     "properties": [
                       {
@@ -731,7 +791,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Grid import"
+                      "options": "ग्रिड आयात"
                     },
                     "properties": [
                       {
@@ -746,7 +806,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Home"
+                      "options": "घर"
                     },
                     "properties": [
                       {
@@ -806,6 +866,66 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "ग्रिड में आपूर्ति"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Grid import"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E24D42"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Home"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#5794F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Feed-in"
                     },
                     "properties": [
@@ -828,7 +948,7 @@
         "kind": "Panel",
         "spec": {
           "id": 22,
-          "title": "Specific yield",
+          "title": "विशिष्ट उपज",
           "description": "",
           "links": [],
           "data": {
@@ -846,7 +966,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "PV",
+                        "legendFormat": "पीवी",
                         "range": false
                       },
                       "datasource": {
@@ -935,7 +1055,7 @@
         "kind": "Panel",
         "spec": {
           "id": 24,
-          "title": "Metric gauges",
+          "title": "मेट्रिक गेज",
           "description": "",
           "links": [],
           "data": {
@@ -1262,6 +1382,62 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "आत्मनिर्भरता"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": null
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "आत्मनिर्भरता"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "स्व-उपभोग"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "purple",
+                              "value": null
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "स्व-उपभोग"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Autarky"
                     },
                     "properties": [
@@ -1283,7 +1459,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Autarky"
+                        "value": "आत्मनिर्भरता"
                       }
                     ]
                   },
@@ -1311,7 +1487,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Self-consumption"
+                        "value": "स्व-उपभोग"
                       }
                     ]
                   }
@@ -1325,7 +1501,7 @@
         "kind": "Panel",
         "spec": {
           "id": 6,
-          "title": "Metrics",
+          "title": "मेट्रिक्स",
           "description": "",
           "links": [],
           "data": {
@@ -1343,7 +1519,7 @@
                         "editorMode": "code",
                         "expr": "1 - ((sum((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000)) / ((sum((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000) + ((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000))",
                         "format": "time_series",
-                        "legendFormat": "Autarkie",
+                        "legendFormat": "आत्मनिर्भरता",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1434,7 +1610,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Autarkie"
+                      "options": "आत्मनिर्भरता"
                     },
                     "properties": [
                       {
@@ -1446,7 +1622,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Self-sufficiency"
+                        "value": "आत्मनिर्भरता"
                       }
                     ]
                   },
@@ -1461,6 +1637,25 @@
                         "value": "time:MM/DD"
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Autarkie"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "आत्मनिर्भरता"
+                      }
+                    ]
                   }
                 ]
               }
@@ -1472,7 +1667,7 @@
         "kind": "Panel",
         "spec": {
           "id": 32,
-          "title": "Home: Energy distribution",
+          "title": "घर: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -1490,7 +1685,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Ext total",
+                        "legendFormat": "EXT कुल",
                         "range": false
                       },
                       "datasource": {
@@ -1512,7 +1707,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Aux total",
+                        "legendFormat": "AUX कुल",
                         "range": false
                       },
                       "datasource": {
@@ -1534,7 +1729,7 @@
                         "editorMode": "code",
                         "expr": "sum(sum_over_time(((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
                         "format": "table",
-                        "legendFormat": "Home total",
+                        "legendFormat": "घर कुल",
                         "range": false
                       },
                       "datasource": {
@@ -1651,6 +1846,21 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "अन्य"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Other"
                     },
                     "properties": [
@@ -1673,7 +1883,7 @@
         "kind": "Panel",
         "spec": {
           "id": 31,
-          "title": "Home: Energy consumption",
+          "title": "घर: ऊर्जा खपत",
           "description": "",
           "links": [],
           "data": {
@@ -1691,7 +1901,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Home total",
+                        "legendFormat": "घर कुल",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1714,7 +1924,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_ext_energy_daily_wh{title!=\"\",title!~\"$extBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Ext total",
+                        "legendFormat": "EXT कुल",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1737,7 +1947,7 @@
                         "editorMode": "code",
                         "expr": "sum((last_over_time(evcc_aux_energy_daily_wh{title!=\"\",title!~\"$auxBlocklist\",local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Aux total",
+                        "legendFormat": "AUX कुल",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1760,7 +1970,7 @@
                         "expression": "$homeTotalDaily - $extTotalDaily",
                         "type": "math",
                         "settings": {
-                          "displayName": "Other"
+                          "displayName": "अन्य"
                         }
                       },
                       "datasource": {
@@ -1913,7 +2123,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Other"
+                        "value": "अन्य"
                       },
                       {
                         "id": "color",
@@ -1934,7 +2144,7 @@
         "kind": "Panel",
         "spec": {
           "id": 36,
-          "title": "Total: Energy distribution",
+          "title": "कुल: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -1952,7 +2162,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Home",
+                        "legendFormat": "घर",
                         "range": true,
                         "interval": "1d"
                       },
@@ -1998,7 +2208,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Battery charge",
+                        "legendFormat": "बैटरी चार्ज",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2021,7 +2231,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Battery discharge",
+                        "legendFormat": "बैटरी डिस्चार्ज",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2110,7 +2320,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Home"
+                        "value": "घर"
                       }
                     ]
                   },
@@ -2139,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "Total: Energy distribution",
+          "title": "कुल: ऊर्जा वितरण",
           "description": "",
           "links": [],
           "data": {
@@ -2260,14 +2470,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Home"
+                        "value": "घर"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Battery charge"
+                      "options": "बैटरी चार्ज"
                     },
                     "properties": [
                       {
@@ -2279,14 +2489,14 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Battery charge"
+                        "value": "बैटरी चार्ज"
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Battery discharge"
+                      "options": "बैटरी डिस्चार्ज"
                     },
                     "properties": [
                       {
@@ -2298,7 +2508,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Battery discharge"
+                        "value": "बैटरी डिस्चार्ज"
                       },
                       {
                         "id": "custom.stacking",
@@ -2320,6 +2530,51 @@
                         "value": "time:MM/DD"
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Battery charge"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी चार्ज"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Battery discharge"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी डिस्चार्ज"
+                      },
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "batteryNegative",
+                          "mode": "normal"
+                        }
+                      }
+                    ]
                   }
                 ]
               }
@@ -2331,7 +2586,7 @@
         "kind": "Panel",
         "spec": {
           "id": 30,
-          "title": "Power balance",
+          "title": "शक्ति संतुलन",
           "description": "",
           "links": [],
           "data": {
@@ -2349,7 +2604,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "avg price daily",
+                        "legendFormat": "औसत दैनिक मूल्य",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2418,7 +2673,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Purchased energy daily",
+                        "legendFormat": "दैनिक खरीदी गई ऊर्जा",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2464,7 +2719,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Purchased daily",
+                        "legendFormat": "दैनिक खरीदा गया",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2586,7 +2841,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Sold daily raw",
+                        "legendFormat": "दैनिक बेचा गया कच्चा",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2742,7 +2997,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Grid price: arithmetic mean"
+                        "value": "ग्रिड कीमत: अंकगणितीय औसत"
                       },
                       {
                         "id": "unit",
@@ -2765,7 +3020,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Effective price, dyn."
+                        "value": "प्रभावी मूल्य, गतिशील"
                       },
                       {
                         "id": "unit",
@@ -2788,7 +3043,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Saved vs arith."
+                        "value": "अंकगणितीय की तुलना में बचत"
                       },
                       {
                         "id": "unit",
@@ -2811,7 +3066,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Potential at arith."
+                        "value": "अंकगणितीय पर संभावित"
                       },
                       {
                         "id": "unit",
@@ -2834,7 +3089,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Purchased, dynamic"
+                        "value": "खरीदा गया, गतिशील"
                       },
                       {
                         "id": "unit",
@@ -2857,7 +3112,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Savings dyn."
+                        "value": "गतिशील बचत"
                       },
                       {
                         "id": "unit",
@@ -2880,7 +3135,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Sold (feed-in)"
+                        "value": "बेचा गया (आपूर्ति)"
                       },
                       {
                         "id": "unit",
@@ -2903,7 +3158,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Balance"
+                        "value": "संतुलन"
                       },
                       {
                         "id": "unit",
@@ -2928,7 +3183,7 @@
         "kind": "Panel",
         "spec": {
           "id": 26,
-          "title": "Dynamic electricity price (ct/kWh)",
+          "title": "गतिशील बिजली कीमत (ct/kWh)",
           "description": "",
           "links": [],
           "data": {
@@ -2969,7 +3224,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_avg_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Average",
+                        "legendFormat": "औसत",
                         "range": true,
                         "interval": "1d"
                       },
@@ -2992,7 +3247,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_price_effective_daily_ct_per_kwh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Effective electricity price",
+                        "legendFormat": "प्रभावी बिजली कीमत",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3118,6 +3373,51 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "औसत"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "text",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "प्रभावी बिजली कीमत"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Min"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "Average"
                     },
                     "properties": [
@@ -3144,21 +3444,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Min"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -3170,7 +3455,7 @@
         "kind": "Panel",
         "spec": {
           "id": 28,
-          "title": "Electricity costs",
+          "title": "बिजली लागत",
           "description": "",
           "links": [],
           "data": {
@@ -3188,7 +3473,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))",
                         "format": "time_series",
-                        "legendFormat": "Purchased",
+                        "legendFormat": "खरीदा गया",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3281,12 +3566,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Purchased"
+                      "options": "खरीदा गया"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Purchased"
+                        "value": "खरीदा गया"
                       }
                     ]
                   },
@@ -3301,6 +3586,18 @@
                         "value": "time:MM/DD"
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Purchased"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "खरीदा गया"
+                      }
+                    ]
                   }
                 ]
               }
@@ -3312,7 +3609,7 @@
         "kind": "Panel",
         "spec": {
           "id": 16,
-          "title": "Battery summary",
+          "title": "बैटरी सारांश",
           "description": "",
           "links": [],
           "data": {
@@ -3330,7 +3627,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_charge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Battery charge daily",
+                        "legendFormat": "दैनिक बैटरी चार्ज",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3353,7 +3650,7 @@
                         "editorMode": "code",
                         "expr": "(last_over_time(evcc_battery_discharge_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 1000",
                         "format": "time_series",
-                        "legendFormat": "Battery discharge daily",
+                        "legendFormat": "दैनिक बैटरी डिस्चार्ज",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3441,7 +3738,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Max SOC series",
+                        "legendFormat": "अधिकतम SOC श्रृंखला",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3464,7 +3761,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "Min SOC series",
+                        "legendFormat": "न्यूनतम SOC श्रृंखला",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3580,7 +3877,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Battery charge"
+                        "value": "बैटरी चार्ज"
                       },
                       {
                         "id": "unit",
@@ -3600,7 +3897,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Battery discharge"
+                        "value": "बैटरी डिस्चार्ज"
                       },
                       {
                         "id": "unit",
@@ -3620,7 +3917,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Battery efficiency"
+                        "value": "बैटरी दक्षता"
                       },
                       {
                         "id": "unit",
@@ -3640,7 +3937,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Avg Max SOC"
+                        "value": "औसत अधिकतम SOC"
                       },
                       {
                         "id": "unit",
@@ -3660,7 +3957,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Avg Min SOC"
+                        "value": "औसत न्यूनतम SOC"
                       },
                       {
                         "id": "unit",
@@ -3682,7 +3979,7 @@
         "kind": "Panel",
         "spec": {
           "id": 11,
-          "title": "Home battery levels",
+          "title": "होम बैटरी स्तर",
           "description": "",
           "links": [],
           "data": {
@@ -3700,7 +3997,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_max_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC max",
+                        "legendFormat": "SOC अधिकतम",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3723,7 +4020,7 @@
                         "editorMode": "code",
                         "expr": "(((last_over_time(evcc_battery_soc_daily_min_pct{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) / 100) > 0)",
                         "format": "time_series",
-                        "legendFormat": "SOC min",
+                        "legendFormat": "SOC न्यूनतम",
                         "range": true,
                         "interval": "1d"
                       },
@@ -3814,6 +4111,56 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "SOC अधिकतम"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी अधिकतम"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "SOC न्यूनतम"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#686868",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी न्यूनतम"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Time"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "time:MM/DD"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "SOC max"
                     },
                     "properties": [
@@ -3826,7 +4173,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Battery max"
+                        "value": "बैटरी अधिकतम"
                       }
                     ]
                   },
@@ -3845,19 +4192,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Battery min"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Time"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "time:MM/DD"
+                        "value": "बैटरी न्यूनतम"
                       }
                     ]
                   }
@@ -3871,8 +4206,8 @@
         "kind": "Panel",
         "spec": {
           "id": 39,
-          "title": "Heat pump total",
-          "description": "Yearly heat pump energy across matching loadpoints.",
+          "title": "हीट पंप कुल",
+          "description": "मेल खाते लोडपॉइंट्स पर वार्षिक हीट पंप ऊर्जा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4013,8 +4348,8 @@
         "kind": "Panel",
         "spec": {
           "id": 40,
-          "title": "Heat pump source mix",
-          "description": "Estimated share of PV, battery discharge and grid supply for the heat pump loadpoint.",
+          "title": "हीट पंप स्रोत मिश्रण",
+          "description": "हीट पंप लोडपॉइंट के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4212,12 +4547,69 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "पीवी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "पीवी"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "बैटरी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#447EBC"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ग्रिड"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "ग्रिड"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E24D42"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "PV"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -4236,7 +4628,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Battery"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -4255,7 +4647,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Grid"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -4276,8 +4668,8 @@
         "kind": "Panel",
         "spec": {
           "id": 41,
-          "title": "Charging stations total",
-          "description": "Yearly charging energy across visible charging loadpoints, excluding the heat pump loadpoint.",
+          "title": "चार्जिंग स्टेशनों का कुल",
+          "description": "हीट पंप लोडपॉइंट को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स की वार्षिक चार्जिंग ऊर्जा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4418,8 +4810,8 @@
         "kind": "Panel",
         "spec": {
           "id": 42,
-          "title": "Charging stations source mix",
-          "description": "Estimated share of PV, battery discharge and grid supply for visible charging loadpoints, excluding the heat pump.",
+          "title": "चार्जिंग स्टेशनों का स्रोत मिश्रण",
+          "description": "हीट पंप को छोड़कर दिखाई देने वाले चार्जिंग लोडपॉइंट्स के लिए पीवी, बैटरी डिस्चार्ज और ग्रिड आपूर्ति का अनुमानित हिस्सा।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -4617,12 +5009,69 @@
                   {
                     "matcher": {
                       "id": "byName",
+                      "options": "पीवी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "पीवी"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73BF69"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "बैटरी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#447EBC"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ग्रिड"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "ग्रिड"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E24D42"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
                       "options": "PV"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "PV"
+                        "value": "पीवी"
                       },
                       {
                         "id": "color",
@@ -4641,7 +5090,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Battery"
+                        "value": "बैटरी"
                       },
                       {
                         "id": "color",
@@ -4660,7 +5109,7 @@
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Grid"
+                        "value": "ग्रिड"
                       },
                       {
                         "id": "color",
@@ -4687,10 +5136,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Month",
+        "title": "माह",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now%2FM&to=now%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -4699,10 +5148,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "Previous month",
+        "title": "पिछला माह",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-1M%2FM&to=now-1M%2FM&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -4711,10 +5160,10 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": false,
-        "title": "2 months ago",
+        "title": "2 महीने पहले",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-month-tab-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
+        "url": "/d/vm-month-en-orig?orgId=1&from=now-2M%2FM&to=now-2M%2FM&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -4725,7 +5174,7 @@
           "EVCC"
         ],
         "targetBlank": false,
-        "title": "Dashboards",
+        "title": "डैशबोर्ड",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -4737,7 +5186,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "EVCC",
+        "title": "ईवीसीसी",
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
@@ -4749,7 +5198,7 @@
         "keepTime": false,
         "tags": [],
         "targetBlank": true,
-        "title": "$inverterPortalTitle",
+        "title": "$इन्वर्टरपोर्टलटाइटल",
         "tooltip": "",
         "type": "link",
         "url": "$inverterPortalUrl"
@@ -4779,7 +5228,7 @@
       "hideTimepicker": false,
       "fiscalYearStartMonth": 0
     },
-    "title": "VM: EVCC: Month Tabs",
+    "title": "VM: EVCC: महीना",
     "variables": [
       {
         "kind": "ConstantVariable",
@@ -4791,10 +5240,10 @@
             "value": "info",
             "selected": false
           },
-          "label": "Build",
+          "label": "बिल्ड",
           "hide": "dontHide",
           "skipUrlSync": true,
-          "description": "Build information is set during deployment."
+          "description": "बिल्ड जानकारी डिप्लॉयमेंट के दौरान सेट की जाती है।"
         }
       },
       {
@@ -4806,7 +5255,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "Loadpoint Blocklist",
+          "label": "लोडपॉइंट ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -4820,7 +5269,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Heat pump loadpoint match",
+          "label": "हीट पंप लोडपॉइंट मिलान",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -4835,7 +5284,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "EXT Blocklist",
+          "label": "EXT ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -4849,7 +5298,7 @@
             "text": "^none$",
             "value": "^none$"
           },
-          "label": "AUX Blocklist",
+          "label": "AUX ब्लॉकलिस्ट",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
@@ -4879,10 +5328,10 @@
             "text": "http://home:7070/#/",
             "selected": false
           },
-          "label": "EVCC URL",
+          "label": "ईवीसीसी यूआरएल",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL used to open EVCC."
+          "description": "EVCC खोलने के लिए प्रयुक्त URL।"
         }
       },
       {
@@ -4895,10 +5344,10 @@
             "text": "Solarman",
             "selected": false
           },
-          "label": "Inverter portal name",
+          "label": "इन्वर्टर पोर्टल नाम",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Name of the inverter portal for the portal link."
+          "description": "पोर्टल लिंक के लिए इन्वर्टर पोर्टल का नाम।"
         }
       },
       {
@@ -4911,10 +5360,10 @@
             "text": "https://globalhome.solarmanpv.com/plant/infos/data",
             "selected": false
           },
-          "label": "Inverter portal URL",
+          "label": "इन्वर्टर पोर्टल URL",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "URL used to open the inverter portal."
+          "description": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।"
         }
       }
     ],
@@ -4925,7 +5374,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "PV",
+              "title": "PV - पीवी",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5003,7 +5452,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Home",
+              "title": "Home - घर",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5068,7 +5517,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consumers",
+              "title": "Consumers - उपभोक्ता",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -5172,7 +5621,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Battery",
+              "title": "Battery - बैटरी",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

@@ -38,7 +38,7 @@ Die Release-Validierung pruefte den Live-Ingest-Pfad, importierte eine echte meh
 
 Die deployten Dashboards verwenden immer das Grafana-13-Tab-Navigation-Layout und erfordern Grafana 13.0.1 oder neuer. Der Legacy-row-basierte Deploy-Pfad und die Dashboard-Set-Auswahl wurden aus Deploy-Manifest und Skripten entfernt.
 
-Die Release-Screenshots dokumentieren das generierte deutsche TAB-Set direkt unter [screenshots](./screenshots/README.md), inklusive aktiver Grafana-Tableiste bei Dashboards mit Tabs.
+Die Release-Screenshots dokumentieren das generierte deutsche Dashboard-Set mit Tab-Navigation direkt unter [screenshots](./screenshots/README.md), inklusive aktiver Grafana-Tableiste bei Dashboards mit Tabs.
 
 ## Deployer-Varianten
 
@@ -93,6 +93,6 @@ Die Release-Validierung deckte ab:
 - vollstaendigen Rollup-Dry-run und Schreib-Backfill
 - taeglichen Rollup-Refresh-Pfad
 - Windows- und Linux-Dashboard-Deployer
-- deutsche TAB-Dashboard-Screenshots fuer jeden aktiven Tab
+- deutsche Screenshots der Dashboards mit Tab-Navigation fuer jeden aktiven Tab
 - Grafana-Lokalisierungs-Spot-Checks fuer `de`, `fr` und `zh`
 - lokale statische/unit/dashboard Checks via `npm test`
