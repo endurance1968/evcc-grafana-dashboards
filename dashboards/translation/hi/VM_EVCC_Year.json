@@ -4419,7 +4419,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "white"
+                          "fixedColor": "#5794F2"
                         }
                       }
                     ]
