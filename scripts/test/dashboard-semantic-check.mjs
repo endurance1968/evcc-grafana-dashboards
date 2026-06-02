@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.9
+ * Version: 2026.06.02.10
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -508,6 +508,12 @@ function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
   }
 }
 
+function validateGrafana13GaugeOptions(fileName, panel, failures) {
+  assert(panel.options?.sparkline === true, failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use Grafana 13 sparkline gauges`);
+  assert(panel.options?.shape === "gauge", failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use arc gauge shape`);
+  assert(!Object.hasOwn(panel.options || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy graphMode option`);
+  assert(!Object.hasOwn(panel.fieldConfig?.defaults?.custom || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy custom.graphMode option`);
+}
 function validateDashboard(fileName, dashboard) {
   const failures = [];
   const rawJson = JSON.stringify(dashboard);
@@ -532,6 +538,14 @@ function validateDashboard(fileName, dashboard) {
 
   validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
   validateTodayPaletteFallbacks(fileName, dashboard, failures);
+
+  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json"].includes(fileName)) {
+    const metricGaugePanel = panels.find((panel) => panel.title === "Metric gauges" && panel.type === "gauge");
+    assert(Boolean(metricGaugePanel), failures, `${fileName}: missing Metric gauges panel`);
+    if (metricGaugePanel) {
+      validateGrafana13GaugeOptions(fileName, metricGaugePanel, failures);
+    }
+  }
 
   if (fileName === "VM_EVCC_Today-Details.json") {
     const topLevelTabs = dashboard.spec?.layout?.spec?.tabs?.map((tab) => tab.spec?.title) || [];
@@ -581,10 +595,7 @@ function validateDashboard(fileName, dashboard) {
     assert(forecastProperties.get("custom.fillOpacity") === 0, failures, `${fileName}: PV forecast must not use area fill`);
 
     for (const panel of panels.filter((item) => item.type === "gauge")) {
-      assert(panel.options?.sparkline === true, failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use Grafana 13 sparkline gauges`);
-      assert(panel.options?.shape === "gauge", failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use arc gauge shape`);
-      assert(!Object.hasOwn(panel.options || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy graphMode option`);
-      assert(!Object.hasOwn(panel.fieldConfig?.defaults?.custom || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy custom.graphMode option`);
+      validateGrafana13GaugeOptions(fileName, panel, failures);
     }
 
     const powerPanel = dashboard.panels?.find((panel) => panel.id === 74);

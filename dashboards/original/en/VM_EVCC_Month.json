@@ -1236,6 +1236,19 @@
                 "sizing": "auto",
                 "text": {
                   "titleSize": 12
+                },
+                "shape": "gauge",
+                "sparkline": true,
+                "barWidthFactor": 0.54,
+                "segmentCount": 1,
+                "segmentSpacing": 0.3,
+                "barShape": "flat",
+                "endpointMarker": "point",
+                "textMode": "auto",
+                "effects": {
+                  "barGlow": false,
+                  "centerGlow": false,
+                  "gradient": false
                 }
               },
               "fieldConfig": {
