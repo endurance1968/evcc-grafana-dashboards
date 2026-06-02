@@ -5334,7 +5334,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consumption",
+              "title": "Home",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

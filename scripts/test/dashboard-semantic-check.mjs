@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.4
+ * Version: 2026.06.02.8
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -534,6 +534,11 @@ function validateDashboard(fileName, dashboard) {
   validateTodayPaletteFallbacks(fileName, dashboard, failures);
 
   if (fileName === "VM_EVCC_Today-Details.json") {
+    const topLevelTabs = dashboard.spec?.layout?.spec?.tabs?.map((tab) => tab.spec?.title) || [];
+    assert(topLevelTabs.includes("Home"), failures, `${fileName}: Today Details must use Home as the house tab title`);
+    assert(!topLevelTabs.includes("Consumption"), failures, `${fileName}: Today Details must not use the old Consumption tab title`);
+
+
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];
     assert(loadpointTab?.spec?.layout?.kind === "RowsLayout", failures, `${fileName}: loadpoint tab must use RowsLayout so panels repeat as a group`);
@@ -574,6 +579,30 @@ function validateDashboard(fileName, dashboard) {
     assert(forecastProperties.get("color")?.mode === "fixed" && forecastProperties.get("color")?.fixedColor === "#2F8F5B", failures, `${fileName}: PV forecast must be fixed dark green`);
     assert(forecastProperties.get("custom.lineStyle")?.fill === "dash", failures, `${fileName}: PV forecast must be dashed`);
     assert(forecastProperties.get("custom.fillOpacity") === 0, failures, `${fileName}: PV forecast must not use area fill`);
+
+    const powerPanel = dashboard.panels?.find((panel) => panel.id === 74);
+    const expectedDetailTabs = new Map([
+      ["PV", "tab=pv"],
+      ["Grid", "tab=grid"],
+      ["Home", "tab=home"],
+      ["Battery", "tab=pv"],
+    ]);
+    for (const [seriesName, tabParam] of expectedDetailTabs) {
+      const links = propertyValue(powerPanel, seriesName, "links") || [];
+      assert(links.some((link) => String(link.url || "").includes(tabParam) && link.targetBlank === true), failures, `${fileName}: Power gauge ${seriesName} must open Today Details with ${tabParam} in a new tab`);
+    }
+  }
+
+  if (fileName === "VM_EVCC_Today-Gauges.json") {
+    const byId = new Map((dashboard.panels || []).map((panel) => [panel.id, panel]));
+    const bottom = (panel) => (panel?.gridPos?.y || 0) + (panel?.gridPos?.h || 0);
+    assert(byId.get(74)?.gridPos?.h === 27, failures, `${fileName}: Power gauge column must align to bottom row height 27`);
+    assert(byId.get(2)?.gridPos?.h === 24, failures, `${fileName}: Power history panel must leave room for bottom distribution strip`);
+    assert(byId.get(76)?.gridPos?.h === 4, failures, `${fileName}: Metric history panel must be four grid rows high`);
+    assert(byId.get(77)?.gridPos?.y === 16, failures, `${fileName}: Energy panel must start below enlarged Metric history panel`);
+    assert(byId.get(75)?.gridPos?.y === 24, failures, `${fileName}: Power distribution panel must align with right column lower section`);
+    assert(byId.get(73)?.gridPos?.y === 25, failures, `${fileName}: Costs panel must align below Energy panel`);
+    assert(bottom(byId.get(74)) === 27 && bottom(byId.get(75)) === 27 && bottom(byId.get(73)) === 27, failures, `${fileName}: left, middle, and right columns must share the same bottom edge`);
   }
 
   for (const expected of expectedLinks[fileName] || []) {

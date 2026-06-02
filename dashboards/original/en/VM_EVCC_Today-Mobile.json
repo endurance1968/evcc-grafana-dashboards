@@ -255,7 +255,7 @@
                   {
                     "targetBlank": true,
                     "title": "More details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
                   }
                 ]
               },
@@ -327,8 +327,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "More details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=grid"
                   }
                 ]
               }
@@ -367,6 +368,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "More details",
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                  }
+                ]
               }
             ]
           },
@@ -404,8 +415,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "More details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=home"
                   }
                 ]
               }

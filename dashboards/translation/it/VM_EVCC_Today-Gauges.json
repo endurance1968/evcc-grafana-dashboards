@@ -239,7 +239,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
                   }
                 ]
               },
@@ -311,8 +311,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
                   }
                 ]
               }
@@ -351,6 +352,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Più dettagli",
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                  }
+                ]
               }
             ]
           },
@@ -388,8 +399,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
                   }
                 ]
               }
@@ -507,8 +519,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
                   }
                 ]
               }
@@ -547,6 +560,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Più dettagli",
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                  }
+                ]
               }
             ]
           },
@@ -584,8 +607,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
                   }
                 ]
               }
@@ -594,7 +618,7 @@
         ]
       },
       "gridPos": {
-        "h": 24,
+        "h": 27,
         "w": 3,
         "x": 0,
         "y": 0
@@ -617,7 +641,8 @@
         "text": {
           "titleSize": 12,
           "valueSize": 16
-        }
+        },
+        "graphMode": "area"
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -1100,7 +1125,7 @@
       "type": "timeseries",
       "id": 2,
       "gridPos": {
-        "h": 21,
+        "h": 24,
         "w": 16,
         "x": 3,
         "y": 0
@@ -2006,7 +2031,7 @@
       "type": "timeseries",
       "id": 76,
       "gridPos": {
-        "h": 2,
+        "h": 4,
         "w": 5,
         "x": 19,
         "y": 12
@@ -2482,7 +2507,7 @@
         "h": 9,
         "w": 5,
         "x": 19,
-        "y": 14
+        "y": 16
       }
     },
     {
@@ -2885,7 +2910,7 @@
         "h": 3,
         "w": 16,
         "x": 3,
-        "y": 21
+        "y": 24
       },
       "title": "Power distribution"
     },
@@ -3087,7 +3112,7 @@
         "h": 2,
         "w": 5,
         "x": 19,
-        "y": 23
+        "y": 25
       },
       "title": "Costi"
     }

@@ -238,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "Mehr Details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
                   }
                 ]
               },
@@ -310,8 +310,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Mehr Details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=netz"
                   }
                 ]
               }
@@ -350,6 +351,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Mehr Details",
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                  }
+                ]
               }
             ]
           },
@@ -387,8 +398,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Mehr Details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=haus"
                   }
                 ]
               }
@@ -506,8 +518,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Mehr Details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=netz"
                   }
                 ]
               }
@@ -546,6 +559,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Mehr Details",
+                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                  }
+                ]
               }
             ]
           },
@@ -583,8 +606,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Mehr Details",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=haus"
                   }
                 ]
               }

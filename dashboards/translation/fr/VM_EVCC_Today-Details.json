@@ -5713,7 +5713,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consommation",
+              "title": "Maison",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {

@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.06.01.2
- * Last modified: 2026-06-01
+ * Version: 2026.06.02.1
+ * Last modified: 2026-06-02
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -148,6 +148,46 @@ function stabilizeTabTitle(sourceTitle, localizedTitle, seenSlugs) {
   return fallback;
 }
 
+function topLevelTabSlugMap(sourceDashboard, localizedDashboard) {
+  const sourceTabs = sourceDashboard?.spec?.layout?.spec?.tabs || [];
+  const localizedTabs = localizedDashboard?.spec?.layout?.spec?.tabs || [];
+  const out = new Map();
+  for (let i = 0; i < Math.min(sourceTabs.length, localizedTabs.length); i += 1) {
+    const sourceSlug = grafanaTabSlug(sourceTabs[i]?.spec?.title);
+    const localizedSlug = grafanaTabSlug(localizedTabs[i]?.spec?.title);
+    if (sourceSlug && localizedSlug) {
+      out.set(sourceSlug, localizedSlug);
+    }
+  }
+  return out;
+}
+
+function localizeTabUrlParams(node, tabSlugMap) {
+  if (!tabSlugMap || tabSlugMap.size === 0) {
+    return;
+  }
+
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      localizeTabUrlParams(item, tabSlugMap);
+    }
+    return;
+  }
+
+  if (!node || typeof node !== "object") {
+    return;
+  }
+
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "url" && typeof value === "string" && value.includes("tab=")) {
+      node[key] = value.replace(/([?&]tab=)([a-z0-9-]+)/g, (match, prefix, slug) => {
+        return `${prefix}${tabSlugMap.get(slug) || slug}`;
+      });
+      continue;
+    }
+    localizeTabUrlParams(value, tabSlugMap);
+  }
+}
 function stabilizeLocalizedTabTitles(sourceNode, localizedNode) {
   if (Array.isArray(sourceNode) && Array.isArray(localizedNode)) {
     for (let i = 0; i < Math.min(sourceNode.length, localizedNode.length); i += 1) {
@@ -207,6 +247,16 @@ function main() {
 
     mappingCache.set(targetLanguage, mapping);
 
+    const detailsSourceFile = files.find((sourceFile) => path.basename(sourceFile) === "VM_EVCC_Today-Details.json");
+    const sourceDetailsJson = detailsSourceFile ? readJson(detailsSourceFile) : null;
+    const localizedDetailsJson = sourceDetailsJson
+      ? (targetLanguage === sourceLanguage ? sourceDetailsJson : translateJsonNode(sourceDetailsJson, mapping))
+      : null;
+    if (sourceDetailsJson && localizedDetailsJson && targetLanguage !== sourceLanguage) {
+      stabilizeLocalizedTabTitles(sourceDetailsJson, localizedDetailsJson);
+    }
+    const tabSlugMap = topLevelTabSlugMap(sourceDetailsJson, localizedDetailsJson);
+
     let count = 0;
     for (const sourceFile of files) {
       const relative = portableRelative(sourceDir, sourceFile);
@@ -222,6 +272,7 @@ function main() {
       if (targetLanguage !== sourceLanguage) {
         stabilizeLocalizedTabTitles(sourceJson, localizedJson);
       }
+      localizeTabUrlParams(localizedJson, tabSlugMap);
 
       writeJson(targetFile, localizedJson);
       count += 1;

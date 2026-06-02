@@ -238,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
                   }
                 ]
               },
@@ -310,8 +310,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=red"
                   }
                 ]
               }
@@ -350,6 +351,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Más detalles",
+                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                  }
+                ]
               }
             ]
           },
@@ -387,8 +398,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
                   }
                 ]
               }
@@ -480,7 +492,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
                   }
                 ]
               },
@@ -552,8 +564,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=red"
                   }
                 ]
               }
@@ -592,6 +605,16 @@
                     }
                   ]
                 }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Más detalles",
+                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                  }
+                ]
               }
             ]
           },
@@ -629,8 +652,9 @@
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range"
+                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
                   }
                 ]
               }

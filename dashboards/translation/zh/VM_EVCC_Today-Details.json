@@ -5831,7 +5831,7 @@
           {
             "kind": "TabsLayoutTab",
             "spec": {
-              "title": "Consumption - 消耗",
+              "title": "Home - 家庭",
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
