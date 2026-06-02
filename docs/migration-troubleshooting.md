@@ -175,6 +175,59 @@ python3 vm-rewrite-label-value.py \
 
 Fuer PV-Geraete ist `title` normalerweise der stabilere Fachschluessel. EVCC kann PV-`id`-Werte neu nummerieren, wenn Geraete hinzugefuegt, entfernt oder umsortiert werden.
 
+## Fachlabels, Titles und Blocklists
+
+Wenn Grafana zwar Rohdaten findet, aber einzelne Detailpanels leer, doppelt oder falsch gruppiert wirken, pruefe zuerst die EVCC-Fachlabels. Typische Symptome sind:
+
+- PV-, Batterie-, AUX- oder EXT-Details zeigen nur `Gesamt` oder unerwartete Namen.
+- Hausverbrauch oder Verbraucheranteile wirken zu hoch, weil AUX-/EXT-Meter nicht passend gefiltert werden.
+- Ladepunkte oder Fahrzeuge fehlen, weil `loadpoint` oder `vehicle` nicht als Label vorhanden ist.
+- Eine Waermepumpe erscheint als normaler Ladepunkt oder Fahrzeugverbrauch statt in der erwarteten Gruppe.
+
+Pruefe die Serien direkt in VictoriaMetrics:
+
+```bash
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=extPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=auxPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=chargePower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+```
+
+Wichtig:
+
+- `title` ist fuer PV-, Batterie-, AUX- und EXT-Geraete der wichtigste Anzeigename.
+- `loadpoint` trennt Ladepunkte.
+- `vehicle` trennt Fahrzeuge.
+- Fehlende AUX-/EXT-Serien sind kein Fehler, wenn EVCC keine solchen Meter schreibt.
+- Aendere zuerst EVCC, wenn ein Name falsch ist. Danach kommen neue Messwerte korrekt an; historische Werte koennen bei Bedarf mit `vm-rewrite-label-value.py` nachgezogen werden.
+
+Dashboard-Blocklists filtern nur die Anzeige und loeschen keine Daten. Sie gehoeren in `vm-dashboard-install.env` und werden beim Dashboard-Deployment uebernommen:
+
+```env
+DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
+DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|heat pump).*"
+```
+
+`^none$` ist der sichere Wert fuer "nichts filtern", weil normale EVCC-Namen dadurch nicht matchen. Wenn du Regexes mit `|`, Leerzeichen oder Sonderzeichen nutzt, setze sie in Anfuehrungszeichen. Nach einer Blocklist-Aenderung reicht ein erneutes Dashboard-Deployment; Daten muessen dafuer nicht migriert werden.
+
 ## Leere Grafana-Dashboards
 
 `Today` leer bedeutet meist Rohdaten- oder Datasource-Probleme:

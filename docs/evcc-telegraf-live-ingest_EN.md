@@ -217,6 +217,31 @@ Expected:
 - no `db` label
 - no `host` label when Telegraf is used with `omit_hostname = true`
 
+### Check EVCC Business Labels
+
+Before deploying dashboards, quickly verify that EVCC sends the business labels. These labels later decide how Grafana separates or groups PV, battery, AUX/EXT, loadpoint, and vehicle series:
+
+```bash
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-1h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=chargePower_value' \
+  --data-urlencode 'start=now-1h' \
+  --data-urlencode 'end=now'
+```
+
+Expected result:
+
+- PV, battery, AUX, and EXT series have stable `title` values when the devices are named in EVCC.
+- Loadpoint series have a `loadpoint` label.
+- Vehicle series have a `vehicle` label once EVCC writes vehicle data.
+- Missing AUX/EXT series are OK when you do not use such EVCC meters; the dashboards should still remain usable.
+
+If a name is wrong, fix EVCC first. New samples will then use the new name; old historical labels stay unchanged until you intentionally migrate them.
+
 ### Optional Telegraf Probe Write
 
 Run only against a test or intentionally prepared instance:
@@ -237,6 +262,7 @@ Then search VictoriaMetrics for `evcc_ingest_probe`. This probe is not relevant 
 - Grafana or EVCC uses `localhost` although the service runs in another container or on another host.
 - Firewall or Docker port mapping blocks `8428` or `8086`.
 - EVCC web configuration overrides the expected `evcc.yaml` value.
+- Dashboard details show only totals or wrong groups: EVCC labels such as `title`, `loadpoint`, or `vehicle` are missing, were renamed historically, or do not match the blocklist regexes.
 
 ## Next Step
 

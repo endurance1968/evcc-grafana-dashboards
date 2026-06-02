@@ -158,6 +158,8 @@ DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 
 Quote regex values containing `|`, `(`, `)`, spaces, or non-ASCII characters so the Bash deployer can source the env file safely.
 
+The blocklist and heat-pump values are regexes against existing EVCC labels. They do not rename series and do not delete data; they only control what the dashboards show or filter out of totals. `^none$` is the recommended value when nothing should be filtered. If detail panels look empty or wrongly grouped, first check the EVCC labels in [migration-troubleshooting_EN.md#business-labels-titles-and-blocklists](./migration-troubleshooting_EN.md#business-labels-titles-and-blocklists).
+
 Backward-compatible aliases are still accepted:
 
 - `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL`

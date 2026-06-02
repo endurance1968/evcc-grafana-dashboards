@@ -217,6 +217,31 @@ Erwartet:
 - kein `db`-Label
 - kein `host`-Label, wenn Telegraf mit `omit_hostname = true` genutzt wird
 
+### EVCC-Fachlabels pruefen
+
+Pruefe vor dem Dashboard-Deployment kurz, ob EVCC die fachlichen Labels mitsendet. Diese Labels steuern spaeter, welche PV-, Batterie-, AUX-/EXT-, Ladepunkt- und Fahrzeugserien Grafana trennt oder zusammenfasst:
+
+```bash
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-1h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=chargePower_value' \
+  --data-urlencode 'start=now-1h' \
+  --data-urlencode 'end=now'
+```
+
+Erwartung:
+
+- PV-, Batterie-, AUX- und EXT-Serien haben stabile `title`-Werte, wenn die Geraete in EVCC benannt sind.
+- Ladepunktserien haben ein `loadpoint`-Label.
+- Fahrzeugserien haben ein `vehicle`-Label, sobald EVCC Fahrzeugdaten schreibt.
+- Fehlende AUX-/EXT-Serien sind OK, wenn du keine solchen EVCC-Meter nutzt; die Dashboards sollen dann trotzdem nutzbar bleiben.
+
+Wenn ein Name falsch ist, korrigiere zuerst EVCC. Neue Messwerte bekommen dann den neuen Namen; alte historische Labels bleiben unveraendert, bis du sie bewusst migrierst.
+
 ### Optionaler Telegraf-Probe-Write
 
 Nur auf einer Test- oder bewusst vorbereiteten Instanz ausfuehren:
@@ -237,6 +262,7 @@ Danach in VictoriaMetrics nach `evcc_ingest_probe` suchen. Diese Probe ist nicht
 - Grafana oder EVCC nutzt `localhost`, obwohl der Dienst in einem anderen Container oder auf einem anderen Host laeuft.
 - Firewall oder Docker-Port-Mapping blockiert `8428` oder `8086`.
 - EVCC-Web-Konfiguration uebersteuert den erwarteten `evcc.yaml`-Wert.
+- Dashboard-Details zeigen nur Summen oder falsche Gruppen: EVCC-Labels wie `title`, `loadpoint` oder `vehicle` fehlen, wurden historisch umbenannt oder passen nicht zu den Blocklist-Regexes.
 
 ## Naechster Schritt
 

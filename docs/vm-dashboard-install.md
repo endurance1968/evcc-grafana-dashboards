@@ -160,6 +160,8 @@ DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
 
 Quote Regex-Werte mit `|`, `(`, `)`, Leerzeichen oder Nicht-ASCII-Zeichen, damit der Bash-Deployer die Env-Datei sicher sourcen kann.
 
+Die Blocklist- und Heat-Pump-Werte sind Regexes gegen vorhandene EVCC-Labels. Sie benennen keine Serien um und loeschen keine Daten; sie steuern nur, was die Dashboards anzeigen oder aus Summen herausfiltern. `^none$` ist der empfohlene Wert, wenn nichts gefiltert werden soll. Wenn Detailpanels leer oder falsch gruppiert wirken, pruefe zuerst die EVCC-Labels in [migration-troubleshooting.md#fachlabels-titles-und-blocklists](./migration-troubleshooting.md#fachlabels-titles-und-blocklists).
+
 Rueckwaertskompatible Aliase werden weiterhin akzeptiert:
 
 - `DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL`

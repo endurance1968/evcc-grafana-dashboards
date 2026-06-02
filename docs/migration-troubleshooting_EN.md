@@ -173,6 +173,59 @@ python3 vm-rewrite-label-value.py \
 
 For PV devices, prefer `title` as the stable business key. EVCC can renumber PV `id` values when devices are added, removed, or reordered.
 
+## Business Labels, Titles, And Blocklists
+
+If Grafana finds raw data but individual detail panels look empty, duplicated, or wrongly grouped, check the EVCC business labels first. Common symptoms are:
+
+- PV, battery, AUX, or EXT details show only `Total` or unexpected names.
+- Home consumption or consumer shares look too high because AUX/EXT meters are not filtered as intended.
+- Loadpoints or vehicles are missing because `loadpoint` or `vehicle` is not present as a label.
+- A heat pump appears as a normal loadpoint or vehicle consumer instead of the expected group.
+
+Check the series directly in VictoriaMetrics:
+
+```bash
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=extPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=auxPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=chargePower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+```
+
+Important points:
+
+- `title` is the most important display name for PV, battery, AUX, and EXT devices.
+- `loadpoint` separates loadpoints.
+- `vehicle` separates vehicles.
+- Missing AUX/EXT series are not an error when EVCC does not write such meters.
+- Fix EVCC first when a name is wrong. New samples will then arrive correctly; historical values can be adjusted with `vm-rewrite-label-value.py` if needed.
+
+Dashboard blocklists only filter the dashboard view and do not delete data. Put them into `vm-dashboard-install.env`; the deployer applies them during dashboard import:
+
+```env
+DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
+DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
+DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|heat pump).*"
+```
+
+`^none$` is the safe value for "filter nothing" because normal EVCC names should not match it. Quote regexes that contain `|`, spaces, or special characters. After changing a blocklist, redeploy the dashboards; no data migration is required for that.
+
 ## Empty Grafana Dashboards
 
 `Today` empty usually means raw data or datasource problems:
