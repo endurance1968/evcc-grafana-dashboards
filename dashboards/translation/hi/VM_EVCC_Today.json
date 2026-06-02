@@ -238,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               },
@@ -312,7 +312,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=grid"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=grid"
                   }
                 ]
               }
@@ -358,7 +358,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -400,7 +400,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=home"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=home"
                   }
                 ]
               }
@@ -492,7 +492,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               },
@@ -566,7 +566,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=grid"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=grid"
                   }
                 ]
               }
@@ -612,7 +612,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -654,7 +654,7 @@
                   {
                     "targetBlank": true,
                     "title": "अधिक विवरण",
-                    "url": "/d/adddvtj?$__url_time_range&tab=home"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=home"
                   }
                 ]
               }
@@ -686,6 +686,19 @@
         "text": {
           "titleSize": 12,
           "valueSize": 16
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.4.0",
@@ -1582,6 +1595,19 @@
         "sizing": "auto",
         "text": {
           "titleSize": 12
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.3.3",

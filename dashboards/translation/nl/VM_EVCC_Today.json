@@ -238,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               },
@@ -312,7 +312,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=net"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=net"
                   }
                 ]
               }
@@ -358,7 +358,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -400,7 +400,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=thuis"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=thuis"
                   }
                 ]
               }
@@ -520,7 +520,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=net"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=net"
                   }
                 ]
               }
@@ -566,7 +566,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -608,7 +608,7 @@
                   {
                     "targetBlank": true,
                     "title": "Meer details",
-                    "url": "/d/adddvtj?$__url_time_range&tab=thuis"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=thuis"
                   }
                 ]
               }
@@ -640,6 +640,19 @@
         "text": {
           "titleSize": 12,
           "valueSize": 16
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.4.0",
@@ -1521,6 +1534,19 @@
         "sizing": "auto",
         "text": {
           "titleSize": 12
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.3.3",

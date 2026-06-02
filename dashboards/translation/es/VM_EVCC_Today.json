@@ -238,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=fotovoltaica"
                   }
                 ]
               },
@@ -312,7 +312,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=red"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=red"
                   }
                 ]
               }
@@ -358,7 +358,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=fotovoltaica"
                   }
                 ]
               }
@@ -400,7 +400,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -492,7 +492,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=fotovoltaica"
                   }
                 ]
               },
@@ -566,7 +566,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=red"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=red"
                   }
                 ]
               }
@@ -612,7 +612,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=fotovoltaica"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=fotovoltaica"
                   }
                 ]
               }
@@ -654,7 +654,7 @@
                   {
                     "targetBlank": true,
                     "title": "Más detalles",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -686,6 +686,19 @@
         "text": {
           "titleSize": 12,
           "valueSize": 16
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.4.0",
@@ -1582,6 +1595,19 @@
         "sizing": "auto",
         "text": {
           "titleSize": 12
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.3.3",

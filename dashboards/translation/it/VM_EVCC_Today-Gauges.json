@@ -199,8 +199,7 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "neutral": 0,
-            "graphMode": "area"
+            "neutral": 0
           },
           "decimals": 2,
           "links": [],
@@ -239,7 +238,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               },
@@ -313,7 +312,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=rete"
                   }
                 ]
               }
@@ -359,7 +358,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -401,7 +400,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -521,7 +520,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=rete"
                   }
                 ]
               }
@@ -567,7 +566,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -609,7 +608,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -642,7 +641,19 @@
           "titleSize": 12,
           "valueSize": 16
         },
-        "graphMode": "area"
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
+        }
       },
       "pluginVersion": "12.4.0",
       "targets": [
@@ -1391,9 +1402,7 @@
             ]
           },
           "unit": "percentunit",
-          "custom": {
-            "graphMode": "area"
-          }
+          "custom": {}
         },
         "overrides": [
           {
@@ -1634,6 +1643,19 @@
         "sizing": "auto",
         "text": {
           "titleSize": 12
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "13.0.1",

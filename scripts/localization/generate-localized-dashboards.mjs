@@ -1,7 +1,7 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.06.02.1
+ * Version: 2026.06.02.2
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -179,8 +179,8 @@ function localizeTabUrlParams(node, tabSlugMap) {
   }
 
   for (const [key, value] of Object.entries(node)) {
-    if (key === "url" && typeof value === "string" && value.includes("tab=")) {
-      node[key] = value.replace(/([?&]tab=)([a-z0-9-]+)/g, (match, prefix, slug) => {
+    if (key === "url" && typeof value === "string" && value.includes("dtab=")) {
+      node[key] = value.replace(/([?&]dtab=)([a-z0-9-]+)/g, (match, prefix, slug) => {
         return `${prefix}${tabSlugMap.get(slug) || slug}`;
       });
       continue;

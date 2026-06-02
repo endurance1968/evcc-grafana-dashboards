@@ -255,7 +255,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               },
@@ -329,7 +329,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=rete"
                   }
                 ]
               }
@@ -375,7 +375,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -417,7 +417,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -537,7 +537,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=rete"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=rete"
                   }
                 ]
               }
@@ -583,7 +583,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=pv"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
               }
@@ -625,7 +625,7 @@
                   {
                     "targetBlank": true,
                     "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&tab=casa"
+                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
               }
@@ -2159,6 +2159,19 @@
         "sizing": "auto",
         "text": {
           "titleSize": 12
+        },
+        "shape": "gauge",
+        "sparkline": true,
+        "barWidthFactor": 0.54,
+        "segmentCount": 1,
+        "segmentSpacing": 0.3,
+        "barShape": "flat",
+        "endpointMarker": "point",
+        "textMode": "auto",
+        "effects": {
+          "barGlow": false,
+          "centerGlow": false,
+          "gradient": false
         }
       },
       "pluginVersion": "12.3.3",

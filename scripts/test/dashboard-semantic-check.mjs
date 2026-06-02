@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.8
+ * Version: 2026.06.02.9
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -580,12 +580,19 @@ function validateDashboard(fileName, dashboard) {
     assert(forecastProperties.get("custom.lineStyle")?.fill === "dash", failures, `${fileName}: PV forecast must be dashed`);
     assert(forecastProperties.get("custom.fillOpacity") === 0, failures, `${fileName}: PV forecast must not use area fill`);
 
+    for (const panel of panels.filter((item) => item.type === "gauge")) {
+      assert(panel.options?.sparkline === true, failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use Grafana 13 sparkline gauges`);
+      assert(panel.options?.shape === "gauge", failures, `${fileName}: gauge panel '${panel.title || panel.id}' must use arc gauge shape`);
+      assert(!Object.hasOwn(panel.options || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy graphMode option`);
+      assert(!Object.hasOwn(panel.fieldConfig?.defaults?.custom || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy custom.graphMode option`);
+    }
+
     const powerPanel = dashboard.panels?.find((panel) => panel.id === 74);
     const expectedDetailTabs = new Map([
-      ["PV", "tab=pv"],
-      ["Grid", "tab=grid"],
-      ["Home", "tab=home"],
-      ["Battery", "tab=pv"],
+      ["PV", "dtab=pv"],
+      ["Grid", "dtab=grid"],
+      ["Home", "dtab=home"],
+      ["Battery", "dtab=pv"],
     ]);
     for (const [seriesName, tabParam] of expectedDetailTabs) {
       const links = propertyValue(powerPanel, seriesName, "links") || [];
