@@ -2,7 +2,7 @@
 
 This is the main entry point for users who want EVCC dashboards on VictoriaMetrics.
 
-Start with the central requirements overview: [system-requirements.md](./system-requirements_EN.md).
+Start with the central requirements overview: [system-requirements.md](./en/system-requirements.md).
 
 ## Pick Your Path
 
@@ -20,26 +20,26 @@ Use this path when you want to keep your history and move the dashboard backend 
 
 Start here:
 
-- [VictoriaMetrics on Debian 13](./victoriametrics-install-debian-13_EN.md) or [VictoriaMetrics with Docker](./victoriametrics-install-docker_EN.md)
-- [Prepare EVCC/Telegraf live ingest](./evcc-telegraf-live-ingest_EN.md)
-- [Migrate from InfluxDB to VictoriaMetrics](./influx-to-vm-migration_EN.md)
-- [Migration checklist](./migration-checklist_EN.md)
+- [VictoriaMetrics on Debian 13](./en/victoriametrics-install-debian-13.md) or [VictoriaMetrics with Docker](./en/victoriametrics-install-docker.md)
+- [Prepare EVCC/Telegraf live ingest](./en/evcc-telegraf-live-ingest.md)
+- [Migrate from InfluxDB to VictoriaMetrics](./en/influx-to-vm-migration.md)
+- [Migration checklist](./en/migration-checklist.md)
 
 ### I am setting up a new VictoriaMetrics stack
 
 Install VictoriaMetrics first. Then configure EVCC/Telegraf and enable the write path immediately, because there is no old InfluxDB history. Once current raw data arrives in VictoriaMetrics, continue with Grafana and dashboard deployment.
 
-- VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13_EN.md)
-- VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker_EN.md)
-- EVCC/Telegraf live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
+- VictoriaMetrics on Debian 13: [victoriametrics-install-debian-13.md](./en/victoriametrics-install-debian-13.md)
+- VictoriaMetrics with Docker: [victoriametrics-install-docker.md](./en/victoriametrics-install-docker.md)
+- EVCC/Telegraf live ingest: [evcc-telegraf-live-ingest.md](./en/evcc-telegraf-live-ingest.md)
 
 ### I only want to update dashboards
 
 Use the deployment guide directly:
 
-- [Grafana dashboard setup](./grafana-vm-dashboard-setup_EN.md)
-- Quick deploy reference: [deployment-readme.md](./deployment-readme_EN.md)
-- Full deployer option reference: [vm-dashboard-install.md](./vm-dashboard-install_EN.md)
+- [Grafana dashboard setup](./en/grafana-vm-dashboard-setup.md)
+- Quick deploy reference: [deployment-readme.md](./en/deployment-readme.md)
+- Full deployer option reference: [vm-dashboard-install.md](./en/vm-dashboard-install.md)
 
 ## Data Model At A Glance
 
@@ -65,12 +65,12 @@ The deployable dashboards require Grafana 13.0.1 or newer and use Grafana tab na
 
 Use these when the normal migration path reports a problem or when you need operational background:
 
-- Migration troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting_EN.md)
-- Migration validation notes: [migration-validation-notes.md](./migration-validation-notes_EN.md)
-- Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design_EN.md)
-- Live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
-- Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference_EN.md)
-- Setup/filter status panel decision: [design/setup-filter-status-panel-decision.md](./design/setup-filter-status-panel-decision_EN.md)
+- Migration troubleshooting: [migration-troubleshooting.md](./en/migration-troubleshooting.md)
+- Migration validation notes: [migration-validation-notes.md](./en/migration-validation-notes.md)
+- Rollup design: [design/victoriametrics-rollup-design.md](./en/design/victoriametrics-rollup-design.md)
+- Live ingest: [evcc-telegraf-live-ingest.md](./en/evcc-telegraf-live-ingest.md)
+- Schema reference: [design/victoriametrics-schema-reference.md](./en/design/victoriametrics-schema-reference.md)
+- Setup/filter status panel decision: [design/setup-filter-status-panel-decision.md](./en/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots
 

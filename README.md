@@ -48,5 +48,5 @@ Typische Anwendungsfaelle:
 
 Der zentrale Einstieg fuer Installation, Migration, Live-Ingest und Dashboard-Deployment ist:
 
-- [docs/README.md](./docs/README.md)
-- [Release Notes](./docs/release-notes.md)
+- [docs/de/README.md](./docs/README.md)
+- [Release Notes](./docs/de/release-notes.md)

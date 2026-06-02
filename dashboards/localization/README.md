@@ -64,4 +64,4 @@ Sichere Display-only-Uebersetzungen auf die generierten Dashboard-Dateien anwend
 node scripts/localization/apply-safe-display-translations.mjs
 ```
 
-Den vollstaendigen End-to-End-Grafana-Validierungsworkflow beschreibt [grafana-localization-testing.md](../../docs/design/grafana-localization-testing.md).
+Den vollstaendigen End-to-End-Grafana-Validierungsworkflow beschreibt [grafana-localization-testing.md](../../docs/de/design/grafana-localization-testing.md).

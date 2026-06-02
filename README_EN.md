@@ -45,5 +45,5 @@ Typical use cases:
 
 For the full end-to-end path from EVCC + InfluxDB to EVCC + VictoriaMetrics + Grafana, continue here:
 
-- [docs/README.md](./docs/README_EN.md)
-- [release notes](./docs/release-notes_EN.md)
+- [docs/en/README.md](./docs/README_EN.md)
+- [release notes](./docs/en/release-notes.md)

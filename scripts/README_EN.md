@@ -248,7 +248,7 @@ Key settings:
 
 The repo assumes one VictoriaMetrics instance per EVCC instance. If you run multiple EVCC instances, run multiple VictoriaMetrics instances as well instead of multiplexing them via a shared `db` label.
 
-For the operator-facing workflow, installation steps, and cron examples, see `docs/influx-to-vm-migration.md` and `docs/migration-checklist.md`.
+For the operator-facing workflow, installation steps, and cron examples, see `docs/en/influx-to-vm-migration.md` and `docs/en/migration-checklist.md`.
 
 ## Safety model
 
@@ -283,4 +283,4 @@ For end users, prefer:
 
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
-- `docs/vm-dashboard-install.md`
+- `docs/en/vm-dashboard-install.md`

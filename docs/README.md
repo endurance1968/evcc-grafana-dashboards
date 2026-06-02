@@ -2,9 +2,9 @@
 
 Dies ist der zentrale Einstieg fuer Nutzer, die EVCC-Dashboards mit VictoriaMetrics betreiben moechten.
 
-Die englische Version dieser Seite ist hier: [README_EN.md](./README_EN.md).
+Die englische Version dieser Seite ist hier: [README.md](./README_EN.md).
 
-Beginne mit der zentralen Uebersicht der Voraussetzungen: [system-requirements.md](./system-requirements.md).
+Beginne mit der zentralen Uebersicht der Voraussetzungen: [system-requirements.md](./de/system-requirements.md).
 
 ## Welcher Pfad passt?
 
@@ -22,26 +22,26 @@ Nutze diesen Pfad, wenn du deine Historie behalten und das Dashboard-Backend auf
 
 Starte hier:
 
-- [VictoriaMetrics auf Debian 13](./victoriametrics-install-debian-13.md) oder [VictoriaMetrics mit Docker](./victoriametrics-install-docker.md)
-- [EVCC/Telegraf Live-Ingest vorbereiten](./evcc-telegraf-live-ingest.md)
-- [Migration von InfluxDB nach VictoriaMetrics](./influx-to-vm-migration.md)
-- [Migrations-Checkliste](./migration-checklist.md)
+- [VictoriaMetrics auf Debian 13](./de/victoriametrics-install-debian-13.md) oder [VictoriaMetrics mit Docker](./de/victoriametrics-install-docker.md)
+- [EVCC/Telegraf Live-Ingest vorbereiten](./de/evcc-telegraf-live-ingest.md)
+- [Migration von InfluxDB nach VictoriaMetrics](./de/influx-to-vm-migration.md)
+- [Migrations-Checkliste](./de/migration-checklist.md)
 
 ### Ich baue einen neuen VictoriaMetrics-Stack auf
 
 Installiere zuerst VictoriaMetrics. Danach richtest du EVCC/Telegraf ein und aktivierst den Schreibpfad sofort, weil es keine alte InfluxDB-Historie gibt. Sobald aktuelle Rohdaten in VictoriaMetrics ankommen, geht es weiter mit Grafana und dem Dashboard-Deployment.
 
-- VictoriaMetrics auf Debian 13: [victoriametrics-install-debian-13.md](./victoriametrics-install-debian-13.md)
-- VictoriaMetrics mit Docker: [victoriametrics-install-docker.md](./victoriametrics-install-docker.md)
-- EVCC/Telegraf Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
+- VictoriaMetrics auf Debian 13: [victoriametrics-install-debian-13.md](./de/victoriametrics-install-debian-13.md)
+- VictoriaMetrics mit Docker: [victoriametrics-install-docker.md](./de/victoriametrics-install-docker.md)
+- EVCC/Telegraf Live-Ingest: [evcc-telegraf-live-ingest.md](./de/evcc-telegraf-live-ingest.md)
 
 ### Ich moechte nur Dashboards aktualisieren
 
 Nutze direkt die Deployment-Dokumentation:
 
-- [Grafana Dashboard Setup](./grafana-vm-dashboard-setup.md)
-- Kurzreferenz: [deployment-readme.md](./deployment-readme.md)
-- Vollstaendige Deployer-Optionen: [vm-dashboard-install.md](./vm-dashboard-install.md)
+- [Grafana Dashboard Setup](./de/grafana-vm-dashboard-setup.md)
+- Kurzreferenz: [deployment-readme.md](./de/deployment-readme.md)
+- Vollstaendige Deployer-Optionen: [vm-dashboard-install.md](./de/vm-dashboard-install.md)
 
 ## Datenmodell im Ueberblick
 
@@ -67,12 +67,12 @@ Die deploybaren Dashboards benoetigen Grafana 13.0.1 oder neuer und verwenden Gr
 
 Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 
-- Migration Troubleshooting: [migration-troubleshooting.md](./migration-troubleshooting.md)
-- Migrations-Validierungsnotizen: [migration-validation-notes.md](./migration-validation-notes.md)
-- Rollup-Design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
-- Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
-- Schema-Referenz: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
-- Entscheidung Setup-/Filter-Statuspanel: [design/setup-filter-status-panel-decision.md](./design/setup-filter-status-panel-decision.md)
+- Migration Troubleshooting: [migration-troubleshooting.md](./de/migration-troubleshooting.md)
+- Migrations-Validierungsnotizen: [migration-validation-notes.md](./de/migration-validation-notes.md)
+- Rollup-Design: [design/victoriametrics-rollup-design.md](./de/design/victoriametrics-rollup-design.md)
+- Live-Ingest: [evcc-telegraf-live-ingest.md](./de/evcc-telegraf-live-ingest.md)
+- Schema-Referenz: [design/victoriametrics-schema-reference.md](./de/design/victoriametrics-schema-reference.md)
+- Entscheidung Setup-/Filter-Statuspanel: [design/setup-filter-status-panel-decision.md](./de/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots
 

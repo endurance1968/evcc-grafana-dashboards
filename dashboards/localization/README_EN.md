@@ -62,4 +62,4 @@ Apply safe display-only translations on generated dashboard files:
 node scripts/localization/apply-safe-display-translations.mjs
 ```
 
-For the full end-to-end Grafana validation workflow, see `../../docs/design/grafana-localization-testing.md`.
+For the full end-to-end Grafana validation workflow, see `../../docs/en/design/grafana-localization-testing.md`.

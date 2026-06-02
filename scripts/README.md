@@ -250,7 +250,7 @@ Wichtige Einstellungen:
 
 Das Repository geht von einer VictoriaMetrics-Instanz pro EVCC-Instanz aus. Wenn du mehrere EVCC-Instanzen betreibst, betreibe mehrere VictoriaMetrics-Instanzen, statt sie ueber ein gemeinsames `db`-Label zu multiplexen.
 
-Den operatororientierten Workflow, Installationsschritte und Cron-Beispiele findest du in [influx-to-vm-migration.md](../docs/influx-to-vm-migration.md) und [migration-checklist.md](../docs/migration-checklist.md).
+Den operatororientierten Workflow, Installationsschritte und Cron-Beispiele findest du in [influx-to-vm-migration.md](../docs/de/influx-to-vm-migration.md) und [migration-checklist.md](../docs/de/migration-checklist.md).
 
 ## Sicherheitsmodell
 
@@ -285,4 +285,4 @@ Fuer Endnutzer bevorzugen:
 
 - `scripts/deploy.ps1`
 - `scripts/deploy-python.sh`
-- [vm-dashboard-install.md](../docs/vm-dashboard-install.md)
+- [vm-dashboard-install.md](../docs/de/vm-dashboard-install.md)
