@@ -93,6 +93,55 @@ class EnergyComparisonValidationTests(unittest.TestCase):
         self.assertEqual(months["2026-01"]["grid"], 5.0)
         self.assertEqual(months["2026-02"]["pv"], 7.0)
 
+    def test_vrm_battery_efficiency_uses_charge_and_discharge_flows(self):
+        rows = [
+            {
+                "day": "2026-01-01",
+                "pv_to_battery_kwh": 4.0,
+                "grid_to_battery_kwh": 1.0,
+                "battery_to_consumers_kwh": 3.0,
+                "battery_to_grid_kwh": 1.0,
+            },
+            {
+                "day": "2026-01-02",
+                "pv_to_battery_kwh": 5.0,
+                "grid_to_battery_kwh": 0.0,
+                "battery_to_consumers_kwh": 4.0,
+                "battery_to_grid_kwh": 1.0,
+            },
+        ]
+
+        monthly = VALIDATE_MODULE.build_vrm_battery_rows(rows)
+        total = VALIDATE_MODULE.totals_for_battery_rows(monthly)
+        result = VALIDATE_MODULE.evaluate_vrm_battery_rows(monthly, min_charge_kwh=1.0)
+
+        self.assertEqual(len(monthly), 1)
+        self.assertEqual(monthly[0].period, "2026-01")
+        self.assertAlmostEqual(monthly[0].vrm_charge_kwh, 10.0)
+        self.assertAlmostEqual(monthly[0].vrm_discharge_kwh, 9.0)
+        self.assertAlmostEqual(monthly[0].vrm_efficiency_pct, 90.0)
+        self.assertAlmostEqual(total.vrm_efficiency_pct, 90.0)
+        self.assertEqual(result.status, "OK")
+
+    def test_vrm_vm_battery_efficiency_reports_percentage_point_delta(self):
+        rows = [
+            VALIDATE_MODULE.BatteryEfficiencyRow(
+                period="2026-01",
+                vrm_charge_kwh=10.0,
+                vrm_discharge_kwh=9.0,
+                vrm_efficiency_pct=90.0,
+                vm_charge_kwh=10.0,
+                vm_discharge_kwh=8.5,
+                vm_efficiency_pct=85.0,
+                delta_efficiency_pct_points=-5.0,
+            )
+        ]
+
+        result = VALIDATE_MODULE.evaluate_vrm_vm_battery_rows(rows, min_charge_kwh=1.0, pct_point_tolerance=6.0)
+
+        self.assertEqual(result.status, "OK")
+        self.assertIn("total_efficiency_delta=5.00 pp", result.details)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,14 +1,14 @@
 /**
  * Script: rollup-path-check.mjs
  * Purpose: Run the complete deterministic rollup validation path as one reproducible check.
- * Version: 2026.04.15.3
- * Last modified: 2026-04-15
+ * Version: 2026.06.02.1
+ * Last modified: 2026-06-02
  */
 import { spawnSync } from "node:child_process";
 
 const scriptName = "rollup-path-check.mjs";
-const version = "2026.04.15.3";
-const lastModified = "2026-04-15";
+const version = "2026.06.02.1";
+const lastModified = "2026-06-02";
 
 function parseArg(name, fallback = "") {
   const prefix = `--${name}=`;
@@ -65,6 +65,7 @@ function energyValidationArgs() {
     args.push("--require-cache", "tibber-vm");
     args.push("--require-cache", "tibber-influx");
     args.push("--require-cache", "vrm");
+    args.push("--require-cache", "vrm-battery");
   }
   if (vmBaseUrl) {
     args.push("--vm-base-url", vmBaseUrl);

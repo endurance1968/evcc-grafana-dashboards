@@ -149,7 +149,7 @@ Gecachte externe Energievergleichs-Snapshots nach Rollup- oder Dashboard-Kosten-
 npm run test:energy-validation
 ```
 
-Das liest lokale Dateien aus `data/energy-comparison/tibber/` und `data/energy-comparison/vrm/`, schliesst die dokumentierten Anomaliemonate `2025-04` und `2025-10` aus und meldet monatliche Tibber-vs-VM-, Tibber-vs-Influx- und VRM-Cache-Zusammenfassungen. Mit `--vm-base-url http://127.0.0.1:8428` werden gecachte VRM-PV-/Grid-Import-Summen gegen Live-VM-Rollups verglichen.
+Das liest lokale Dateien aus `data/energy-comparison/tibber/` und `data/energy-comparison/vrm/`, schliesst die dokumentierten Anomaliemonate `2025-04` und `2025-10` aus und meldet monatliche Tibber-vs-VM-, Tibber-vs-Influx-, VRM-Cache- und VRM-Speicher-Effizienz-Zusammenfassungen. Mit `--vm-base-url http://127.0.0.1:8428` werden gecachte VRM-PV-/Grid-Import-Summen und die Batteriefluss-Effizienz gegen Live-VM-Rollups verglichen.
 
 Fuer einen strikten privaten Validierungsjob auf einem Runner mit aktualisierten Cache-Snapshots:
 
@@ -157,14 +157,15 @@ Fuer einen strikten privaten Validierungsjob auf einem Runner mit aktualisierten
 npm run test:energy-validation -- \
   --require-cache tibber-vm \
   --require-cache tibber-influx \
-  --require-cache vrm
+  --require-cache vrm \
+  --require-cache vrm-battery
 ```
 
 Fuege `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` hinzu, wenn der Runner auch Zugriff auf eine VM-Instanz mit Rollups hat. Ohne `--require-cache` werden fehlende private Caches als `SKIP` gemeldet, damit der Befehl fuer public CI und frische Developer-Checkouts sicher bleibt.
 
 Der Forgejo-Workflow haelt den public/default-Pfad cache-optional, kann aber ueber Runner-Umgebungsvariablen in strikte private Validierung geschaltet werden:
 
-- `ENERGY_VALIDATION_STRICT=1` erzwingt Tibber-vs-VM-, Tibber-vs-Influx- und VRM-Cache-Snapshots.
+- `ENERGY_VALIDATION_STRICT=1` erzwingt Tibber-vs-VM-, Tibber-vs-Influx-, VRM-Cache- und VRM-Speicher-Effizienz-Snapshots.
 - `ENERGY_VALIDATION_VM_BASE_URL=http://127.0.0.1:8428` aktiviert zusaetzlich den Live-VM-Rollup-Vergleich und erzwingt den VRM-vs-VM-Cache-Pfad.
 
 Pruefen, dass generierte Dashboard-Uebersetzungen reproduzierbar aus `dashboards/original/` entstehen und die Lokalisierungsskripte auf sauberem Tree keine Diffs erzeugen:

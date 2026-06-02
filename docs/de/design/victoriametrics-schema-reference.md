@@ -249,6 +249,16 @@ Grund:
 Aktuelle Regel:
 
 - Batterie-Lade-/Entladerollups entstehen aus vorzeichenbewusster Verarbeitung von `batteryPower_value`
+- `evcc_battery_charge_daily_wh` enthaelt die taegliche Speicher-Ladeenergie
+- `evcc_battery_discharge_daily_wh` enthaelt die taegliche Speicher-Entladeenergie
+
+Die Dashboard-Kennzahl `Speicher-Effizienz` ist definiert als:
+
+```text
+sum(evcc_battery_discharge_daily_wh) / sum(evcc_battery_charge_daily_wh) * 100
+```
+
+Wenn im betrachteten Zeitraum keine Speicher-Ladeenergie vorhanden ist, wird keine Effizienz angezeigt. Fuer VRM-Vergleiche wird dieselbe Logik mit den naheliegenden VRM-Fluessen angewendet: `(battery_to_consumers_kwh + battery_to_grid_kwh) / (pv_to_battery_kwh + grid_to_battery_kwh) * 100`. Das ist ein Vergleich der bilanzierten Energiefluesse und keine Herstellerangabe zur Zell- oder Wechselrichtereffizienz.
 
 ### Fahrzeugdistanz
 

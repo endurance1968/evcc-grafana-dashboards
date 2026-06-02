@@ -247,6 +247,16 @@ Reason:
 Current rule:
 
 - battery charge/discharge rollups come from sign-aware processing of `batteryPower_value`
+- `evcc_battery_charge_daily_wh` contains daily battery charge energy
+- `evcc_battery_discharge_daily_wh` contains daily battery discharge energy
+
+The dashboard value `Battery efficiency` is defined as:
+
+```text
+sum(evcc_battery_discharge_daily_wh) / sum(evcc_battery_charge_daily_wh) * 100
+```
+
+If the selected period has no battery charge energy, no efficiency is shown. VRM comparisons use the same logic with the closest matching VRM flows: `(battery_to_consumers_kwh + battery_to_grid_kwh) / (pv_to_battery_kwh + grid_to_battery_kwh) * 100`. This compares accounted energy flows and is not a manufacturer statement about cell or inverter efficiency.
 
 ### Vehicle distance
 

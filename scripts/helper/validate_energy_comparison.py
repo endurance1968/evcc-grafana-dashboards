@@ -28,8 +28,8 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from zoneinfo import ZoneInfo
 
 SCRIPT_NAME = "validate_energy_comparison.py"
-SCRIPT_VERSION = "2026.04.15.1"
-SCRIPT_LAST_MODIFIED = "2026-04-15"
+SCRIPT_VERSION = "2026.06.02.1"
+SCRIPT_LAST_MODIFIED = "2026-06-02"
 UTC = dt.timezone.utc
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_TIBBER_DIR = ROOT / "data" / "energy-comparison" / "tibber"
@@ -61,6 +61,18 @@ class VrmMonthlyRow:
     vrm_grid_kwh: Optional[float]
     vm_grid_kwh: Optional[float]
     delta_grid_kwh: Optional[float]
+
+
+@dataclass(frozen=True)
+class BatteryEfficiencyRow:
+    period: str
+    vrm_charge_kwh: Optional[float]
+    vrm_discharge_kwh: Optional[float]
+    vrm_efficiency_pct: Optional[float]
+    vm_charge_kwh: Optional[float]
+    vm_discharge_kwh: Optional[float]
+    vm_efficiency_pct: Optional[float]
+    delta_efficiency_pct_points: Optional[float]
 
 
 @dataclass(frozen=True)
@@ -137,6 +149,12 @@ def pct_delta(delta_value: Optional[float], reference: Optional[float]) -> Optio
     if delta_value is None or reference is None or reference == 0:
         return None
     return delta_value / reference * 100.0
+
+
+def ratio_pct(numerator: Optional[float], denominator: Optional[float]) -> Optional[float]:
+    if numerator is None or denominator is None or denominator == 0:
+        return None
+    return numerator / denominator * 100.0
 
 
 def fmt(value: Optional[float], digits: int = 2) -> str:
@@ -319,6 +337,41 @@ def aggregate_vrm_months(rows: Sequence[Mapping[str, object]]) -> Dict[str, Dict
     return buckets
 
 
+def aggregate_vrm_battery_months(rows: Sequence[Mapping[str, object]]) -> Dict[str, Dict[str, float]]:
+    buckets: Dict[str, Dict[str, float]] = {}
+    for row in rows:
+        day = str(row.get("day") or "")
+        if not day:
+            continue
+        period = month_from_day(day)
+        bucket = buckets.setdefault(period, {"charge": 0.0, "discharge": 0.0})
+        bucket["charge"] += parse_number(row.get("pv_to_battery_kwh")) or 0.0
+        bucket["charge"] += parse_number(row.get("grid_to_battery_kwh")) or 0.0
+        bucket["discharge"] += parse_number(row.get("battery_to_consumers_kwh")) or 0.0
+        bucket["discharge"] += parse_number(row.get("battery_to_grid_kwh")) or 0.0
+    return buckets
+
+
+def build_vrm_battery_rows(vrm_rows: Sequence[Mapping[str, object]]) -> List[BatteryEfficiencyRow]:
+    rows: List[BatteryEfficiencyRow] = []
+    for period, values in sorted(aggregate_vrm_battery_months(vrm_rows).items()):
+        charge = values.get("charge")
+        discharge = values.get("discharge")
+        rows.append(
+            BatteryEfficiencyRow(
+                period=period,
+                vrm_charge_kwh=charge,
+                vrm_discharge_kwh=discharge,
+                vrm_efficiency_pct=ratio_pct(discharge, charge),
+                vm_charge_kwh=None,
+                vm_discharge_kwh=None,
+                vm_efficiency_pct=None,
+                delta_efficiency_pct_points=None,
+            )
+        )
+    return rows
+
+
 def vm_export_url(base_url: str, matcher: str, start: dt.datetime, end: dt.datetime) -> str:
     params = [("match[]", matcher), ("start", iso_z(start)), ("end", iso_z(end))]
     return f"{base_url.rstrip('/')}/api/v1/export?{urllib.parse.urlencode(params)}"
@@ -348,13 +401,19 @@ def fetch_vm_daily_metric(base_url: str, metric: str, start_day: dt.date, end_da
     return out
 
 
-def build_vrm_vm_months(vrm_rows: Sequence[Mapping[str, object]], base_url: str, timezone_name: str) -> List[VrmMonthlyRow]:
+def vm_day_range(vrm_rows: Sequence[Mapping[str, object]]) -> Optional[Tuple[dt.date, dt.date]]:
     days = sorted(str(row.get("day")) for row in vrm_rows if row.get("day"))
     if not days:
+        return None
+    return (dt.date.fromisoformat(days[0]), dt.date.fromisoformat(days[-1]))
+
+
+def build_vrm_vm_months(vrm_rows: Sequence[Mapping[str, object]], base_url: str, timezone_name: str) -> List[VrmMonthlyRow]:
+    day_range = vm_day_range(vrm_rows)
+    if day_range is None:
         return []
     timezone = ZoneInfo(timezone_name)
-    start_day = dt.date.fromisoformat(days[0])
-    end_day = dt.date.fromisoformat(days[-1])
+    start_day, end_day = day_range
     vm_pv_daily = fetch_vm_daily_metric(base_url, "evcc_pv_energy_daily_wh", start_day, end_day, timezone, 1000.0)
     vm_grid_daily = fetch_vm_daily_metric(base_url, "evcc_grid_import_daily_wh", start_day, end_day, timezone, 1000.0)
     vrm_months = aggregate_vrm_months(vrm_rows)
@@ -384,6 +443,44 @@ def build_vrm_vm_months(vrm_rows: Sequence[Mapping[str, object]], base_url: str,
     return rows
 
 
+def build_vrm_vm_battery_rows(vrm_rows: Sequence[Mapping[str, object]], base_url: str, timezone_name: str) -> List[BatteryEfficiencyRow]:
+    day_range = vm_day_range(vrm_rows)
+    if day_range is None:
+        return []
+    timezone = ZoneInfo(timezone_name)
+    start_day, end_day = day_range
+    vm_charge_daily = fetch_vm_daily_metric(base_url, "evcc_battery_charge_daily_wh", start_day, end_day, timezone, 1000.0)
+    vm_discharge_daily = fetch_vm_daily_metric(base_url, "evcc_battery_discharge_daily_wh", start_day, end_day, timezone, 1000.0)
+    vrm_months = aggregate_vrm_battery_months(vrm_rows)
+    vm_months: Dict[str, Dict[str, float]] = {}
+    for day, value in vm_charge_daily.items():
+        vm_months.setdefault(month_from_day(day), {"charge": 0.0, "discharge": 0.0})["charge"] += value
+    for day, value in vm_discharge_daily.items():
+        vm_months.setdefault(month_from_day(day), {"charge": 0.0, "discharge": 0.0})["discharge"] += value
+
+    rows: List[BatteryEfficiencyRow] = []
+    for period in sorted(set(vrm_months) | set(vm_months)):
+        vrm_charge = vrm_months.get(period, {}).get("charge")
+        vrm_discharge = vrm_months.get(period, {}).get("discharge")
+        vm_charge = vm_months.get(period, {}).get("charge")
+        vm_discharge = vm_months.get(period, {}).get("discharge")
+        vrm_efficiency = ratio_pct(vrm_discharge, vrm_charge)
+        vm_efficiency = ratio_pct(vm_discharge, vm_charge)
+        rows.append(
+            BatteryEfficiencyRow(
+                period=period,
+                vrm_charge_kwh=vrm_charge,
+                vrm_discharge_kwh=vrm_discharge,
+                vrm_efficiency_pct=vrm_efficiency,
+                vm_charge_kwh=vm_charge,
+                vm_discharge_kwh=vm_discharge,
+                vm_efficiency_pct=vm_efficiency,
+                delta_efficiency_pct_points=delta(vm_efficiency, vrm_efficiency),
+            )
+        )
+    return rows
+
+
 def totals_for_vrm_rows(rows: Sequence[VrmMonthlyRow]) -> VrmMonthlyRow:
     vrm_pv = sum_optional(row.vrm_pv_kwh for row in rows)
     vm_pv = sum_optional(row.vm_pv_kwh for row in rows)
@@ -397,6 +494,70 @@ def totals_for_vrm_rows(rows: Sequence[VrmMonthlyRow]) -> VrmMonthlyRow:
         vrm_grid_kwh=vrm_grid,
         vm_grid_kwh=vm_grid,
         delta_grid_kwh=delta(vm_grid, vrm_grid),
+    )
+
+
+def totals_for_battery_rows(rows: Sequence[BatteryEfficiencyRow]) -> BatteryEfficiencyRow:
+    vrm_charge = sum_optional(row.vrm_charge_kwh for row in rows)
+    vrm_discharge = sum_optional(row.vrm_discharge_kwh for row in rows)
+    vm_charge = sum_optional(row.vm_charge_kwh for row in rows)
+    vm_discharge = sum_optional(row.vm_discharge_kwh for row in rows)
+    vrm_efficiency = ratio_pct(vrm_discharge, vrm_charge)
+    vm_efficiency = ratio_pct(vm_discharge, vm_charge)
+    return BatteryEfficiencyRow(
+        period="TOTAL",
+        vrm_charge_kwh=vrm_charge,
+        vrm_discharge_kwh=vrm_discharge,
+        vrm_efficiency_pct=vrm_efficiency,
+        vm_charge_kwh=vm_charge,
+        vm_discharge_kwh=vm_discharge,
+        vm_efficiency_pct=vm_efficiency,
+        delta_efficiency_pct_points=delta(vm_efficiency, vrm_efficiency),
+    )
+
+
+def evaluate_vrm_battery_rows(rows: Sequence[BatteryEfficiencyRow], min_charge_kwh: float) -> CheckResult:
+    meaningful = [row for row in rows if (row.vrm_charge_kwh or 0.0) >= min_charge_kwh]
+    if not meaningful:
+        return CheckResult(name="VRM battery efficiency", status="SKIP", details="no VRM battery charge rows above threshold")
+    total = totals_for_battery_rows(meaningful)
+    return CheckResult(
+        name="VRM battery efficiency",
+        status="OK" if total.vrm_efficiency_pct is not None else "CHECK",
+        details=(
+            f"rows={len(meaningful)}, total_charge={fmt(total.vrm_charge_kwh)} kWh, "
+            f"total_discharge={fmt(total.vrm_discharge_kwh)} kWh, total_efficiency={fmt(total.vrm_efficiency_pct)}%"
+        ),
+    )
+
+
+def evaluate_vrm_vm_battery_rows(
+    rows: Sequence[BatteryEfficiencyRow], min_charge_kwh: float, pct_point_tolerance: float
+) -> CheckResult:
+    meaningful = [row for row in rows if (row.vrm_charge_kwh or 0.0) >= min_charge_kwh or (row.vm_charge_kwh or 0.0) >= min_charge_kwh]
+    if not meaningful:
+        return CheckResult(name="VRM vs VM battery", status="SKIP", details="no battery charge rows above threshold")
+    missing = sum(
+        1
+        for row in meaningful
+        if row.vrm_efficiency_pct is None or row.vm_efficiency_pct is None or row.delta_efficiency_pct_points is None
+    )
+    deltas = [abs(row.delta_efficiency_pct_points) for row in meaningful if row.delta_efficiency_pct_points is not None]
+    max_delta = max(deltas) if deltas else None
+    total = totals_for_battery_rows(meaningful)
+    total_delta = abs(total.delta_efficiency_pct_points) if total.delta_efficiency_pct_points is not None else None
+    problems = missing
+    if max_delta is not None and max_delta > pct_point_tolerance:
+        problems += 1
+    if total_delta is not None and total_delta > pct_point_tolerance:
+        problems += 1
+    return CheckResult(
+        name="VRM vs VM battery",
+        status="OK" if problems == 0 else "CHECK",
+        details=(
+            f"rows={len(meaningful)}, missing={missing}, "
+            f"max_month_efficiency_delta={fmt(max_delta)} pp, total_efficiency_delta={fmt(total_delta)} pp"
+        ),
     )
 
 
@@ -500,6 +661,33 @@ def print_vrm_table(rows: Sequence[VrmMonthlyRow]) -> None:
     print()
 
 
+def print_vrm_battery_table(rows: Sequence[BatteryEfficiencyRow]) -> None:
+    if not rows:
+        print("VRM battery efficiency: SKIP - no VRM battery rows")
+        print()
+        return
+    table_rows = list(rows) + [totals_for_battery_rows(rows)]
+    has_vm = any(row.vm_charge_kwh is not None or row.vm_discharge_kwh is not None for row in rows)
+    print("VRM battery efficiency")
+    print("----------------------")
+    if has_vm:
+        print(
+            f"{'Month':<10} {'VRM charge':>11} {'VRM disch.':>11} {'VRM eff.':>9} "
+            f"{'VM charge':>11} {'VM disch.':>11} {'VM eff.':>9} {'Delta pp':>9}"
+        )
+        for row in table_rows:
+            print(
+                f"{row.period:<10} {fmt(row.vrm_charge_kwh):>11} {fmt(row.vrm_discharge_kwh):>11} {fmt(row.vrm_efficiency_pct):>9} "
+                f"{fmt(row.vm_charge_kwh):>11} {fmt(row.vm_discharge_kwh):>11} {fmt(row.vm_efficiency_pct):>9} "
+                f"{fmt(row.delta_efficiency_pct_points):>9}"
+            )
+    else:
+        print(f"{'Month':<10} {'VRM charge':>11} {'VRM disch.':>11} {'VRM eff. %':>11}")
+        for row in table_rows:
+            print(f"{row.period:<10} {fmt(row.vrm_charge_kwh):>11} {fmt(row.vrm_discharge_kwh):>11} {fmt(row.vrm_efficiency_pct):>11}")
+    print()
+
+
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Validate cached Tibber, Influx, VM, and VRM comparison data.")
     parser.add_argument("--env-file", default=".env.local", help="Optional env file. Used only for VM_BASE_URL fallback.")
@@ -515,10 +703,17 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--total-eur-pct-tolerance", type=float, default=5.0, help="Allowed total cost delta percent.")
     parser.add_argument("--vrm-monthly-pct-tolerance", type=float, default=3.0, help="Allowed max monthly VRM-vs-VM energy delta percent.")
     parser.add_argument("--vrm-total-pct-tolerance", type=float, default=2.0, help="Allowed total VRM-vs-VM energy delta percent.")
+    parser.add_argument("--vrm-battery-min-charge-kwh", type=float, default=1.0, help="Minimum monthly battery charge for VRM battery-efficiency checks.")
+    parser.add_argument(
+        "--vrm-battery-efficiency-pct-point-tolerance",
+        type=float,
+        default=15.0,
+        help="Allowed VRM-vs-VM battery-efficiency delta in percentage points.",
+    )
     parser.add_argument(
         "--require-cache",
         action="append",
-        choices=("tibber-vm", "tibber-influx", "vrm", "vrm-vm"),
+        choices=("tibber-vm", "tibber-influx", "vrm", "vrm-vm", "vrm-battery"),
         default=[],
         help="Turn a missing cache/comparison into CHECK. Repeat for multiple required inputs.",
     )
@@ -541,6 +736,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     tibber_influx_rows: List[MonthlyCostRow] = []
     vrm_rows: List[Mapping[str, object]] = []
     vrm_vm_rows: List[VrmMonthlyRow] = []
+    vrm_battery_rows: List[BatteryEfficiencyRow] = []
 
     if tibber_vm_path and tibber_vm_path.exists():
         tibber_vm_rows = load_tibber_vm_months(tibber_vm_path, excluded_months)
@@ -577,13 +773,32 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if vrm_path and vrm_path.exists():
         vrm_rows = load_vrm_rows(vrm_path, excluded_months)
         checks.append(required_status("VRM cache", "OK" if vrm_rows else "SKIP", f"rows={len(vrm_rows)}", "vrm", required_caches))
+        vrm_battery_rows = build_vrm_battery_rows(vrm_rows)
+        vrm_battery_check = evaluate_vrm_battery_rows(vrm_battery_rows, args.vrm_battery_min_charge_kwh)
+        checks.append(
+            required_status(
+                vrm_battery_check.name,
+                vrm_battery_check.status,
+                vrm_battery_check.details,
+                "vrm-battery",
+                required_caches,
+            )
+        )
         if vm_base_url:
             vrm_vm_rows = build_vrm_vm_months(vrm_rows, vm_base_url, args.timezone)
             checks.append(evaluate_vrm_rows(vrm_vm_rows, args.vrm_monthly_pct_tolerance, args.vrm_total_pct_tolerance))
+            vrm_battery_rows = build_vrm_vm_battery_rows(vrm_rows, vm_base_url, args.timezone)
+            checks.append(
+                evaluate_vrm_vm_battery_rows(
+                    vrm_battery_rows, args.vrm_battery_min_charge_kwh, args.vrm_battery_efficiency_pct_point_tolerance
+                )
+            )
         elif "vrm-vm" in required_caches:
             checks.append(CheckResult("VRM vs VM", "CHECK", "--require-cache vrm-vm needs --vm-base-url or VM_BASE_URL"))
     else:
         checks.append(required_status("VRM cache", "SKIP", "no local VRM JSON cache found", "vrm", required_caches))
+        if "vrm-battery" in required_caches:
+            checks.append(CheckResult("VRM battery efficiency", "CHECK", "--require-cache vrm-battery needs a VRM cache"))
         if "vrm-vm" in required_caches:
             checks.append(CheckResult("VRM vs VM", "CHECK", "--require-cache vrm-vm needs a VRM cache and --vm-base-url/VM_BASE_URL"))
 
@@ -606,6 +821,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     "tibber_vm_monthly": [row.__dict__ for row in tibber_vm_rows],
                     "tibber_influx_monthly": [row.__dict__ for row in tibber_influx_rows],
                     "vrm_vm_monthly": [row.__dict__ for row in vrm_vm_rows],
+                    "vrm_battery_monthly": [row.__dict__ for row in vrm_battery_rows],
                 },
                 ensure_ascii=True,
                 indent=2,
@@ -625,6 +841,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print_cost_table("Tibber vs VM rollup costs", tibber_vm_rows, "VM")
         print_cost_table("Tibber vs Influx dashboard costs", tibber_influx_rows, "Influx")
         print_vrm_summary(vrm_rows)
+        print_vrm_battery_table(vrm_battery_rows)
         print_vrm_table(vrm_vm_rows)
         print("Checks")
         print("------")

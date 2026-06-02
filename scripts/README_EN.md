@@ -147,7 +147,7 @@ Validate cached external energy comparison snapshots after rollup or dashboard-c
 npm run test:energy-validation
 ```
 
-This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months `2025-04` and `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, and VRM cache summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals against live VM rollups.
+This reads local files from `data/energy-comparison/tibber/` and `data/energy-comparison/vrm/`, excludes documented anomaly months `2025-04` and `2025-10`, and reports monthly Tibber-vs-VM, Tibber-vs-Influx, VRM cache, and VRM battery-efficiency summaries. Add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals and battery-flow efficiency against live VM rollups.
 
 For a strict private validation job on a runner that has refreshed cache snapshots, use:
 
@@ -155,14 +155,15 @@ For a strict private validation job on a runner that has refreshed cache snapsho
 npm run test:energy-validation -- \
   --require-cache tibber-vm \
   --require-cache tibber-influx \
-  --require-cache vrm
+  --require-cache vrm \
+  --require-cache vrm-battery
 ```
 
 Add `-- --require-cache vrm-vm --vm-base-url http://127.0.0.1:8428` when the runner also has access to a VM instance with rollups. Without `--require-cache`, missing private caches are reported as `SKIP` so the command remains safe for public CI and fresh developer checkouts.
 
 The Forgejo workflow keeps the public/default path cache-optional, but can be switched into strict private validation by setting runner environment variables:
 
-- `ENERGY_VALIDATION_STRICT=1` requires Tibber-vs-VM, Tibber-vs-Influx, and VRM cache snapshots.
+- `ENERGY_VALIDATION_STRICT=1` requires Tibber-vs-VM, Tibber-vs-Influx, VRM cache, and VRM battery-efficiency snapshots.
 - `ENERGY_VALIDATION_VM_BASE_URL=http://127.0.0.1:8428` additionally enables the live VM rollup comparison and requires the VRM-vs-VM cache path.
 
 Verify that generated dashboard translations are reproducible from `dashboards/original/` and that the localization scripts do not create diffs on a clean tree:

@@ -46,7 +46,7 @@ jobs:
         run: |
           args=()
           if [ "${ENERGY_VALIDATION_STRICT:-}" = "1" ]; then
-            args+=(--require-cache tibber-vm --require-cache tibber-influx --require-cache vrm)
+            args+=(--require-cache tibber-vm --require-cache tibber-influx --require-cache vrm --require-cache vrm-battery)
             if [ -n "${ENERGY_VALIDATION_VM_BASE_URL:-}" ]; then
               args+=(--vm-base-url "$ENERGY_VALIDATION_VM_BASE_URL" --require-cache vrm-vm)
             fi
