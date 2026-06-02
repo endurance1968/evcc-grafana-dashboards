@@ -2462,358 +2462,6 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "neutral": 0
-          },
-          "decimals": 2,
-          "links": [
-            {
-              "title": "Più dettagli",
-              "url": "/d/adddvtj?$__url_time_range"
-            }
-          ],
-          "mappings": [],
-          "min": 0,
-          "max": 30,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#7a7a7a4d",
-                "value": null
-              },
-              {
-                "color": "green",
-                "value": 0.001
-              },
-              {
-                "color": "dark-green",
-                "value": 10
-              }
-            ]
-          },
-          "unit": "kW"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 0,
-        "y": 0
-      },
-      "id": 101,
-      "options": {
-        "minVizHeight": 120,
-        "minVizWidth": 140,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 28
-        }
-      },
-      "pluginVersion": "13.0.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "avg(pvPower_value{id=\"\"} / 1000)",
-          "format": "time_series",
-          "legendFormat": "FV ora",
-          "range": true,
-          "refId": "pvNow"
-        }
-      ],
-      "title": "FV ora",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "victoriametrics-metrics-datasource",
-        "uid": "${DS_VM-EVCC}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "neutral": 0
-          },
-          "decimals": 2,
-          "links": [
-            {
-              "title": "Più dettagli",
-              "url": "/d/adddvtj?$__url_time_range"
-            }
-          ],
-          "mappings": [],
-          "min": -12,
-          "max": 12,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 0.001
-              },
-              {
-                "color": "orange",
-                "value": 5
-              }
-            ]
-          },
-          "unit": "kW"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 6,
-        "y": 0
-      },
-      "id": 102,
-      "options": {
-        "minVizHeight": 120,
-        "minVizWidth": 140,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 28
-        }
-      },
-      "pluginVersion": "13.0.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "avg(gridPower_value / 1000)",
-          "format": "time_series",
-          "legendFormat": "Rete ora",
-          "range": true,
-          "refId": "gridNow"
-        }
-      ],
-      "title": "Rete ora",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "victoriametrics-metrics-datasource",
-        "uid": "${DS_VM-EVCC}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "neutral": 0
-          },
-          "decimals": 0,
-          "links": [
-            {
-              "title": "Più dettagli",
-              "url": "/d/adddvtj?$__url_time_range"
-            }
-          ],
-          "mappings": [],
-          "min": 0,
-          "max": 100,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "red",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 15
-              },
-              {
-                "color": "green",
-                "value": 35
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 12,
-        "y": 0
-      },
-      "id": 103,
-      "options": {
-        "minVizHeight": 120,
-        "minVizWidth": 140,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 28
-        }
-      },
-      "pluginVersion": "13.0.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "avg(batterySoc_value{id=\"\"})",
-          "format": "time_series",
-          "legendFormat": "SOC batteria",
-          "range": true,
-          "refId": "batterySoc"
-        }
-      ],
-      "title": "SOC batteria",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "victoriametrics-metrics-datasource",
-        "uid": "${DS_VM-EVCC}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "custom": {
-            "neutral": 0
-          },
-          "decimals": 2,
-          "links": [
-            {
-              "title": "Più dettagli",
-              "url": "/d/adddvtj?$__url_time_range"
-            }
-          ],
-          "mappings": [],
-          "min": 0,
-          "max": 22,
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "#7a7a7a4d",
-                "value": null
-              },
-              {
-                "color": "orange",
-                "value": 0.001
-              },
-              {
-                "color": "semi-dark-orange",
-                "value": 11
-              }
-            ]
-          },
-          "unit": "kW"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 6,
-        "x": 18,
-        "y": 0
-      },
-      "id": 104,
-      "options": {
-        "minVizHeight": 120,
-        "minVizWidth": 140,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto",
-        "text": {
-          "titleSize": 13,
-          "valueSize": 28
-        }
-      },
-      "pluginVersion": "13.0.1",
-      "targets": [
-        {
-          "datasource": {
-            "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM-EVCC}"
-          },
-          "editorMode": "code",
-          "expr": "sum(avg by(loadpoint) (chargePower_value / -1000))",
-          "format": "time_series",
-          "legendFormat": "Ricarica ora",
-          "range": true,
-          "refId": "chargingNow"
-        }
-      ],
-      "title": "Ricarica ora",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "victoriametrics-metrics-datasource",
-        "uid": "${DS_VM-EVCC}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
             "mode": "palette-classic"
           },
           "custom": {
@@ -2997,6 +2645,65 @@
                     {
                       "color": "#7a7a7a4d",
                       "value": 0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Più dettagli",
+                    "url": "/d/adddvtj?$__url_time_range"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SOC batteria"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 15
+                    },
+                    {
+                      "color": "green",
+                      "value": 35
                     }
                   ]
                 }
@@ -3207,6 +2914,65 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery SOC"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 100
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 15
+                    },
+                    {
+                      "color": "green",
+                      "value": 35
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Più dettagli",
+                    "url": "/d/adddvtj?$__url_time_range"
+                  }
+                ]
+              }
+            ]
           }
         ]
       },
@@ -3214,11 +2980,11 @@
         "h": 24,
         "w": 3,
         "x": 0,
-        "y": 5
+        "y": 0
       },
       "id": 74,
       "options": {
-        "minVizHeight": 200,
+        "minVizHeight": 165,
         "minVizWidth": 138,
         "orientation": "horizontal",
         "reduceOptions": {
@@ -3245,10 +3011,10 @@
           },
           "editorMode": "code",
           "expr": "avg(pvPower_value{id=\"\"} / 1000)",
-          "format": "time_series",
           "legendFormat": "PV",
           "range": true,
-          "refId": "PV"
+          "refId": "PV",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -3257,10 +3023,10 @@
           },
           "editorMode": "code",
           "expr": "avg(gridPower_value / 1000)",
-          "format": "time_series",
           "legendFormat": "Rete",
           "range": true,
-          "refId": "gridPower"
+          "refId": "gridPower",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -3269,10 +3035,10 @@
           },
           "editorMode": "code",
           "expr": "avg(homePower_value / -1000)",
-          "format": "time_series",
           "legendFormat": "Casa",
           "range": true,
-          "refId": "homePower"
+          "refId": "homePower",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -3281,10 +3047,22 @@
           },
           "editorMode": "code",
           "expr": "avg(batteryPower_value{id=\"\"} / 1000)",
-          "format": "time_series",
           "legendFormat": "Batteria",
           "range": true,
-          "refId": "batteryPower"
+          "refId": "batteryPower",
+          "format": "time_series"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(batterySoc_value{id=\"\"})",
+          "legendFormat": "SOC batteria",
+          "range": true,
+          "refId": "batterySoc",
+          "format": "time_series"
         },
         {
           "datasource": {
@@ -3293,10 +3071,10 @@
           },
           "editorMode": "code",
           "expr": "sort_by_label(avg by(loadpoint) (chargePower_value / -1000),\"loadpoint\")",
-          "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
-          "refId": "loadpointPowers"
+          "refId": "loadpointPowers",
+          "format": "time_series"
         }
       ],
       "title": "Potenza",
@@ -3308,7 +3086,7 @@
         "h": 21,
         "w": 16,
         "x": 3,
-        "y": 5
+        "y": 0
       },
       "id": 2,
       "libraryPanel": {
@@ -3321,7 +3099,7 @@
         "h": 7,
         "w": 5,
         "x": 19,
-        "y": 5
+        "y": 0
       },
       "id": 66,
       "libraryPanel": {
@@ -3334,7 +3112,7 @@
         "h": 4,
         "w": 5,
         "x": 19,
-        "y": 12
+        "y": 7
       },
       "id": 64,
       "libraryPanel": {
@@ -3347,7 +3125,7 @@
         "h": 2,
         "w": 5,
         "x": 19,
-        "y": 16
+        "y": 11
       },
       "id": 76,
       "libraryPanel": {
@@ -3360,7 +3138,7 @@
         "h": 9,
         "w": 5,
         "x": 19,
-        "y": 18
+        "y": 13
       },
       "id": 77,
       "libraryPanel": {
@@ -3373,7 +3151,7 @@
         "h": 3,
         "w": 16,
         "x": 3,
-        "y": 26
+        "y": 21
       },
       "id": 75,
       "libraryPanel": {
@@ -3386,7 +3164,7 @@
         "h": 2,
         "w": 5,
         "x": 19,
-        "y": 27
+        "y": 22
       },
       "id": 73,
       "libraryPanel": {

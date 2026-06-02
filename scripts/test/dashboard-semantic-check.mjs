@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.1
+ * Version: 2026.06.02.2
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -309,34 +309,10 @@ const criticalPanels = {
   ],
   "VM_EVCC_Today-Gauges.json": [
     {
-      "id": 101,
-      "title": "PV now",
-      "type": "gauge",
-      "minTargets": 1
-    },
-    {
-      "id": 102,
-      "title": "Grid now",
-      "type": "gauge",
-      "minTargets": 1
-    },
-    {
-      "id": 103,
-      "title": "Battery SOC",
-      "type": "gauge",
-      "minTargets": 1
-    },
-    {
-      "id": 104,
-      "title": "Charging now",
-      "type": "gauge",
-      "minTargets": 1
-    },
-    {
       "id": 74,
       "title": "Power",
       "type": "gauge",
-      "minTargets": 5
+      "minTargets": 6
     }
   ],
   "VM_EVCC_Today.json": [
