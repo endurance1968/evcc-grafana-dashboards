@@ -72,6 +72,8 @@ Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 - Rollup-Design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design.md)
 - Live-Ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest.md)
 - Schema-Referenz: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference.md)
+- Entscheidung Setup-/Filter-Statuspanel: [design/setup-filter-status-panel-decision.md](./design/setup-filter-status-panel-decision.md)
+
 ## Screenshots
 
 - Screenshot-Galerie: [screenshots/README.md](./screenshots/README.md)

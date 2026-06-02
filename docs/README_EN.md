@@ -70,6 +70,8 @@ Use these when the normal migration path reports a problem or when you need oper
 - Rollup design: [design/victoriametrics-rollup-design.md](./design/victoriametrics-rollup-design_EN.md)
 - Live ingest: [evcc-telegraf-live-ingest.md](./evcc-telegraf-live-ingest_EN.md)
 - Schema reference: [design/victoriametrics-schema-reference.md](./design/victoriametrics-schema-reference_EN.md)
+- Setup/filter status panel decision: [design/setup-filter-status-panel-decision.md](./design/setup-filter-status-panel-decision_EN.md)
+
 ## Screenshots
 
 - Screenshot gallery: [screenshots/README.md](./screenshots/README_EN.md)
