@@ -128,8 +128,23 @@ Checks:
 - critical panels are opened via `/d-solo/...&panelId=...`
 - critical panels do not render `No data` unless `--fail-no-data=false` is passed
 
-## rollup-e2e.py
+## render-e2e.mjs
 
+Purpose: start disposable Grafana and VictoriaMetrics, import fixture data, and render the critical dashboard panels in a browser.
+
+Default fixture with AUX/EXT:
+
+```bash
+npm run test:render-e2e
+```
+
+No-AUX/EXT fixture for users without additional meters. The fixture still includes home consumption and core metrics, but no `auxPower_value`, `extPower_value`, `evcc_aux_*`, or `evcc_ext_*` series:
+
+```bash
+npm run test:render-e2e:no-aux-ext
+```
+
+## rollup-e2e.py
 Purpose: validate the real rollup write path against a disposable VictoriaMetrics instance.
 
 Checks:

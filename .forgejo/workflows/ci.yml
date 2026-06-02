@@ -72,5 +72,8 @@ jobs:
       - name: Grafana render smoke E2E
         run: npm run test:render-e2e
 
+      - name: Grafana render smoke E2E without AUX/EXT
+        run: npm run test:render-e2e:no-aux-ext
+
       - name: Rollup disposable E2E
         run: npm run test:rollup-e2e

@@ -16,6 +16,7 @@
     "test:powershell-compat": "node scripts/test/powershell-deployer-compat.mjs",
     "test:query-readback": "node scripts/test/dashboard-query-readback.mjs --docker",
     "test:render-e2e": "node scripts/test/render-e2e.mjs",
+    "test:render-e2e:no-aux-ext": "node scripts/test/render-e2e.mjs --fixture-profile=no-aux-ext --tag=vm-render-e2e-no-aux-ext --manifest=tests/artifacts/import-manifest-vm-render-e2e-no-aux-ext.json",
     "test:dedup-e2e": "node scripts/test/local-checks.mjs --dedup-e2e",
     "test:rename-e2e": "node scripts/test/local-checks.mjs --rename-e2e",
     "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e",

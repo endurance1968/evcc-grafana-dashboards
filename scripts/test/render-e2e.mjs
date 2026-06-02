@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.05.31.4
- * Last modified: 2026-05-31
+ * Version: 2026.06.02.1
+ * Last modified: 2026-06-02
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -266,7 +266,11 @@ function dailyShape(base, day, index) {
   return Math.round(base * monthFactor * dayFactor * 1000) / 1000;
 }
 
-function fixtureSeries(now) {
+function fixtureSeries(now, profile = "default") {
+  if (!["default", "no-aux-ext"].includes(profile)) {
+    throw new Error(`Unsupported fixture profile '${profile}'. Use default or no-aux-ext.`);
+  }
+  const includeAuxExt = profile !== "no-aux-ext";
   const series = [];
   const days = uniqueDays(now);
   const dailyValues = [
@@ -277,8 +281,6 @@ function fixtureSeries(now) {
     ["evcc_grid_export_daily_wh", {}, 3000],
     ["evcc_grid_import_cost_daily_eur", {}, 1.8],
     ["evcc_grid_export_credit_daily_eur", {}, 0.24],
-    ["evcc_ext_energy_daily_wh", { title: "Server" }, 2500],
-    ["evcc_aux_energy_daily_wh", { title: "Aux" }, 500],
     ["evcc_battery_charge_daily_wh", {}, 1800],
     ["evcc_battery_discharge_daily_wh", {}, 900],
     ["evcc_battery_soc_daily_min_pct", {}, 35],
@@ -302,6 +304,12 @@ function fixtureSeries(now) {
     ["evcc_battery_discharge_value_daily_eur", {}, 0.27],
     ["evcc_battery_charge_feedin_cost_daily_eur", {}, 0.14],
   ];
+  if (includeAuxExt) {
+    dailyValues.push(
+      ["evcc_ext_energy_daily_wh", { title: "Server" }, 2500],
+      ["evcc_aux_energy_daily_wh", { title: "Aux" }, 500],
+    );
+  }
 
   for (const [metric, labels, value] of dailyValues) {
     addDailyRollupSeries(series, metric, labels, days, (day, index) => dailyShape(value, day, index));
@@ -336,9 +344,11 @@ function fixtureSeries(now) {
   addSeries(series, "tariffGrid_value", {}, rawValues(0.3));
   addSeries(series, "tariffFeedIn_value", {}, rawValues(0.08));
   addSeries(series, "tariffCo2_value", {}, rawValues(320));
-  addSeries(series, "extPower_value", { title: "Server" }, rawValues(350));
-  addSeries(series, "extPower_value", { title: "KWL" }, rawValues(180));
-  addSeries(series, "auxPower_value", { title: "Aux" }, rawValues(90));
+  if (includeAuxExt) {
+    addSeries(series, "extPower_value", { title: "Server" }, rawValues(350));
+    addSeries(series, "extPower_value", { title: "KWL" }, rawValues(180));
+    addSeries(series, "auxPower_value", { title: "Aux" }, rawValues(90));
+  }
   addSeries(series, "gridCurrents_l1", {}, rawValues(2));
   addSeries(series, "gridCurrents_l2", {}, rawValues(3));
   addSeries(series, "gridCurrents_l3", {}, rawValues(4));
@@ -354,8 +364,8 @@ function fixtureSeries(now) {
   return series;
 }
 
-async function importVmFixture(baseUrl, now) {
-  const body = fixtureSeries(now).map((item) => JSON.stringify(item)).join("\n") + "\n";
+async function importVmFixture(baseUrl, now, profile) {
+  const body = fixtureSeries(now, profile).map((item) => JSON.stringify(item)).join("\n") + "\n";
   const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/v1/import`, {
     method: "POST",
     headers: {
@@ -499,6 +509,7 @@ async function main() {
     tag: parseArg("tag", "vm-render-e2e"),
     manifest: parseArg("manifest", "tests/artifacts/import-manifest-vm-render-e2e.json"),
     waitMs: parseArg("wait-ms", "5000"),
+    fixtureProfile: parseArg("fixture-profile", "default"),
     keepDocker: hasFlag("keep-docker"),
   };
   const now = new Date(parseArg("fixture-now", new Date().toISOString()));
@@ -514,7 +525,7 @@ async function main() {
   try {
     await waitForHttp(`${vmBaseUrl}/health`);
     await waitForHttp(`${grafanaBaseUrl}/api/health`, 120000);
-    await importVmFixture(vmBaseUrl, now);
+    await importVmFixture(vmBaseUrl, now, args.fixtureProfile);
     const token = await createServiceToken(grafanaBaseUrl, args.grafanaUser, args.grafanaPassword);
     await createDatasource(grafanaBaseUrl, token, dockerEnv.vmContainerName);
     const env = childEnv(grafanaBaseUrl, token, args.grafanaUser, args.grafanaPassword);
@@ -539,8 +550,9 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.05.31.4");
-    console.log("Last modified: 2026-05-31");
+    console.log("Version:       2026.06.02.1");
+    console.log("Last modified: 2026-06-02");
+    console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");
     console.log("------");
