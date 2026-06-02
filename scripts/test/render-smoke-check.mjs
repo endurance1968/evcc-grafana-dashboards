@@ -1,7 +1,7 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.06.02.2
+ * Version: 2026.06.02.4
  * Last modified: 2026-06-02
  */
 import path from "node:path";
@@ -263,18 +263,66 @@ const criticalPanelsByFile = {
     {
       "id": 74,
       "title": "Power"
+    },
+    {
+      "id": 2,
+      "title": "Power history"
+    },
+    {
+      "id": 66,
+      "title": "Battery levels"
+    },
+    {
+      "id": 64,
+      "title": "Metrics"
+    },
+    {
+      "id": 40,
+      "title": "Energy"
     }
   ],
   "VM_EVCC_Today-Gauges.json": [
     {
       "id": 74,
       "title": "Power"
+    },
+    {
+      "id": 2,
+      "title": "Power history"
+    },
+    {
+      "id": 66,
+      "title": "Battery levels"
+    },
+    {
+      "id": 64,
+      "title": "Metrics"
+    },
+    {
+      "id": 77,
+      "title": "Energy"
     }
   ],
   "VM_EVCC_Today.json": [
     {
       "id": 74,
       "title": "Power"
+    },
+    {
+      "id": 2,
+      "title": "Power history"
+    },
+    {
+      "id": 66,
+      "title": "Battery levels"
+    },
+    {
+      "id": 64,
+      "title": "Metrics"
+    },
+    {
+      "id": 77,
+      "title": "Energy"
     }
   ]
 };

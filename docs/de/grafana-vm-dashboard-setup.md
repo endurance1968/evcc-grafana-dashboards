@@ -194,14 +194,14 @@ Direkte Einmal-Befehle werden ebenfalls unterstuetzt:
 - prueft Grafana-Zugriff
 - loest die feste Dashboard-Dateiliste aus `dashboards/deploy-manifest.json` auf
 - zeigt, welche Dashboards importiert werden
-- aktualisiert eingebettete Library Panels vor dem Dashboard-Import
+- importiert Dashboards mit Inline-Panels; es werden keine Grafana-Library-Panels erstellt
 - importiert Dashboards in den Ordner `EVCC`
 
-Mit `PURGE=false` werden vorhandene Dashboards per UID ueberschrieben und Library Panels in place aktualisiert.
+Mit `PURGE=false` werden vorhandene Dashboards per UID ueberschrieben. Die Dashboards nutzen Inline-Panels; Library Panels werden nicht erstellt oder aktualisiert.
 Mit `PURGE_ONLY=false` bleibt der Deployer im normalen Importmodus.
 
 Mit `PURGE=true` werden bekannte EVCC-Dashboards zuerst geloescht und danach neu erstellt. Nutze das nur, wenn du bewusst einen vollstaendigen Neuaufbau willst.
-Mit `PURGE_ONLY=true` werden bekannte EVCC-Dashboards und referenzierte EVCC-Library-Panels geloescht; danach endet der Deployer ohne Import.
+Mit `PURGE_ONLY=true` werden bekannte EVCC-Dashboards geloescht; danach endet der Deployer ohne Import.
 
 ## 6. Ergebnis pruefen
 
@@ -249,7 +249,7 @@ Setze `GRAFANA_API_TOKEN` in `vm-dashboard-install.env` oder uebergebe `--token`
 
 ### 403 / Permission denied
 
-Dem Service Account fehlen Berechtigungen fuer Dashboards, Ordner oder Library Panels.
+Dem Service Account fehlen Berechtigungen fuer Dashboards oder Ordner.
 
 ### 401 / `Invalid API key`
 

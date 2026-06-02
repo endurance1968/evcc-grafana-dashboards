@@ -65,2272 +65,6 @@
       "description": ""
     }
   ],
-  "__elements": {
-    "afc1nq1oy29s0a": {
-      "name": "EVCC: VM: Power history",
-      "uid": "afc1nq1oy29s0a",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": true,
-              "axisColorMode": "text",
-              "axisGridShow": true,
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "axisSoftMax": 9000,
-              "axisSoftMin": -9000,
-              "axisWidth": 50,
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 50,
-              "gradientMode": "opacity",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": 300000,
-              "lineInterpolation": "linear",
-              "lineStyle": {
-                "fill": "solid"
-              },
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "showValues": false,
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "line"
-              }
-            },
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "red",
-                  "value": null
-                },
-                {
-                  "color": "#b3b3b3",
-                  "value": 0
-                }
-              ]
-            },
-            "unit": "watt"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Thuis"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Net"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Garage"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Stellplatz"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Heizlüfter"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV-voorspelling"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#2F8F5B",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "custom.drawStyle",
-                  "value": "line"
-                },
-                {
-                  "id": "custom.lineInterpolation",
-                  "value": "smooth"
-                },
-                {
-                  "id": "custom.lineWidth",
-                  "value": 2
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 0
-                },
-                {
-                  "id": "custom.pointSize",
-                  "value": 0
-                },
-                {
-                  "id": "custom.lineStyle",
-                  "value": {
-                    "fill": "dash",
-                    "dash": [
-                      8,
-                      6
-                    ]
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Home"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Grid"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV forecast"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#2F8F5B",
-                    "mode": "fixed"
-                  }
-                },
-                {
-                  "id": "custom.drawStyle",
-                  "value": "line"
-                },
-                {
-                  "id": "custom.lineInterpolation",
-                  "value": "smooth"
-                },
-                {
-                  "id": "custom.lineWidth",
-                  "value": 2
-                },
-                {
-                  "id": "custom.fillOpacity",
-                  "value": 0
-                },
-                {
-                  "id": "custom.pointSize",
-                  "value": 0
-                },
-                {
-                  "id": "custom.lineStyle",
-                  "value": {
-                    "fill": "dash",
-                    "dash": [
-                      8,
-                      6
-                    ]
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "maxDataPoints": 1400,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.3.3",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "max_over_time(pvPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
-            "format": "time_series",
-            "interval": "$energySampleInterval",
-            "legendFormat": "PV",
-            "range": true,
-            "refId": "pvPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg_over_time(gridPower_value[$__interval]) < $peakPowerLimit",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Net",
-            "range": true,
-            "refId": "gridPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "max_over_time(homePower_value[$__interval]) * (-1) > (-$peakPowerLimit)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Thuis",
-            "range": true,
-            "refId": "homePower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg_over_time(batteryPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Batterij",
-            "range": true,
-            "refId": "batteryPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "max by (loadpoint) (max_over_time(chargePower_value{id=\"\", loadpoint!~\"$loadpointBlocklist\"}[$__interval])) * (-1) > (-$peakPowerLimit)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "{{loadpoint}}",
-            "range": true,
-            "refId": "loadpointPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg(tariffSolar_value)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "1h",
-            "legendFormat": "PV-voorspelling",
-            "range": true,
-            "refId": "pvForecast"
-          }
-        ],
-        "type": "timeseries"
-      }
-    },
-    "ffc1nfxu4it4wd": {
-      "name": "EVCC: VM: Battery levels",
-      "uid": "ffc1nfxu4it4wd",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "Zwart: prioriteitsdrempel voor voertuigladen",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisGridShow": true,
-              "axisLabel": "",
-              "axisPlacement": "left",
-              "axisWidth": 50,
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 50,
-              "gradientMode": "opacity",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": 1800000,
-              "lineInterpolation": "linear",
-              "lineStyle": {
-                "fill": "solid"
-              },
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "auto",
-              "showValues": false,
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "dashed"
-              }
-            },
-            "links": [],
-            "mappings": [],
-            "max": 100,
-            "min": 0,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "text",
-                  "value": null
-                }
-              ]
-            },
-            "unit": "percent"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Tesla"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Ioniq 5"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byType",
-                "options": "time"
-              },
-              "properties": [
-                {
-                  "id": "custom.axisPlacement",
-                  "value": "hidden"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "legend": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "maxHeight": 600,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.3.3",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg(batterySoc_value{id=\"\"}) < 100",
-            "format": "time_series",
-            "interval": "5m",
-            "legendFormat": "Batterij",
-            "range": true,
-            "refId": "batterySoc"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sort_by_label(avg by(vehicle) (vehicleSoc_value{vehicle!=\"\", vehicle!~\"$vehicleBlocklist\"}), \"vehicle\")",
-            "format": "time_series",
-            "hide": false,
-            "interval": "5m",
-            "legendFormat": "{{vehicle}}",
-            "range": true,
-            "refId": "vehicleSocs"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "last_over_time(prioritySoc_value[5m])",
-            "format": "time_series",
-            "hide": false,
-            "interval": "5m",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "prioritySoc"
-          }
-        ],
-        "title": "Batterijniveaus",
-        "transformations": [
-          {
-            "id": "configFromData",
-            "options": {
-              "applyTo": {
-                "id": "byFrameRefID",
-                "options": "batterySoc"
-              },
-              "configRefId": "prioritySoc",
-              "mappings": [
-                {
-                  "fieldName": "prioritySoc_value",
-                  "handlerArguments": {
-                    "threshold": {
-                      "color": "text"
-                    }
-                  },
-                  "handlerKey": "threshold1"
-                }
-              ]
-            }
-          }
-        ],
-        "transparent": false,
-        "type": "timeseries"
-      }
-    },
-    "afc1njs05twqoc": {
-      "name": "EVCC: VM: Metric gauges",
-      "uid": "afc1njs05twqoc",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "fixedColor": "semi-dark-green",
-              "mode": "thresholds"
-            },
-            "decimals": 0,
-            "links": [],
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                }
-              ]
-            },
-            "unit": "percentunit"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Autarkie"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Zelfvoorziening"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Eigenverbruik"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "purple",
-                        "value": null
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Eigenverbruik"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Autarky"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Zelfvoorziening"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Self-consumption"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "purple",
-                        "value": null
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "displayName",
-                  "value": "Eigenverbruik"
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "minVizHeight": 75,
-          "minVizWidth": 75,
-          "orientation": "auto",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "showThresholdLabels": false,
-          "showThresholdMarkers": true,
-          "sizing": "auto",
-          "text": {
-            "titleSize": 12
-          }
-        },
-        "pluginVersion": "12.3.3",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
-            "format": "time_series",
-            "hide": true,
-            "interval": "$energySampleInterval",
-            "legendFormat": "__auto",
-            "range": false,
-            "refId": "pvEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600)",
-            "format": "time_series",
-            "hide": true,
-            "interval": "$energySampleInterval",
-            "legendFormat": "__auto",
-            "range": false,
-            "refId": "gridEnergyIn"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / -3600)",
-            "format": "time_series",
-            "hide": true,
-            "interval": "$energySampleInterval",
-            "legendFormat": "__auto",
-            "range": false,
-            "refId": "gridEnergyOut"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
-            "format": "time_series",
-            "hide": true,
-            "interval": "$energySampleInterval",
-            "legendFormat": "__auto",
-            "range": false,
-            "refId": "homeEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[$__range:$energySampleInterval]) / 3600)",
-            "format": "time_series",
-            "hide": true,
-            "legendFormat": "__auto",
-            "range": false,
-            "refId": "loadpointEnergy"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
-            "hide": false,
-            "refId": "Autarky",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600), 0.001), 0), 1)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Eigenverbruik",
-            "range": false,
-            "refId": "Self-consumption"
-          }
-        ],
-        "title": "Kengetallen",
-        "transparent": false,
-        "type": "gauge"
-      }
-    },
-    "dfc1nkrqu10qoc": {
-      "name": "EVCC: VM: Metric history",
-      "uid": "dfc1nkrqu10qoc",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "auto",
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 50,
-              "gradientMode": "opacity",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": false,
-              "lineInterpolation": "smooth",
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "never",
-              "showValues": false,
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "none"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "decimals": 1,
-            "links": [],
-            "mappings": [],
-            "max": 1,
-            "min": 0,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                }
-              ]
-            },
-            "unit": "percentunit"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Autarkie"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#73BF69",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Eigenverbruik"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#B877D9",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byType",
-                "options": "time"
-              },
-              "properties": [
-                {
-                  "id": "custom.axisPlacement",
-                  "value": "hidden"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byRegexp",
-                "options": "/.*Energy.*/"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "watth"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Autarky"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#73BF69",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Self-consumption"
-              },
-              "properties": [
-                {
-                  "id": "unit",
-                  "value": "percentunit"
-                },
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "#B877D9",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "interval": "1h",
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": false
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.4.0",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1h:$energySampleInterval]) / 3600",
-            "format": "time_series",
-            "hide": true,
-            "interval": "1h",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "pvEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "integrate(clamp_min(avg(gridPower_value{id=\"\"} offset -1h) < $peakPowerLimit[1h], 0)) / 3600",
-            "format": "time_series",
-            "hide": true,
-            "interval": "1h",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "gridEnergyIn"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "integrate(clamp_max(avg(gridPower_value{id=\"\"} offset -1h) > (-$peakPowerLimit)[1h],0)) / -3600",
-            "format": "time_series",
-            "hide": true,
-            "interval": "1h",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "gridEnergyOut"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "integrate((homePower_value < $peakPowerLimit)[1h]  offset -1h) / 3600",
-            "format": "time_series",
-            "hide": true,
-            "interval": "1h",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "homeEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[1h] offset -1h) / 3600)",
-            "format": "time_series",
-            "hide": true,
-            "interval": "1h",
-            "legendFormat": "__auto",
-            "range": true,
-            "refId": "loadpointEnergy"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
-            "refId": "Autarky",
-            "type": "math"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
-            "refId": "Self-consumption",
-            "type": "math"
-          }
-        ],
-        "transparent": false,
-        "type": "timeseries"
-      }
-    },
-    "dfc1nml5oazuoc": {
-      "name": "EVCC: VM: Energy",
-      "uid": "dfc1nml5oazuoc",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": false,
-              "axisColorMode": "text",
-              "axisLabel": "",
-              "axisPlacement": "hidden",
-              "fillOpacity": 80,
-              "gradientMode": "opacity",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "lineWidth": 1,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "thresholdsStyle": {
-                "mode": "off"
-              }
-            },
-            "decimals": 1,
-            "links": [],
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                }
-              ]
-            }
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Netafname"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Teruglevering"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Thuis"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Tesla"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij laden"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij ontladen"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Ioniq 5"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Gast: Garage"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Gast: Stellplatz"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Grid import"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Feed-in"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Home"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery charge"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery discharge"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "barRadius": 0.2,
-          "barWidth": 0.9,
-          "fullHighlight": false,
-          "groupWidth": 1,
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": true
-          },
-          "orientation": "vertical",
-          "showValue": "always",
-          "stacking": "none",
-          "text": {},
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "single",
-            "sort": "none"
-          },
-          "xField": "__panel_axis",
-          "xTickLabelRotation": 0,
-          "xTickLabelSpacing": 0
-        },
-        "pluginVersion": "12.3.3",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600000)",
-            "format": "time_series",
-            "legendFormat": "PV",
-            "range": true,
-            "refId": "pvEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Netafname",
-            "range": true,
-            "refId": "gridEnergyIn"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Teruglevering",
-            "range": true,
-            "refId": "gridEnergyOut"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600000)",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Thuis",
-            "range": true,
-            "refId": "homeEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Batterij ontladen",
-            "range": true,
-            "refId": "batteryDischargeEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Batterij laden",
-            "range": true,
-            "refId": "batteryChargeEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sort_by_label(\n  sum without(host) (\n    integrate(\n      ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [$__range:$energySampleInterval]\n    ) / -3600000\n  )\n, \"vehicle\")",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "{{vehicle}}",
-            "range": true,
-            "refId": "vehiclesEnergys"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "sum without(host) ((integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[$__range:$energySampleInterval]) / -3600000))",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "Gast: {{loadpoint}}",
-            "range": true,
-            "refId": "guestVehicleEnergy"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "1",
-            "format": "time_series",
-            "hide": false,
-            "legendFormat": "__panel_axis",
-            "range": true,
-            "refId": "panelGuard"
-          }
-        ],
-        "title": "Energie (kWh)",
-        "transformations": [
-          {
-            "id": "reduce",
-            "options": {
-              "includeTimeField": false,
-              "mode": "seriesToRows",
-              "reducers": [
-                "lastNotNull"
-              ]
-            }
-          },
-          {
-            "id": "filterByValue",
-            "options": {
-              "filters": [
-                {
-                  "config": {
-                    "id": "equal",
-                    "options": {
-                      "value": "0"
-                    }
-                  },
-                  "fieldName": "Last *"
-                }
-              ],
-              "match": "any",
-              "type": "exclude"
-            }
-          },
-          {
-            "id": "rowsToFields",
-            "options": {
-              "mappings": [
-                {
-                  "fieldName": "PV",
-                  "handlerKey": "field.name"
-                },
-                {
-                  "fieldName": "Field",
-                  "handlerKey": "field.name"
-                }
-              ]
-            }
-          }
-        ],
-        "transparent": false,
-        "type": "barchart"
-      }
-    },
-    "afc1nrf3k9hc0e": {
-      "name": "EVCC: VM: Power distribution",
-      "uid": "afc1nrf3k9hc0e",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "palette-classic"
-            },
-            "custom": {
-              "axisBorderShow": false,
-              "axisCenteredZero": true,
-              "axisColorMode": "text",
-              "axisGridShow": false,
-              "axisLabel": "",
-              "axisPlacement": "left",
-              "axisWidth": 50,
-              "barAlignment": 0,
-              "barWidthFactor": 0.6,
-              "drawStyle": "line",
-              "fillOpacity": 80,
-              "gradientMode": "none",
-              "hideFrom": {
-                "legend": false,
-                "tooltip": false,
-                "viz": false
-              },
-              "insertNulls": 300000,
-              "lineInterpolation": "smooth",
-              "lineStyle": {
-                "fill": "solid"
-              },
-              "lineWidth": 1,
-              "pointSize": 5,
-              "scaleDistribution": {
-                "type": "linear"
-              },
-              "showPoints": "never",
-              "showValues": false,
-              "spanNulls": false,
-              "stacking": {
-                "group": "A",
-                "mode": "percent"
-              },
-              "thresholdsStyle": {
-                "mode": "line"
-              }
-            },
-            "mappings": [],
-            "max": 1,
-            "min": -1,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "red",
-                  "value": null
-                },
-                {
-                  "color": "#b3b3b3",
-                  "value": 0
-                }
-              ]
-            },
-            "unit": "watt"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "PV"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "semi-dark-green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Thuis"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Netafname"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Garage"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "light-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij ontladen"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Stellplatz"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "dark-orange",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Teruglevering"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Batterij laden"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byType",
-                "options": "time"
-              },
-              "properties": [
-                {
-                  "id": "custom.axisPlacement",
-                  "value": "hidden"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Home"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "purple",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Grid import"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery discharge"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Feed-in"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "yellow",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Battery charge"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "blue",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "maxDataPoints": 1400,
-        "options": {
-          "legend": {
-            "calcs": [],
-            "displayMode": "list",
-            "placement": "bottom",
-            "showLegend": false
-          },
-          "tooltip": {
-            "hideZeros": false,
-            "mode": "multi",
-            "sort": "none"
-          }
-        },
-        "pluginVersion": "12.3.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "clamp_min(avg(gridPower_value) < $peakPowerLimit,0)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Netafname",
-            "range": true,
-            "refId": "gridPowerIn"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "clamp_max(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Batterij ontladen",
-            "range": true,
-            "refId": "batteryPowerOut"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg(pvPower_value{id=\"\"}) < $peakPowerLimit",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "PV",
-            "range": true,
-            "refId": "pvPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "clamp_max(avg(gridPower_value) < $peakPowerLimit,0)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Teruglevering",
-            "range": true,
-            "refId": "gridPowerOut"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "clamp_min(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Batterij laden",
-            "range": true,
-            "refId": "batteryPowerIn"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg by (loadpoint) (chargePower_value{id=\"\"}) * (-1) > (-$peakPowerLimit)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "{{loadpoint}}",
-            "range": true,
-            "refId": "loadpointPower"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "avg(homePower_value) * (-1) > (-$peakPowerLimit)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$energySampleInterval",
-            "legendFormat": "Thuis",
-            "range": true,
-            "refId": "homePower"
-          }
-        ],
-        "transparent": false,
-        "type": "timeseries"
-      }
-    },
-    "afc1no2uz7u9sf": {
-      "name": "EVCC: VM: Costs",
-      "uid": "afc1no2uz7u9sf",
-      "kind": 1,
-      "model": {
-        "datasource": {
-          "type": "victoriametrics-metrics-datasource",
-          "uid": "${DS_VM-EVCC}"
-        },
-        "description": "",
-        "fieldConfig": {
-          "defaults": {
-            "color": {
-              "mode": "thresholds"
-            },
-            "decimals": 2,
-            "links": [
-              {
-                "title": "Meer details",
-                "url": "/d/adddvtj?$__url_time_range"
-              }
-            ],
-            "mappings": [],
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "red",
-                  "value": 80
-                }
-              ]
-            },
-            "unit": "currencyEUR"
-          },
-          "overrides": [
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Aangekocht"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Verkocht"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "dailyTotal"
-              },
-              "properties": [
-                {
-                  "id": "thresholds",
-                  "value": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": null
-                      },
-                      {
-                        "color": "red",
-                        "value": 0
-                      }
-                    ]
-                  }
-                },
-                {
-                  "id": "color"
-                },
-                {
-                  "id": "displayName",
-                  "value": "Dagtotaal"
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Purchased"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "red",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            },
-            {
-              "matcher": {
-                "id": "byName",
-                "options": "Sold"
-              },
-              "properties": [
-                {
-                  "id": "color",
-                  "value": {
-                    "fixedColor": "green",
-                    "mode": "fixed"
-                  }
-                }
-              ]
-            }
-          ]
-        },
-        "options": {
-          "colorMode": "value",
-          "graphMode": "none",
-          "justifyMode": "auto",
-          "orientation": "vertical",
-          "percentChangeColorMode": "standard",
-          "reduceOptions": {
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": "",
-            "values": false
-          },
-          "showPercentChange": false,
-          "text": {
-            "titleSize": 10,
-            "valueSize": 20
-          },
-          "textMode": "auto",
-          "wideLayout": true
-        },
-        "pluginVersion": "12.3.2",
-        "targets": [
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$tariffPriceInterval",
-            "legendFormat": "Aangekocht",
-            "range": true,
-            "refId": "boughtTotal"
-          },
-          {
-            "datasource": {
-              "type": "victoriametrics-metrics-datasource",
-              "uid": "${DS_VM-EVCC}"
-            },
-            "editorMode": "code",
-            "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
-            "format": "time_series",
-            "hide": false,
-            "interval": "$tariffPriceInterval",
-            "legendFormat": "Verkocht",
-            "range": true,
-            "refId": "soldTotal"
-          },
-          {
-            "datasource": {
-              "name": "Expression",
-              "type": "__expr__",
-              "uid": "__expr__"
-            },
-            "expression": "$boughtTotal + $soldTotal",
-            "hide": false,
-            "refId": "dailyTotal",
-            "type": "math"
-          }
-        ],
-        "transparent": false,
-        "type": "stat"
-      }
-    }
-  },
   "__requires": [
     {
       "type": "panel",
@@ -2952,95 +686,2286 @@
       "type": "gauge"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": true,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMax": 9000,
+            "axisSoftMin": -9000,
+            "axisWidth": 50,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 300000,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "#b3b3b3",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Thuis"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Net"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Garage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stellplatz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Heizlüfter"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV-voorspelling"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2F8F5B",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    8,
+                    6
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV forecast"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#2F8F5B",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "line"
+              },
+              {
+                "id": "custom.lineInterpolation",
+                "value": "smooth"
+              },
+              {
+                "id": "custom.lineWidth",
+                "value": 2
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              },
+              {
+                "id": "custom.pointSize",
+                "value": 0
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    8,
+                    6
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "max_over_time(pvPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
+          "format": "time_series",
+          "interval": "$energySampleInterval",
+          "legendFormat": "PV",
+          "range": true,
+          "refId": "pvPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(gridPower_value[$__interval]) < $peakPowerLimit",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Net",
+          "range": true,
+          "refId": "gridPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "max_over_time(homePower_value[$__interval]) * (-1) > (-$peakPowerLimit)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Thuis",
+          "range": true,
+          "refId": "homePower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(batteryPower_value{id=\"\"}[$__interval]) < $peakPowerLimit",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Batterij",
+          "range": true,
+          "refId": "batteryPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "max by (loadpoint) (max_over_time(chargePower_value{id=\"\", loadpoint!~\"$loadpointBlocklist\"}[$__interval])) * (-1) > (-$peakPowerLimit)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{loadpoint}}",
+          "range": true,
+          "refId": "loadpointPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(tariffSolar_value)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "1h",
+          "legendFormat": "PV-voorspelling",
+          "range": true,
+          "refId": "pvForecast"
+        }
+      ],
+      "type": "timeseries",
+      "id": 2,
       "gridPos": {
         "h": 21,
         "w": 16,
         "x": 3,
         "y": 0
       },
-      "id": 2,
-      "libraryPanel": {
-        "uid": "afc1nq1oy29s0a",
-        "name": "EVCC: VM: Power history"
-      }
+      "title": "Power history"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "Zwart: prioriteitsdrempel voor voertuigladen",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisGridShow": true,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 50,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 1800000,
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "dashed"
+            }
+          },
+          "links": [],
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tesla"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ioniq 5"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "maxHeight": 600,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(batterySoc_value{id=\"\"}) < 100",
+          "format": "time_series",
+          "interval": "5m",
+          "legendFormat": "Batterij",
+          "range": true,
+          "refId": "batterySoc"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(avg by(vehicle) (vehicleSoc_value{vehicle!=\"\", vehicle!~\"$vehicleBlocklist\"}), \"vehicle\")",
+          "format": "time_series",
+          "hide": false,
+          "interval": "5m",
+          "legendFormat": "{{vehicle}}",
+          "range": true,
+          "refId": "vehicleSocs"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "last_over_time(prioritySoc_value[5m])",
+          "format": "time_series",
+          "hide": false,
+          "interval": "5m",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "prioritySoc"
+        }
+      ],
+      "title": "Batterijniveaus",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {
+            "applyTo": {
+              "id": "byFrameRefID",
+              "options": "batterySoc"
+            },
+            "configRefId": "prioritySoc",
+            "mappings": [
+              {
+                "fieldName": "prioritySoc_value",
+                "handlerArguments": {
+                  "threshold": {
+                    "color": "text"
+                  }
+                },
+                "handlerKey": "threshold1"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": false,
+      "type": "timeseries",
+      "id": 66,
       "gridPos": {
         "h": 7,
         "w": 5,
         "x": 19,
         "y": 0
-      },
-      "id": 66,
-      "libraryPanel": {
-        "uid": "ffc1nfxu4it4wd",
-        "name": "EVCC: VM: Battery levels"
       }
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "semi-dark-green",
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Autarkie"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Zelfvoorziening"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Eigenverbruik"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "purple",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Eigenverbruik"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Autarky"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Zelfvoorziening"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Self-consumption"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "purple",
+                      "value": null
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Eigenverbruik"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "text": {
+          "titleSize": 12
+        }
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
+          "format": "time_series",
+          "hide": true,
+          "interval": "$energySampleInterval",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "pvEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600)",
+          "format": "time_series",
+          "hide": true,
+          "interval": "$energySampleInterval",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "gridEnergyIn"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / -3600)",
+          "format": "time_series",
+          "hide": true,
+          "interval": "$energySampleInterval",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "gridEnergyOut"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600)",
+          "format": "time_series",
+          "hide": true,
+          "interval": "$energySampleInterval",
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "homeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[$__range:$energySampleInterval]) / 3600)",
+          "format": "time_series",
+          "hide": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "loadpointEnergy"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
+          "hide": false,
+          "refId": "Autarky",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_max(clamp_min((sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600) - sum(integrate((((gridPower_value < 0 <$peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600))) / clamp_min(sum(integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600), 0.001), 0), 1)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Eigenverbruik",
+          "range": false,
+          "refId": "Self-consumption"
+        }
+      ],
+      "title": "Kengetallen",
+      "transparent": false,
+      "type": "gauge",
+      "id": 64,
       "gridPos": {
         "h": 4,
         "w": 5,
         "x": 19,
         "y": 7
-      },
-      "id": 64,
-      "libraryPanel": {
-        "uid": "afc1njs05twqoc",
-        "name": "EVCC: VM: Metric gauges"
       }
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "links": [],
+          "mappings": [],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Autarkie"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Eigenverbruik"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#B877D9",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*Energy.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "watth"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Autarky"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Self-consumption"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#B877D9",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "interval": "1h",
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[1h:$energySampleInterval]) / 3600",
+          "format": "time_series",
+          "hide": true,
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "pvEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "integrate(clamp_min(avg(gridPower_value{id=\"\"} offset -1h) < $peakPowerLimit[1h], 0)) / 3600",
+          "format": "time_series",
+          "hide": true,
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "gridEnergyIn"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "integrate(clamp_max(avg(gridPower_value{id=\"\"} offset -1h) > (-$peakPowerLimit)[1h],0)) / -3600",
+          "format": "time_series",
+          "hide": true,
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "gridEnergyOut"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "integrate((homePower_value < $peakPowerLimit)[1h]  offset -1h) / 3600",
+          "format": "time_series",
+          "hide": true,
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "homeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum(integrate(avg by (loadpoint)(chargePower_value{loadpoint!=\"\"})[1h] offset -1h) / 3600)",
+          "format": "time_series",
+          "hide": true,
+          "interval": "1h",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "loadpointEnergy"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "1 - $gridEnergyIn/($homeEnergy+$loadpointEnergy)",
+          "refId": "Autarky",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
+          "refId": "Self-consumption",
+          "type": "math"
+        }
+      ],
+      "transparent": false,
+      "type": "timeseries",
+      "id": 76,
       "gridPos": {
         "h": 2,
         "w": 5,
         "x": 19,
         "y": 11
       },
-      "id": 76,
-      "libraryPanel": {
-        "uid": "dfc1nkrqu10qoc",
-        "name": "EVCC: VM: Metric history"
-      }
+      "title": "Metric history"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "hidden",
+            "fillOpacity": 80,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "links": [],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Netafname"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Teruglevering"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Thuis"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Tesla"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij laden"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij ontladen"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Ioniq 5"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gast: Garage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Gast: Stellplatz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid import"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Feed-in"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery charge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery discharge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "barRadius": 0.2,
+        "barWidth": 0.9,
+        "fullHighlight": false,
+        "groupWidth": 1,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "vertical",
+        "showValue": "always",
+        "stacking": "none",
+        "text": {},
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xField": "__panel_axis",
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(((pvPower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / 3600000)",
+          "format": "time_series",
+          "legendFormat": "PV",
+          "range": true,
+          "refId": "pvEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Netafname",
+          "range": true,
+          "refId": "gridEnergyIn"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(\n  ((gridPower_value < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Teruglevering",
+          "range": true,
+          "refId": "gridEnergyOut"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(((homePower_value{id=\"\"} < $peakPowerLimit) default 0)[$__range:$energySampleInterval]) / -3600000)",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Thuis",
+          "range": true,
+          "refId": "homeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Batterij ontladen",
+          "range": true,
+          "refId": "batteryDischargeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) (integrate(\n  ((batteryPower_value {id=\"\"} < 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Batterij laden",
+          "range": true,
+          "refId": "batteryChargeEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sort_by_label(\n  sum without(host) (\n    integrate(\n      ((chargePower_value{vehicle!=\"\", vehicle !~ \"$vehicleBlocklist\"}) default 0) [$__range:$energySampleInterval]\n    ) / -3600000\n  )\n, \"vehicle\")",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "{{vehicle}}",
+          "range": true,
+          "refId": "vehiclesEnergys"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "sum without(host) ((integrate((chargePower_value{vehicle=\"\", loadpoint !~ \"$loadpointBlocklist\"} default 0)[$__range:$energySampleInterval]) / -3600000))",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "Gast: {{loadpoint}}",
+          "range": true,
+          "refId": "guestVehicleEnergy"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "1",
+          "format": "time_series",
+          "hide": false,
+          "legendFormat": "__panel_axis",
+          "range": true,
+          "refId": "panelGuard"
+        }
+      ],
+      "title": "Energie",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "includeTimeField": false,
+            "mode": "seriesToRows",
+            "reducers": [
+              "lastNotNull"
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "0"
+                  }
+                },
+                "fieldName": "Last *"
+              }
+            ],
+            "match": "any",
+            "type": "exclude"
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "PV",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "Field",
+                "handlerKey": "field.name"
+              }
+            ]
+          }
+        }
+      ],
+      "transparent": false,
+      "type": "barchart",
+      "id": 77,
       "gridPos": {
         "h": 9,
         "w": 5,
         "x": 19,
         "y": 13
-      },
-      "id": 77,
-      "libraryPanel": {
-        "uid": "dfc1nml5oazuoc",
-        "name": "EVCC: VM: Energy"
       }
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": true,
+            "axisColorMode": "text",
+            "axisGridShow": false,
+            "axisLabel": "",
+            "axisPlacement": "left",
+            "axisWidth": 50,
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": 300000,
+            "lineInterpolation": "smooth",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "percent"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "max": 1,
+          "min": -1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "#b3b3b3",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "watt"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PV"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Thuis"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Netafname"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Garage"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "light-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij ontladen"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stellplatz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Teruglevering"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Batterij laden"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "time"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Home"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "purple",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Grid import"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery discharge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Feed-in"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Battery charge"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "maxDataPoints": 1400,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(avg(gridPower_value) < $peakPowerLimit,0)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Netafname",
+          "range": true,
+          "refId": "gridPowerIn"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_max(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Batterij ontladen",
+          "range": true,
+          "refId": "batteryPowerOut"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(pvPower_value{id=\"\"}) < $peakPowerLimit",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "PV",
+          "range": true,
+          "refId": "pvPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_max(avg(gridPower_value) < $peakPowerLimit,0)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Teruglevering",
+          "range": true,
+          "refId": "gridPowerOut"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "clamp_min(avg(batteryPower_value{id=\"\"}) *(-1) > (-$peakPowerLimit),0) * (-1)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Batterij laden",
+          "range": true,
+          "refId": "batteryPowerIn"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg by (loadpoint) (chargePower_value{id=\"\"}) * (-1) > (-$peakPowerLimit)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "{{loadpoint}}",
+          "range": true,
+          "refId": "loadpointPower"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "avg(homePower_value) * (-1) > (-$peakPowerLimit)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$energySampleInterval",
+          "legendFormat": "Thuis",
+          "range": true,
+          "refId": "homePower"
+        }
+      ],
+      "transparent": false,
+      "type": "timeseries",
+      "id": 75,
       "gridPos": {
         "h": 3,
         "w": 16,
         "x": 3,
         "y": 21
       },
-      "id": 75,
-      "libraryPanel": {
-        "uid": "afc1nrf3k9hc0e",
-        "name": "EVCC: VM: Power distribution"
-      }
+      "title": "Power distribution"
     },
     {
+      "datasource": {
+        "type": "victoriametrics-metrics-datasource",
+        "uid": "${DS_VM-EVCC}"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "links": [
+            {
+              "title": "Meer details",
+              "url": "/d/adddvtj?$__url_time_range"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Aangekocht"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Verkocht"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dailyTotal"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "color"
+              },
+              {
+                "id": "displayName",
+                "value": "Dagtotaal"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Purchased"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Sold"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 10,
+          "valueSize": 20
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "Aangekocht",
+          "range": true,
+          "refId": "boughtTotal"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM-EVCC}"
+          },
+          "editorMode": "code",
+          "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
+          "format": "time_series",
+          "hide": false,
+          "interval": "$tariffPriceInterval",
+          "legendFormat": "Verkocht",
+          "range": true,
+          "refId": "soldTotal"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$boughtTotal + $soldTotal",
+          "hide": false,
+          "refId": "dailyTotal",
+          "type": "math"
+        }
+      ],
+      "transparent": false,
+      "type": "stat",
+      "id": 73,
       "gridPos": {
         "h": 2,
         "w": 5,
         "x": 19,
         "y": 22
       },
-      "id": 73,
-      "libraryPanel": {
-        "uid": "afc1no2uz7u9sf",
-        "name": "EVCC: VM: Costs"
-      }
+      "title": "Kosten"
     }
   ],
   "preload": false,

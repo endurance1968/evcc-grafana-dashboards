@@ -307,7 +307,7 @@ These dashboards query raw metrics directly:
 Special note:
 
 - the `Today` PV forecast line uses raw `tariffSolar_value`
-- the large `Today` power plot is a Grafana library panel, so source changes must also update the library panel
+- the large `Today` power plot is embedded directly in the dashboard, so source changes deploy without separate Grafana library panels
 
 ### Rollup dashboards
 

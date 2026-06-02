@@ -9,7 +9,7 @@ Dieses Dokument ist die Optionsreferenz fuer den Deployer.
 ## Ziele des Deployers
 
 - kein Node.js fuer Endnutzer erforderlich
-- Dashboards und eingebettete Grafana-Library-Panels importieren
+- Dashboards mit Inline-Panels importieren; es werden keine Grafana-Library-Panels erstellt
 - Windows PowerShell, portable POSIX-Shell mit Python und Bash + `jq` unterstuetzen
 - `PURGE=false` und `PURGE_ONLY=false` als sicheren Default behalten
 
@@ -82,7 +82,7 @@ DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
-Lokale Dashboard-Verzeichnisquelle. Das Verzeichnis muss die sechs deploybaren Dashboard-JSON-Dateien fuer die gewaehlte Sprache/Variante enthalten; der Deployer liest in diesem Modus kein Repository-Manifest:
+Lokale Dashboard-Verzeichnisquelle. Das Verzeichnis muss die sieben deploybaren Dashboard-JSON-Dateien fuer die gewaehlte Sprache/Variante enthalten; der Deployer liest in diesem Modus kein Repository-Manifest:
 
 ```env
 DASHBOARD_SOURCE_MODE=localdir
@@ -118,20 +118,20 @@ PURGE=false
 PURGE_ONLY=false
 ```
 
-`PURGE=false` ueberschreibt bekannte Dashboards per UID und aktualisiert referenzierte Library Panels in place.
+`PURGE=false` ueberschreibt bekannte Dashboards per UID. Die Dashboards nutzen Inline-Panels; Library Panels werden nicht erstellt oder aktualisiert.
 `PURGE_ONLY=false` haelt den Deployer im normalen Importmodus.
 
 ```env
 PURGE=true
 ```
 
-`PURGE=true` loescht bekannte EVCC-Dashboards zuerst und erstellt Dashboards und eingebettete Library Panels danach neu. Nutze das fuer einen bewussten vollstaendigen Neuaufbau.
+`PURGE=true` loescht bekannte EVCC-Dashboards zuerst und importiert sie danach neu. Nutze das fuer einen bewussten vollstaendigen Neuaufbau.
 
 ```env
 PURGE_ONLY=true
 ```
 
-`PURGE_ONLY=true` loescht bekannte EVCC-Dashboards und referenzierte EVCC-Library-Panels und beendet danach ohne Import. Nutze das nur, wenn du die deployten Dashboards absichtlich aus Grafana entfernen willst.
+`PURGE_ONLY=true` loescht bekannte EVCC-Dashboards und beendet danach ohne Import. Nutze das nur, wenn du die deployten Dashboards absichtlich aus Grafana entfernen willst.
 
 ## Optionale Dashboard-Variablen-Overrides
 

@@ -31,7 +31,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.02.1'
+$ScriptVersion = '2026.06.02.2'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-06-02'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -720,8 +720,12 @@ Write-Host ''
 if ($purgeOnlyEnabled) { Write-Host 'Will inspect dashboards for purge-only deletion:' } else { Write-Host 'Will import dashboards:' }
 foreach ($dashboard in $dashboards) { Write-Host "- $(Get-DashboardTitle $dashboard.raw) [$(Get-DashboardUid $dashboard.raw)]" }
 Write-Host ''
-Write-Host 'Dashboards embed these library panels:'
-foreach ($element in $libraryElements.Values) { Write-Host "- $($element.name) [$($element.uid)]" }
+if ($libraryElements.Count -gt 0) {
+  Write-Host 'Dashboards embed these legacy library panels:'
+  foreach ($element in $libraryElements.Values) { Write-Host "- $($element.name) [$($element.uid)]" }
+} else {
+  Write-Host 'Panel mode: inline dashboards (no Grafana library panels will be created or updated)'
+}
 
 $existingLibrary = @{}
 foreach ($element in $libraryElements.Values) {
@@ -753,8 +757,12 @@ if ($purgeEnabled) {
   if ($purgeOnlyEnabled) { Write-Host 'Will delete existing dashboards without import:' } else { Write-Host 'Will delete existing dashboards before import:' }
   if ($existingDashboards.Count -eq 0) { Write-Host '- none' } else { foreach ($item in $existingDashboards) { Write-Host "- $(Get-DashboardTitle $item) [$(Get-DashboardUid $item)]" } }
   Write-Host ''
-  if ($purgeOnlyEnabled) { Write-Host 'Will delete referenced library panels after dashboard deletion:' } else { Write-Host 'Will ensure referenced library panels before import:' }
-  if ($existingLibrary.Count -eq 0) { if ($purgeOnlyEnabled) { Write-Host '- none' } else { Write-Host '- none found yet; missing panels will be created' } } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
+  if ($libraryElements.Count -gt 0) {
+    if ($purgeOnlyEnabled) { Write-Host 'Will delete referenced legacy library panels after dashboard deletion:' } else { Write-Host 'Will ensure referenced legacy library panels before import:' }
+    if ($existingLibrary.Count -eq 0) { if ($purgeOnlyEnabled) { Write-Host '- none' } else { Write-Host '- none found yet; missing panels will be created' } } else { foreach ($item in $existingLibrary.Values) { Write-Host "- $($item.name) [$($item.uid)]" } }
+  } else {
+    Write-Host 'Panel mode: inline dashboards; no library panel API calls are needed'
+  }
 }
 
 Write-Host ''

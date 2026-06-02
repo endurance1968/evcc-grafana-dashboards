@@ -7,7 +7,7 @@ This document is the deployer option reference.
 ## Deployer Goals
 
 - no Node.js required for end users
-- import dashboards and embedded Grafana library panels
+- import dashboards with inline panels; no Grafana library panels are created
 - support Windows PowerShell, portable POSIX shell with Python, and Bash + `jq`
 - keep `PURGE=false` and `PURGE_ONLY=false` as the safe default
 
@@ -80,7 +80,7 @@ DASHBOARD_SOURCE_MODE=rawurl
 DASHBOARD_RAW_BASE_URL=http://<server:port>/<reponame>/raw/branch/main
 ```
 
-Local dashboard directory source. The directory must contain the six deployable dashboard JSON files for the selected language/variant; the deployer does not read a repository manifest in this mode:
+Local dashboard directory source. The directory must contain the seven deployable dashboard JSON files for the selected language/variant; the deployer does not read a repository manifest in this mode:
 
 ```env
 DASHBOARD_SOURCE_MODE=localdir
@@ -116,20 +116,20 @@ PURGE=false
 PURGE_ONLY=false
 ```
 
-`PURGE=false` overwrites known dashboards by UID and updates referenced library panels in place.
+`PURGE=false` overwrites known dashboards by UID. Dashboards use inline panels; library panels are not created or updated.
 `PURGE_ONLY=false` keeps the deployer in normal import mode.
 
 ```env
 PURGE=true
 ```
 
-`PURGE=true` deletes known EVCC dashboards first and then recreates dashboards and embedded library panels. Use this for a deliberate full rebuild.
+`PURGE=true` deletes known EVCC dashboards first and then imports them again. Use this for a deliberate full rebuild.
 
 ```env
 PURGE_ONLY=true
 ```
 
-`PURGE_ONLY=true` deletes known EVCC dashboards and referenced EVCC library panels, then stops without importing anything. Use this only when you intentionally want to remove the deployed dashboards from Grafana.
+`PURGE_ONLY=true` deletes known EVCC dashboards, then stops without importing anything. Use this only when you intentionally want to remove the deployed dashboards from Grafana.
 
 ## Optional Dashboard Variable Overrides
 

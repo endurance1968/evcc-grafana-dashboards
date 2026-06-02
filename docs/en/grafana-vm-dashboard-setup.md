@@ -192,14 +192,14 @@ Direct one-time commands are also supported:
 - verifies Grafana access
 - resolves the fixed dashboard file list from `dashboards/deploy-manifest.json`
 - shows which dashboards will be imported
-- updates embedded library panels before dashboard import
+- imports dashboards with inline panels; no Grafana library panels are created
 - imports dashboards into the `EVCC` folder
 
-With `PURGE=false`, existing dashboards are overwritten by UID and library panels are updated in place.
+With `PURGE=false`, existing dashboards are overwritten by UID. Dashboards use inline panels; library panels are not created or updated.
 With `PURGE_ONLY=false`, the deployer stays in normal import mode.
 
 With `PURGE=true`, known EVCC dashboards are deleted first and then recreated. Use it only when you intentionally want a full rebuild.
-With `PURGE_ONLY=true`, known EVCC dashboards and referenced EVCC library panels are deleted, then the deployer stops without importing anything.
+With `PURGE_ONLY=true`, known EVCC dashboards are deleted, then the deployer stops without importing anything.
 
 ## 6. Verify The Result
 
@@ -247,7 +247,7 @@ Set `GRAFANA_API_TOKEN` in `vm-dashboard-install.env` or pass `--token` / `-toke
 
 ### 403 / Permission denied
 
-The service account lacks permissions to manage dashboards, folders, or library panels.
+The service account lacks permissions to manage dashboards or folders.
 
 ### 401 / `Invalid API key`
 

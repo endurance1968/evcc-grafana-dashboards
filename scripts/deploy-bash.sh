@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.02.1"
+SCRIPT_VERSION="2026.06.02.2"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-02"
 SCRIPT_NAME="${0##*/}"
@@ -658,11 +658,15 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   echo "- $(dashboard_title "$raw_file") [$(dashboard_uid "$raw_file")]"
 done
 echo
-echo "Dashboards embed these library panels:"
-for lib_file in "$LIB_DIR"/*.json; do
-  [[ -e "$lib_file" ]] || continue
-  echo "- $(jq -r '.name' "$lib_file") [$(jq -r '.uid' "$lib_file")]"
-done
+if compgen -G "$LIB_DIR/*.json" >/dev/null; then
+  echo "Dashboards embed these legacy library panels:"
+  for lib_file in "$LIB_DIR"/*.json; do
+    [[ -e "$lib_file" ]] || continue
+    echo "- $(jq -r '.name' "$lib_file") [$(jq -r '.uid' "$lib_file")]"
+  done
+else
+  echo "Panel mode: inline dashboards (no Grafana library panels will be created or updated)"
+fi
 
 existing_library=()
 for lib_file in "$LIB_DIR"/*.json; do
@@ -712,29 +716,33 @@ if truthy "$PURGE_EFFECTIVE"; then
   [[ "$found" -eq 1 ]] || echo "- none"
 
   echo
-  if truthy "$PURGE_ONLY"; then
-    echo "Will delete referenced library panels after dashboard deletion:"
-  else
-    echo "Will ensure referenced library panels before import:"
-  fi
-  found=0
-  for lib_file in "$LIB_DIR"/*.json; do
-    [[ -e "$lib_file" ]] || continue
-    uid=$(jq -r '.uid' "$lib_file")
-    purge_out="$TMP_DIR/check-library.json"
-    status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
-    if [[ "$status" == "200" ]]; then
-      echo "- $(jq -r '.result.name' "$purge_out") [$uid]"
-      found=1
-    elif [[ "$status" != "404" ]]; then
-      echo "Failed to inspect library panel $uid: $(cat "$purge_out")" >&2
-      exit 1
+  if compgen -G "$LIB_DIR/*.json" >/dev/null; then
+    if truthy "$PURGE_ONLY"; then
+      echo "Will delete referenced legacy library panels after dashboard deletion:"
+    else
+      echo "Will ensure referenced legacy library panels before import:"
     fi
-  done
-  if truthy "$PURGE_ONLY"; then
-    [[ "$found" -eq 1 ]] || echo "- none"
+    found=0
+    for lib_file in "$LIB_DIR"/*.json; do
+      [[ -e "$lib_file" ]] || continue
+      uid=$(jq -r '.uid' "$lib_file")
+      purge_out="$TMP_DIR/check-library.json"
+      status=$(api GET "/api/library-elements/$(urlencode "$uid")" "" "$purge_out")
+      if [[ "$status" == "200" ]]; then
+        echo "- $(jq -r '.result.name' "$purge_out") [$uid]"
+        found=1
+      elif [[ "$status" != "404" ]]; then
+        echo "Failed to inspect library panel $uid: $(cat "$purge_out")" >&2
+        exit 1
+      fi
+    done
+    if truthy "$PURGE_ONLY"; then
+      [[ "$found" -eq 1 ]] || echo "- none"
+    else
+      [[ "$found" -eq 1 ]] || echo "- none found yet; missing panels will be created"
+    fi
   else
-    [[ "$found" -eq 1 ]] || echo "- none found yet; missing panels will be created"
+    echo "Panel mode: inline dashboards; no library panel API calls are needed"
   fi
 fi
 

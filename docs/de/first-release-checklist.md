@@ -35,8 +35,8 @@ Wenn einer der Punkte offen ist, sollte der Release nicht als final veroeffentli
 - [x] `deploy.ps1` funktioniert unter Windows PowerShell mit sauberem Dashboard-Deployment.
 - [x] `deploy-python.sh` funktioniert unter Linux mit sauberem Dashboard-Deployment.
 - [x] `deploy-bash.sh` funktioniert unter Linux mit sauberem Dashboard-Deployment.
-- [x] `purge=true` erstellt Dashboards und eingebettete Library Panels sauber neu.
-- [x] `purge=false` aktualisiert bestehende Library Panels und zeigt die korrekten Preflight-Informationen.
+- [x] `purge=true` erstellt die Dashboards mit Inline-Panels sauber neu.
+- [x] `purge=false` aktualisiert bestehende Dashboards und zeigt die korrekten Preflight-Informationen.
 - [x] Dashboard-Override-Variablen sind dokumentiert und verifiziert:
 - [x] `DASHBOARD_FILTER_PEAK_POWER_LIMIT`
 - [x] `DASHBOARD_ENERGY_SAMPLE_INTERVAL`
@@ -53,7 +53,7 @@ Wenn einer der Punkte offen ist, sollte der Release nicht als final veroeffentli
 ## 4. Dashboard-Qualitaet
 
 - [x] Alle sechs VM-Dashboards laden im produktionsnahen Deploy-Pfad ohne Panel-Fehler.
-- [x] `Today` rendert korrekt inklusive eingebetteter Library Panels.
+- [x] `Today` rendert korrekt mit Inline-Panels.
 - [x] `Month` rendert korrekt inklusive Verbraucher-Panels.
 - [x] `Year` rendert korrekt inklusive Verbraucher-Panels und Jahres-Navigationsbuttons.
 - [x] `All-time` rendert korrekt inklusive Top-Day- und Jahres-/Monatsvergleich-Panels.

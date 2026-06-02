@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.02.1"
+SCRIPT_VERSION="2026.06.02.2"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-02"
 SCRIPT_NAME="${0##*/}"
@@ -628,9 +628,12 @@ else:
 for dashboard in dashboards:
     print(f"- {dashboard_title(dashboard['raw'])} [{dashboard_uid(dashboard['raw'])}]")
 print()
-print("Dashboards embed these library panels:")
-for element in library.values():
-    print(f"- {element.get('name')} [{element.get('uid')}]")
+if library:
+    print("Dashboards embed these legacy library panels:")
+    for element in library.values():
+        print(f"- {element.get('name')} [{element.get('uid')}]")
+else:
+    print("Panel mode: inline dashboards (no Grafana library panels will be created or updated)")
 
 existing_library = {}
 for element in library.values():
@@ -669,20 +672,23 @@ if purge_enabled:
         for item in existing_dashboards:
             print(f"- {dashboard_title(item)} [{dashboard_uid(item)}]")
     print()
-    if purge_only:
-        print("Will delete referenced library panels after dashboard deletion:")
-        if not existing_library:
-            print("- none")
+    if library:
+        if purge_only:
+            print("Will delete referenced legacy library panels after dashboard deletion:")
+            if not existing_library:
+                print("- none")
+            else:
+                for item in existing_library.values():
+                    print(f"- {item.get('name')} [{item.get('uid')}]")
         else:
-            for item in existing_library.values():
-                print(f"- {item.get('name')} [{item.get('uid')}]")
+            print("Will ensure referenced legacy library panels before import:")
+            if not existing_library:
+                print("- none found yet; missing panels will be created")
+            else:
+                for item in existing_library.values():
+                    print(f"- {item.get('name')} [{item.get('uid')}]")
     else:
-        print("Will ensure referenced library panels before import:")
-        if not existing_library:
-            print("- none found yet; missing panels will be created")
-        else:
-            for item in existing_library.values():
-                print(f"- {item.get('name')} [{item.get('uid')}]")
+        print("Panel mode: inline dashboards; no library panel API calls are needed")
 
 print()
 confirm_prompt = "Proceed with purge-only deletion? [y/N] " if purge_only else "Proceed with dashboard deployment? [y/N] "

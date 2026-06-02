@@ -201,7 +201,7 @@ Bevorzugtes Design:
 - stabile interne IDs wie `gridImport`, `selfConsumption`, `batteryCharge`
 - uebersetzte Labels nur in Display-Properties
 
-Das ist die wichtigste strukturelle Verbesserung, die Maintainer in VM-Quelldashboards und Library Panels anstreben sollten.
+Das ist die wichtigste strukturelle Verbesserung, die Maintainer in VM-Quelldashboards anstreben sollten.
 
 ## Aktueller VM-Meilenstein
 

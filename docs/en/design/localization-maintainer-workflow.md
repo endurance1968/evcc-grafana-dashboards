@@ -198,7 +198,7 @@ Preferred design:
 - stable internal ids such as `gridImport`, `selfConsumption`, `batteryCharge`
 - translated labels only in display properties
 
-This is the main structural improvement maintainers should aim for in VM source dashboards and library panels.
+This is the main structural improvement maintainers should aim for in VM source dashboards.
 
 ## Current VM milestone
 

@@ -309,7 +309,7 @@ Diese Dashboards fragen Rohmetriken direkt ab:
 Spezialhinweis:
 
 - die PV-Prognoselinie in `Today` nutzt rohes `tariffSolar_value`
-- der grosse `Today`-Leistungsplot ist ein Grafana-Library-Panel; Quellaenderungen muessen deshalb auch das Library Panel aktualisieren
+- der grosse `Today`-Leistungsplot ist direkt im Dashboard enthalten; Quellaenderungen werden damit ohne separate Grafana-Library-Panels deployt
 
 ### Rollup-Dashboards
 

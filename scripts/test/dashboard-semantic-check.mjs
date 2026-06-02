@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.2
+ * Version: 2026.06.02.4
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -312,7 +312,13 @@ const criticalPanels = {
       "id": 74,
       "title": "Power",
       "type": "gauge",
-      "minTargets": 6
+      "minTargets": 5
+    },
+    {
+      "id": 64,
+      "title": "Metrics",
+      "type": "gauge",
+      "minTargets": 8
     }
   ],
   "VM_EVCC_Today.json": [
@@ -487,10 +493,10 @@ function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
 
   const dynamicColorPanels = [
     { label: "Power", panel: dashboard.panels?.find((panel) => panel.id === 74) },
-    { label: "Power history", panel: dashboard.__elements?.afc1nq1oy29s0a?.model },
-    { label: "Battery levels", panel: dashboard.__elements?.ffc1nfxu4it4wd?.model },
-    { label: "Energy", panel: dashboard.__elements?.dfc1nml5oazuoc?.model },
-    { label: "Power distribution", panel: dashboard.__elements?.afc1nrf3k9hc0e?.model },
+    { label: "Power history", panel: dashboard.panels?.find((panel) => panel.id === 2) },
+    { label: "Battery levels", panel: dashboard.panels?.find((panel) => panel.id === 66) },
+    { label: "Energy", panel: dashboard.panels?.find((panel) => panel.title === "Energy") },
+    { label: "Power distribution", panel: dashboard.panels?.find((panel) => panel.id === 75) },
   ];
 
   for (const item of dynamicColorPanels) {
@@ -557,9 +563,12 @@ function validateDashboard(fileName, dashboard) {
   }
 
   if (["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
-    const powerHistoryTargets = dashboard.__elements?.afc1nq1oy29s0a?.model?.targets || [];
-    assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: embedded Power history library panel must include PV forecast target`);
-    const powerHistoryOverrides = dashboard.__elements?.afc1nq1oy29s0a?.model?.fieldConfig?.overrides || [];
+    assert(!rawJson.includes('"libraryPanel"'), failures, `${fileName}: deployed dashboards must not use Grafana library panels`);
+    assert(!Object.hasOwn(dashboard, "__elements"), failures, `${fileName}: deployed dashboards must not embed Grafana library panel elements`);
+    const powerHistoryPanel = dashboard.panels?.find((panel) => panel.id === 2);
+    const powerHistoryTargets = powerHistoryPanel?.targets || [];
+    assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: Power history panel must include PV forecast target`);
+    const powerHistoryOverrides = powerHistoryPanel?.fieldConfig?.overrides || [];
     const forecastOverride = powerHistoryOverrides.find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "PV forecast");
     const forecastProperties = new Map((forecastOverride?.properties || []).map((property) => [property.id, property.value]));
     assert(forecastProperties.get("color")?.mode === "fixed" && forecastProperties.get("color")?.fixedColor === "#2F8F5B", failures, `${fileName}: PV forecast must be fixed dark green`);
@@ -578,9 +587,7 @@ function validateDashboard(fileName, dashboard) {
   }
 
   for (const panel of panels) {
-    if (panel.libraryPanel) {
-      continue;
-    }
+    assert(!panel.libraryPanel, failures, `${fileName}: panel '${panel.title || panel.id}' must not be a Grafana library panel reference`);
     if (isRenderablePanel(panel)) {
       assert(panelTargetCount(panel) > 0, failures, `${fileName}: renderable panel '${panel.title || panel.id}' has no targets`);
     }

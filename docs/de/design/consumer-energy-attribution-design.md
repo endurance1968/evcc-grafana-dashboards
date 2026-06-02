@@ -120,7 +120,7 @@ Operative Interpretation:
 
 ### Today
 
-Fuer `Today` soll die Zuordnung direkt aus Rohmetriken in Grafana-Queries oder in einem dedizierten Helper-Panel-/Library-Modell berechnet werden.
+Fuer `Today` soll die Zuordnung direkt aus Rohmetriken in Grafana-Queries oder in einem dedizierten Helper-Panel berechnet werden.
 
 Das bedeutet:
 
