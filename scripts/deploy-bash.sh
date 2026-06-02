@@ -3,9 +3,9 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.01.1"
+SCRIPT_VERSION="2026.06.02.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-01"
+SCRIPT_LAST_MODIFIED="2026-06-02"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -179,6 +179,7 @@ FIXED_DASHBOARD_FILES=(
   "VM_EVCC_Month.json"
   "VM_EVCC_Today-Details.json"
   "VM_EVCC_Today.json"
+  "VM_EVCC_Today-Gauges.json"
   "VM_EVCC_Today-Mobile.json"
 )
 case "$DASHBOARD_SOURCE_MODE" in

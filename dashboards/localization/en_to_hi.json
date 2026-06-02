@@ -330,7 +330,12 @@
     "15 min import energy": "15 मिनट आयात ऊर्जा",
     "15 min feed-in energy": "15 मिनट फीड-इन ऊर्जा",
     "Grid: 15 min import/export energy (MSB approximation)": "ग्रिड: 15 मिनट आयात/फीड-इन ऊर्जा (MSB अनुमान)",
-    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "EVCC ग्रिड पावर से 15 मिनट की दिशात्मक ग्रिड ऊर्जा। धनात्मक मान आयात ऊर्जा हैं, ऋणात्मक मान फीड-इन ऊर्जा हैं; मीटरिंग ऑपरेटर के अलग-अलग रजिस्टरों का अनुमान लगाने के लिए आयात और फीड-इन को इंटीग्रेशन से पहले अलग किया जाता है। बार पिछले 15 मिनट के ग्रिड अंतराल से संरेखित हैं।"
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "EVCC ग्रिड पावर से 15 मिनट की दिशात्मक ग्रिड ऊर्जा। धनात्मक मान आयात ऊर्जा हैं, ऋणात्मक मान फीड-इन ऊर्जा हैं; मीटरिंग ऑपरेटर के अलग-अलग रजिस्टरों का अनुमान लगाने के लिए आयात और फीड-इन को इंटीग्रेशन से पहले अलग किया जाता है। बार पिछले 15 मिनट के ग्रिड अंतराल से संरेखित हैं।",
+    "VM: EVCC: Today Gauges": "VM: EVCC: आज गेज",
+    "PV now": "PV अभी",
+    "Grid now": "ग्रिड अभी",
+    "Battery SOC": "बैटरी SOC",
+    "Charging now": "चार्जिंग अभी"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

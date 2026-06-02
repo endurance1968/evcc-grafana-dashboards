@@ -330,7 +330,12 @@
     "15 min import energy": "15 min Bezugsenergie",
     "15 min feed-in energy": "15 min Einspeiseenergie",
     "Grid: 15 min import/export energy (MSB approximation)": "Netz: 15 min Bezugs-/Einspeiseenergie (MSB-Näherung)",
-    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunähern. Balken sind auf das vorherige 15-Minuten-Raster ausgerichtet."
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "Richtungsgetrennte 15-Minuten-Netzenergie aus der EVCC-Netzleistung. Positive Werte sind Bezugsenergie, negative Werte sind Einspeiseenergie; Bezug und Einspeisung werden vor der Integration getrennt, um getrennte Register eines Messstellenbetreibers anzunähern. Balken sind auf das vorherige 15-Minuten-Raster ausgerichtet.",
+    "VM: EVCC: Today Gauges": "VM: EVCC: Heute Gauges",
+    "PV now": "PV aktuell",
+    "Grid now": "Netz aktuell",
+    "Battery SOC": "Batterie SOC",
+    "Charging now": "Laden aktuell"
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

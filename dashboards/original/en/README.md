@@ -2,11 +2,12 @@
 
 Englische Version: [README_EN.md](./README_EN.md).
 
-Diese Dateien wurden aus dem Maintainer-Branch `upstream/victoria-metrics` importiert.
+Diese Dateien basieren auf dem Maintainer-Branch `upstream/victoria-metrics`; `VM_EVCC_Today-Gauges.json` ist eine lokale Today-Variante mit zusaetzlichem Gauge-Kopfbereich.
 
 Importierte Dateien:
 
 - `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Gauges.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today-Mobile.json`
 - `VM_EVCC_All-time.json`

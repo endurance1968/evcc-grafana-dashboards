@@ -43,6 +43,7 @@ Nicht auf `dashboards/original` anwenden, ausser du refaktorierst absichtlich di
 Aktuelles Upstream-VM-Quellset:
 
 - `dashboards/original/en/VM_EVCC_Today.json`
+- `dashboards/original/en/VM_EVCC_Today-Gauges.json`
 - `dashboards/original/en/VM_EVCC_Today-Mobile.json`
 - `dashboards/original/en/VM_EVCC_Today-Details.json`
 

@@ -300,6 +300,7 @@ Price and cost rollups use:
 These dashboards query raw metrics directly:
 
 - `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Gauges.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today-Mobile.json`
 

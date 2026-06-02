@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.01.1
- * Last modified: 2026-06-01
+ * Version: 2026.06.02.1
+ * Last modified: 2026-06-02
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -12,8 +12,8 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.06.01.1";
-const lastModified = "2026-06-01";
+const version = "2026.06.02.1";
+const lastModified = "2026-06-02";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
 const defaultDashboardFiles = resolveDashboardFiles(manifest);
@@ -126,7 +126,7 @@ function buildHarness(functionSources) {
     `$dashboardPath = '${dashboardPath.replace(/'/g, "''")}'`,
     `$localDashboardDir = '${localDashboardDir.replace(/'/g, "''")}'`,
     "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'localdir'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
-    "$FixedDashboardFiles = @('VM_EVCC_All-time.json','VM_EVCC_Year.json','VM_EVCC_Month.json','VM_EVCC_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Mobile.json')",
+    "$FixedDashboardFiles = @('VM_EVCC_All-time.json','VM_EVCC_Year.json','VM_EVCC_Month.json','VM_EVCC_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Gauges.json','VM_EVCC_Today-Mobile.json')",
     "$raw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $dashboardPath)",
     "$rewritten = Replace-DatasourcePlaceholders $raw",
     "$dashboardFiles = @(Get-DashboardFilesFromManifest)",
@@ -167,7 +167,7 @@ function buildHarness(functionSources) {
     "Assert-Array $metric.options.reduceOptions.calcs 'metric.options.reduceOptions.calcs' 1",
     "if ($metric.targets[0].datasource.uid -ne 'vm-evcc') { throw \"metric.targets[0].datasource.uid is $($metric.targets[0].datasource.uid), expected vm-evcc\" }",
     "",
-    "if ($dashboardFiles.Count -ne 6) { throw \"Get-DashboardFilesFromManifest returned $($dashboardFiles.Count), expected 6\" }",
+    "if ($dashboardFiles.Count -ne 7) { throw \"Get-DashboardFilesFromManifest returned $($dashboardFiles.Count), expected 7\" }",
     "if (-not $sourceText.Contains('\"title\"')) { throw 'Get-SourceFileContent returned unexpected dashboard content' }",
     "",
     "Write-Output 'Windows PowerShell deployer compatibility check passed.'",

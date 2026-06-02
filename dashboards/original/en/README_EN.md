@@ -1,10 +1,11 @@
 # English VM Dashboard Source Import
 
-These files were imported from the maintainer branch `upstream/victoria-metrics`.
+These files are based on the maintainer branch `upstream/victoria-metrics`; `VM_EVCC_Today-Gauges.json` is a local Today variant with an additional gauge header area.
 
 Imported files:
 
 - `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Gauges.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today-Mobile.json`
 - `VM_EVCC_All-time.json`

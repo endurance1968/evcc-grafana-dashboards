@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.01.3
- * Last modified: 2026-06-01
+ * Version: 2026.06.02.1
+ * Last modified: 2026-06-02
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -41,6 +41,10 @@ const expectedTimes = {
     "to": "now/d"
   },
   "VM_EVCC_Today-Mobile.json": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "VM_EVCC_Today-Gauges.json": {
     "from": "now/d",
     "to": "now/d"
   },
@@ -115,6 +119,23 @@ const expectedLinks = {
     }
   ],
   "VM_EVCC_Today-Mobile.json": [
+    {
+      "title": "Today",
+      "from": "now%2Fd",
+      "to": "now%2Fd"
+    },
+    {
+      "title": "Yesterday",
+      "from": "now-1d%2Fd",
+      "to": "now-1d%2Fd"
+    },
+    {
+      "title": "Day before yesterday",
+      "from": "now-2d%2Fd",
+      "to": "now-2d%2Fd"
+    }
+  ],
+  "VM_EVCC_Today-Gauges.json": [
     {
       "title": "Today",
       "from": "now%2Fd",
@@ -286,6 +307,38 @@ const criticalPanels = {
       "minTargets": 5
     }
   ],
+  "VM_EVCC_Today-Gauges.json": [
+    {
+      "id": 101,
+      "title": "PV now",
+      "type": "gauge",
+      "minTargets": 1
+    },
+    {
+      "id": 102,
+      "title": "Grid now",
+      "type": "gauge",
+      "minTargets": 1
+    },
+    {
+      "id": 103,
+      "title": "Battery SOC",
+      "type": "gauge",
+      "minTargets": 1
+    },
+    {
+      "id": 104,
+      "title": "Charging now",
+      "type": "gauge",
+      "minTargets": 1
+    },
+    {
+      "id": 74,
+      "title": "Power",
+      "type": "gauge",
+      "minTargets": 5
+    }
+  ],
   "VM_EVCC_Today.json": [
     {
       "id": 74,
@@ -403,6 +456,7 @@ function validateDeployManifest(manifest) {
   assert(deployFiles.has("VM_EVCC_Month.json"), failures, "deploy manifest: must include Month dashboard");
   assert(deployFiles.has("VM_EVCC_Today-Details.json"), failures, "deploy manifest: must include Today Details dashboard");
   assert(deployFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: must keep the normal Today dashboard");
+  assert(deployFiles.has("VM_EVCC_Today-Gauges.json"), failures, "deploy manifest: must include Today Gauges dashboard");
   assert(deployFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: must keep the normal Today Mobile dashboard");
 
   return failures;
@@ -451,7 +505,7 @@ function validateGrafanaTabSlugs(fileName, layout, failures, pathLabel = "layout
 }
 
 function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
-  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
     return;
   }
 
@@ -526,7 +580,7 @@ function validateDashboard(fileName, dashboard) {
     }
   }
 
-  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
     const powerHistoryTargets = dashboard.__elements?.afc1nq1oy29s0a?.model?.targets || [];
     assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: embedded Power history library panel must include PV forecast target`);
     const powerHistoryOverrides = dashboard.__elements?.afc1nq1oy29s0a?.model?.fieldConfig?.overrides || [];

@@ -330,7 +330,12 @@
     "15 min import energy": "15 分钟购电电量",
     "15 min feed-in energy": "15 分钟馈电电量",
     "Grid: 15 min import/export energy (MSB approximation)": "电网：15 分钟购电/馈电电量（MSB 近似）",
-    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "由 EVCC 电网功率计算的 15 分钟方向性电网电量。正值表示购电电量，负值表示馈电电量；购电和馈电在积分前分开处理，以近似计量运营商的独立寄存器。柱形对齐到前一个 15 分钟网格区间。"
+    "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "由 EVCC 电网功率计算的 15 分钟方向性电网电量。正值表示购电电量，负值表示馈电电量；购电和馈电在积分前分开处理，以近似计量运营商的独立寄存器。柱形对齐到前一个 15 分钟网格区间。",
+    "VM: EVCC: Today Gauges": "VM: EVCC: 今日仪表",
+    "PV now": "当前光伏",
+    "Grid now": "当前电网",
+    "Battery SOC": "电池 SOC",
+    "Charging now": "当前充电"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",

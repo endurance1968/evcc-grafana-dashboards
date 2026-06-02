@@ -31,9 +31,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.01.1'
+$ScriptVersion = '2026.06.02.1'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-06-01'
+$ScriptLastModified = '2026-06-02'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -194,6 +194,7 @@ $FixedDashboardFiles = @(
   'VM_EVCC_Month.json',
   'VM_EVCC_Today-Details.json',
   'VM_EVCC_Today.json',
+  'VM_EVCC_Today-Gauges.json',
   'VM_EVCC_Today-Mobile.json'
 )
 

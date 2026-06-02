@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.01.2"
+SCRIPT_VERSION="2026.06.02.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-01"
+SCRIPT_LAST_MODIFIED="2026-06-02"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -173,6 +173,7 @@ FIXED_DASHBOARD_FILES = [
     "VM_EVCC_Month.json",
     "VM_EVCC_Today-Details.json",
     "VM_EVCC_Today.json",
+    "VM_EVCC_Today-Gauges.json",
     "VM_EVCC_Today-Mobile.json",
 ]
 

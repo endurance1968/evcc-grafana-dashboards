@@ -302,6 +302,7 @@ Preis- und Kostenrollups nutzen:
 Diese Dashboards fragen Rohmetriken direkt ab:
 
 - `VM_EVCC_Today.json`
+- `VM_EVCC_Today-Gauges.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today-Mobile.json`
 
