@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.10
+ * Version: 2026.06.02.11
  * Last modified: 2026-06-02
  */
 import fs from "node:fs";
@@ -183,7 +183,7 @@ const criticalPanels = {
       "id": 24,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 7
+      "minTargets": 2
     },
     {
       "id": 28,
@@ -209,7 +209,7 @@ const criticalPanels = {
       "id": 44,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 7
+      "minTargets": 2
     },
     {
       "id": 47,
@@ -246,7 +246,7 @@ const criticalPanels = {
       "id": 24,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 12
+      "minTargets": 2
     },
     {
       "id": 25,
@@ -514,6 +514,19 @@ function validateGrafana13GaugeOptions(fileName, panel, failures) {
   assert(!Object.hasOwn(panel.options || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy graphMode option`);
   assert(!Object.hasOwn(panel.fieldConfig?.defaults?.custom || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy custom.graphMode option`);
 }
+
+function validateMetricGaugeTimeSeries(fileName, panel, failures) {
+  for (const refId of ["Autarky", "Self-consumption"]) {
+    const target = panel.targets?.find((item) => item.refId === refId);
+    const querySpec = target?.raw?.spec?.query?.spec || {};
+    assert(Boolean(target), failures, `${fileName}: Metric gauges must query ${refId}`);
+    assert(target?.group === "victoriametrics-metrics-datasource", failures, `${fileName}: Metric gauges ${refId} must use VictoriaMetrics directly, not an expression`);
+    assert(querySpec.range === true, failures, `${fileName}: Metric gauges ${refId} must be a range query so Grafana can render a sparkline`);
+    assert(querySpec.format === "time_series", failures, `${fileName}: Metric gauges ${refId} must return time_series data`);
+    assert(querySpec.interval === "1d", failures, `${fileName}: Metric gauges ${refId} must use a deterministic 1d sparkline interval`);
+    assert(String(querySpec.expr || "").includes("running_sum("), failures, `${fileName}: Metric gauges ${refId} must use cumulative range data so the reduced value still represents the selected period`);
+  }
+}
 function validateDashboard(fileName, dashboard) {
   const failures = [];
   const rawJson = JSON.stringify(dashboard);
@@ -544,6 +557,7 @@ function validateDashboard(fileName, dashboard) {
     assert(Boolean(metricGaugePanel), failures, `${fileName}: missing Metric gauges panel`);
     if (metricGaugePanel) {
       validateGrafana13GaugeOptions(fileName, metricGaugePanel, failures);
+      validateMetricGaugeTimeSeries(fileName, metricGaugePanel, failures);
     }
   }
 

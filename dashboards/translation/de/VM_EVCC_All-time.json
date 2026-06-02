@@ -1896,117 +1896,11 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "instant": true,
-                        "legendFormat": "PV",
-                        "range": false
-                      }
-                    },
-                    "refId": "pvEnergy",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "vm-evcc"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "instant": true,
-                        "legendFormat": "Netzbezug",
-                        "range": false
-                      }
-                    },
-                    "refId": "gridEnergyIn",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "vm-evcc"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "instant": true,
-                        "legendFormat": "Einspeisung",
-                        "range": false
-                      }
-                    },
-                    "refId": "gridEnergyOut",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "vm-evcc"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "instant": true,
-                        "legendFormat": "Haus",
-                        "range": false
-                      }
-                    },
-                    "refId": "homeEnergy",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "vm-evcc"
-                      },
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh[1d]))[$__range:1d])) / 1000",
-                        "instant": true,
-                        "legendFormat": "Ladepunkte",
-                        "range": false
-                      }
-                    },
-                    "refId": "loadpointEnergy",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "__expr__",
-                      "version": "v0",
-                      "datasource": {
-                        "name": "__expr__"
-                      },
-                      "spec": {
-                        "expression": "1 - $gridEnergyIn / ($homeEnergy + $loadpointEnergy)",
-                        "type": "math"
+                        "expr": "WITH (\n  gridImport = running_sum(sum(last_over_time(evcc_grid_import_daily_wh[1d]))),\n  homeEnergy = running_sum(sum(last_over_time(evcc_home_energy_daily_wh[1d]))),\n  loadpointEnergy = running_sum(sum(last_over_time(evcc_loadpoint_energy_daily_wh[1d])))\n)\nclamp_max(clamp_min(1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001), 0), 1)",
+                        "format": "time_series",
+                        "legendFormat": "Autarkie",
+                        "range": true,
+                        "interval": "1d"
                       }
                     },
                     "refId": "Autarky",
@@ -2018,14 +1912,18 @@
                   "spec": {
                     "query": {
                       "kind": "DataQuery",
-                      "group": "__expr__",
+                      "group": "victoriametrics-metrics-datasource",
                       "version": "v0",
                       "datasource": {
-                        "name": "__expr__"
+                        "name": "vm-evcc"
                       },
                       "spec": {
-                        "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
-                        "type": "math"
+                        "editorMode": "code",
+                        "expr": "WITH (\n  pvEnergy = running_sum(sum(last_over_time(evcc_pv_energy_daily_wh[1d]))),\n  gridExport = running_sum(sum(last_over_time(evcc_grid_export_daily_wh[1d])))\n)\nclamp_max(clamp_min((pvEnergy - gridExport) / clamp_min(pvEnergy, 0.001), 0), 1)",
+                        "format": "time_series",
+                        "legendFormat": "Eigenverbrauch",
+                        "range": true,
+                        "interval": "1d"
                       }
                     },
                     "refId": "Self-consumption",
