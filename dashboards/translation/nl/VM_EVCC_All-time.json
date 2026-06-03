@@ -223,8 +223,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#73BF69",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#2F8F5B"
                         }
                       }
                     ]
@@ -242,8 +242,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#E24D42",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#E0B400"
                         }
                       }
                     ]
@@ -261,8 +261,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#5794F2",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#9F7AEA"
                         }
                       }
                     ]
@@ -280,8 +280,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#2F8F5B",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#14B8A6"
                         }
                       }
                     ]
@@ -1069,7 +1069,7 @@
                   },
                   "color": {
                     "mode": "fixed",
-                    "fixedColor": "#5794F2"
+                    "fixedColor": "#3274D9"
                   }
                 },
                 "overrides": [
@@ -1090,6 +1090,13 @@
                       {
                         "id": "unit",
                         "value": "watth"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
                       }
                     ]
                   },
@@ -1110,6 +1117,13 @@
                       {
                         "id": "unit",
                         "value": "watth"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
                       }
                     ]
                   },
@@ -1130,8 +1144,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "#5794F2",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
                         }
                       },
                       {
@@ -1157,6 +1171,13 @@
                       {
                         "id": "decimals",
                         "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
                       }
                     ]
                   },
@@ -1177,6 +1198,13 @@
                       {
                         "id": "decimals",
                         "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
                       }
                     ]
                   }
@@ -1997,7 +2025,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "purple"
+                              "color": "#14B8A6",
+                              "value": null
                             }
                           ]
                         }
@@ -2005,6 +2034,13 @@
                       {
                         "id": "displayName",
                         "value": "Eigenverbruik"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#14B8A6"
+                        }
                       }
                     ]
                   }
@@ -4940,8 +4976,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
                         }
                       }
                     ]
@@ -4963,8 +4999,8 @@
                       {
                         "id": "color",
                         "value": {
-                          "fixedColor": "dark-blue",
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
                         }
                       }
                     ]
