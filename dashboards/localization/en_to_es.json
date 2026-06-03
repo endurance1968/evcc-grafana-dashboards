@@ -334,7 +334,8 @@
     "PV now": "FV ahora",
     "Grid now": "Red ahora",
     "Battery SOC": "SOC batería",
-    "Charging now": "Carga ahora"
+    "Charging now": "Carga ahora",
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "Los valores de previsión FV proceden de la configuración de previsión solar de EVCC y se guardan como tariffSolar_value. Si EVCC no tiene proveedor de previsión solar o no hay muestras recientes de tariffSolar_value, esta previsión queda vacía; el panel no consulta directamente Forecast.Solar, Solcast ni Open-Meteo."
   },
   "Heat pump source mix": "Mezcla de fuentes de la bomba de calor",
   "Heat pump title match": "Coincidencia de título de bomba de calor",

@@ -715,7 +715,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "PV-Prognosewerte kommen aus der EVCC-Solarprognose-Konfiguration und werden als tariffSolar_value gespeichert. Wenn EVCC keinen Solar-Forecast-Provider oder keine aktuellen tariffSolar_value-Samples hat, bleibt diese Prognose leer; das Dashboard ruft Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab.",
       "fieldConfig": {
         "defaults": {
           "color": {

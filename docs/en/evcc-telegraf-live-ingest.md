@@ -242,6 +242,31 @@ Expected result:
 
 If a name is wrong, fix EVCC first. New samples will then use the new name; old historical labels stay unchanged until you intentionally migrate them.
 
+
+### Verify PV Forecast From EVCC
+
+The dashboard forecast panels do not call forecast providers directly. They only display EVCC's `tariffSolar_value` metric. This metric exists only when a solar forecast is configured in EVCC, for example through EVCC's `solar` tariff/forecast configuration with Forecast.Solar, Solcast, or Open-Meteo.
+
+If you do not use an EVCC solar forecast, empty forecast panels are expected and are not a VictoriaMetrics or dashboard error. PV, grid, home, and battery panels can still work correctly.
+
+Check whether EVCC writes forecast values to VictoriaMetrics:
+
+```bash
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/series' \
+  --data-urlencode 'match[]=tariffSolar_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://<victoriametrics-host>:8428/api/v1/query' \
+  --data-urlencode 'query=last_over_time(tariffSolar_value[24h])'
+```
+
+Expected result:
+
+- With an EVCC solar forecast: at least one `tariffSolar_value` series and a recent value.
+- Without an EVCC solar forecast: no series or an empty result; this is a tolerated optional state for forecast panels.
+
+Configure or fix forecast providers in EVCC, not in the Grafana dashboard. EVCC will then write new `tariffSolar_value` samples, and Grafana will show them automatically.
 ### Optional Telegraf Probe Write
 
 Run only against a test or intentionally prepared instance:
@@ -276,6 +301,8 @@ If you used this guide only to prepare an InfluxDB migration, go back to [influx
 ## Sources
 
 - [EVCC Influx configuration](https://docs.evcc.io/docs/reference/configuration/influx)
+- [EVCC Tariffs and forecasts](https://docs.evcc.io/en/docs/tariffs)
+- [EVCC Forecast.Solar](https://docs.evcc.io/en/tariffs/forecast-solar)
 - [Telegraf influxdb_v2_listener](https://docs.influxdata.com/telegraf/v1/input-plugins/influxdb_v2_listener/)
 - [Telegraf HTTP output](https://docs.influxdata.com/telegraf/v1/output-plugins/http/)
 - [Telegraf output data formats](https://docs.influxdata.com/telegraf/v1/data_formats/output/)

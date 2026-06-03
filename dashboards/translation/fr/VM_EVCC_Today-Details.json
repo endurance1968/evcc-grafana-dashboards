@@ -651,7 +651,7 @@
         "spec": {
           "id": 35,
           "title": "Prévision",
-          "description": "",
+          "description": "Les valeurs de prévision PV proviennent de la configuration de prévision solaire EVCC et sont stockées sous tariffSolar_value. Si EVCC n’a pas de fournisseur de prévision solaire ou pas d’échantillons tariffSolar_value récents, cette prévision reste vide ; le tableau de bord n’interroge pas directement Forecast.Solar, Solcast ou Open-Meteo.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -901,7 +901,7 @@
         "spec": {
           "id": 16,
           "title": "Prévision",
-          "description": "",
+          "description": "Les valeurs de prévision PV proviennent de la configuration de prévision solaire EVCC et sont stockées sous tariffSolar_value. Si EVCC n’a pas de fournisseur de prévision solaire ou pas d’échantillons tariffSolar_value récents, cette prévision reste vide ; le tableau de bord n’interroge pas directement Forecast.Solar, Solcast ou Open-Meteo.",
           "links": [],
           "data": {
             "kind": "QueryGroup",

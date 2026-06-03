@@ -6,6 +6,11 @@ Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf Victoria
 
 ## VNext (unreleased)
 
+
+### Dokumentation und Diagnose
+
+- Forgejo-Issue #6 umgesetzt: EVCC-Forecast-Datenfluss fuer `tariffSolar_value`, No-Data-Verhalten und VictoriaMetrics-Pruefkommandos dokumentiert; Forecast-Panels erklaeren nun direkt, dass der Solar-Forecast aus EVCC kommen muss.
+
 ### Verbesserungen
 
 - Grafana-13-Gauge-Visualisierung aus Forgejo-Issue #7 umgesetzt und vom Hold-Status in den Dashboard-Pfad uebernommen:

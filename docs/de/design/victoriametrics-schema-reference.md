@@ -173,6 +173,8 @@ Diese Rohmetriken sind ebenfalls aktiv genutzt:
 | `tariffPriceLoadpoints_value` | Ladetarif am Loadpoint | Fahrzeugladekosten |
 | `tariffSolar_value` | Solarprognose | PV-Prognosepanels in `Today` und `Today - Details` |
 
+Hinweis: `tariffSolar_value` ist ein optionaler EVCC-Rohwert. Er entsteht nur, wenn EVCC selbst einen Solar-Forecast konfiguriert hat. Die Dashboards rufen Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab; sie zeigen nur die von EVCC geschriebenen Forecast-Samples an.
+
 ## Produktions-Rollupfamilien pro Tag
 
 Der Produktionspraefix ist aktuell `evcc`.

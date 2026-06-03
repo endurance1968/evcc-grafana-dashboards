@@ -761,7 +761,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "PV 预测值来自 EVCC 的太阳能预测配置，并保存为 tariffSolar_value。如果 EVCC 没有太阳能预测提供程序，或没有最新的 tariffSolar_value 样本，此预测会保持为空；仪表板不会直接调用 Forecast.Solar、Solcast 或 Open-Meteo。",
       "fieldConfig": {
         "defaults": {
           "color": {

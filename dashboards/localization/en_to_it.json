@@ -334,7 +334,8 @@
     "PV now": "FV ora",
     "Grid now": "Rete ora",
     "Battery SOC": "SOC batteria",
-    "Charging now": "Ricarica ora"
+    "Charging now": "Ricarica ora",
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "I valori di previsione FV provengono dalla configurazione della previsione solare di EVCC e sono salvati come tariffSolar_value. Se EVCC non ha un provider di previsione solare o campioni tariffSolar_value recenti, questa previsione resta vuota; la dashboard non interroga direttamente Forecast.Solar, Solcast o Open-Meteo."
   },
   "Heat pump source mix": "Ripartizione fonti pompa di calore",
   "Heat pump title match": "Corrispondenza titolo pompa di calore",

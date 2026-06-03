@@ -171,6 +171,8 @@ These raw metrics are also in active use:
 | `tariffPriceLoadpoints_value` | Loadpoint charging tariff | Vehicle charging cost |
 | `tariffSolar_value` | Solar forecast | `Today` and `Today - Details` PV forecast panels |
 
+Note: `tariffSolar_value` is an optional EVCC raw value. It exists only when EVCC itself has a solar forecast configured. The dashboards do not call Forecast.Solar, Solcast, or Open-Meteo directly; they only display forecast samples written by EVCC.
+
 ## Production daily rollup families
 
 The production prefix is currently `evcc`.

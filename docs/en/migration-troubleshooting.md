@@ -226,6 +226,34 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 `^none$` is the safe value for "filter nothing" because normal EVCC names should not match it. Quote regexes that contain `|`, spaces, or special characters. After changing a blocklist, redeploy the dashboards; no data migration is required for that.
 
+
+## Forecast Panel Is Empty
+
+Forecast panels are based exclusively on the EVCC raw metric `tariffSolar_value`. The dashboard does not call Forecast.Solar, Solcast, Open-Meteo, or any other provider directly.
+
+Data flow:
+
+```text
+EVCC solar forecast -> tariffSolar_value -> Telegraf/Influx line protocol -> VictoriaMetrics -> Grafana
+```
+
+First check whether the metric exists in VictoriaMetrics:
+
+```bash
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=tariffSolar_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/query' \
+  --data-urlencode 'query=last_over_time(tariffSolar_value[24h])'
+```
+
+Interpretation:
+
+- Result exists: check Grafana datasource, time range, and panel settings.
+- No result: EVCC is not currently writing a solar forecast. Configure the forecast in EVCC or accept that forecast panels stay empty.
+- Old history without forecast is not an import error if EVCC did not write `tariffSolar_value` at that time.
 ## Empty Grafana Dashboards
 
 `Today` empty usually means raw data or datasource problems:

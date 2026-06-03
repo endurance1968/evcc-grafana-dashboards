@@ -721,7 +721,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "PV-verwachtingswaarden komen uit de EVCC-configuratie voor zonneprognoses en worden opgeslagen als tariffSolar_value. Als EVCC geen solar-forecast-provider of geen recente tariffSolar_value-samples heeft, blijft deze forecast leeg; het dashboard haalt Forecast.Solar, Solcast of Open-Meteo niet direct op.",
       "fieldConfig": {
         "defaults": {
           "color": {

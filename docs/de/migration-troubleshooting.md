@@ -228,6 +228,34 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 `^none$` ist der sichere Wert fuer "nichts filtern", weil normale EVCC-Namen dadurch nicht matchen. Wenn du Regexes mit `|`, Leerzeichen oder Sonderzeichen nutzt, setze sie in Anfuehrungszeichen. Nach einer Blocklist-Aenderung reicht ein erneutes Dashboard-Deployment; Daten muessen dafuer nicht migriert werden.
 
+
+## Forecast-Panel ist leer
+
+Forecast-Panels basieren ausschliesslich auf der EVCC-Rohmetrik `tariffSolar_value`. Das Dashboard fragt Forecast.Solar, Solcast, Open-Meteo oder andere Provider nicht selbst ab.
+
+Datenfluss:
+
+```text
+EVCC-Solar-Forecast -> tariffSolar_value -> Telegraf/Influx-Line-Protocol -> VictoriaMetrics -> Grafana
+```
+
+Pruefe zuerst, ob die Metrik in VictoriaMetrics existiert:
+
+```bash
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=tariffSolar_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/query' \
+  --data-urlencode 'query=last_over_time(tariffSolar_value[24h])'
+```
+
+Interpretation:
+
+- Ergebnis vorhanden: Grafana-Datasource, Zeitbereich und Panel pruefen.
+- Kein Ergebnis: EVCC schreibt aktuell keinen Solar-Forecast. Konfiguriere den Forecast in EVCC oder akzeptiere, dass die Forecast-Panels leer bleiben.
+- Alte Historie ohne Forecast ist kein Importfehler, wenn EVCC damals keinen `tariffSolar_value` geschrieben hat.
 ## Leere Grafana-Dashboards
 
 `Today` leer bedeutet meist Rohdaten- oder Datasource-Probleme:

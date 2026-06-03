@@ -4,6 +4,11 @@ These notes summarize the first public VictoriaMetrics-based EVCC dashboard rele
 
 ## VNext (unreleased)
 
+
+### Documentation And Diagnostics
+
+- Implemented Forgejo issue #6: documented the EVCC forecast data flow for `tariffSolar_value`, no-data behavior, and VictoriaMetrics check commands; forecast panels now explain directly that the solar forecast must come from EVCC.
+
 ### Improvements
 
 - Implemented the Grafana 13 gauge visualization tracked in Forgejo issue #7 and moved it from hold status into the dashboard path:

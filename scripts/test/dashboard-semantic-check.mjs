@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.1
+ * Version: 2026.06.03.2
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -414,6 +414,21 @@ function hasDashedDarkGreenForecast(panel) {
     lineWidth === 2
   );
 }
+function panelDescription(panel) {
+  return String(panel?.description || panel?.rawElement?.spec?.description || "");
+}
+
+function hasEvccForecastDescription(panel) {
+  const description = panelDescription(panel);
+  return (
+    description.includes("EVCC") &&
+    description.includes("tariffSolar_value") &&
+    description.includes("does not fetch") &&
+    description.includes("Forecast.Solar") &&
+    description.includes("Solcast") &&
+    description.includes("Open-Meteo")
+  );
+}
 
 function assert(condition, failures, message) {
   if (!condition) {
@@ -621,6 +636,7 @@ function validateDashboard(fileName, dashboard) {
     assert(Boolean(forecastPanel), failures, `${fileName}: missing PV tab timeseries Forecast panel`);
     if (forecastPanel) {
       assert(hasDashedDarkGreenForecast(forecastPanel), failures, `${fileName}: PV tab Forecast series must be dark green, dashed, and unfilled`);
+      assert(hasEvccForecastDescription(forecastPanel), failures, `${fileName}: PV tab Forecast panel must explain EVCC tariffSolar_value source and optional no-data behavior`);
     }
   }
 
@@ -630,6 +646,7 @@ function validateDashboard(fileName, dashboard) {
     const powerHistoryPanel = dashboard.panels?.find((panel) => panel.id === 2);
     const powerHistoryTargets = powerHistoryPanel?.targets || [];
     assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: Power history panel must include PV forecast target`);
+    assert(String(powerHistoryPanel?.description || "").includes("EVCC") && String(powerHistoryPanel?.description || "").includes("tariffSolar_value") && String(powerHistoryPanel?.description || "").includes("does not fetch"), failures, `${fileName}: Power history panel must explain EVCC tariffSolar_value source and optional no-data behavior`);
     const powerHistoryOverrides = powerHistoryPanel?.fieldConfig?.overrides || [];
     const forecastOverride = powerHistoryOverrides.find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "PV forecast");
     const forecastProperties = new Map((forecastOverride?.properties || []).map((property) => [property.id, property.value]));

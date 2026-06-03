@@ -334,7 +334,8 @@
     "PV now": "PV aktuell",
     "Grid now": "Netz aktuell",
     "Battery SOC": "Batterie SOC",
-    "Charging now": "Laden aktuell"
+    "Charging now": "Laden aktuell",
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "PV-Prognosewerte kommen aus der EVCC-Solarprognose-Konfiguration und werden als tariffSolar_value gespeichert. Wenn EVCC keinen Solar-Forecast-Provider oder keine aktuellen tariffSolar_value-Samples hat, bleibt diese Prognose leer; das Dashboard ruft Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab."
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

@@ -715,7 +715,7 @@
         "type": "victoriametrics-metrics-datasource",
         "uid": "${DS_VM-EVCC}"
       },
-      "description": "",
+      "description": "I valori di previsione FV provengono dalla configurazione della previsione solare di EVCC e sono salvati come tariffSolar_value. Se EVCC non ha un provider di previsione solare o campioni tariffSolar_value recenti, questa previsione resta vuota; la dashboard non interroga direttamente Forecast.Solar, Solcast o Open-Meteo.",
       "fieldConfig": {
         "defaults": {
           "color": {
