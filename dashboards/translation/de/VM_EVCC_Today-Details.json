@@ -668,7 +668,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(tariffSolar_value))) / 3600000",
+                        "expr": "(range_sum(integrate(avg(tariffSolar_value))) / 3600000) and (sum(present_over_time(tariffSolar_value[24h])) > 0)",
                         "format": "time_series",
                         "interval": "",
                         "legendFormat": "Vorhersage",
@@ -691,7 +691,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "min(chargePower_value)",
+                        "expr": "(min(chargePower_value) and (sum(present_over_time(tariffSolar_value[24h])) > 0)) or vector(1)",
                         "format": "time_series",
                         "legendFormat": "__panel_axis",
                         "range": true
@@ -713,7 +713,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
+                        "expr": "(range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000) and (sum(present_over_time(tariffSolar_value[24h])) > 0)",
                         "format": "time_series",
                         "interval": "",
                         "legendFormat": "Tatsächlich",
@@ -724,6 +724,29 @@
                       }
                     },
                     "refId": "pvStringEnergy",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "label_set((vector(1) unless (sum(present_over_time(tariffSolar_value[24h])) > 0)), \"series\", \"Keine EVCC Forecast Daten\")",
+                        "format": "time_series",
+                        "interval": "",
+                        "legendFormat": "Keine EVCC Forecast Daten",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "noForecast",
                     "hidden": false
                   }
                 }
@@ -778,10 +801,10 @@
                   "showLegend": true
                 },
                 "orientation": "horizontal",
-                "showValue": "never",
+                "showValue": "always",
                 "stacking": "none",
                 "text": {
-                  "valueSize": 20
+                  "valueSize": 18
                 },
                 "tooltip": {
                   "hideZeros": false,
@@ -859,6 +882,39 @@
                           "fixedColor": "green",
                           "mode": "fixed"
                         }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Keine EVCC Forecast Daten"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "orange"
+                        }
+                      },
+                      {
+                        "id": "unit",
+                        "value": "none"
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "type": "value",
+                            "options": {
+                              "1": {
+                                "color": "orange",
+                                "text": "Keine EVCC Forecast Daten"
+                              }
+                            }
+                          }
+                        ]
                       }
                     ]
                   }
@@ -4805,119 +4861,6 @@
             }
           }
         }
-      },
-      "panel-44": {
-        "kind": "Panel",
-        "spec": {
-          "id": 44,
-          "title": "Solar-Forecast Status",
-          "description": "Prueft, ob EVCC in den letzten 24 Stunden tariffSolar_value-Samples geschrieben hat. Forecast-Vergleichspanels koennen Prognose und tatsaechliche PV nur vergleichen, wenn EVCC diese Metrik liefert.",
-          "links": [],
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(present_over_time(tariffSolar_value[24h])) or vector(0)",
-                        "format": "time_series",
-                        "legendFormat": "Status",
-                        "range": false
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "forecastStatus",
-                    "hidden": false
-                  }
-                }
-              ],
-              "transformations": [],
-              "queryOptions": {}
-            }
-          },
-          "vizConfig": {
-            "kind": "VizConfig",
-            "group": "stat",
-            "version": "12.4.0",
-            "spec": {
-              "options": {
-                "colorMode": "background",
-                "graphMode": "none",
-                "justifyMode": "center",
-                "orientation": "horizontal",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "text": {
-                  "titleSize": 13,
-                  "valueSize": 18
-                },
-                "textMode": "value",
-                "wideLayout": true
-              },
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "decimals": 0,
-                  "mappings": [
-                    {
-                      "type": "value",
-                      "options": {
-                        "0": {
-                          "color": "orange",
-                          "text": "Keine EVCC Forecast Daten"
-                        }
-                      }
-                    },
-                    {
-                      "type": "range",
-                      "options": {
-                        "from": 0.5,
-                        "to": 1000000,
-                        "result": {
-                          "color": "green",
-                          "text": "Forecast-Daten empfangen"
-                        }
-                      }
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "orange",
-                        "value": 0
-                      },
-                      {
-                        "color": "green",
-                        "value": 0.5
-                      }
-                    ]
-                  },
-                  "unit": "none"
-                },
-                "overrides": []
-              }
-            }
-          }
-        }
       }
     },
     "id": null,
@@ -5349,19 +5292,6 @@
                         "x": 0,
                         "y": 16,
                         "width": 7,
-                        "height": 4,
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-44"
-                        }
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "x": 0,
-                        "y": 20,
-                        "width": 7,
                         "height": 7,
                         "element": {
                           "kind": "ElementReference",
@@ -5373,7 +5303,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 7,
-                        "y": 20,
+                        "y": 16,
                         "width": 17,
                         "height": 7,
                         "element": {

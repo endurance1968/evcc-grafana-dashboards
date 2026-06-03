@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.03.4"
+SCRIPT_VERSION="2026.06.03.5"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
@@ -181,7 +181,7 @@ FIXED_DASHBOARD_FILES=(
   "VM_EVCC_Today.json"
   "VM_EVCC_Today-Mobile.json"
 )
-LEGACY_DASHBOARD_UIDS=("vm-today-gauges-en-orig|VM: EVCC: Today Gauges")
+LEGACY_DASHBOARD_UIDS=()
 case "$DASHBOARD_SOURCE_MODE" in
   github)
     [[ -n "$GITHUB_REPO" ]] || { echo "GITHUB_REPO is required when DASHBOARD_SOURCE_MODE=github." >&2; exit 1; }

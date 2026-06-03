@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.19
+ * Version: 2026.06.03.23
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -395,6 +395,9 @@ function assertFixedColor(fileName, panel, matcherOption, expectedColor, failure
   if (!color) {
     return;
   }
+  if (color.mode === "thresholds" && propertyValue(panel, matcherOption, "thresholds")) {
+    return;
+  }
   assert(color.mode === "fixed" && color.fixedColor === expectedColor, failures, `${fileName}: panel '${panel.title || panel.id}' matcher '${matcherOption}' must use semantic color ${expectedColor}`);
 }
 
@@ -446,6 +449,7 @@ function validateSemanticColors(fileName, panel, failures) {
   assertThresholdContains(fileName, panel, "Self-consumption", [dashboardColors.selfConsumption], failures);
 
   if (panel.id === 74 && panel.title === "Power") {
+    assert(panel.fieldConfig?.defaults?.color?.mode === "thresholds", failures, `${fileName}: Power gauge defaults must use threshold color mode`);
     const defaultThresholds = panel.fieldConfig?.defaults?.thresholds?.steps || [];
     assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpoint), failures, `${fileName}: Power gauge dynamic loadpoints must use loadpoint orange threshold color`);
     assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpointHigh), failures, `${fileName}: Power gauge dynamic loadpoints must use high-loadpoint orange threshold color`);
@@ -588,8 +592,13 @@ function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
   }
 
   const panels = collectDashboardPanels(dashboard);
+  const powerGaugePanel = panels.find((panel) => panel.id === 74);
+  assert(
+    powerGaugePanel?.fieldConfig?.defaults?.color?.mode === "thresholds",
+    failures,
+    `${fileName}: Power gauge must use threshold colors as default fallback for dynamic loadpoint labels`,
+  );
   const dynamicColorPanels = [
-    { label: "Power", panel: panels.find((panel) => panel.id === 74) },
     { label: "Power history", panel: panels.find((panel) => panel.id === 2) },
     { label: "Battery levels", panel: panels.find((panel) => panel.id === 66) },
     { label: "Energy", panel: panels.find((panel) => panel.title === "Energy") },
@@ -670,6 +679,7 @@ function validateDashboard(fileName, dashboard) {
   for (const text of forbiddenRuntimeDefaults) {
     assert(!rawJson.includes(text), failures, `${fileName}: private or vendor-specific runtime default is present: ${text}`);
   }
+  assert(!rawJson.includes("vm-today-gauges-en-orig"), failures, `${fileName}: Today Gauges legacy UID must not be referenced`);
   assert(!dashboardLinks(dashboard).some(isPortalDashboardLink), failures, `${fileName}: optional portal link must not be visible by default`);
   for (const variable of dashboardVariables(dashboard)) {
     const name = dashboardVariableName(variable);
@@ -742,14 +752,21 @@ function validateDashboard(fileName, dashboard) {
     const pvStacking = pvPowerPanel?.vizConfig?.spec?.fieldConfig?.defaults?.custom?.stacking;
     assert(pvStacking?.mode === "normal", failures, `${fileName}: PV power panel must stack PV strings additively`);
 
-    const forecastStatusPanel = panels.find((panel) => panel.id === 44 && panel.title === "Solar forecast status" && panel.type === "stat");
-    assert(Boolean(forecastStatusPanel), failures, `${fileName}: missing PV tab Solar forecast status panel`);
-    if (forecastStatusPanel) {
-      const statusExpr = forecastStatusPanel.targets?.[0]?.expr || "";
-      const statusMappings = forecastStatusPanel.fieldConfig?.defaults?.mappings || [];
-      assert(statusExpr.includes("present_over_time(tariffSolar_value[24h])") && statusExpr.includes("or vector(0)"), failures, `${fileName}: Solar forecast status panel must degrade missing tariffSolar_value to a visible zero state`);
-      assert(JSON.stringify(statusMappings).includes("No EVCC forecast data"), failures, `${fileName}: Solar forecast status panel must explain missing EVCC forecast data visibly`);
-      assert(JSON.stringify(statusMappings).includes("Forecast data received"), failures, `${fileName}: Solar forecast status panel must show the OK state when tariffSolar_value exists`);
+    const forecastStatusPanel = panels.find((panel) => panel.id === 44 || panel.title === "Solar forecast status");
+    assert(!forecastStatusPanel, failures, `${fileName}: PV tab must not use a separate Solar forecast status panel`);
+
+    const forecastBarPanel = panels.find((panel) => panel.id === 35 && panel.title === "Forecast" && panel.type === "barchart");
+    assert(Boolean(forecastBarPanel), failures, `${fileName}: missing PV tab Forecast bar panel`);
+    if (forecastBarPanel) {
+      const fallbackTarget = forecastBarPanel.targets?.find((target) => target.refId === "noForecast");
+      const actualTarget = forecastBarPanel.targets?.find((target) => target.refId === "pvStringEnergy");
+      const forecastEnergyTarget = forecastBarPanel.targets?.find((target) => target.refId === "pvEnergy");
+      const fallbackOverride = (forecastBarPanel.fieldConfig?.overrides || []).find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "No EVCC forecast data");
+      assert(Boolean(fallbackTarget), failures, `${fileName}: Forecast bar panel must include noForecast fallback target`);
+      assert(String(fallbackTarget?.expr || "").includes("unless") && String(fallbackTarget?.expr || "").includes("present_over_time(tariffSolar_value[24h])"), failures, `${fileName}: Forecast bar fallback must only appear when EVCC tariffSolar_value is absent`);
+      assert(String(actualTarget?.expr || "").includes("present_over_time(tariffSolar_value[24h])"), failures, `${fileName}: Forecast bar Actual series must be hidden when EVCC forecast data is absent`);
+      assert(String(forecastEnergyTarget?.expr || "").includes("present_over_time(tariffSolar_value[24h])"), failures, `${fileName}: Forecast bar Forecast series must be guarded by EVCC forecast data presence`);
+      assert(JSON.stringify(fallbackOverride).includes("No EVCC forecast data"), failures, `${fileName}: Forecast bar panel must show the no-forecast text in the existing forecast panel`);
     }
 
     const forecastPanel = panels.find((panel) => panel.id === 16 && panel.title === "Forecast" && panel.type === "timeseries");
@@ -790,6 +807,7 @@ function validateDashboard(fileName, dashboard) {
     if (powerPanel) {
       const powerDefaults = powerPanel.fieldConfig?.defaults || {};
       assert(powerDefaults.min === 0 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a positive 0..11 kW scale for dynamic loadpoint series`);
+      assert(powerDefaults.color?.mode === "thresholds", failures, `${fileName}: Power gauge defaults must use threshold color mode for dynamic loadpoint series`);
       const defaultThresholds = powerDefaults.thresholds?.steps || [];
       assert(defaultThresholds.length >= 4 && defaultThresholds.some((step) => step.color === dashboardColors.danger && step.value === 10), failures, `${fileName}: Power gauge dynamic loadpoints must use multiple positive absolute threshold steps`);
       const powerGaugeTargetOrder = (powerPanel.targets || []).map((target) => target.refId);
@@ -808,6 +826,7 @@ function validateDashboard(fileName, dashboard) {
       }
       for (const [refId, label] of expectedPowerGaugeMatchers) {
         assert(powerGaugeOverrides.some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === refId), failures, `${fileName}: Power gauge ${label} override must match stable query refId '${refId}'`);
+        assert(propertyValue(powerPanel, refId, "color")?.mode === "thresholds", failures, `${fileName}: Power gauge ${label} must use threshold color mode so compact gauge views keep semantic colors`);
       }
       const homeTarget = (powerPanel.targets || []).find((target) => target.refId === "homePower");
       assert(/homePower_value\)?\s*\/\s*1000/.test(String(homeTarget?.expr || "")), failures, `${fileName}: Power gauge Home must render as positive house consumption`);

@@ -31,7 +31,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.03.4'
+$ScriptVersion = '2026.06.03.5'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-06-03'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -196,9 +196,7 @@ $FixedDashboardFiles = @(
   'VM_EVCC_Today.json',
   'VM_EVCC_Today-Mobile.json'
 )
-$LegacyDashboardUids = @(
-  @{ uid = 'vm-today-gauges-en-orig'; title = 'VM: EVCC: Today Gauges' }
-)
+$LegacyDashboardUids = @()
 
 
 function Get-RemoteSourceUrl([string]$RelativePath) {

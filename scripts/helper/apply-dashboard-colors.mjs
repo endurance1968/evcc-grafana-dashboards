@@ -1,7 +1,7 @@
 /**
  * Script: apply-dashboard-colors.mjs
  * Purpose: Apply the central semantic color palette to original EVCC VM dashboards.
- * Version: 2026.06.03.6
+ * Version: 2026.06.03.8
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -194,6 +194,7 @@ function applyPowerGaugeDefaults(fieldConfig, panel, kind) {
     return false;
   }
   fieldConfig.defaults ||= {};
+  fieldConfig.defaults.color = { mode: "thresholds" };
   fieldConfig.defaults.thresholds = loadpointDefaults;
   return true;
 }
@@ -213,6 +214,9 @@ function applyFieldConfig(fieldConfig, panel, kind) {
     const isGauge = kind === "gauge" || isPowerGaugePanel(panel);
     if (gaugeThresholdsByMatcher.has(option) && (isGauge || option === "Self-consumption")) {
       setProperty(override, "thresholds", gaugeThresholdsByMatcher.get(option));
+      if (isGauge && option !== "Self-consumption") {
+        setProperty(override, "color", { mode: "thresholds" });
+      }
       changed = true;
     }
 
@@ -227,7 +231,8 @@ function applyFieldConfig(fieldConfig, panel, kind) {
 
     const isThresholdDrivenGauge = isGauge && (hasProperty(override, "thresholds") || gaugeThresholdsByMatcher.has(option));
     if (isThresholdDrivenGauge && option !== "Self-consumption") {
-      changed = removeProperty(override, "color") || changed;
+      setProperty(override, "color", { mode: "thresholds" });
+      changed = true;
     } else {
       setProperty(override, "color", fixedColor(color));
       changed = true;

@@ -204,7 +204,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "mode": "thresholds"
           },
           "decimals": 2,
           "links": [],
@@ -285,6 +285,12 @@
                     "url": "/d/adddvtj?$__url_time_range&dtab=rete"
                   }
                 ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
               }
             ]
           },
@@ -335,6 +341,12 @@
                     "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                   }
                 ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
               }
             ]
           },
@@ -380,6 +392,12 @@
                       "value": 75
                     }
                   ]
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
                 }
               }
             ]
@@ -431,6 +449,12 @@
                     "url": "/d/adddvtj?$__url_time_range&dtab=casa"
                   }
                 ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
               }
             ]
           }
@@ -1562,6 +1586,12 @@
               {
                 "id": "max",
                 "value": 1
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
               }
             ]
           },

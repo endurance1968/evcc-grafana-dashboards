@@ -1095,6 +1095,12 @@
                       {
                         "id": "max",
                         "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
                       }
                     ]
                   },

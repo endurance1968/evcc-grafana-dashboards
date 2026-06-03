@@ -173,7 +173,7 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "mode": "palette-classic"
+                    "mode": "thresholds"
                   },
                   "custom": {
                     "neutral": 0
@@ -254,6 +254,12 @@
                             "url": "/d/adddvtj?$__url_time_range&dtab=grid"
                           }
                         ]
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
                       }
                     ]
                   },
@@ -304,6 +310,12 @@
                             "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                           }
                         ]
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
                       }
                     ]
                   },
@@ -349,6 +361,12 @@
                               "value": 75
                             }
                           ]
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
                         }
                       }
                     ]
@@ -400,6 +418,12 @@
                             "url": "/d/adddvtj?$__url_time_range&dtab=home"
                           }
                         ]
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
                       }
                     ]
                   }
@@ -1277,6 +1301,12 @@
                       {
                         "id": "max",
                         "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
                       }
                     ]
                   },
@@ -2745,7 +2775,7 @@
         "title": "今天",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+        "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
       },
       {
         "asDropdown": false,
@@ -2757,7 +2787,7 @@
         "title": "昨天",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+        "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -2769,7 +2799,7 @@
         "title": "前天",
         "tooltip": "",
         "type": "link",
-        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+        "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
       },
       {
         "asDropdown": true,
