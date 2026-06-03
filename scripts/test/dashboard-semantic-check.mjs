@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.31
+ * Version: 2026.06.03.32
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -649,6 +649,22 @@ function validateAutarkyGaugeThresholds(fileName, panel, failures) {
   assert((panel.fieldConfig?.overrides || []).some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === "Self-consumption"), failures, `${fileName}: gauge panel '${panel.title}' Self-consumption override must match stable query refId`);
 }
 
+function validateMetricHistoryOverrides(fileName, panel, failures) {
+  if (fileName !== "VM_EVCC_Today.json" || panel.id !== 76 || panel.title !== "Metric history") {
+    return;
+  }
+  const expected = new Map([
+    ["Autarky", dashboardColors.autarky],
+    ["Self-consumption", dashboardColors.selfConsumption],
+  ]);
+  for (const [refId, color] of expected) {
+    const override = (panel.fieldConfig?.overrides || []).find((item) => item?.matcher?.id === "byFrameRefID" && item?.matcher?.options === refId);
+    const properties = new Map((override?.properties || []).map((property) => [property.id, property.value]));
+    assert(Boolean(override), failures, `${fileName}: Metric history ${refId} override must match stable query refId`);
+    assert(properties.get("color")?.mode === "fixed" && properties.get("color")?.fixedColor === color, failures, `${fileName}: Metric history ${refId} must use semantic fixed color ${color}`);
+  }
+}
+
 function validateMetricGaugeTimeSeries(fileName, panel, failures) {
   for (const refId of ["Autarky", "Self-consumption"]) {
     const target = panel.targets?.find((item) => item.refId === refId);
@@ -801,6 +817,9 @@ function validateDashboard(fileName, dashboard) {
     for (const panel of panels.filter((item) => item.type === "gauge")) {
       validateGrafana13GaugeOptions(fileName, panel, failures);
       validateAutarkyGaugeThresholds(fileName, panel, failures);
+    }
+    for (const panel of panels.filter((item) => fileName === "VM_EVCC_Today.json" && item.id === 76 && item.title === "Metric history")) {
+      validateMetricHistoryOverrides(fileName, panel, failures);
     }
 
     const powerPanel = panels.find((panel) => panel.id === 74);
