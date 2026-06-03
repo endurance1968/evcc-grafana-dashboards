@@ -490,51 +490,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -862,51 +817,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1172,62 +1082,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Eigenverbrauch"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "purple",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Eigenverbrauch"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarky"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "green",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autarkie"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Self-consumption"
                     },
                     "properties": [
                       {
@@ -1589,21 +1443,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Sonstiges"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#9FA7B3"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Other"
                     },
                     "properties": [
                       {
@@ -2270,51 +2109,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery charge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Speicher laden"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery discharge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Speicher entladen"
-                      },
-                      {
-                        "id": "custom.stacking",
-                        "value": {
-                          "group": "batteryNegative",
-                          "mode": "normal"
-                        }
                       }
                     ]
                   }
@@ -3156,36 +2950,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Average"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Effective electricity price"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -3326,18 +3090,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Einkauf"
                       }
                     ]
                   }
@@ -3899,44 +3651,6 @@
                         "value": "time:MM/DD"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC max"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterie max"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC min"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#686868",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterie min"
-                      }
-                    ]
                   }
                 ]
               }
@@ -4342,44 +4056,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Speicher"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Netz"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -4771,44 +4447,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Netz"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Netz"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Speicher"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
                     },
                     "properties": [
                       {

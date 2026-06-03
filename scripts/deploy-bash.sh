@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.03.1"
+SCRIPT_VERSION="2026.06.03.3"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
@@ -179,9 +179,9 @@ FIXED_DASHBOARD_FILES=(
   "VM_EVCC_Month.json"
   "VM_EVCC_Today-Details.json"
   "VM_EVCC_Today.json"
-  "VM_EVCC_Today-Gauges.json"
   "VM_EVCC_Today-Mobile.json"
 )
+LEGACY_DASHBOARD_UIDS=("vm-today-gauges-en-orig|VM: EVCC: Today Gauges")
 case "$DASHBOARD_SOURCE_MODE" in
   github)
     [[ -n "$GITHUB_REPO" ]] || { echo "GITHUB_REPO is required when DASHBOARD_SOURCE_MODE=github." >&2; exit 1; }
@@ -722,6 +722,29 @@ if ! truthy "$PURGE_EFFECTIVE" && [[ ${#existing_library[@]} -gt 0 ]]; then
   echo "Dashboard import will use the updated embedded __elements definitions."
 fi
 
+existing_legacy_dashboards=()
+if ! truthy "$PURGE_EFFECTIVE"; then
+  for legacy in "${LEGACY_DASHBOARD_UIDS[@]}"; do
+    uid="${legacy%%|*}"
+    title="${legacy#*|}"
+    legacy_out="$TMP_DIR/check-legacy-dashboard-nopurge.json"
+    status=$(api GET "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$(urlencode "$uid")" "" "$legacy_out")
+    if [[ "$status" == "200" ]]; then
+      existing_legacy_dashboards+=("$legacy")
+    elif [[ "$status" != "404" ]]; then
+      echo "Failed to inspect legacy dashboard $uid: $(cat "$legacy_out")" >&2
+      exit 1
+    fi
+  done
+fi
+if [[ ${#existing_legacy_dashboards[@]} -gt 0 ]]; then
+  echo
+  echo "Legacy dashboards from previous releases will be removed before import:"
+  for legacy in "${existing_legacy_dashboards[@]}"; do
+    echo "- ${legacy#*|} [${legacy%%|*}]"
+  done
+fi
+
 if truthy "$PURGE_EFFECTIVE"; then
   echo
   if truthy "$PURGE_ONLY"; then
@@ -741,6 +764,19 @@ if truthy "$PURGE_EFFECTIVE"; then
       found=1
     elif [[ "$status" != "404" ]]; then
       echo "Failed to inspect dashboard $uid: $(cat "$purge_out")" >&2
+      exit 1
+    fi
+  done
+  for legacy in "${LEGACY_DASHBOARD_UIDS[@]}"; do
+    uid="${legacy%%|*}"
+    title="${legacy#*|}"
+    purge_out="$TMP_DIR/check-legacy-dashboard.json"
+    status=$(api GET "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$(urlencode "$uid")" "" "$purge_out")
+    if [[ "$status" == "200" ]]; then
+      echo "- $title [$uid]"
+      found=1
+    elif [[ "$status" != "404" ]]; then
+      echo "Failed to inspect legacy dashboard $uid: $(cat "$purge_out")" >&2
       exit 1
     fi
   done
@@ -796,6 +832,23 @@ if [[ "$GRAFANA_THEME_CONFIGURED" == "true" ]] && ! truthy "$PURGE_ONLY"; then
   apply_grafana_theme
 fi
 
+if ! truthy "$PURGE_EFFECTIVE"; then
+  for legacy in "${existing_legacy_dashboards[@]}"; do
+    uid="${legacy%%|*}"
+    title="${legacy#*|}"
+    purge_out="$TMP_DIR/purge-legacy-dashboard-nopurge.json"
+    status=$(api DELETE "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$(urlencode "$uid")" "" "$purge_out")
+    if [[ "$status" == "404" ]]; then
+      echo "Skipping legacy dashboard delete (not found): $title [$uid]"
+    elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+      echo "Failed to purge legacy dashboard $uid: $(cat "$purge_out")" >&2
+      exit 1
+    else
+      echo "Deleted legacy dashboard: $title [$uid]"
+    fi
+  done
+fi
+
 if truthy "$PURGE_EFFECTIVE"; then
   for file_name in "${DASHBOARD_FILES[@]}"; do
     raw_file="$TMP_DIR/$file_name"
@@ -811,6 +864,20 @@ if truthy "$PURGE_EFFECTIVE"; then
       else
         echo "Deleted dashboard: $(dashboard_title "$raw_file") [$uid]"
       fi
+    fi
+  done
+  for legacy in "${LEGACY_DASHBOARD_UIDS[@]}"; do
+    uid="${legacy%%|*}"
+    title="${legacy#*|}"
+    purge_out="$TMP_DIR/purge-legacy-dashboard.json"
+    status=$(api DELETE "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$(urlencode "$uid")" "" "$purge_out")
+    if [[ "$status" == "404" ]]; then
+      echo "Skipping legacy dashboard delete (not found): $title [$uid]"
+    elif [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+      echo "Failed to purge legacy dashboard $uid: $(cat "$purge_out")" >&2
+      exit 1
+    else
+      echo "Deleted legacy dashboard: $title [$uid]"
     fi
   done
   if truthy "$PURGE_ONLY"; then

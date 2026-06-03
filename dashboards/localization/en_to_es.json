@@ -330,7 +330,6 @@
     "15 min feed-in energy": "Energía vertida 15 min",
     "Grid: 15 min import/export energy (MSB approximation)": "Red: energía importada/vertida 15 min (aprox. MSB)",
     "15-minute directional grid energy from EVCC grid power. Positive values are import energy, negative values are feed-in energy; import and feed-in are separated before integration to approximate separate metering operator registers. Bars are aligned to the previous 15-minute grid interval.": "Energía de red direccional de 15 minutos a partir de la potencia de red de EVCC. Los valores positivos son energía importada y los negativos energía vertida; importación y vertido se separan antes de la integración para aproximar registros separados del operador de medida. Las barras están alineadas con el intervalo de 15 minutos anterior.",
-    "VM: EVCC: Today Gauges": "VM: EVCC: Hoy indicadores",
     "PV now": "FV ahora",
     "Grid now": "Red ahora",
     "Battery SOC": "SOC batería",

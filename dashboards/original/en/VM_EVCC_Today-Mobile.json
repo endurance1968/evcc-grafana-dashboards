@@ -240,7 +240,7 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "PV"
             },
             "properties": [
@@ -286,8 +286,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Grid"
+              "id": "byFrameRefID",
+              "options": "gridPower"
             },
             "properties": [
               {
@@ -336,8 +336,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Battery"
+              "id": "byFrameRefID",
+              "options": "batteryPower"
             },
             "properties": [
               {
@@ -386,8 +386,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Home"
+              "id": "byFrameRefID",
+              "options": "homePower"
             },
             "properties": [
               {
@@ -429,88 +429,6 @@
                     "targetBlank": true,
                     "title": "More details",
                     "url": "/d/adddvtj?$__url_time_range&dtab=home"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
-                    {
-                      "color": "orange",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "semi-dark-orange",
-                      "value": 7
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "EVCC: $loadpoint1Name",
-                    "url": "$evccUrl?lp=1"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
-                    {
-                      "color": "orange",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "semi-dark-orange",
-                      "value": 7
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "EVCC: $loadpoint2Name",
-                    "url": "$evccUrl?lp=2"
                   }
                 ]
               }
@@ -730,21 +648,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Battery"
             },
             "properties": [
@@ -752,36 +655,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Heizlüfter"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-purple",
                   "mode": "fixed"
                 }
               }
@@ -1061,21 +934,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Battery discharge"
             },
             "properties": [
@@ -1083,21 +941,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
                   "mode": "fixed"
                 }
               }
@@ -1349,36 +1192,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Tesla"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Ioniq 5"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-red",
                   "mode": "fixed"
                 }
               }
@@ -2239,21 +2052,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tesla"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Battery charge"
             },
             "properties": [
@@ -2284,21 +2082,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Ioniq 5"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "PV"
             },
             "properties": [
@@ -2306,36 +2089,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Gast: Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Gast: Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
                   "mode": "fixed"
                 }
               }

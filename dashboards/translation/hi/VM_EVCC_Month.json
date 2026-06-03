@@ -490,66 +490,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "PV"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#73BF69"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -877,66 +817,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "PV"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#73BF69"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1225,62 +1105,6 @@
                         "value": "स्व-उपभोग"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarky"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "green",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "आत्मनिर्भरता"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Self-consumption"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "purple",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "स्व-उपभोग"
-                      }
-                    ]
                   }
                 ]
               }
@@ -1426,25 +1250,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarkie"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "आत्मनिर्भरता"
                       }
                     ]
                   }
@@ -1638,21 +1443,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "अन्य"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#9FA7B3"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Other"
                     },
                     "properties": [
                       {
@@ -2319,51 +2109,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery charge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी चार्ज"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery discharge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी डिस्चार्ज"
-                      },
-                      {
-                        "id": "custom.stacking",
-                        "value": {
-                          "group": "batteryNegative",
-                          "mode": "normal"
-                        }
                       }
                     ]
                   }
@@ -3205,36 +2950,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Average"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Effective electricity price"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -3375,18 +3090,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "खरीदा गया"
                       }
                     ]
                   }
@@ -3948,44 +3651,6 @@
                         "value": "time:MM/DD"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC max"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी अधिकतम"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC min"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#686868",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी न्यूनतम"
-                      }
-                    ]
                   }
                 ]
               }
@@ -4391,63 +4056,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "PV"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "पीवी"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#73BF69"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "ग्रिड"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -4839,63 +4447,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "ग्रिड"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "ग्रिड"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "PV"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "पीवी"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#73BF69"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "बैटरी"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
                     },
                     "properties": [
                       {

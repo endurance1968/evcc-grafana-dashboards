@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.10
+ * Version: 2026.06.03.12
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -27,6 +27,15 @@ const forbiddenRuntimeDefaults = [
   "Solarman",
   "globalhome.solarmanpv.com",
 ];
+const forbiddenUserSpecificMatchers = new Set([
+  "Garage",
+  "Stellplatz",
+  "Gast: Garage",
+  "Gast: Stellplatz",
+  "Heizlüfter",
+  "Tesla",
+  "Ioniq 5",
+]);
 
 const expectedTimes = {
   "VM_EVCC_All-time.json": {
@@ -46,10 +55,6 @@ const expectedTimes = {
     "to": "now/d"
   },
   "VM_EVCC_Today-Mobile.json": {
-    "from": "now/d",
-    "to": "now/d"
-  },
-  "VM_EVCC_Today-Gauges.json": {
     "from": "now/d",
     "to": "now/d"
   },
@@ -124,23 +129,6 @@ const expectedLinks = {
     }
   ],
   "VM_EVCC_Today-Mobile.json": [
-    {
-      "title": "Today",
-      "from": "now%2Fd",
-      "to": "now%2Fd"
-    },
-    {
-      "title": "Yesterday",
-      "from": "now-1d%2Fd",
-      "to": "now-1d%2Fd"
-    },
-    {
-      "title": "Day before yesterday",
-      "from": "now-2d%2Fd",
-      "to": "now-2d%2Fd"
-    }
-  ],
-  "VM_EVCC_Today-Gauges.json": [
     {
       "title": "Today",
       "from": "now%2Fd",
@@ -312,20 +300,6 @@ const criticalPanels = {
       "minTargets": 5
     }
   ],
-  "VM_EVCC_Today-Gauges.json": [
-    {
-      "id": 74,
-      "title": "Power",
-      "type": "gauge",
-      "minTargets": 5
-    },
-    {
-      "id": 64,
-      "title": "Metrics",
-      "type": "gauge",
-      "minTargets": 8
-    }
-  ],
   "VM_EVCC_Today.json": [
     {
       "id": 74,
@@ -495,8 +469,8 @@ function validateDeployManifest(manifest) {
   assert(deployFiles.has("VM_EVCC_Year.json"), failures, "deploy manifest: must include Year dashboard");
   assert(deployFiles.has("VM_EVCC_Month.json"), failures, "deploy manifest: must include Month dashboard");
   assert(deployFiles.has("VM_EVCC_Today-Details.json"), failures, "deploy manifest: must include Today Details dashboard");
-  assert(deployFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: must keep the normal Today dashboard");
-  assert(deployFiles.has("VM_EVCC_Today-Gauges.json"), failures, "deploy manifest: must include Today Gauges dashboard");
+  assert(deployFiles.has("VM_EVCC_Today.json"), failures, "deploy manifest: must include the Today dashboard");
+  assert(!deployFiles.has("VM_EVCC_Today-Gauges.json"), failures, "deploy manifest: Today Gauges must be folded into Today, not deployed separately");
   assert(deployFiles.has("VM_EVCC_Today-Mobile.json"), failures, "deploy manifest: must keep the normal Today Mobile dashboard");
 
   return failures;
@@ -545,7 +519,7 @@ function validateGrafanaTabSlugs(fileName, layout, failures, pathLabel = "layout
 }
 
 function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
-  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
     return;
   }
 
@@ -627,9 +601,9 @@ function validateDashboard(fileName, dashboard) {
     assert(timeSettings?.to === expectedTime.to, failures, `${fileName}: expected time.to=${expectedTime.to}, got ${timeSettings?.to}`);
   }
 
-  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_Today-Details.json", "VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json"].includes(fileName)) {
+  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_Today-Details.json", "VM_EVCC_Today.json"].includes(fileName)) {
     assert(isV2Dashboard(dashboard), failures, `${fileName}: expected a Grafana v2 dashboard resource`);
-    const expectedLayout = ["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json"].includes(fileName) ? "GridLayout" : "TabsLayout";
+    const expectedLayout = ["VM_EVCC_Today.json"].includes(fileName) ? "GridLayout" : "TabsLayout";
     assert(dashboardLayoutKind(dashboard) === expectedLayout, failures, `${fileName}: expected layout.kind=${expectedLayout}, got ${dashboardLayoutKind(dashboard)}`);
     for (const [elementName, element] of Object.entries(dashboard.spec?.elements || {})) {
       if (element?.kind === "Panel") {
@@ -640,6 +614,11 @@ function validateDashboard(fileName, dashboard) {
 
   validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
   validateTodayPaletteFallbacks(fileName, dashboard, failures);
+  for (const panel of panels) {
+    for (const override of panel.fieldConfig?.overrides || []) {
+      assert(!(override?.matcher?.id === "byName" && forbiddenUserSpecificMatchers.has(override?.matcher?.options)), failures, `${fileName}: panel '${panel.title}' must not contain user-specific byName matcher '${override?.matcher?.options}'`);
+    }
+  }
 
   if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json"].includes(fileName)) {
     const metricGaugePanel = panels.find((panel) => panel.title === "Metric gauges" && panel.type === "gauge");
@@ -695,7 +674,7 @@ function validateDashboard(fileName, dashboard) {
     }
   }
 
-  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
+  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
     assert(!rawJson.includes('"libraryPanel"'), failures, `${fileName}: deployed dashboards must not use Grafana library panels`);
     assert(!Object.hasOwn(dashboard, "__elements"), failures, `${fileName}: deployed dashboards must not embed Grafana library panel elements`);
     const powerHistoryPanel = panels.find((panel) => panel.id === 2);
@@ -714,6 +693,12 @@ function validateDashboard(fileName, dashboard) {
     }
 
     const powerPanel = panels.find((panel) => panel.id === 74);
+    const expectedPowerGaugeMatchers = new Map([
+      ["PV", "PV"],
+      ["gridPower", "Grid"],
+      ["batteryPower", "Battery"],
+      ["homePower", "Home"],
+    ]);
     assert(Boolean(powerPanel), failures, `${fileName}: missing Power gauge panel`);
     if (powerPanel) {
       const powerDefaults = powerPanel.fieldConfig?.defaults || {};
@@ -727,6 +712,14 @@ function validateDashboard(fileName, dashboard) {
         assert(expr.includes("chargePower_value / 1000"), failures, `${fileName}: Power gauge loadpoints must render as positive charging power`);
         assert(!expr.includes("chargePower_value / -1000"), failures, `${fileName}: Power gauge loadpoints must not render as signed negative consumer power`);
       }
+      const stalePowerGaugeMatchers = new Set(["Garage", "Stellplatz", "Grid", "Battery", "Home"]);
+      const powerGaugeOverrides = powerPanel.fieldConfig?.overrides || [];
+      for (const override of powerGaugeOverrides) {
+        assert(!(override?.matcher?.id === "byName" && stalePowerGaugeMatchers.has(override?.matcher?.options)), failures, `${fileName}: Power gauge must not use stale byName matcher '${override?.matcher?.options}'`);
+      }
+      for (const [refId, label] of expectedPowerGaugeMatchers) {
+        assert(powerGaugeOverrides.some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === refId), failures, `${fileName}: Power gauge ${label} override must match stable query refId '${refId}'`);
+      }
       const homeTarget = (powerPanel.targets || []).find((target) => target.refId === "homePower");
       assert(/homePower_value\)?\s*\/\s*1000/.test(String(homeTarget?.expr || "")), failures, `${fileName}: Power gauge Home must render as positive house consumption`);
       assert(dashboardVariables(dashboard).some((variable) => dashboardVariableName(variable) === "installedWattPeak"), failures, `${fileName}: Power gauge PV max requires installedWattPeak dashboard variable`);
@@ -735,32 +728,34 @@ function validateDashboard(fileName, dashboard) {
       assert(pvMin === 0 && pvMax === "$installedWattPeak", failures, `${fileName}: Power gauge PV must use a 0..installedWattPeak kW scale`);
       const pvThresholds = propertyValue(powerPanel, "PV", "thresholds");
       assert(pvThresholds?.mode === "percentage" && (pvThresholds.steps || []).length >= 3, failures, `${fileName}: Power gauge PV must use percentage thresholds relative to installedWattPeak`);
-      assert(propertyValue(powerPanel, "Home", "min") === 0 && propertyValue(powerPanel, "Home", "max") === 11, failures, `${fileName}: Power gauge Home must use a positive 0..11 kW scale`);
-      const homeThresholds = propertyValue(powerPanel, "Home", "thresholds")?.steps || [];
+      assert(propertyValue(powerPanel, "homePower", "min") === 0 && propertyValue(powerPanel, "homePower", "max") === 11, failures, `${fileName}: Power gauge Home must use a positive 0..11 kW scale`);
+      const homeThresholds = propertyValue(powerPanel, "homePower", "thresholds")?.steps || [];
       assert(homeThresholds.length >= 4 && homeThresholds.some((step) => step.color === "red" && step.value === 10), failures, `${fileName}: Power gauge Home must use multiple positive absolute threshold steps`);
       const expectedSignedGaugeRanges = new Map([
-        ["Grid", [-11, 11]],
-        ["Battery", [-11, 11]],
+        ["gridPower", [-11, 11]],
+        ["batteryPower", [-11, 11]],
       ]);
-      for (const [seriesName, [min, max]] of expectedSignedGaugeRanges) {
-        assert(propertyValue(powerPanel, seriesName, "min") === min && propertyValue(powerPanel, seriesName, "max") === max, failures, `${fileName}: Power gauge ${seriesName} must keep signed ${min}..${max} kW scale`);
-        const thresholds = propertyValue(powerPanel, seriesName, "thresholds")?.steps || [];
-        assert(thresholds.length >= 4 && thresholds.some((step) => step.value < 0) && thresholds.some((step) => step.value > 0), failures, `${fileName}: Power gauge ${seriesName} must use multiple signed threshold steps around zero`);
+      for (const [matcherOption, [min, max]] of expectedSignedGaugeRanges) {
+        const label = expectedPowerGaugeMatchers.get(matcherOption) || matcherOption;
+        assert(propertyValue(powerPanel, matcherOption, "min") === min && propertyValue(powerPanel, matcherOption, "max") === max, failures, `${fileName}: Power gauge ${label} must keep signed ${min}..${max} kW scale`);
+        const thresholds = propertyValue(powerPanel, matcherOption, "thresholds")?.steps || [];
+        assert(thresholds.length >= 4 && thresholds.some((step) => step.value < 0) && thresholds.some((step) => step.value > 0), failures, `${fileName}: Power gauge ${label} must use multiple signed threshold steps around zero`);
       }
     }
     const expectedDetailTabs = new Map([
       ["PV", "dtab=pv"],
-      ["Grid", "dtab=grid"],
-      ["Home", "dtab=home"],
-      ["Battery", "dtab=pv"],
+      ["gridPower", "dtab=grid"],
+      ["homePower", "dtab=home"],
+      ["batteryPower", "dtab=pv"],
     ]);
-    for (const [seriesName, tabParam] of expectedDetailTabs) {
-      const links = propertyValue(powerPanel, seriesName, "links") || [];
-      assert(links.some((link) => String(link.url || "").includes(tabParam) && link.targetBlank === true), failures, `${fileName}: Power gauge ${seriesName} must open Today Details with ${tabParam} in a new tab`);
+    for (const [matcherOption, tabParam] of expectedDetailTabs) {
+      const label = expectedPowerGaugeMatchers.get(matcherOption) || matcherOption;
+      const links = propertyValue(powerPanel, matcherOption, "links") || [];
+      assert(links.some((link) => String(link.url || "").includes(tabParam) && link.targetBlank === true), failures, `${fileName}: Power gauge ${label} must open Today Details with ${tabParam} in a new tab`);
     }
   }
 
-  if (fileName === "VM_EVCC_Today-Gauges.json") {
+  if (fileName === "VM_EVCC_Today.json") {
     const byId = dashboardGridPositionsById(dashboard);
     const bottom = (gridPos) => (gridPos?.y || 0) + (gridPos?.h || 0);
     assert(byId.get(74)?.h === 27, failures, `${fileName}: Power gauge column must align to bottom row height 27`);

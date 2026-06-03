@@ -2087,36 +2087,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -2273,36 +2243,6 @@
                         "id": "color",
                         "value": {
                           "fixedColor": "purple",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
                           "mode": "fixed"
                         }
                       }

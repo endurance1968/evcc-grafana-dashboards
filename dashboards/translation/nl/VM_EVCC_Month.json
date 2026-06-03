@@ -490,51 +490,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -862,51 +817,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#5794F2"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#56A64B"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1195,62 +1105,6 @@
                         "value": "Eigenverbruik"
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarky"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "green",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Zelfvoorziening"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Self-consumption"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "purple",
-                              "value": null
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Eigenverbruik"
-                      }
-                    ]
                   }
                 ]
               }
@@ -1396,25 +1250,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarkie"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Zelfvoorziening"
                       }
                     ]
                   }
@@ -1608,21 +1443,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Overig"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#9FA7B3"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Other"
                     },
                     "properties": [
                       {
@@ -2289,51 +2109,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery charge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterij laden"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery discharge"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Batterij ontladen"
-                      },
-                      {
-                        "id": "custom.stacking",
-                        "value": {
-                          "group": "batteryNegative",
-                          "mode": "normal"
-                        }
                       }
                     ]
                   }
@@ -3175,36 +2950,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Average"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Effective electricity price"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -3345,18 +3090,6 @@
                       {
                         "id": "unit",
                         "value": "time:MM/DD"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Aangekocht"
                       }
                     ]
                   }
@@ -4323,44 +4056,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Batterij"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Net"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -4752,44 +4447,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Net"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Net"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#E24D42"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Batterij"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#447EBC"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
                     },
                     "properties": [
                       {

@@ -31,7 +31,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.03.1'
+$ScriptVersion = '2026.06.03.3'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-06-03'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -194,8 +194,10 @@ $FixedDashboardFiles = @(
   'VM_EVCC_Month.json',
   'VM_EVCC_Today-Details.json',
   'VM_EVCC_Today.json',
-  'VM_EVCC_Today-Gauges.json',
   'VM_EVCC_Today-Mobile.json'
+)
+$LegacyDashboardUids = @(
+  @{ uid = 'vm-today-gauges-en-orig'; title = 'VM: EVCC: Today Gauges' }
 )
 
 
@@ -781,6 +783,20 @@ if (-not $purgeEnabled -and $existingLibrary.Count -gt 0) {
   Write-Host 'Dashboard import will use the updated embedded __elements definitions.' -ForegroundColor Yellow
 }
 
+$existingLegacyDashboards = @()
+if (-not $purgeEnabled) {
+  foreach ($legacy in $LegacyDashboardUids) {
+    $path = "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$([Uri]::EscapeDataString($legacy.uid))"
+    $existing = Invoke-GrafanaApi GET $path -Allow404
+    if ($null -ne $existing) { $existingLegacyDashboards += $legacy }
+  }
+}
+if ($existingLegacyDashboards.Count -gt 0) {
+  Write-Host ''
+  Write-Host 'Legacy dashboards from previous releases will be removed before import:' -ForegroundColor Yellow
+  foreach ($item in $existingLegacyDashboards) { Write-Host "- $($item.title) [$($item.uid)]" }
+}
+
 if ($purgeEnabled) {
   $existingDashboards = @()
   foreach ($dashboard in $dashboards) {
@@ -793,6 +809,11 @@ if ($purgeEnabled) {
     } else {
       $existingDashboards += $existing.dashboard
     }
+  }
+  foreach ($legacy in $LegacyDashboardUids) {
+    $path = "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$([Uri]::EscapeDataString($legacy.uid))"
+    $existing = Invoke-GrafanaApi GET $path -Allow404
+    if ($null -ne $existing) { $existingDashboards += $existing }
   }
   Write-Host ''
   if ($purgeOnlyEnabled) { Write-Host 'Will delete existing dashboards without import:' } else { Write-Host 'Will delete existing dashboards before import:' }
@@ -817,12 +838,23 @@ if ($grafanaThemeConfigured -and -not $purgeOnlyEnabled) {
   Set-GrafanaOrgTheme -ThemeValue $grafanaTheme
 }
 
+if (-not $purgeEnabled) {
+  foreach ($legacy in $existingLegacyDashboards) {
+    $path = "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$([Uri]::EscapeDataString($legacy.uid))"
+    Remove-And-Report 'legacy dashboard' $legacy.title $legacy.uid $path
+  }
+}
+
 if ($purgeEnabled) {
   foreach ($dashboard in $dashboards) {
     $uid = Get-DashboardUid $dashboard.raw
     if ($uid) {
       Remove-And-Report 'dashboard' (Get-DashboardTitle $dashboard.raw) $uid (Get-DashboardPath $dashboard.raw)
     }
+  }
+  foreach ($legacy in $LegacyDashboardUids) {
+    $path = "/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/$([Uri]::EscapeDataString($legacy.uid))"
+    Remove-And-Report 'legacy dashboard' $legacy.title $legacy.uid $path
   }
   if ($purgeOnlyEnabled) {
     foreach ($uid in ($libraryElements.Keys | Sort-Object)) {

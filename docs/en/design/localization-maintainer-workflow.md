@@ -41,7 +41,6 @@ Do not apply it to `dashboards/original` unless you are intentionally refactorin
 Current upstream VM source set:
 
 - `dashboards/original/en/VM_EVCC_Today.json`
-- `dashboards/original/en/VM_EVCC_Today-Gauges.json`
 - `dashboards/original/en/VM_EVCC_Today-Mobile.json`
 - `dashboards/original/en/VM_EVCC_Today-Details.json`
 

@@ -240,7 +240,7 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "PV"
             },
             "properties": [
@@ -286,8 +286,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Rete"
+              "id": "byFrameRefID",
+              "options": "gridPower"
             },
             "properties": [
               {
@@ -336,8 +336,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Batteria"
+              "id": "byFrameRefID",
+              "options": "batteryPower"
             },
             "properties": [
               {
@@ -386,240 +386,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Casa"
-            },
-            "properties": [
-              {
-                "id": "min",
-                "value": 0
-              },
-              {
-                "id": "max",
-                "value": 11
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
-                    {
-                      "color": "#9f7aea",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "orange",
-                      "value": 7
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": true,
-                    "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&dtab=casa"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
-                    {
-                      "color": "orange",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "semi-dark-orange",
-                      "value": 7
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "EVCC: $loadpoint1Name",
-                    "url": "$evccUrl?lp=1"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": 0
-                    },
-                    {
-                      "color": "orange",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "semi-dark-orange",
-                      "value": 7
-                    },
-                    {
-                      "color": "red",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "title": "EVCC: $loadpoint2Name",
-                    "url": "$evccUrl?lp=2"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Grid"
-            },
-            "properties": [
-              {
-                "id": "min",
-                "value": -11
-              },
-              {
-                "id": "max",
-                "value": 11
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": -11
-                    },
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": -0.001
-                    },
-                    {
-                      "color": "yellow",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "red",
-                      "value": 8
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": true,
-                    "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&dtab=rete"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery"
-            },
-            "properties": [
-              {
-                "id": "min",
-                "value": -11
-              },
-              {
-                "id": "max",
-                "value": 11
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "blue",
-                      "value": -11
-                    },
-                    {
-                      "color": "#7a7a7a4d",
-                      "value": -0.001
-                    },
-                    {
-                      "color": "dark-blue",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "purple",
-                      "value": 8
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "links",
-                "value": [
-                  {
-                    "targetBlank": true,
-                    "title": "Più dettagli",
-                    "url": "/d/adddvtj?$__url_time_range&dtab=pv"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Home"
+              "id": "byFrameRefID",
+              "options": "homePower"
             },
             "properties": [
               {
@@ -880,21 +648,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Batteria"
             },
             "properties": [
@@ -910,127 +663,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Heizlüfter"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Previsione FV"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#2F8F5B",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.drawStyle",
-                "value": "line"
-              },
-              {
-                "id": "custom.lineInterpolation",
-                "value": "smooth"
-              },
-              {
-                "id": "custom.lineWidth",
-                "value": 2
-              },
-              {
-                "id": "custom.fillOpacity",
-                "value": 0
-              },
-              {
-                "id": "custom.pointSize",
-                "value": 0
-              },
-              {
-                "id": "custom.lineStyle",
-                "value": {
-                  "fill": "dash",
-                  "dash": [
-                    8,
-                    6
-                  ]
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Home"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Grid"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "PV forecast"
             },
             "properties": [
               {
@@ -1301,21 +934,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Scarica batteria"
             },
             "properties": [
@@ -1323,21 +941,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
                   "mode": "fixed"
                 }
               }
@@ -1382,81 +985,6 @@
               {
                 "id": "custom.axisPlacement",
                 "value": "hidden"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Home"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Grid import"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery discharge"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Feed-in"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery charge"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
               }
             ]
           }
@@ -1671,36 +1199,6 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Tesla"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Ioniq 5"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
               "id": "byType",
               "options": "time"
             },
@@ -1708,21 +1206,6 @@
               {
                 "id": "custom.axisPlacement",
                 "value": "hidden"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "blue",
-                  "mode": "fixed"
-                }
               }
             ]
           }
@@ -1930,36 +1413,6 @@
                 "value": "Totale giornaliero"
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Purchased"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Sold"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
           }
         ]
       },
@@ -2096,62 +1549,6 @@
             "matcher": {
               "id": "byName",
               "options": "Autoconsumo"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percentunit"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "purple",
-                      "value": null
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "displayName",
-                "value": "Autoconsumo"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Autarky"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percentunit"
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "green",
-                      "value": null
-                    }
-                  ]
-                }
-              },
-              {
-                "id": "displayName",
-                "value": "Autarchia"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -2440,44 +1837,6 @@
                 "value": "watth"
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Autarky"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percentunit"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#73BF69",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Self-consumption"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percentunit"
-              },
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#B877D9",
-                  "mode": "fixed"
-                }
-              }
-            ]
           }
         ]
       },
@@ -2693,21 +2052,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Tesla"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "Carica batteria"
             },
             "properties": [
@@ -2738,21 +2082,6 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Ioniq 5"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-red",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
               "options": "PV"
             },
             "properties": [
@@ -2760,111 +2089,6 @@
                 "id": "color",
                 "value": {
                   "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Gast: Garage"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Gast: Stellplatz"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Grid import"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "semi-dark-yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Feed-in"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-yellow",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Home"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "purple",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery charge"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "light-blue",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery discharge"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "semi-dark-blue",
                   "mode": "fixed"
                 }
               }

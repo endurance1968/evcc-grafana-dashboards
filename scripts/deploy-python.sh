@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.03.1"
+SCRIPT_VERSION="2026.06.03.3"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
@@ -173,8 +173,10 @@ FIXED_DASHBOARD_FILES = [
     "VM_EVCC_Month.json",
     "VM_EVCC_Today-Details.json",
     "VM_EVCC_Today.json",
-    "VM_EVCC_Today-Gauges.json",
     "VM_EVCC_Today-Mobile.json",
+]
+LEGACY_DASHBOARD_UIDS = [
+    {"uid": "vm-today-gauges-en-orig", "title": "VM: EVCC: Today Gauges"},
 ]
 
 
@@ -687,6 +689,20 @@ if not purge_enabled and existing_library:
         print(f"- {item.get('name')} [{item.get('uid')}]")
     print("Dashboard import will use the updated embedded __elements definitions.")
 
+existing_legacy_dashboards = []
+if not purge_enabled:
+    for legacy in LEGACY_DASHBOARD_UIDS:
+        uid = legacy["uid"]
+        path = f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
+        existing = api("GET", path, allow_404=True)
+        if existing is not None:
+            existing_legacy_dashboards.append(legacy)
+if existing_legacy_dashboards:
+    print()
+    print("Legacy dashboards from previous releases will be removed before import:")
+    for item in existing_legacy_dashboards:
+        print(f"- {item['title']} [{item['uid']}]")
+
 if purge_enabled:
     existing_dashboards = []
     for dashboard in dashboards:
@@ -696,6 +712,12 @@ if purge_enabled:
         existing = api("GET", dashboard_path(dashboard["raw"]), allow_404=True)
         if existing is not None:
             existing_dashboards.append(existing.get("dashboard") or existing)
+    for legacy in LEGACY_DASHBOARD_UIDS:
+        uid = legacy["uid"]
+        path = f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
+        existing = api("GET", path, allow_404=True)
+        if existing is not None:
+            existing_dashboards.append(existing)
 
     print()
     if purge_only:
@@ -735,11 +757,21 @@ if not confirm_apply(confirm_prompt):
 if grafana_theme is not None and not purge_only:
     apply_grafana_theme(grafana_theme)
 
+if not purge_enabled:
+    for legacy in existing_legacy_dashboards:
+        uid = legacy["uid"]
+        path = f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
+        delete_and_report("legacy dashboard", legacy["title"], uid, path)
+
 if purge_enabled:
     for dashboard in dashboards:
         uid = dashboard_uid(dashboard["raw"])
         if uid:
             delete_and_report("dashboard", dashboard_title(dashboard["raw"]) or uid, uid, dashboard_path(dashboard["raw"]))
+    for legacy in LEGACY_DASHBOARD_UIDS:
+        uid = legacy["uid"]
+        path = f"/apis/dashboard.grafana.app/v2/namespaces/default/dashboards/{urllib.parse.quote(uid)}"
+        delete_and_report("legacy dashboard", legacy["title"], uid, path)
     if purge_only:
         for uid, element in sorted(library.items()):
             delete_and_report("library panel", element.get("name") or uid, uid, f"/api/library-elements/{urllib.parse.quote(uid)}")

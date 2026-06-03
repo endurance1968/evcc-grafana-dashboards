@@ -61,9 +61,9 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "avg(pvPower_value{id=\"\"} / 1000)",
-                        "format": "time_series",
                         "legendFormat": "PV",
-                        "range": true
+                        "range": true,
+                        "format": "time_series"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -83,9 +83,9 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "avg(gridPower_value / 1000)",
-                        "format": "time_series",
                         "legendFormat": "Grid",
-                        "range": true
+                        "range": true,
+                        "format": "time_series"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -105,9 +105,9 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "avg(homePower_value / 1000)",
-                        "format": "time_series",
                         "legendFormat": "Home",
-                        "range": true
+                        "range": true,
+                        "format": "time_series"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -127,9 +127,9 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "avg(batteryPower_value{id=\"\"} / 1000)",
-                        "format": "time_series",
                         "legendFormat": "Battery",
-                        "range": true
+                        "range": true,
+                        "format": "time_series"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -149,9 +149,9 @@
                       "spec": {
                         "editorMode": "code",
                         "expr": "sort_by_label(avg by(loadpoint) (chargePower_value / 1000),\"loadpoint\")",
-                        "format": "time_series",
                         "legendFormat": "{{loadpoint}}",
-                        "range": true
+                        "range": true,
+                        "format": "time_series"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -209,7 +209,7 @@
                 "overrides": [
                   {
                     "matcher": {
-                      "id": "byName",
+                      "id": "byFrameRefID",
                       "options": "PV"
                     },
                     "properties": [
@@ -255,8 +255,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Grid"
+                      "id": "byFrameRefID",
+                      "options": "gridPower"
                     },
                     "properties": [
                       {
@@ -305,8 +305,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Battery"
+                      "id": "byFrameRefID",
+                      "options": "batteryPower"
                     },
                     "properties": [
                       {
@@ -355,8 +355,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Home"
+                      "id": "byFrameRefID",
+                      "options": "homePower"
                     },
                     "properties": [
                       {
@@ -402,93 +402,11 @@
                         ]
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "#7a7a7a4d",
-                              "value": 0
-                            },
-                            {
-                              "color": "orange",
-                              "value": 0.001
-                            },
-                            {
-                              "color": "semi-dark-orange",
-                              "value": 7
-                            },
-                            {
-                              "color": "red",
-                              "value": 10
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "links",
-                        "value": [
-                          {
-                            "title": "EVCC",
-                            "url": "$evccUrl?lp=1"
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "#7a7a7a4d",
-                              "value": 0
-                            },
-                            {
-                              "color": "orange",
-                              "value": 0.001
-                            },
-                            {
-                              "color": "semi-dark-orange",
-                              "value": 7
-                            },
-                            {
-                              "color": "red",
-                              "value": 10
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "links",
-                        "value": [
-                          {
-                            "title": "EVCC",
-                            "url": "$evccUrl?lp=2"
-                          }
-                        ]
-                      }
-                    ]
                   }
                 ]
               },
               "options": {
-                "minVizHeight": 200,
+                "minVizHeight": 165,
                 "minVizWidth": 138,
                 "orientation": "horizontal",
                 "reduceOptions": {
@@ -793,21 +711,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Battery"
                     },
                     "properties": [
@@ -815,36 +718,6 @@
                         "id": "color",
                         "value": {
                           "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Heizlüfter"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-purple",
                           "mode": "fixed"
                         }
                       }
@@ -1106,36 +979,6 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Tesla"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-red",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Ioniq 5"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-red",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
                       "id": "byType",
                       "options": "time"
                     },
@@ -1335,6 +1178,28 @@
                     "refId": "Self-consumption",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(batterySoc_value{id=\"\"})",
+                        "format": "time_series",
+                        "legendFormat": "Battery SOC",
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "batterySoc",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": []
@@ -1343,7 +1208,7 @@
           "vizConfig": {
             "kind": "VizConfig",
             "group": "gauge",
-            "version": "12.3.3",
+            "version": "13.0.1",
             "spec": {
               "fieldConfig": {
                 "defaults": {
@@ -1363,7 +1228,8 @@
                       }
                     ]
                   },
-                  "unit": "percentunit"
+                  "unit": "percentunit",
+                  "custom": {}
                 },
                 "overrides": [
                   {
@@ -1419,6 +1285,60 @@
                       {
                         "id": "displayName",
                         "value": "Self-consumption"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Battery SOC"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 0
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 100
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": null
+                            },
+                            {
+                              "color": "orange",
+                              "value": 15
+                            },
+                            {
+                              "color": "green",
+                              "value": 35
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Battery SOC"
                       }
                     ]
                   }
@@ -2130,21 +2050,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Tesla"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-red",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Battery charge"
                     },
                     "properties": [
@@ -2175,21 +2080,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Ioniq 5"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-red",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "PV"
                     },
                     "properties": [
@@ -2197,36 +2087,6 @@
                         "id": "color",
                         "value": {
                           "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Gast: Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Gast: Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
                           "mode": "fixed"
                         }
                       }
@@ -2555,21 +2415,6 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
                       "options": "Battery discharge"
                     },
                     "properties": [
@@ -2577,21 +2422,6 @@
                         "id": "color",
                         "value": {
                           "fixedColor": "blue",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
                           "mode": "fixed"
                         }
                       }
@@ -2876,7 +2706,7 @@
         "title": "Today",
         "tooltip": "",
         "type": "link",
-        "url": "/d/adsmz7v?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
+        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now%2Fd&to=now%2Fd&timezone=browser&refresh=10s"
       },
       {
         "asDropdown": false,
@@ -2888,7 +2718,7 @@
         "title": "Yesterday",
         "tooltip": "",
         "type": "link",
-        "url": "/d/adsmz7v?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
+        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now-1d%2Fd&to=now-1d%2Fd&timezone=browser"
       },
       {
         "asDropdown": false,
@@ -2900,7 +2730,7 @@
         "title": "Day before yesterday",
         "tooltip": "",
         "type": "link",
-        "url": "/d/adsmz7v?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
+        "url": "/d/vm-today-gauges-en-orig?orgId=1&from=now-2d%2Fd&to=now-2d%2Fd&timezone=browser"
       },
       {
         "asDropdown": true,
@@ -3194,7 +3024,7 @@
               "x": 0,
               "y": 0,
               "width": 3,
-              "height": 24,
+              "height": 27,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-74"
@@ -3207,7 +3037,7 @@
               "x": 3,
               "y": 0,
               "width": 16,
-              "height": 21,
+              "height": 24,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-2"
@@ -3233,7 +3063,7 @@
               "x": 19,
               "y": 7,
               "width": 5,
-              "height": 4,
+              "height": 5,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-64"
@@ -3244,9 +3074,9 @@
             "kind": "GridLayoutItem",
             "spec": {
               "x": 19,
-              "y": 11,
+              "y": 12,
               "width": 5,
-              "height": 2,
+              "height": 4,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-76"
@@ -3257,7 +3087,7 @@
             "kind": "GridLayoutItem",
             "spec": {
               "x": 19,
-              "y": 13,
+              "y": 16,
               "width": 5,
               "height": 9,
               "element": {
@@ -3270,7 +3100,7 @@
             "kind": "GridLayoutItem",
             "spec": {
               "x": 3,
-              "y": 21,
+              "y": 24,
               "width": 16,
               "height": 3,
               "element": {
@@ -3283,7 +3113,7 @@
             "kind": "GridLayoutItem",
             "spec": {
               "x": 19,
-              "y": 22,
+              "y": 25,
               "width": 5,
               "height": 2,
               "element": {

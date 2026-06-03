@@ -1,8 +1,8 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.05.31.2
- * Last modified: 2026-05-31
+ * Version: 2026.06.03.1
+ * Last modified: 2026-06-03
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -50,53 +50,9 @@ function translateMatcherOptions(node, mapping) {
   return node;
 }
 
-function originalMatcherFallbackOverride(originalNode, translatedNode, mapping) {
-  const originalOption = originalNode?.matcher?.options;
-  if (
-    originalNode?.matcher?.id !== "byName" ||
-    translatedNode?.matcher?.id !== "byName" ||
-    typeof originalOption !== "string"
-  ) {
-    return null;
-  }
 
-  const translatedOption = translateString(originalOption, mapping);
-  if (translatedOption === originalOption) {
-    return null;
-  }
-
-  return {
-    ...translatedNode,
-    matcher: {
-      ...translatedNode.matcher,
-      options: originalOption,
-    },
-  };
-}
-
-function sameByNameMatcher(left, right) {
-  return (
-    left?.matcher?.id === "byName" &&
-    right?.matcher?.id === "byName" &&
-    left.matcher.options === right.matcher.options
-  );
-}
-
-function translateOverridesWithOriginalMatcherFallback(overrides, mapping) {
-  const translatedOverrides = overrides.map((override) => translateSafeNode(override, mapping));
-  const result = [...translatedOverrides];
-
-  overrides.forEach((override, index) => {
-    const fallback = originalMatcherFallbackOverride(override, translatedOverrides[index], mapping);
-    if (!fallback) {
-      return;
-    }
-    if (!result.some((item) => sameByNameMatcher(item, fallback))) {
-      result.push(fallback);
-    }
-  });
-
-  return result;
+function translateOverrides(overrides, mapping) {
+  return overrides.map((override) => translateSafeNode(override, mapping));
 }
 const aliasRiskyKeys = new Set([
   "refId",
@@ -289,7 +245,7 @@ function translateSafeNode(node, mapping) {
     }
 
     if (childKey === "overrides" && Array.isArray(childValue)) {
-      result[childKey] = translateOverridesWithOriginalMatcherFallback(childValue, mapping);
+      result[childKey] = translateOverrides(childValue, mapping);
       continue;
     }
 

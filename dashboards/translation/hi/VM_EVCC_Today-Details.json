@@ -236,20 +236,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -519,20 +505,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -658,20 +630,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "कुल"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
                     },
                     "properties": [
                       {
@@ -901,36 +859,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Forecast"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "yellow",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Actual"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1098,66 +1026,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "पूर्वानुमान"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#2F8F5B",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "custom.drawStyle",
-                        "value": "line"
-                      },
-                      {
-                        "id": "custom.lineInterpolation",
-                        "value": "smooth"
-                      },
-                      {
-                        "id": "custom.lineWidth",
-                        "value": 2
-                      },
-                      {
-                        "id": "custom.fillOpacity",
-                        "value": 0
-                      },
-                      {
-                        "id": "custom.pointSize",
-                        "value": 0
-                      },
-                      {
-                        "id": "custom.lineStyle",
-                        "value": {
-                          "fill": "dash",
-                          "dash": [
-                            8,
-                            6
-                          ]
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Actual"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Forecast"
                     },
                     "properties": [
                       {
@@ -1399,20 +1267,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Sonstige"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1641,20 +1495,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Sonstige"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -1847,20 +1687,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "अन्य"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Sonstige"
                     },
                     "properties": [
                       {
@@ -2128,50 +1954,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "transparent",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "custom.stacking",
-                        "value": {
-                          "group": "A",
-                          "mode": "none"
-                        }
-                      },
-                      {
-                        "id": "custom.fillOpacity",
-                        "value": 0
-                      },
-                      {
-                        "id": "custom.lineWidth",
-                        "value": 0
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Sonstige"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -2295,51 +2077,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "घर"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "purple",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
                     },
                     "properties": [
                       {
@@ -2500,51 +2237,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "घर"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "purple",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Garage"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "light-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Stellplatz"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "dark-orange",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
                     },
                     "properties": [
                       {
@@ -2739,21 +2431,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Durchschnitt"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -2942,61 +2619,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "मूल्य"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "currencyEUR"
-                      },
-                      {
-                        "id": "decimals",
-                        "value": 2
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "watt"
-                      },
-                      {
-                        "id": "custom.drawStyle",
-                        "value": "line"
-                      },
-                      {
-                        "id": "custom.fillOpacity",
-                        "value": 20
-                      },
-                      {
-                        "id": "custom.axisPlacement",
-                        "value": "right"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "custom.lineWidth",
-                        "value": 1
-                      },
-                      {
-                        "id": "custom.axisSoftMin",
-                        "value": 0
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Preis"
                     },
                     "properties": [
                       {
@@ -3388,36 +3010,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "red",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Sold"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -3598,21 +3190,6 @@
                         "id": "color",
                         "value": {
                           "fixedColor": "green",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Durchschnitt"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
                           "mode": "fixed"
                         }
                       }
@@ -3809,61 +3386,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "सीओ 2"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "massg"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "watt"
-                      },
-                      {
-                        "id": "custom.drawStyle",
-                        "value": "line"
-                      },
-                      {
-                        "id": "custom.fillOpacity",
-                        "value": 80
-                      },
-                      {
-                        "id": "custom.axisPlacement",
-                        "value": "right"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "text",
-                          "mode": "fixed"
-                        }
-                      },
-                      {
-                        "id": "custom.lineWidth",
-                        "value": 1
-                      },
-                      {
-                        "id": "custom.axisSoftMin",
-                        "value": 0
-                      },
-                      {
-                        "id": "custom.gradientMode",
-                        "value": "opacity"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "CO2"
                     },
                     "properties": [
                       {
@@ -4344,21 +3866,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "semi-dark-blue"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -4550,25 +4057,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "कुल"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "semi-dark-blue"
-                        }
-                      },
-                      {
-                        "id": "custom.lineWidth",
-                        "value": 2
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Total"
                     },
                     "properties": [
                       {
@@ -5016,21 +4504,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Active phases"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "purple",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -5314,36 +4787,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "15 मिनट फीड-इन ऊर्जा"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "green"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "15 min import energy"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed",
-                          "fixedColor": "yellow"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "15 min feed-in energy"
                     },
                     "properties": [
                       {

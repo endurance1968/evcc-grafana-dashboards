@@ -15,7 +15,6 @@ The current VM deployment imports the files listed in [`deploy-manifest.json`](.
 - `VM_EVCC_Month.json`
 - `VM_EVCC_Today-Details.json`
 - `VM_EVCC_Today.json`
-- `VM_EVCC_Today-Gauges.json`
 - `VM_EVCC_Today-Mobile.json`
 
 Depending on `DASHBOARD_LANGUAGE`, the files are loaded from `translation/<language>/`. With `DASHBOARD_VARIANT=orig`, the English source dashboards from `original/en/` are used.

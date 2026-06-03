@@ -330,63 +330,6 @@
                         }
                       }
                     ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Grid import"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Prelievo rete"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#E24D42",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Home"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Casa"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#5794F2",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Feed-in"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Immissione"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "#2F8F5B",
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
                   }
                 ]
               }
@@ -2021,60 +1964,6 @@
                     "matcher": {
                       "id": "byName",
                       "options": "Autoconsumo"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "purple"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autoconsumo"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Autarky"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percentunit"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "green"
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autarchia"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Self-consumption"
                     },
                     "properties": [
                       {
@@ -3787,37 +3676,6 @@
                       {
                         "id": "displayName",
                         "value": "Bilancio"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "purchased"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Acquistato, dinamico"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "sold"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Venduto (immissione)"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "fixedColor": "yellow",
-                          "mode": "fixed"
-                        }
                       }
                     ]
                   }
