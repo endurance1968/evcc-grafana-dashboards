@@ -1,7 +1,7 @@
 /**
  * Script: apply-dashboard-colors.mjs
  * Purpose: Apply the central semantic color palette to original EVCC VM dashboards.
- * Version: 2026.06.03.13
+ * Version: 2026.06.03.19
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -72,11 +72,11 @@ const gaugeThresholdsByMatcher = new Map([
     { color: dashboardColors.storageDanger, value: 8 },
   ])],
   ["homePower", thresholds("absolute", [
-    { color: dashboardColors.neutral, value: 0 },
-    { color: dashboardColors.homeLight, value: 0.001 },
-    { color: dashboardColors.home, value: 5 },
-    { color: dashboardColors.homeHigh, value: 8 },
-    { color: dashboardColors.homeDanger, value: 10 },
+    { color: dashboardColors.homeDanger, value: null },
+    { color: dashboardColors.homeHigh, value: -10 },
+    { color: dashboardColors.home, value: -8 },
+    { color: dashboardColors.homeLight, value: -5 },
+    { color: dashboardColors.neutral, value: -0.001 },
   ])],
   ["Autarky", thresholds("absolute", [
     { color: dashboardColors.autarkyLow, value: null },
@@ -111,11 +111,11 @@ const gaugeThresholdsByMatcher = new Map([
 ]);
 
 const loadpointDefaults = thresholds("absolute", [
-  { color: dashboardColors.neutral, value: 0 },
-  { color: dashboardColors.loadpointLight, value: 0.001 },
-  { color: dashboardColors.loadpoint, value: 5 },
-  { color: dashboardColors.loadpointHigh, value: 8 },
-  { color: dashboardColors.loadpointDanger, value: 10 },
+  { color: dashboardColors.loadpointDanger, value: null },
+  { color: dashboardColors.loadpointHigh, value: -10 },
+  { color: dashboardColors.loadpoint, value: -8 },
+  { color: dashboardColors.loadpointLight, value: -5 },
+  { color: dashboardColors.neutral, value: -0.001 },
 ]);
 
 const mobilePowerFixedColorsByMatcher = new Map([
@@ -125,7 +125,12 @@ const mobilePowerFixedColorsByMatcher = new Map([
   ["homePower", dashboardColors.home],
 ]);
 
-const signedPowerGaugeMatchers = new Set(["gridPower", "batteryPower"]);
+const gaugeScalesByMatcher = new Map([
+  ["gridPower", [-11, 11]],
+  ["batteryPower", [-11, 11]],
+  ["PV", [0, 20]],
+  ["homePower", [-11, 0]],
+]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -227,6 +232,10 @@ function panelFieldConfigs(dashboard) {
   return configs;
 }
 
+function panelOptions(panel) {
+  return panel.options || panel.spec?.vizConfig?.spec?.options || null;
+}
+
 function isPowerGaugePanel(panel) {
   const panelId = panel.id || panel.spec?.id;
   const title = panel.title || panel.spec?.title || "";
@@ -243,10 +252,20 @@ function applyPowerGaugeDefaults(fieldConfig, panel, kind) {
   }
   fieldConfig.defaults ||= {};
   fieldConfig.defaults.color = { mode: "thresholds" };
+  fieldConfig.defaults.min = -11;
+  fieldConfig.defaults.max = 0;
   fieldConfig.defaults.thresholds = loadpointDefaults;
+  if (fieldConfig.defaults.custom && Object.hasOwn(fieldConfig.defaults.custom, "neutral")) {
+    delete fieldConfig.defaults.custom.neutral;
+    if (Object.keys(fieldConfig.defaults.custom).length === 0) {
+      delete fieldConfig.defaults.custom;
+    }
+  }
   if (kind === "gauge") {
-    fieldConfig.defaults.custom ||= {};
-    fieldConfig.defaults.custom.neutral = 0;
+    const options = panelOptions(panel);
+    if (options) {
+      options.neutral = 0;
+    }
   }
   return true;
 }
@@ -258,6 +277,7 @@ function applyFieldConfig(fieldConfig, panel, kind) {
   }
   let changed = applyPowerGaugeDefaults(fieldConfig, panel, kind);
   for (const override of fieldConfig.overrides || []) {
+    changed = removeProperty(override, "custom.neutral") || changed;
     const option = matcherOption(override);
     if (typeof option !== "string") {
       continue;
@@ -266,14 +286,21 @@ function applyFieldConfig(fieldConfig, panel, kind) {
     const isGauge = kind === "gauge" || isPowerGaugePanel(panel);
     if (isPowerStatPanel(panel, kind) && mobilePowerFixedColorsByMatcher.has(option)) {
       setProperty(override, "color", fixedColor(mobilePowerFixedColorsByMatcher.get(option)));
+      if (gaugeScalesByMatcher.has(option)) {
+        const [min, max] = gaugeScalesByMatcher.get(option);
+        setProperty(override, "min", min);
+        setProperty(override, "max", max);
+      }
       changed = removeProperty(override, "thresholds") || true;
       continue;
     }
     if (gaugeThresholdsByMatcher.has(option) && isGauge) {
       setProperty(override, "thresholds", gaugeThresholdsByMatcher.get(option));
       setProperty(override, "color", { mode: "thresholds" });
-      if (kind === "gauge" && signedPowerGaugeMatchers.has(option)) {
-        setProperty(override, "custom.neutral", 0);
+      if (gaugeScalesByMatcher.has(option)) {
+        const [min, max] = gaugeScalesByMatcher.get(option);
+        setProperty(override, "min", min);
+        setProperty(override, "max", max);
       }
       changed = true;
     } else if (gaugeThresholdsByMatcher.has(option)) {
@@ -321,8 +348,3 @@ function main() {
 }
 
 main();
-
-
-
-
-

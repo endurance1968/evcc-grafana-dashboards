@@ -39,10 +39,10 @@ The central technical source is `scripts/helper/dashboard-colors.mjs`. Color cha
 | Autarky medium | Soft green | `#A8DDB5` | medium range in autarky gauge thresholds |
 | Autarky | Green | `#73BF69` | autarky gauge and history |
 | Autarky high | Dark green | `#2F8F5B` | high range in autarky gauge thresholds |
-| Self-consumption low | Light teal | `#CFFAFE` | low range in self-consumption gauge thresholds |
-| Self-consumption medium | Soft teal | `#5EEAD4` | medium range in self-consumption gauge thresholds |
-| Self-consumption | Teal | `#14B8A6` | self-consumption gauge and history |
-| Self-consumption high | Dark teal | `#0F766E` | high range in self-consumption gauge thresholds |
+| Self-consumption low | Light violet | `#F5D8F1` | low range in self-consumption gauge thresholds |
+| Self-consumption medium | Soft violet | `#DFA8D8` | medium range in self-consumption gauge thresholds |
+| Self-consumption | Red violet | `#A44C9C` | self-consumption gauge and history, close to the home-consumption color family |
+| Self-consumption high | Dark violet | `#7C3A75` | high range in self-consumption gauge thresholds |
 | Purchase / costs | Red | `red` | electricity cost, purchase, negative cost perspective |
 | Sold / compensation | Green | `green` | feed-in compensation or sold energy |
 
@@ -51,8 +51,8 @@ The central technical source is `scripts/helper/dashboard-colors.mjs`. Color cha
 The power gauges in the Today dashboard intentionally use different scales:
 
 - Grid and storage are signed: `-11 kW` to `+11 kW`.
-- Grid and storage gauges use `neutral=0`, so the bar starts at `0` and extends in the matching direction based on the sign.
-- Home and loadpoints are positive only: `0 kW` to `11 kW`.
+- The gauge panel uses `neutral=0` as a panel default. Grafana shows this under gauge options, not as a visible field override; this makes the bar start at `0` and lets grid and storage extend in the matching direction based on the sign.
+- Home and loadpoints are rendered as negative consumers in the Today power gauge: `-11 kW` to `0 kW`.
 - PV is positive only: `0 kW` to the installed PV peak power. The deploy process can adjust the maximum via `installedWattPeak`.
 - Loadpoints are dynamic because EVCC users can choose arbitrary names. Therefore loadpoints use default thresholds instead of hard `byName` overrides.
 
@@ -64,7 +64,7 @@ Gauge thresholds stay within the same color family:
 - Home uses violet shades.
 - Loadpoints use orange shades.
 - Autarky uses green shades instead of traffic-light colors.
-- Self-consumption uses teal shades.
+- Self-consumption uses violet/red-violet shades close to the home color family.
 - Storage SOC uses blue shades matching the storage base color.
 
 ## Maintenance Notes

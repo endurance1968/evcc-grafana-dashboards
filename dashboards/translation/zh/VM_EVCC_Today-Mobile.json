@@ -209,37 +209,34 @@
           "decimals": 2,
           "links": [],
           "mappings": [],
-          "max": 11,
-          "min": 0,
+          "max": 0,
+          "min": -11,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "#7A7A7A4D",
-                "value": 0
-              },
-              {
-                "color": "#FFC078",
-                "value": 0.001
-              },
-              {
-                "color": "#FF9830",
-                "value": 5
+                "color": "#B84A1C",
+                "value": null
               },
               {
                 "color": "#E66A00",
-                "value": 8
+                "value": -10
               },
               {
-                "color": "#B84A1C",
-                "value": 10
+                "color": "#FF9830",
+                "value": -8
+              },
+              {
+                "color": "#FFC078",
+                "value": -5
+              },
+              {
+                "color": "#7A7A7A4D",
+                "value": -0.001
               }
             ]
           },
-          "unit": "kW",
-          "custom": {
-            "neutral": 0
-          }
+          "unit": "kW"
         },
         "overrides": [
           {
@@ -349,11 +346,11 @@
             "properties": [
               {
                 "id": "min",
-                "value": 0
+                "value": -11
               },
               {
                 "id": "max",
-                "value": 11
+                "value": 0
               },
               {
                 "id": "links",
@@ -448,7 +445,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "avg(homePower_value) / 1000",
+          "expr": "avg(homePower_value) / -1000",
           "format": "time_series",
           "legendFormat": "家庭",
           "range": true,
@@ -460,7 +457,7 @@
             "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
-          "expr": "sort_by_label(avg by(loadpoint) (chargePower_value / 1000), \"loadpoint\")",
+          "expr": "sort_by_label(avg by(loadpoint) (chargePower_value / -1000), \"loadpoint\")",
           "format": "time_series",
           "legendFormat": "{{loadpoint}}",
           "range": true,
@@ -1527,19 +1524,19 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "#CFFAFE",
+                      "color": "#F5D8F1",
                       "value": null
                     },
                     {
-                      "color": "#5EEAD4",
+                      "color": "#DFA8D8",
                       "value": 0.25
                     },
                     {
-                      "color": "#14B8A6",
+                      "color": "#A44C9C",
                       "value": 0.5
                     },
                     {
-                      "color": "#0F766E",
+                      "color": "#7C3A75",
                       "value": 0.75
                     }
                   ]
@@ -1793,7 +1790,7 @@
                 "id": "color",
                 "value": {
                   "mode": "fixed",
-                  "fixedColor": "#14B8A6"
+                  "fixedColor": "#A44C9C"
                 }
               }
             ]

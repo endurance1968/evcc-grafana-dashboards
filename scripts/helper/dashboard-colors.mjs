@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-colors.mjs
  * Purpose: Central semantic color palette for EVCC VictoriaMetrics dashboards.
- * Version: 2026.06.03.3
+ * Version: 2026.06.03.4
  * Last modified: 2026-06-03
  */
 
@@ -36,10 +36,10 @@ export const dashboardColors = Object.freeze({
   warning: "orange",
   caution: "yellow",
   success: "green",
-  selfConsumptionLow: "#CFFAFE",
-  selfConsumptionMid: "#5EEAD4",
-  selfConsumption: "#14B8A6",
-  selfConsumptionDark: "#0F766E",
+  selfConsumptionLow: "#F5D8F1",
+  selfConsumptionMid: "#DFA8D8",
+  selfConsumption: "#A44C9C",
+  selfConsumptionDark: "#7C3A75",
   autarkyLow: "#D8F3DC",
   autarkyMid: "#A8DDB5",
   autarky: "#73BF69",

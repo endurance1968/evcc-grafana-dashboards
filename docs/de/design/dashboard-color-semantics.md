@@ -39,10 +39,10 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 | Autarkie mittel | Gruenhell | `#A8DDB5` | mittlerer Bereich in Autarkie-Gauge-Schwellen |
 | Autarkie | Gruen | `#73BF69` | Autarkie-Gauge und Verlauf |
 | Autarkie hoch | Dunkelgruen | `#2F8F5B` | hoher Bereich in Autarkie-Gauge-Schwellen |
-| Eigenverbrauch niedrig | Helltuerkis | `#CFFAFE` | niedriger Bereich in Eigenverbrauch-Gauge-Schwellen |
-| Eigenverbrauch mittel | Tuerkishell | `#5EEAD4` | mittlerer Bereich in Eigenverbrauch-Gauge-Schwellen |
-| Eigenverbrauch | Tuerkis | `#14B8A6` | Eigenverbrauchs-Gauge und Verlauf |
-| Eigenverbrauch hoch | Dunkeltuerkis | `#0F766E` | hoher Bereich in Eigenverbrauch-Gauge-Schwellen |
+| Eigenverbrauch niedrig | Hellviolett | `#F5D8F1` | niedriger Bereich in Eigenverbrauch-Gauge-Schwellen |
+| Eigenverbrauch mittel | Weichviolett | `#DFA8D8` | mittlerer Bereich in Eigenverbrauch-Gauge-Schwellen |
+| Eigenverbrauch | Rotviolett | `#A44C9C` | Eigenverbrauchs-Gauge und Verlauf, nahe an der Hausverbrauchsfarbe |
+| Eigenverbrauch hoch | Dunkelviolett | `#7C3A75` | hoher Bereich in Eigenverbrauch-Gauge-Schwellen |
 | Einkauf / Kosten | Rot | `red` | Stromkosten, Einkauf, negative Kostensicht |
 | Verkauf / Verguetung | Gruen | `green` | Einspeiseverguetung oder Verkauf |
 
@@ -51,8 +51,8 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 Die Leistungs-Gauges im Today-Dashboard sind bewusst unterschiedlich skaliert:
 
 - Netz und Speicher sind signiert: `-11 kW` bis `+11 kW`.
-- Netz und Speicher verwenden in den Gauges `neutral=0`, damit der Balken bei `0` startet und je nach Vorzeichen in die passende Richtung laeuft.
-- Haus und Ladepunkte sind nur positiv: `0 kW` bis `11 kW`.
+- Das Gauge-Panel verwendet `neutral=0` als Panel-Default. Grafana zeigt diese Option unter den Gauge-Optionen, nicht als sichtbaren Feld-Override; dadurch startet der Balken bei `0` und laeuft bei Netz und Speicher je nach Vorzeichen in die passende Richtung.
+- Haus und Ladepunkte werden im Today-Leistungsgauge als Verbraucher negativ dargestellt: `-11 kW` bis `0 kW`.
 - PV ist nur positiv: `0 kW` bis zur installierten PV-Leistung. Der Deploy-Prozess kann den Maximalwert ueber `installedWattPeak` anpassen.
 - Ladepunkte sind dynamisch, weil EVCC-Nutzer die Namen frei vergeben koennen. Deshalb verwenden Ladepunkte Default-Schwellen statt harter `byName`-Overrides.
 
@@ -64,7 +64,7 @@ Gauge-Schwellen bleiben innerhalb derselben Farbfamilie:
 - Haus nutzt violette Abstufungen.
 - Ladepunkte nutzen orange Abstufungen.
 - Autarkie nutzt gruene Abstufungen statt Ampelfarben.
-- Eigenverbrauch nutzt tuerquise Abstufungen.
+- Eigenverbrauch nutzt violette/rotviolette Abstufungen nahe an der Haus-Farbfamilie.
 - Speicher-SOC nutzt blaue Abstufungen passend zur Speicher-Grundfarbe.
 
 ## Pflegehinweise
