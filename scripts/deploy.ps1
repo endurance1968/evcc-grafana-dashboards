@@ -31,7 +31,7 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.03.3'
+$ScriptVersion = '2026.06.03.4'
 $ScriptBuildDate = '2026-05-31'
 $ScriptLastModified = '2026-06-03'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
@@ -507,6 +507,40 @@ function New-PortalDashboardLink() {
   }
 }
 
+function Set-OverrideProperty($Properties, [string]$Id, $Value) {
+  foreach ($property in @($Properties)) {
+    if ([string]$property.id -eq $Id) {
+      $property.value = $Value
+      return @($Properties)
+    }
+  }
+  return @($Properties) + [pscustomobject]@{ id = $Id; value = $Value }
+}
+
+function Set-InstalledWattPeakGaugeMax($Raw, [hashtable]$Overrides) {
+  if ($null -eq $Raw -or $null -eq $Overrides -or -not $Overrides.ContainsKey('installedWattPeak')) { return $Raw }
+  $numericValue = 0.0
+  if (-not [double]::TryParse(([string]$Overrides.installedWattPeak), [Globalization.NumberStyles]::Float, [Globalization.CultureInfo]::InvariantCulture, [ref]$numericValue)) { return $Raw }
+  function Visit-Node($Node) {
+    if ($null -eq $Node) { return }
+    if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [string]) -and -not ($Node -is [pscustomobject])) {
+      foreach ($item in @($Node)) { Visit-Node $item }
+      return
+    }
+    if ($Node -isnot [pscustomobject]) { return }
+    if ($null -ne $Node.PSObject.Properties['fieldConfig'] -and $null -ne $Node.fieldConfig -and $null -ne $Node.fieldConfig.PSObject.Properties['overrides']) {
+      foreach ($override in @($Node.fieldConfig.overrides)) {
+        if ([string]$override.matcher.id -eq 'byFrameRefID' -and [string]$override.matcher.options -eq 'PV') {
+          if ($null -eq $override.PSObject.Properties['properties']) { $override | Add-Member -NotePropertyName properties -NotePropertyValue @() -Force }
+          $override.properties = @(Set-OverrideProperty $override.properties 'max' $numericValue)
+        }
+      }
+    }
+    foreach ($property in @($Node.PSObject.Properties)) { Visit-Node $property.Value }
+  }
+  Visit-Node $Raw
+  return $Raw
+}
 function Test-PortalDashboardLink($Link) {
   if ($null -eq $Link) { return $false }
   return ([string]$Link.url -eq '$inverterPortalUrl') -or ([string]$Link.title -eq '$inverterPortalTitle')
@@ -712,6 +746,7 @@ $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
   $raw = Parse-JsonDocument (Get-SourceFileContent $fileName)
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
+  $raw = Set-InstalledWattPeakGaugeMax $raw $dashboardOverrides
   $raw = Apply-DashboardPortalLink $raw $dashboardOverrides.inverterPortalUrl
   $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
   $raw = Replace-DatasourcePlaceholders $raw

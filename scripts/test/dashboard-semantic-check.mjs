@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.12
+ * Version: 2026.06.03.15
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -548,6 +548,26 @@ function validateGrafana13GaugeOptions(fileName, panel, failures) {
   assert(!Object.hasOwn(panel.fieldConfig?.defaults?.custom || {}, "graphMode"), failures, `${fileName}: gauge panel '${panel.title || panel.id}' must not use legacy custom.graphMode option`);
 }
 
+function validateAutarkyGaugeThresholds(fileName, panel, failures) {
+  if (panel.type !== "gauge") {
+    return;
+  }
+  const autarkyOverride = (panel.fieldConfig?.overrides || []).find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "Autarky");
+  if (!autarkyOverride) {
+    return;
+  }
+  const properties = new Map((autarkyOverride.properties || []).map((property) => [property.id, property.value]));
+  const steps = properties.get("thresholds")?.steps || [];
+  assert(properties.get("unit") === "percentunit", failures, `${fileName}: gauge panel '${panel.title}' Autarky must use percentunit`);
+  assert(properties.get("min") === 0 && properties.get("max") === 1, failures, `${fileName}: gauge panel '${panel.title}' Autarky must use 0..1 scale`);
+  assert(JSON.stringify(steps) === JSON.stringify([
+    { color: "red", value: null },
+    { color: "orange", value: 0.25 },
+    { color: "yellow", value: 0.5 },
+    { color: "green", value: 0.75 },
+  ]), failures, `${fileName}: gauge panel '${panel.title}' Autarky thresholds must be red <=25%, orange <=50%, yellow <=75%, green above`);
+}
+
 function validateMetricGaugeTimeSeries(fileName, panel, failures) {
   for (const refId of ["Autarky", "Self-consumption"]) {
     const target = panel.targets?.find((item) => item.refId === refId);
@@ -690,6 +710,7 @@ function validateDashboard(fileName, dashboard) {
 
     for (const panel of panels.filter((item) => item.type === "gauge")) {
       validateGrafana13GaugeOptions(fileName, panel, failures);
+      validateAutarkyGaugeThresholds(fileName, panel, failures);
     }
 
     const powerPanel = panels.find((panel) => panel.id === 74);
@@ -705,6 +726,8 @@ function validateDashboard(fileName, dashboard) {
       assert(powerDefaults.min === 0 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a positive 0..11 kW scale for dynamic loadpoint series`);
       const defaultThresholds = powerDefaults.thresholds?.steps || [];
       assert(defaultThresholds.length >= 4 && defaultThresholds.some((step) => step.color === "red" && step.value === 10), failures, `${fileName}: Power gauge dynamic loadpoints must use multiple positive absolute threshold steps`);
+      const powerGaugeTargetOrder = (powerPanel.targets || []).map((target) => target.refId);
+      assert(powerGaugeTargetOrder.slice(0, 5).join(",") === "gridPower,batteryPower,PV,homePower,loadpointPowers", failures, `${fileName}: Power gauge order must be Grid, Battery, PV, Home, then dynamic loadpoints`);
       const loadpointTarget = (powerPanel.targets || []).find((target) => target.refId === "loadpointPowers");
       assert(Boolean(loadpointTarget), failures, `${fileName}: Power gauge must include loadpointPowers target`);
       if (loadpointTarget) {
@@ -722,12 +745,12 @@ function validateDashboard(fileName, dashboard) {
       }
       const homeTarget = (powerPanel.targets || []).find((target) => target.refId === "homePower");
       assert(/homePower_value\)?\s*\/\s*1000/.test(String(homeTarget?.expr || "")), failures, `${fileName}: Power gauge Home must render as positive house consumption`);
-      assert(dashboardVariables(dashboard).some((variable) => dashboardVariableName(variable) === "installedWattPeak"), failures, `${fileName}: Power gauge PV max requires installedWattPeak dashboard variable`);
+      assert(dashboardVariables(dashboard).some((variable) => dashboardVariableName(variable) === "installedWattPeak"), failures, `${fileName}: Power gauge PV max is deploy-patched from installedWattPeak dashboard variable`);
       const pvMin = propertyValue(powerPanel, "PV", "min");
       const pvMax = propertyValue(powerPanel, "PV", "max");
-      assert(pvMin === 0 && pvMax === "$installedWattPeak", failures, `${fileName}: Power gauge PV must use a 0..installedWattPeak kW scale`);
+      assert(pvMin === 0 && pvMax === 20, failures, `${fileName}: Power gauge PV must use a numeric 0..20 kW default scale so Grafana does not auto-scale it as full`);
       const pvThresholds = propertyValue(powerPanel, "PV", "thresholds");
-      assert(pvThresholds?.mode === "percentage" && (pvThresholds.steps || []).length >= 3, failures, `${fileName}: Power gauge PV must use percentage thresholds relative to installedWattPeak`);
+      assert(pvThresholds?.mode === "percentage" && (pvThresholds.steps || []).length >= 3, failures, `${fileName}: Power gauge PV must use percentage thresholds relative to its numeric max`);
       assert(propertyValue(powerPanel, "homePower", "min") === 0 && propertyValue(powerPanel, "homePower", "max") === 11, failures, `${fileName}: Power gauge Home must use a positive 0..11 kW scale`);
       const homeThresholds = propertyValue(powerPanel, "homePower", "thresholds")?.steps || [];
       assert(homeThresholds.length >= 4 && homeThresholds.some((step) => step.color === "red" && step.value === 10), failures, `${fileName}: Power gauge Home must use multiple positive absolute threshold steps`);

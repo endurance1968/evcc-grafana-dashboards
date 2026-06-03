@@ -1949,7 +1949,20 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "green"
+                              "color": "red",
+                              "value": null
+                            },
+                            {
+                              "color": "orange",
+                              "value": 0.25
+                            },
+                            {
+                              "color": "yellow",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "green",
+                              "value": 0.75
                             }
                           ]
                         }
@@ -1957,6 +1970,14 @@
                       {
                         "id": "displayName",
                         "value": "आत्मनिर्भरता"
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 1
                       }
                     ]
                   },

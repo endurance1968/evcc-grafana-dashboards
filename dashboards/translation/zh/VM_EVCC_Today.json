@@ -60,28 +60,6 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(pvPower_value{id=\"\"} / 1000)",
-                        "legendFormat": "光伏发电",
-                        "range": true,
-                        "format": "time_series"
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "PV",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
                         "expr": "avg(gridPower_value / 1000)",
                         "legendFormat": "电网",
                         "range": true,
@@ -104,8 +82,8 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value / 1000)",
-                        "legendFormat": "家庭",
+                        "expr": "avg(batteryPower_value{id=\"\"} / 1000)",
+                        "legendFormat": "电池",
                         "range": true,
                         "format": "time_series"
                       },
@@ -113,7 +91,7 @@
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "homePower",
+                    "refId": "batteryPower",
                     "hidden": false
                   }
                 },
@@ -126,8 +104,8 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(batteryPower_value{id=\"\"} / 1000)",
-                        "legendFormat": "电池",
+                        "expr": "avg(pvPower_value{id=\"\"} / 1000)",
+                        "legendFormat": "光伏发电",
                         "range": true,
                         "format": "time_series"
                       },
@@ -135,7 +113,29 @@
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "batteryPower",
+                    "refId": "PV",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(homePower_value / 1000)",
+                        "legendFormat": "家庭",
+                        "range": true,
+                        "format": "time_series"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "homePower",
                     "hidden": false
                   }
                 },
@@ -207,52 +207,6 @@
                   "unit": "kW"
                 },
                 "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byFrameRefID",
-                      "options": "PV"
-                    },
-                    "properties": [
-                      {
-                        "id": "links",
-                        "value": [
-                          {
-                            "targetBlank": true,
-                            "title": "更多详情",
-                            "url": "/d/adddvtj?$__url_time_range&dtab=pv"
-                          }
-                        ]
-                      },
-                      {
-                        "id": "min",
-                        "value": 0
-                      },
-                      {
-                        "id": "max",
-                        "value": "$installedWattPeak"
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "percentage",
-                          "steps": [
-                            {
-                              "color": "#7a7a7a4d",
-                              "value": 0
-                            },
-                            {
-                              "color": "green",
-                              "value": 1
-                            },
-                            {
-                              "color": "dark-green",
-                              "value": 75
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  },
                   {
                     "matcher": {
                       "id": "byFrameRefID",
@@ -350,6 +304,52 @@
                             "url": "/d/adddvtj?$__url_time_range&dtab=pv"
                           }
                         ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "PV"
+                    },
+                    "properties": [
+                      {
+                        "id": "links",
+                        "value": [
+                          {
+                            "targetBlank": true,
+                            "title": "更多详情",
+                            "url": "/d/adddvtj?$__url_time_range&dtab=pv"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 20
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "percentage",
+                          "steps": [
+                            {
+                              "color": "#7a7a7a4d",
+                              "value": 0
+                            },
+                            {
+                              "color": "green",
+                              "value": 1
+                            },
+                            {
+                              "color": "dark-green",
+                              "value": 75
+                            }
+                          ]
+                        }
                       }
                     ]
                   },
@@ -1248,8 +1248,20 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "green",
+                              "color": "red",
                               "value": null
+                            },
+                            {
+                              "color": "orange",
+                              "value": 0.25
+                            },
+                            {
+                              "color": "yellow",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "green",
+                              "value": 0.75
                             }
                           ]
                         }
@@ -1257,6 +1269,14 @@
                       {
                         "id": "displayName",
                         "value": "自给率"
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 1
                       }
                     ]
                   },

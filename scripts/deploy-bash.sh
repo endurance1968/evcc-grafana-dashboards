@@ -3,7 +3,7 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.03.3"
+SCRIPT_VERSION="2026.06.03.4"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
@@ -463,6 +463,31 @@ apply_dashboard_override() {
   mv "$tmp_file" "$file"
 }
 
+apply_installed_watt_peak_gauge_max() {
+  local file="$1"
+  local value="$2"
+  [[ -n "${value//[[:space:]]/}" ]] || return 0
+  local tmp_file="${file}.tmp"
+  jq --arg value "$value" '
+    ($value | tonumber?) as $max
+    | if $max == null then . else
+        def patch_pv_max:
+          if type == "object" then
+            (if (.fieldConfig? and ((.fieldConfig.overrides? // null) | type == "array")) then
+              .fieldConfig.overrides |= map(
+                if (.matcher.id? == "byFrameRefID" and .matcher.options? == "PV") then
+                  .properties = (((.properties // []) | map(select(.id != "max"))) + [{id:"max", value:$max}])
+                else . end
+              )
+            else . end)
+            | with_entries(.value |= patch_pv_max)
+          elif type == "array" then map(patch_pv_max)
+          else . end;
+        patch_pv_max
+      end
+  ' "$file" > "$tmp_file"
+  mv "$tmp_file" "$file"
+}
 apply_dashboard_portal_link() {
   local file="$1"
   local portal_url="$2"
@@ -587,6 +612,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "energySampleInterval" "${DASHBOARD_ENERGY_SAMPLE_INTERVAL:-$DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL}"
   apply_dashboard_override "$raw_file" "tariffPriceInterval" "${DASHBOARD_TARIFF_PRICE_INTERVAL:-$DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL}"
   apply_dashboard_override "$raw_file" "installedWattPeak" "$DASHBOARD_INSTALLED_WATT_PEAK"
+  apply_installed_watt_peak_gauge_max "$raw_file" "$DASHBOARD_INSTALLED_WATT_PEAK"
   apply_dashboard_override "$raw_file" "vehicleConsumption" "${DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM:-$DASHBOARD_ICE_CONSUMPTION_L_PER_100KM}"
   apply_dashboard_override "$raw_file" "fuelCost" "${DASHBOARD_FUEL_COST_PER_L:-$DASHBOARD_FUEL_PRICE_PER_L}"
   apply_dashboard_override "$raw_file" "purchasePricePv" "$DASHBOARD_PV_PURCHASE_PRICE"

@@ -2,7 +2,7 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.03.3"
+SCRIPT_VERSION="2026.06.03.4"
 SCRIPT_BUILD_DATE="2026-05-31"
 SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
@@ -458,6 +458,41 @@ def apply_dashboard_build_description(raw, marker):
         if variable.get("name") == "dashboardBuild":
             variable["description"] = marker
     return raw
+def set_override_property(properties, property_id, value):
+    for prop in properties:
+        if prop.get("id") == property_id:
+            prop["value"] = value
+            return
+    properties.append({"id": property_id, "value": value})
+
+def apply_installed_watt_peak_gauge_max(raw, overrides):
+    value = str((overrides or {}).get("installedWattPeak", "") or "").strip()
+    if not value:
+        return raw
+    try:
+        numeric_value = float(value)
+    except ValueError:
+        return raw
+
+    def visit(node):
+        if isinstance(node, dict):
+            field_config = node.get("fieldConfig")
+            overrides_list = field_config.get("overrides") if isinstance(field_config, dict) else None
+            if isinstance(overrides_list, list):
+                for override in overrides_list:
+                    matcher = override.get("matcher") if isinstance(override, dict) else None
+                    if matcher and matcher.get("id") == "byFrameRefID" and matcher.get("options") == "PV":
+                        properties = override.setdefault("properties", [])
+                        set_override_property(properties, "max", numeric_value)
+            for child in node.values():
+                visit(child)
+        elif isinstance(node, list):
+            for item in node:
+                visit(item)
+
+    visit(raw)
+    return raw
+
 def apply_dashboard_filter_overrides(raw, overrides):
     if not overrides:
         return raw
@@ -620,6 +655,7 @@ library = {}
 for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
     raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
+    raw = apply_installed_watt_peak_gauge_max(raw, dashboard_overrides)
     raw = apply_dashboard_portal_link(raw, dashboard_overrides.get("inverterPortalUrl", ""))
     raw = apply_dashboard_build_description(raw, dashboard_build_marker)
     raw = replace_ds(raw)

@@ -19,8 +19,8 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.05.31.3";
-const SCRIPT_LAST_MODIFIED = "2026-05-31";
+const SCRIPT_VERSION = "2026.06.03.1";
+const SCRIPT_LAST_MODIFIED = "2026-06-03";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -368,10 +368,29 @@ function applyVariableDefaults(raw, variableMap) {
   }
 }
 
+function applyInstalledWattPeakGaugeMax(node, installedWattPeak) {
+  const numericValue = Number(installedWattPeak);
+  if (!Number.isFinite(numericValue)) return;
+  if (!node || typeof node !== "object") return;
+  const overrides = node?.fieldConfig?.overrides;
+  if (Array.isArray(overrides)) {
+    for (const override of overrides) {
+      if (override?.matcher?.id !== "byFrameRefID" || override?.matcher?.options !== "PV") continue;
+      override.properties ||= [];
+      const existing = override.properties.find((property) => property.id === "max");
+      if (existing) existing.value = numericValue;
+      else override.properties.push({ id: "max", value: numericValue });
+    }
+  }
+  for (const value of Object.values(node)) applyInstalledWattPeakGaugeMax(value, installedWattPeak);
+}
 function applyOverridesToDashboard(raw, overrides) {
   const clone = JSON.parse(JSON.stringify(raw));
   if (!overrides || typeof overrides !== "object") return clone;
-  if (overrides.variables) applyVariableDefaults(clone, overrides.variables);
+  if (overrides.variables) {
+    applyVariableDefaults(clone, overrides.variables);
+    applyInstalledWattPeakGaugeMax(clone, overrides.variables.installedWattPeak);
+  }
   if (overrides.colors) applyColorOverrides(clone, overrides.colors);
   return clone;
 }
