@@ -2,7 +2,7 @@
 
 Die VictoriaMetrics-Dashboards verwenden ein gemeinsames semantisches Farbschema. Gleiche Energie- und Leistungsarten sollen in allen Dashboards gleich aussehen, unabhaengig davon, ob sie als Gauge, Time series, Bar gauge oder Balkendiagramm dargestellt werden.
 
-Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aenderungen am Farbschema sollen dort beginnen und danach mit `node scripts/helper/apply-dashboard-colors.mjs` auf die Original-Dashboards angewendet werden. Die lokalisierten Dashboards unter `dashboards/translation/` werden anschliessend aus den Original-Dashboards neu generiert.
+Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aenderungen am Farbschema sollen dort beginnen und danach mit `scripts/helper/apply-dashboard-colors.mjs` auf die Original-Dashboards angewendet werden. Die lokalisierten Dashboards unter `dashboards/translation/` werden anschliessend aus den Original-Dashboards neu generiert.
 
 ## Farben
 
@@ -23,6 +23,10 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 | Speicher entladen | Blau | `#3274D9` | Entladeenergie oder positive Speicherleistung |
 | Speicher entladen hoch | Dunkelblau | `#1F60A8` | hoher Entladebereich in Gauge-Schwellen |
 | Speicher kritisch | Tiefblau | `#174A7C` | sehr hoher Speicherleistungsbereich in Gauge-Schwellen |
+| Speicher-SOC niedrig | Sehr helles Blau | `#D6E8FF` | niedriger Bereich in Speicher-SOC-Gauge-Schwellen |
+| Speicher-SOC mittel | Hellblau | `#A8CBFF` | mittlerer Bereich in Speicher-SOC-Gauge-Schwellen |
+| Speicher-SOC | Blauhell | `#73A7F2` | normaler Bereich in Speicher-SOC-Gauge-Schwellen |
+| Speicher-SOC hoch | Blau | `#3274D9` | hoher Bereich in Speicher-SOC-Gauge-Schwellen |
 | Haus niedrig | Hellviolett | `#CDB6F6` | niedriger Hausverbrauch in Gauge-Schwellen |
 | Haus | Violett | `#9F7AEA` | Hausverbrauch und Verbrauchsverteilung |
 | Haus hoch | Dunkelviolett | `#7C5BD6` | hoeherer Hausverbrauch in Gauge-Schwellen |
@@ -31,8 +35,14 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 | Ladepunkte | Orange | `#FF9830` | dynamische Ladepunktserien als Default-Farbe |
 | Ladepunkte hoch | Dunkelorange | `#E66A00` | hoher Ladepunktleistungsbereich in Gauge-Schwellen |
 | Ladepunkte kritisch | Braunorange | `#B84A1C` | sehr hoher Ladepunktleistungsbereich in Gauge-Schwellen |
-| Autarkie | Schwellenfarben | `red`, `orange`, `yellow`, `green` | Gauge-Schwellen: bis 25 %, bis 50 %, bis 75 %, danach gruen |
+| Autarkie niedrig | Hellgruen | `#D8F3DC` | niedriger Bereich in Autarkie-Gauge-Schwellen |
+| Autarkie mittel | Gruenhell | `#A8DDB5` | mittlerer Bereich in Autarkie-Gauge-Schwellen |
+| Autarkie | Gruen | `#73BF69` | Autarkie-Gauge und Verlauf |
+| Autarkie hoch | Dunkelgruen | `#2F8F5B` | hoher Bereich in Autarkie-Gauge-Schwellen |
+| Eigenverbrauch niedrig | Helltuerkis | `#CFFAFE` | niedriger Bereich in Eigenverbrauch-Gauge-Schwellen |
+| Eigenverbrauch mittel | Tuerkishell | `#5EEAD4` | mittlerer Bereich in Eigenverbrauch-Gauge-Schwellen |
 | Eigenverbrauch | Tuerkis | `#14B8A6` | Eigenverbrauchs-Gauge und Verlauf |
+| Eigenverbrauch hoch | Dunkeltuerkis | `#0F766E` | hoher Bereich in Eigenverbrauch-Gauge-Schwellen |
 | Einkauf / Kosten | Rot | `red` | Stromkosten, Einkauf, negative Kostensicht |
 | Verkauf / Verguetung | Gruen | `green` | Einspeiseverguetung oder Verkauf |
 
@@ -41,6 +51,7 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 Die Leistungs-Gauges im Today-Dashboard sind bewusst unterschiedlich skaliert:
 
 - Netz und Speicher sind signiert: `-11 kW` bis `+11 kW`.
+- Netz und Speicher verwenden in den Gauges `neutral=0`, damit der Balken bei `0` startet und je nach Vorzeichen in die passende Richtung laeuft.
 - Haus und Ladepunkte sind nur positiv: `0 kW` bis `11 kW`.
 - PV ist nur positiv: `0 kW` bis zur installierten PV-Leistung. Der Deploy-Prozess kann den Maximalwert ueber `installedWattPeak` anpassen.
 - Ladepunkte sind dynamisch, weil EVCC-Nutzer die Namen frei vergeben koennen. Deshalb verwenden Ladepunkte Default-Schwellen statt harter `byName`-Overrides.
@@ -52,6 +63,9 @@ Gauge-Schwellen bleiben innerhalb derselben Farbfamilie:
 - PV nutzt gruene Abstufungen von hell bis dunkel.
 - Haus nutzt violette Abstufungen.
 - Ladepunkte nutzen orange Abstufungen.
+- Autarkie nutzt gruene Abstufungen statt Ampelfarben.
+- Eigenverbrauch nutzt tuerquise Abstufungen.
+- Speicher-SOC nutzt blaue Abstufungen passend zur Speicher-Grundfarbe.
 
 ## Pflegehinweise
 

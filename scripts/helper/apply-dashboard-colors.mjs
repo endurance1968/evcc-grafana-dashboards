@@ -1,7 +1,7 @@
 /**
  * Script: apply-dashboard-colors.mjs
  * Purpose: Apply the central semantic color palette to original EVCC VM dashboards.
- * Version: 2026.06.03.9
+ * Version: 2026.06.03.13
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -29,8 +29,9 @@ const exactColorByName = new Map([
   ["batteryEfficiency", dashboardColors.storage],
   ["chargedEnergy", dashboardColors.storageCharge],
   ["dischargedEnergy", dashboardColors.storageDischarge],
-  ["minSoc", dashboardColors.storage],
-  ["maxSoc", dashboardColors.storage],
+  ["minSoc", dashboardColors.storageSocDark],
+  ["maxSoc", dashboardColors.storageSocDark],
+  ["Battery SOC", dashboardColors.storageSocDark],
   ["Active phases", dashboardColors.gridImport],
   ["Autarky", dashboardColors.autarky],
   ["Autarkie", dashboardColors.autarky],
@@ -77,8 +78,35 @@ const gaugeThresholdsByMatcher = new Map([
     { color: dashboardColors.homeHigh, value: 8 },
     { color: dashboardColors.homeDanger, value: 10 },
   ])],
+  ["Autarky", thresholds("absolute", [
+    { color: dashboardColors.autarkyLow, value: null },
+    { color: dashboardColors.autarkyMid, value: 0.25 },
+    { color: dashboardColors.autarky, value: 0.5 },
+    { color: dashboardColors.autarkyDark, value: 0.75 },
+  ])],
   ["Self-consumption", thresholds("absolute", [
-    { color: dashboardColors.selfConsumption, value: null },
+    { color: dashboardColors.selfConsumptionLow, value: null },
+    { color: dashboardColors.selfConsumptionMid, value: 0.25 },
+    { color: dashboardColors.selfConsumption, value: 0.5 },
+    { color: dashboardColors.selfConsumptionDark, value: 0.75 },
+  ])],
+  ["Battery SOC", thresholds("absolute", [
+    { color: dashboardColors.storageSocLow, value: null },
+    { color: dashboardColors.storageSocMid, value: 15 },
+    { color: dashboardColors.storageSoc, value: 35 },
+    { color: dashboardColors.storageSocDark, value: 80 },
+  ])],
+  ["minSoc", thresholds("absolute", [
+    { color: dashboardColors.storageSocLow, value: null },
+    { color: dashboardColors.storageSocMid, value: 15 },
+    { color: dashboardColors.storageSoc, value: 35 },
+    { color: dashboardColors.storageSocDark, value: 80 },
+  ])],
+  ["maxSoc", thresholds("absolute", [
+    { color: dashboardColors.storageSocLow, value: null },
+    { color: dashboardColors.storageSocMid, value: 15 },
+    { color: dashboardColors.storageSoc, value: 35 },
+    { color: dashboardColors.storageSocDark, value: 80 },
   ])],
 ]);
 
@@ -89,6 +117,15 @@ const loadpointDefaults = thresholds("absolute", [
   { color: dashboardColors.loadpointHigh, value: 8 },
   { color: dashboardColors.loadpointDanger, value: 10 },
 ]);
+
+const mobilePowerFixedColorsByMatcher = new Map([
+  ["gridPower", dashboardColors.grid],
+  ["batteryPower", dashboardColors.storage],
+  ["PV", dashboardColors.pv],
+  ["homePower", dashboardColors.home],
+]);
+
+const signedPowerGaugeMatchers = new Set(["gridPower", "batteryPower"]);
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -196,6 +233,10 @@ function isPowerGaugePanel(panel) {
   return panelId === 74 && title === "Power";
 }
 
+function isPowerStatPanel(panel, kind) {
+  return kind === "stat" && isPowerGaugePanel(panel);
+}
+
 function applyPowerGaugeDefaults(fieldConfig, panel, kind) {
   if (!isPowerGaugePanel(panel) || !["gauge", "stat"].includes(kind)) {
     return false;
@@ -203,6 +244,10 @@ function applyPowerGaugeDefaults(fieldConfig, panel, kind) {
   fieldConfig.defaults ||= {};
   fieldConfig.defaults.color = { mode: "thresholds" };
   fieldConfig.defaults.thresholds = loadpointDefaults;
+  if (kind === "gauge") {
+    fieldConfig.defaults.custom ||= {};
+    fieldConfig.defaults.custom.neutral = 0;
+  }
   return true;
 }
 
@@ -219,12 +264,20 @@ function applyFieldConfig(fieldConfig, panel, kind) {
     }
 
     const isGauge = kind === "gauge" || isPowerGaugePanel(panel);
-    if (gaugeThresholdsByMatcher.has(option) && (isGauge || option === "Self-consumption")) {
+    if (isPowerStatPanel(panel, kind) && mobilePowerFixedColorsByMatcher.has(option)) {
+      setProperty(override, "color", fixedColor(mobilePowerFixedColorsByMatcher.get(option)));
+      changed = removeProperty(override, "thresholds") || true;
+      continue;
+    }
+    if (gaugeThresholdsByMatcher.has(option) && isGauge) {
       setProperty(override, "thresholds", gaugeThresholdsByMatcher.get(option));
-      if (isGauge && option !== "Self-consumption") {
-        setProperty(override, "color", { mode: "thresholds" });
+      setProperty(override, "color", { mode: "thresholds" });
+      if (kind === "gauge" && signedPowerGaugeMatchers.has(option)) {
+        setProperty(override, "custom.neutral", 0);
       }
       changed = true;
+    } else if (gaugeThresholdsByMatcher.has(option)) {
+      changed = removeProperty(override, "thresholds") || changed;
     }
 
     if (!isGauge && option === "PV") {
@@ -237,7 +290,7 @@ function applyFieldConfig(fieldConfig, panel, kind) {
     }
 
     const isThresholdDrivenGauge = isGauge && (hasProperty(override, "thresholds") || gaugeThresholdsByMatcher.has(option));
-    if (isThresholdDrivenGauge && option !== "Self-consumption") {
+    if (isThresholdDrivenGauge) {
       setProperty(override, "color", { mode: "thresholds" });
       changed = true;
     } else {

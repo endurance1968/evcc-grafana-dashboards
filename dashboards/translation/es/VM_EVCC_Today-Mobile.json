@@ -257,38 +257,6 @@
                 "value": 11
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#F8E7A1",
-                      "value": -11
-                    },
-                    {
-                      "color": "#E0B400",
-                      "value": -1
-                    },
-                    {
-                      "color": "#7A7A7A4D",
-                      "value": -0.001
-                    },
-                    {
-                      "color": "#E0B400",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "#C98200",
-                      "value": 1
-                    },
-                    {
-                      "color": "#B85C2A",
-                      "value": 8
-                    }
-                  ]
-                }
-              },
-              {
                 "id": "links",
                 "value": [
                   {
@@ -301,7 +269,8 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "thresholds"
+                  "mode": "fixed",
+                  "fixedColor": "#E0B400"
                 }
               }
             ]
@@ -321,38 +290,6 @@
                 "value": 11
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#A8CBFF",
-                      "value": -11
-                    },
-                    {
-                      "color": "#73A7F2",
-                      "value": -1
-                    },
-                    {
-                      "color": "#7A7A7A4D",
-                      "value": -0.001
-                    },
-                    {
-                      "color": "#3274D9",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "#1F60A8",
-                      "value": 1
-                    },
-                    {
-                      "color": "#174A7C",
-                      "value": 8
-                    }
-                  ]
-                }
-              },
-              {
                 "id": "links",
                 "value": [
                   {
@@ -365,7 +302,8 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "thresholds"
+                  "mode": "fixed",
+                  "fixedColor": "#3274D9"
                 }
               }
             ]
@@ -395,33 +333,10 @@
                 "value": 20
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "percentage",
-                  "steps": [
-                    {
-                      "color": "#7A7A7A4D",
-                      "value": 0
-                    },
-                    {
-                      "color": "#A8DDB5",
-                      "value": 1
-                    },
-                    {
-                      "color": "#2F8F5B",
-                      "value": 50
-                    },
-                    {
-                      "color": "#1B5E20",
-                      "value": 80
-                    }
-                  ]
-                }
-              },
-              {
                 "id": "color",
                 "value": {
-                  "mode": "thresholds"
+                  "mode": "fixed",
+                  "fixedColor": "#2F8F5B"
                 }
               }
             ]
@@ -441,34 +356,6 @@
                 "value": 11
               },
               {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#7A7A7A4D",
-                      "value": 0
-                    },
-                    {
-                      "color": "#CDB6F6",
-                      "value": 0.001
-                    },
-                    {
-                      "color": "#9F7AEA",
-                      "value": 5
-                    },
-                    {
-                      "color": "#7C5BD6",
-                      "value": 8
-                    },
-                    {
-                      "color": "#A44C9C",
-                      "value": 10
-                    }
-                  ]
-                }
-              },
-              {
                 "id": "links",
                 "value": [
                   {
@@ -481,7 +368,8 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "thresholds"
+                  "mode": "fixed",
+                  "fixedColor": "#9F7AEA"
                 }
               }
             ]
@@ -1585,19 +1473,19 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "red",
+                      "color": "#D8F3DC",
                       "value": null
                     },
                     {
-                      "color": "orange",
+                      "color": "#A8DDB5",
                       "value": 0.25
                     },
                     {
-                      "color": "yellow",
+                      "color": "#73BF69",
                       "value": 0.5
                     },
                     {
-                      "color": "green",
+                      "color": "#2F8F5B",
                       "value": 0.75
                     }
                   ]
@@ -1639,8 +1527,20 @@
                   "mode": "absolute",
                   "steps": [
                     {
-                      "color": "#14B8A6",
+                      "color": "#CFFAFE",
                       "value": null
+                    },
+                    {
+                      "color": "#5EEAD4",
+                      "value": 0.25
+                    },
+                    {
+                      "color": "#14B8A6",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "#0F766E",
+                      "value": 0.75
                     }
                   ]
                 }
@@ -1652,8 +1552,7 @@
               {
                 "id": "color",
                 "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#14B8A6"
+                  "mode": "thresholds"
                 }
               }
             ]
@@ -1895,18 +1794,6 @@
                 "value": {
                   "mode": "fixed",
                   "fixedColor": "#14B8A6"
-                }
-              },
-              {
-                "id": "thresholds",
-                "value": {
-                  "mode": "absolute",
-                  "steps": [
-                    {
-                      "color": "#14B8A6",
-                      "value": null
-                    }
-                  ]
                 }
               }
             ]

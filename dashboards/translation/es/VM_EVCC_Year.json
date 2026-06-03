@@ -882,19 +882,19 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "red",
+                              "color": "#D8F3DC",
                               "value": null
                             },
                             {
-                              "color": "orange",
+                              "color": "#A8DDB5",
                               "value": 0.25
                             },
                             {
-                              "color": "yellow",
+                              "color": "#73BF69",
                               "value": 0.5
                             },
                             {
-                              "color": "green",
+                              "color": "#2F8F5B",
                               "value": 0.75
                             }
                           ]
@@ -936,8 +936,20 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#14B8A6",
+                              "color": "#CFFAFE",
                               "value": null
+                            },
+                            {
+                              "color": "#5EEAD4",
+                              "value": 0.25
+                            },
+                            {
+                              "color": "#14B8A6",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "#0F766E",
+                              "value": 0.75
                             }
                           ]
                         }
@@ -949,8 +961,7 @@
                       {
                         "id": "color",
                         "value": {
-                          "mode": "fixed",
-                          "fixedColor": "#14B8A6"
+                          "mode": "thresholds"
                         }
                       }
                     ]
@@ -1174,18 +1185,6 @@
                         "value": {
                           "mode": "fixed",
                           "fixedColor": "#14B8A6"
-                        }
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "#14B8A6",
-                              "value": null
-                            }
-                          ]
                         }
                       }
                     ]

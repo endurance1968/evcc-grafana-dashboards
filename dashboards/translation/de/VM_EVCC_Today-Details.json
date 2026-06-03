@@ -90,29 +90,6 @@
                     "refId": "panelGuard",
                     "hidden": false
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(pvPower_value{id=\"\"}) < $peakPowerLimit)) / 3600000",
-                        "format": "time_series",
-                        "interval": "$__interval",
-                        "legendFormat": "Gesamt",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "pvEnergy",
-                    "hidden": false
-                  }
                 }
               ],
               "transformations": [
@@ -222,22 +199,7 @@
                   },
                   "unit": "kWh"
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "Gesamt"
-                    },
-                    "properties": [
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "fixed"
-                        }
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               }
             }
           }
