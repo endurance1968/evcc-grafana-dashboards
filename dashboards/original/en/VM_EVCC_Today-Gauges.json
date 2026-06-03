@@ -26,14 +26,14 @@
       "name": "VAR_INVERTERPORTALTITLE",
       "type": "constant",
       "label": "Inverter portal name",
-      "value": "Solarman",
+      "value": "",
       "description": ""
     },
     {
       "name": "VAR_INVERTERPORTALURL",
       "type": "constant",
       "label": "Inverter portal URL",
-      "value": "https://globalhome.solarmanpv.com/plant/infos/data",
+      "value": "",
       "description": ""
     },
     {
@@ -172,18 +172,6 @@
       "tooltip": "",
       "type": "link",
       "url": "$evccUrl"
-    },
-    {
-      "asDropdown": false,
-      "icon": "cloud",
-      "includeVars": false,
-      "keepTime": false,
-      "tags": [],
-      "targetBlank": true,
-      "title": "$inverterPortalTitle",
-      "tooltip": "",
-      "type": "link",
-      "url": "$inverterPortalUrl"
     }
   ],
   "liveNow": true,
@@ -2648,19 +2636,19 @@
         "hide": 2,
         "label": "Inverter portal name",
         "name": "inverterPortalTitle",
-        "query": "${VAR_INVERTERPORTALTITLE}",
+        "query": "",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_INVERTERPORTALTITLE}",
-          "text": "${VAR_INVERTERPORTALTITLE}",
+          "value": "",
+          "text": "",
           "selected": false
         },
         "options": [
           {
-            "value": "${VAR_INVERTERPORTALTITLE}",
-            "text": "${VAR_INVERTERPORTALTITLE}",
-            "selected": false
+            "selected": false,
+            "text": "",
+            "value": ""
           }
         ]
       },
@@ -2669,19 +2657,19 @@
         "hide": 2,
         "label": "Inverter portal URL",
         "name": "inverterPortalUrl",
-        "query": "${VAR_INVERTERPORTALURL}",
+        "query": "",
         "skipUrlSync": true,
         "type": "constant",
         "current": {
-          "value": "${VAR_INVERTERPORTALURL}",
-          "text": "${VAR_INVERTERPORTALURL}",
+          "value": "",
+          "text": "",
           "selected": false
         },
         "options": [
           {
-            "value": "${VAR_INVERTERPORTALURL}",
-            "text": "${VAR_INVERTERPORTALURL}",
-            "selected": false
+            "selected": false,
+            "text": "",
+            "value": ""
           }
         ]
       },

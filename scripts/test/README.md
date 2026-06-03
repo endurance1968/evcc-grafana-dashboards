@@ -162,6 +162,8 @@ Docker-Modus startet und stoppt einen temporaeren VM-Container:
 python scripts/test/rollup-e2e.py --docker
 ```
 
+Standardmaessig veroeffentlicht der Docker-Modus einen zufaelligen Host-Port. Das vermeidet Haenger in Forgejo-/act-Runnern, die bei `--network container:<job-container>` auftreten koennen. Falls ein aelteres Runner-Setup den geteilten Container-Namespace wirklich benoetigt, nutze `--docker-network-mode container` oder `ROLLUP_E2E_DOCKER_NETWORK_MODE=container`.
+
 Externer disposable VM-Modus ist absichtlich geschuetzt:
 
 ```bash

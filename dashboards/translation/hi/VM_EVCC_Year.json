@@ -7027,18 +7027,6 @@
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
-      },
-      {
-        "asDropdown": false,
-        "icon": "cloud",
-        "includeVars": false,
-        "keepTime": false,
-        "tags": [],
-        "targetBlank": true,
-        "title": "$इन्वर्टरपोर्टलटाइटल",
-        "tooltip": "",
-        "type": "link",
-        "url": "$inverterPortalUrl"
       }
     ],
     "liveNow": false,
@@ -7238,10 +7226,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalTitle",
-          "query": "Solarman",
+          "query": "",
           "current": {
-            "value": "Solarman",
-            "text": "Solarman",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "इन्वर्टर पोर्टल नाम",
@@ -7250,9 +7238,9 @@
           "description": "पोर्टल लिंक के लिए इन्वर्टर पोर्टल का नाम।",
           "options": [
             {
-              "value": "Solarman",
-              "text": "Solarman",
-              "selected": false
+              "selected": false,
+              "text": "",
+              "value": ""
             }
           ]
         }
@@ -7261,10 +7249,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalUrl",
-          "query": "https://globalhome.solarmanpv.com/plant/infos/data",
+          "query": "",
           "current": {
-            "value": "https://globalhome.solarmanpv.com/plant/infos/data",
-            "text": "https://globalhome.solarmanpv.com/plant/infos/data",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "इन्वर्टर पोर्टल URL",
@@ -7273,9 +7261,9 @@
           "description": "इन्वर्टर पोर्टल खोलने के लिए प्रयुक्त URL।",
           "options": [
             {
-              "value": "https://globalhome.solarmanpv.com/plant/infos/data",
-              "text": "https://globalhome.solarmanpv.com/plant/infos/data",
-              "selected": false
+              "selected": false,
+              "text": "",
+              "value": ""
             }
           ]
         }

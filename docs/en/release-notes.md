@@ -2,6 +2,18 @@
 
 These notes summarize the first public VictoriaMetrics-based EVCC dashboard release.
 
+## VNext (unreleased)
+
+### Improvements
+
+- Implemented the Grafana 13 gauge visualization tracked in Forgejo issue #7 and moved it from hold status into the dashboard path:
+  - `3cc765e` add the Today Gauges dashboard
+  - `d052a84` simplify the Today Gauges layout
+  - `43cdb86` link gauges to the matching Today Details tabs
+  - `bf9999c` use Grafana tab state and sparkline gauges
+  - `61a7e71` switch autonomy/self-consumption metric panels to sparkline gauges
+  - `5f08c29` stabilize metric-gauge sparkline rendering
+
 ## Supported Installation Paths
 
 Supported end-user paths:

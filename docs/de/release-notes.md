@@ -4,6 +4,18 @@ Englische Version: [release-notes.md](../en/release-notes.md).
 
 Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf VictoriaMetrics-Basis zusammen.
 
+## VNext (unreleased)
+
+### Verbesserungen
+
+- Grafana-13-Gauge-Visualisierung aus Forgejo-Issue #7 umgesetzt und vom Hold-Status in den Dashboard-Pfad uebernommen:
+  - `3cc765e` Today-Gauges-Dashboard ergaenzt
+  - `d052a84` Today-Gauges-Layout vereinfacht
+  - `43cdb86` Gauge-Links auf passende Today-Details-Tabs gesetzt
+  - `bf9999c` Grafana-Tab-State und Sparkline-Gauges verwendet
+  - `61a7e71` Autarkie-/Eigenverbrauchs-Metriken auf Sparkline-Gauges umgestellt
+  - `5f08c29` Sparkline-Darstellung der Metric-Gauges stabilisiert
+
 ## Unterstuetzte Installationspfade
 
 Unterstuetzte Endnutzerpfade:

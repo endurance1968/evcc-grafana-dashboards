@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.02.2"
+SCRIPT_VERSION="2026.06.03.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-02"
+SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -418,6 +418,8 @@ def build_dashboard_marker(settings):
 
 
 def build_dashboard_overrides(settings):
+    portal_url = str(settings.get("DASHBOARD_PORTAL_URL", "") or "").strip()
+    portal_title = str(settings.get("DASHBOARD_PORTAL_TITLE", "") or "").strip()
     return {
         "peakPowerLimit": settings.get("DASHBOARD_FILTER_PEAK_POWER_LIMIT", ""),
         "energySampleInterval": settings.get("DASHBOARD_ENERGY_SAMPLE_INTERVAL", "") or settings.get("DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL", ""),
@@ -435,8 +437,8 @@ def build_dashboard_overrides(settings):
         "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
         "vehicleBlocklist": settings.get("DASHBOARD_FILTER_VEHICLE_BLOCKLIST", ""),
         "evccUrl": settings.get("DASHBOARD_EVCC_URL", ""),
-        "inverterPortalTitle": settings.get("DASHBOARD_PORTAL_TITLE", ""),
-        "inverterPortalUrl": settings.get("DASHBOARD_PORTAL_URL", ""),
+        "inverterPortalTitle": (portal_title or "Portal") if portal_url else "",
+        "inverterPortalUrl": portal_url,
     }
 
 def apply_dashboard_build_description(raw, marker):
@@ -491,6 +493,39 @@ def apply_dashboard_filter_overrides(raw, overrides):
             variable["options"] = [{"selected": True, "text": value, "value": value}]
     return raw
 
+
+def is_portal_link(link):
+    return str((link or {}).get("url") or "") == "$inverterPortalUrl" or str((link or {}).get("title") or "") == "$inverterPortalTitle"
+
+def configured_portal_link():
+    return {
+        "asDropdown": False,
+        "icon": "cloud",
+        "includeVars": False,
+        "keepTime": False,
+        "tags": [],
+        "targetBlank": True,
+        "title": "$inverterPortalTitle",
+        "tooltip": "",
+        "type": "link",
+        "url": "$inverterPortalUrl",
+    }
+
+def apply_dashboard_portal_link(raw, portal_url):
+    portal_url = str(portal_url or "").strip()
+    if is_v2_dashboard(raw):
+        spec = raw.setdefault("spec", {})
+        links = [link for link in spec.get("links") or [] if not is_portal_link(link)]
+        if portal_url:
+            links.append(configured_portal_link())
+        spec["links"] = links
+        return raw
+
+    links = [link for link in raw.get("links") or [] if not is_portal_link(link)]
+    if portal_url:
+        links.append(configured_portal_link())
+    raw["links"] = links
+    return raw
 
 def confirm_apply(prompt):
     if settings.get("CLI_YES", "").lower() == "true":
@@ -583,6 +618,7 @@ library = {}
 for filename in DASHBOARD_FILES:
     raw = json.loads(get_source_text(filename))
     raw = apply_dashboard_filter_overrides(raw, dashboard_overrides)
+    raw = apply_dashboard_portal_link(raw, dashboard_overrides.get("inverterPortalUrl", ""))
     raw = apply_dashboard_build_description(raw, dashboard_build_marker)
     raw = replace_ds(raw)
     raw = ensure_v2_folder_annotation(raw)

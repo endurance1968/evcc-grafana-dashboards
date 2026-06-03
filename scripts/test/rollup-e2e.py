@@ -24,8 +24,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.04.29.1"
-SCRIPT_LAST_MODIFIED = "2026-04-29"
+SCRIPT_VERSION = "2026.06.03.1"
+SCRIPT_LAST_MODIFIED = "2026-06-03"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -61,6 +61,15 @@ def parse_args() -> argparse.Namespace:
         "--docker-published-host",
         default=os.environ.get("ROLLUP_E2E_DOCKER_PUBLISHED_HOST", ""),
         help="Host name used by the test process to reach the published Docker port; defaults to host.docker.internal inside containers, otherwise 127.0.0.1.",
+    )
+    parser.add_argument(
+        "--docker-network-mode",
+        choices=("published", "container"),
+        default=os.environ.get("ROLLUP_E2E_DOCKER_NETWORK_MODE", "published"),
+        help=(
+            "Docker network mode for --docker. 'published' publishes a random host port and is the CI default; "
+            "'container' shares the current container network namespace for older act runner setups."
+        ),
     )
     parser.add_argument("--keep-docker", action="store_true", help="Do not stop the Docker container after the test.")
     parser.add_argument("--base-url", default=os.environ.get("ROLLUP_E2E_VM_URL", ""), help="Disposable VM base URL.")
@@ -157,6 +166,7 @@ def docker_published_port(container_name: str) -> int:
         text=True,
         capture_output=True,
         check=False,
+        timeout=30,
     )
     if result.returncode != 0:
         raise RuntimeError(f"docker port failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}")
@@ -171,7 +181,8 @@ def docker_published_port(container_name: str) -> int:
 
 def start_docker_vm(args: argparse.Namespace, json_mode: bool) -> tuple[str, str]:
     name = f"evcc-rollup-e2e-{os.getpid()}-{uuid.uuid4().hex[:8]}"
-    if runs_inside_container():
+    use_container_network = runs_inside_container() and args.docker_network_mode == "container"
+    if use_container_network:
         cmd = [
             "docker",
             "run",
@@ -206,18 +217,21 @@ def start_docker_vm(args: argparse.Namespace, json_mode: bool) -> tuple[str, str
         base_url = ""
 
     log(f"$ {' '.join(cmd)}", json_mode=json_mode)
-    result = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
+    try:
+        result = subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False, timeout=60)
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(f"docker run timed out after {exc.timeout}s: {' '.join(cmd)}") from exc
     if result.returncode != 0:
         raise RuntimeError(f"docker run failed ({result.returncode}): {result.stderr.strip() or result.stdout.strip()}")
     try:
-        if not runs_inside_container():
+        if not use_container_network:
             published_port = args.docker_port if args.docker_port > 0 else docker_published_port(name)
             published_host = args.docker_published_host or default_docker_published_host()
             base_url = f"http://{published_host}:{published_port}"
         wait_for_vm(base_url)
         return name, base_url
     except Exception:
-        subprocess.run(["docker", "stop", name], cwd=REPO_ROOT, text=True, capture_output=True, check=False)
+        subprocess.run(["docker", "stop", name], cwd=REPO_ROOT, text=True, capture_output=True, check=False, timeout=30)
         raise
 
 
@@ -226,7 +240,7 @@ def stop_docker_vm(container_name: str, json_mode: bool) -> None:
         return
     cmd = ["docker", "stop", container_name]
     log(f"$ {' '.join(cmd)}", json_mode=json_mode)
-    subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False)
+    subprocess.run(cmd, cwd=REPO_ROOT, text=True, capture_output=True, check=False, timeout=30)
 
 
 def http_post_bytes(base_url: str, path: str, body: bytes) -> None:

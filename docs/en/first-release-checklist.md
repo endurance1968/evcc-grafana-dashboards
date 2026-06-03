@@ -96,9 +96,9 @@ At minimum, do not publish a first end-user release until all of these are true:
 
 Last updated: 2026-05-31.
 
-Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, the local Windows Docker migration walkthrough on 2026-05-29 using Ole's real EVCC/Influx data, and the manually refreshed release screenshots from 2026-05-31.
+Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, a local Windows Docker migration walkthrough on 2026-05-29 using real read-only EVCC/Influx source data, and the manually refreshed release screenshots from 2026-05-31.
 
-Real-data migration evidence from 2026-05-29:
+Migration evidence with real read-only source data from 2026-05-29:
 
 - source InfluxDB v1 database `evcc`, read-only access during the test
 - source EVCC API was used only for read-only topology verification

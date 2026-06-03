@@ -31,9 +31,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.02.2'
+$ScriptVersion = '2026.06.03.1'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-06-02'
+$ScriptLastModified = '2026-06-03'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -401,6 +401,9 @@ function Get-DashboardBuildMarker() {
 }
 
 function Get-DashboardOverrides() {
+  $portalUrl = ([string]$settings.DASHBOARD_PORTAL_URL).Trim()
+  $portalTitle = ([string]$settings.DASHBOARD_PORTAL_TITLE).Trim()
+  if (-not [string]::IsNullOrWhiteSpace($portalUrl) -and [string]::IsNullOrWhiteSpace($portalTitle)) { $portalTitle = 'Portal' }
   return @{
     peakPowerLimit = $settings.DASHBOARD_FILTER_PEAK_POWER_LIMIT
     energySampleInterval = $(if ($settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL) { $settings.DASHBOARD_ENERGY_SAMPLE_INTERVAL } else { $settings.DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL })
@@ -418,8 +421,8 @@ function Get-DashboardOverrides() {
     auxBlocklist = $settings.DASHBOARD_FILTER_AUX_BLOCKLIST
     vehicleBlocklist = $settings.DASHBOARD_FILTER_VEHICLE_BLOCKLIST
     evccUrl = $settings.DASHBOARD_EVCC_URL
-    inverterPortalTitle = $settings.DASHBOARD_PORTAL_TITLE
-    inverterPortalUrl = $settings.DASHBOARD_PORTAL_URL
+    inverterPortalTitle = $(if ($portalUrl) { $portalTitle } else { '' })
+    inverterPortalUrl = $portalUrl
   }
 }
 
@@ -484,6 +487,43 @@ function Apply-DashboardFilterOverrides($Raw, [hashtable]$Overrides) {
       $variable.options = @([pscustomobject]@{ selected = $true; text = $value; value = $value })
     }
   }
+  return $Raw
+}
+
+function New-PortalDashboardLink() {
+  return [pscustomobject]@{
+    asDropdown = $false
+    icon = 'cloud'
+    includeVars = $false
+    keepTime = $false
+    tags = @()
+    targetBlank = $true
+    title = '$inverterPortalTitle'
+    tooltip = ''
+    type = 'link'
+    url = '$inverterPortalUrl'
+  }
+}
+
+function Test-PortalDashboardLink($Link) {
+  if ($null -eq $Link) { return $false }
+  return ([string]$Link.url -eq '$inverterPortalUrl') -or ([string]$Link.title -eq '$inverterPortalTitle')
+}
+
+function Apply-DashboardPortalLink($Raw, [string]$PortalUrl) {
+  if ($null -eq $Raw) { return $Raw }
+  $hasPortalUrl = -not [string]::IsNullOrWhiteSpace($PortalUrl)
+  if (Is-V2Dashboard $Raw) {
+    if ($null -eq $Raw.spec.PSObject.Properties['links']) { $Raw.spec | Add-Member -NotePropertyName links -NotePropertyValue @() -Force }
+    $links = @($Raw.spec.links) | Where-Object { -not (Test-PortalDashboardLink $_) }
+    if ($hasPortalUrl) { $links += (New-PortalDashboardLink) }
+    $Raw.spec.links = @($links)
+    return $Raw
+  }
+  if ($null -eq $Raw.PSObject.Properties['links']) { $Raw | Add-Member -NotePropertyName links -NotePropertyValue @() -Force }
+  $links = @($Raw.links) | Where-Object { -not (Test-PortalDashboardLink $_) }
+  if ($hasPortalUrl) { $links += (New-PortalDashboardLink) }
+  $Raw.links = @($links)
   return $Raw
 }
 
@@ -670,6 +710,7 @@ $libraryElements = @{}
 foreach ($fileName in $dashboardFiles) {
   $raw = Parse-JsonDocument (Get-SourceFileContent $fileName)
   $raw = Apply-DashboardFilterOverrides $raw $dashboardOverrides
+  $raw = Apply-DashboardPortalLink $raw $dashboardOverrides.inverterPortalUrl
   $raw = Set-DashboardBuildDescription $raw $dashboardBuildMarker
   $raw = Replace-DatasourcePlaceholders $raw
   $raw = Ensure-V2FolderAnnotation $raw

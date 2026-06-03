@@ -135,7 +135,7 @@ PURGE_ONLY=true
 
 ## Optionale Dashboard-Variablen-Overrides
 
-Diese Werte setzen versteckte Dashboard-Variablen und Header-Buttons, ohne Dashboard-JSON-Dateien zu bearbeiten:
+Diese Werte setzen versteckte Dashboard-Variablen und optionale Header-Buttons, ohne Dashboard-JSON-Dateien zu bearbeiten:
 
 ```env
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
@@ -154,8 +154,9 @@ DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_EVCC_URL=http://home:7070/#/
-DASHBOARD_PORTAL_TITLE=Solarman
-DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+# Optionaler externer Portal-Button. Ohne DASHBOARD_PORTAL_URL wird kein Portal-Button angezeigt.
+# DASHBOARD_PORTAL_TITLE=Portal
+# DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
 
 Quote Regex-Werte mit `|`, `(`, `)`, Leerzeichen oder Nicht-ASCII-Zeichen, damit der Bash-Deployer die Env-Datei sicher sourcen kann.

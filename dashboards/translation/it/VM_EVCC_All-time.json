@@ -6145,18 +6145,6 @@
         "targetBlank": true,
         "includeVars": false,
         "keepTime": false
-      },
-      {
-        "title": "$inverterPortalTitolo",
-        "type": "link",
-        "icon": "cloud",
-        "tooltip": "",
-        "url": "$inverterPortalUrl",
-        "tags": [],
-        "asDropdown": false,
-        "targetBlank": true,
-        "includeVars": false,
-        "keepTime": false
       }
     ],
     "liveNow": false,
@@ -6447,10 +6435,11 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalTitle",
-          "query": "Solarman",
+          "query": "",
           "current": {
-            "text": "Solarman",
-            "value": "Solarman"
+            "text": "",
+            "value": "",
+            "selected": false
           },
           "label": "Nome portale inverter",
           "hide": "hideVariable",
@@ -6462,10 +6451,11 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalUrl",
-          "query": "https://globalhome.solarmanpv.com/plant/infos/data",
+          "query": "",
           "current": {
-            "text": "https://globalhome.solarmanpv.com/plant/infos/data",
-            "value": "https://globalhome.solarmanpv.com/plant/infos/data"
+            "text": "",
+            "value": "",
+            "selected": false
           },
           "label": "URL portale inverter",
           "hide": "hideVariable",

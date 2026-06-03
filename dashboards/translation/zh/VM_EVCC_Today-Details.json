@@ -5425,18 +5425,6 @@
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
-      },
-      {
-        "asDropdown": false,
-        "icon": "cloud",
-        "includeVars": false,
-        "keepTime": false,
-        "tags": [],
-        "targetBlank": true,
-        "title": "$inverterPortalTitle",
-        "tooltip": "",
-        "type": "link",
-        "url": "$inverterPortalUrl"
       }
     ],
     "liveNow": false,
@@ -5690,10 +5678,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalTitle",
-          "query": "Solarman",
+          "query": "",
           "current": {
-            "value": "Solarman",
-            "text": "Solarman",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "逆变器门户名称",
@@ -5702,9 +5690,9 @@
           "description": "门户链接使用的逆变器门户名称。",
           "options": [
             {
-              "value": "Solarman",
-              "text": "Solarman",
-              "selected": false
+              "selected": false,
+              "text": "",
+              "value": ""
             }
           ]
         }
@@ -5713,10 +5701,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalUrl",
-          "query": "https://globalhome.solarmanpv.com/plant/infos/data",
+          "query": "",
           "current": {
-            "value": "https://globalhome.solarmanpv.com/plant/infos/data",
-            "text": "https://globalhome.solarmanpv.com/plant/infos/data",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "逆变器门户网址",
@@ -5725,9 +5713,9 @@
           "description": "用于打开逆变器门户的 URL。",
           "options": [
             {
-              "value": "https://globalhome.solarmanpv.com/plant/infos/data",
-              "text": "https://globalhome.solarmanpv.com/plant/infos/data",
-              "selected": false
+              "selected": false,
+              "text": "",
+              "value": ""
             }
           ]
         }

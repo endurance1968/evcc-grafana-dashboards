@@ -3,9 +3,9 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.02.2"
+SCRIPT_VERSION="2026.06.03.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-02"
+SCRIPT_LAST_MODIFIED="2026-06-03"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -463,6 +463,34 @@ apply_dashboard_override() {
   mv "$tmp_file" "$file"
 }
 
+apply_dashboard_portal_link() {
+  local file="$1"
+  local portal_url="$2"
+  local tmp_file="${file}.tmp"
+  jq --arg portal_url "$portal_url" '
+    def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
+    def is_portal_link: (.url // "") == "$inverterPortalUrl" or (.title // "") == "$inverterPortalTitle";
+    def portal_link: {
+      asDropdown: false,
+      icon: "cloud",
+      includeVars: false,
+      keepTime: false,
+      tags: [],
+      targetBlank: true,
+      title: "$inverterPortalTitle",
+      tooltip: "",
+      type: "link",
+      url: "$inverterPortalUrl"
+    };
+    if is_v2 then
+      .spec.links = (((.spec.links // []) | map(select(is_portal_link | not))) + (if ($portal_url | gsub("\\s"; "")) != "" then [portal_link] else [] end))
+    else
+      .links = (((.links // []) | map(select(is_portal_link | not))) + (if ($portal_url | gsub("\\s"; "")) != "" then [portal_link] else [] end))
+    end
+  ' "$file" > "$tmp_file"
+  mv "$tmp_file" "$file"
+}
+
 dashboard_build_marker() {
   local source
   if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
@@ -571,8 +599,11 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "auxBlocklist" "$DASHBOARD_FILTER_AUX_BLOCKLIST"
   apply_dashboard_override "$raw_file" "vehicleBlocklist" "$DASHBOARD_FILTER_VEHICLE_BLOCKLIST"
   apply_dashboard_override "$raw_file" "evccUrl" "$DASHBOARD_EVCC_URL"
-  apply_dashboard_override "$raw_file" "inverterPortalTitle" "$DASHBOARD_PORTAL_TITLE"
-  apply_dashboard_override "$raw_file" "inverterPortalUrl" "$DASHBOARD_PORTAL_URL"
+  if [[ -n "${DASHBOARD_PORTAL_URL//[[:space:]]/}" ]]; then
+    apply_dashboard_override "$raw_file" "inverterPortalTitle" "${DASHBOARD_PORTAL_TITLE:-Portal}"
+    apply_dashboard_override "$raw_file" "inverterPortalUrl" "$DASHBOARD_PORTAL_URL"
+  fi
+  apply_dashboard_portal_link "$raw_file" "$DASHBOARD_PORTAL_URL"
 
   tmp_ds_file="$raw_file.ds"
   jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" "$replace_ds_filter" "$raw_file" > "$tmp_ds_file"

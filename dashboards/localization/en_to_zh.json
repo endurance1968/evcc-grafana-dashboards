@@ -318,7 +318,6 @@
     "homeConsumption": "homeConsumption",
     "info": "info",
     "pvEnergy": "pvEnergy",
-    "Solarman": "Solarman",
     "Battery amortization": "电池摊销",
     "Build": "构建",
     "Build information is set during deployment.": "构建信息在部署期间设置。",

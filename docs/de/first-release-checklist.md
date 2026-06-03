@@ -96,9 +96,9 @@ Mindestens diese Punkte muessen vor dem ersten Endnutzer-Release erfuellt sein:
 
 Zuletzt aktualisiert: 2026-05-31.
 
-Die abgehakten Punkte basieren auf der abgeschlossenen Dokumentationsstruktur, dem erfolgreichen `npm run test:rollup-path` vom 2026-05-28, dem lokalen Windows-Docker-Migrationsdurchlauf vom 2026-05-29 mit Oles realen EVCC-/Influx-Daten und den manuell aktualisierten Release-Screenshots vom 2026-05-31.
+Die abgehakten Punkte basieren auf der abgeschlossenen Dokumentationsstruktur, dem erfolgreichen `npm run test:rollup-path` vom 2026-05-28, einem lokalen Windows-Docker-Migrationsdurchlauf vom 2026-05-29 mit realen read-only EVCC-/Influx-Quelldaten und den manuell aktualisierten Release-Screenshots vom 2026-05-31.
 
-Real-Daten-Migrationsnachweise vom 2026-05-29:
+Migrationsnachweise mit realen read-only Quelldaten vom 2026-05-29:
 
 - InfluxDB-v1-Quelle: Datenbank `evcc`, waehrend des Tests nur lesend genutzt
 - EVCC-API wurde nur zur lesenden Topologie-Verifikation genutzt

@@ -160,6 +160,8 @@ Docker mode starts and stops a temporary VM container:
 python scripts/test/rollup-e2e.py --docker
 ```
 
+By default, Docker mode publishes a random host port. This avoids hangs in Forgejo/act runners that can occur with `--network container:<job-container>`. If an older runner setup really needs the shared container namespace, use `--docker-network-mode container` or `ROLLUP_E2E_DOCKER_NETWORK_MODE=container`.
+
 External disposable VM mode is deliberately guarded:
 
 ```bash

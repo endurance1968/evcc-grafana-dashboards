@@ -1,13 +1,17 @@
 # Energy comparison data
 
-Local third-party energy comparison data lives here. The data is intentionally outside `tmp/` because it is reused for migration and rollup validation.
+German version: [README.md](./README.md).
+
+This directory is a location for private external energy comparison data. It is not required for normal dashboard operation and regular users do not need it.
+
+The data is intentionally outside `tmp/` because it can be reused for private migration, rollup, and release validation.
 
 - `tibber/`: local Tibber API exports or comparison snapshots.
 - `vrm/`: local Victron VRM daily kWh cache files.
 
-The actual cache/export files are machine-local and ignored by Git. Keep only this documentation and `.gitkeep` files tracked.
+The actual cache/export files are machine-local and ignored by Git. Keep only this documentation and `.gitkeep` files tracked. Private snapshots can contain installation IDs, local paths, energy consumption, or cost data and must not be committed to the public repository.
 
-## Battery efficiency
+## Battery Efficiency
 
 The dashboard value `Battery efficiency` is an energy-flow ratio, not a manufacturer statement about cell or inverter efficiency:
 
@@ -15,24 +19,22 @@ The dashboard value `Battery efficiency` is an energy-flow ratio, not a manufact
 Battery efficiency = battery discharge / battery charge * 100
 ```
 
-In VictoriaMetrics the dashboard uses `evcc_battery_discharge_daily_wh` and `evcc_battery_charge_daily_wh`. The VRM comparison uses the closest matching VRM flows:
+In VictoriaMetrics the dashboard uses `evcc_battery_discharge_daily_wh` and `evcc_battery_charge_daily_wh`. An optional VRM comparison can use the closest matching VRM flows:
 
 ```text
 VRM battery charge    = pv_to_battery_kwh + grid_to_battery_kwh
 VRM battery discharge = battery_to_consumers_kwh + battery_to_grid_kwh
 ```
 
-Short periods can visibly differ because EVCC/VM and VRM use different accounting boundaries. For release and migration validation, the monthly and total view is therefore the relevant view.
+Short periods can visibly differ because EVCC/VM and external portals can use different accounting boundaries. For release and migration validation, the monthly and total view is therefore the relevant view. Concrete local findings and anomalies belong in private notes or local cache files, not in this repository documentation.
 
-Current local VRM cache check with Ole's data after the default exclusions `2025-04` and `2025-10`: `2025-07..2026-03`, 243 days, 5102.02 kWh battery charge, 4604.82 kWh battery discharge, total efficiency `90.25%`. The monthly value `2025-08` is above 100% at `105.73%`; this is not automatically treated as a rollup error because VRM flow groups and EVCC/VM battery power can use different accounting boundaries. Such differences must be interpreted in the monthly/total view or investigated further against a live VM with `--vm-base-url`.
+## Validation Workflow
 
-## Validation workflow
-
-Refresh external snapshots when needed:
+Refresh external snapshots locally when needed:
 
 ```bash
-python3 scripts/helper/compare_tibber_vm.py --start-day 2025-04-01 --end-day 2026-03-31 --json > data/energy-comparison/tibber/tibber-vm-cost-2025-04-01_2026-03-31.json
-python3 scripts/helper/fetch_vrm_kwh_cache.py --start-day 2025-07-01 --end-day 2026-03-31
+python3 scripts/helper/compare_tibber_vm.py --start-day YYYY-MM-DD --end-day YYYY-MM-DD --json > data/energy-comparison/tibber/tibber-vm-cost-YYYY-MM-DD_YYYY-MM-DD.json
+python3 scripts/helper/fetch_vrm_kwh_cache.py --start-day YYYY-MM-DD --end-day YYYY-MM-DD --site-id <vrm-site-id>
 ```
 
 Validate the cached snapshots without contacting Tibber or VRM again:
@@ -41,7 +43,7 @@ Validate the cached snapshots without contacting Tibber or VRM again:
 python3 scripts/helper/validate_energy_comparison.py
 ```
 
-By default the validator excludes `2025-04` and `2025-10`, because those months are documented Tibber/EVCC/import anomalies. Use repeated `--exclude-month YYYY-MM` arguments for additional documented anomalies.
+By default the validator excludes documented anomaly months as maintained in the script. Use repeated `--exclude-month YYYY-MM` arguments for additional documented anomalies.
 
 For private validation with an available VRM cache, require the battery-efficiency check explicitly:
 
@@ -49,4 +51,4 @@ For private validation with an available VRM cache, require the battery-efficien
 python3 scripts/helper/validate_energy_comparison.py --require-cache vrm-battery
 ```
 
-If a live VictoriaMetrics instance is available, add `--vm-base-url http://127.0.0.1:8428` to compare cached VRM PV/grid-import totals and battery-flow efficiency against the current VM rollups as well.
+If a disposable or explicitly approved VictoriaMetrics instance is available, add `--vm-base-url http://127.0.0.1:8428` to compare cached external totals against current VM rollups as well. Never write to or delete from a production VictoriaMetrics instance.

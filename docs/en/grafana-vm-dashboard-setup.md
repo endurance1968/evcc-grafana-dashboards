@@ -138,18 +138,19 @@ PURGE=false
 PURGE_ONLY=false
 ```
 
-Personal dashboard variable overrides can be kept in the same env file. For example:
+Personal dashboard variable overrides can be kept in the same env file. The external portal is optional; without `DASHBOARD_PORTAL_URL` no portal button is shown. For example:
 
 ```env
 DASHBOARD_INSTALLED_WATT_PEAK=22
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
-DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^Altherma-3$
+DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
 DASHBOARD_EVCC_URL=http://home:7070/#/
-DASHBOARD_PORTAL_TITLE=VRM
-DASHBOARD_PORTAL_URL=https://vrm.victronenergy.com/installation/<id>/dashboard
+# Optional external portal button, for example for an inverter or energy portal.
+# DASHBOARD_PORTAL_TITLE=Portal
+# DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
 
 If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:

@@ -133,7 +133,7 @@ PURGE_ONLY=true
 
 ## Optional Dashboard Variable Overrides
 
-These values let you set hidden dashboard variables and header buttons without editing dashboard JSON files:
+These values let you set hidden dashboard variables and optional header buttons without editing dashboard JSON files:
 
 ```env
 DASHBOARD_FILTER_PEAK_POWER_LIMIT=30000
@@ -152,8 +152,9 @@ DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_EVCC_URL=http://home:7070/#/
-DASHBOARD_PORTAL_TITLE=Solarman
-DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+# Optional external portal button. Without DASHBOARD_PORTAL_URL no portal button is shown.
+# DASHBOARD_PORTAL_TITLE=Portal
+# DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
 
 Quote regex values containing `|`, `(`, `)`, spaces, or non-ASCII characters so the Bash deployer can source the env file safely.

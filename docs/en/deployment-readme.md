@@ -67,8 +67,9 @@ DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
 DASHBOARD_EVCC_URL=http://home:7070/#/
-DASHBOARD_PORTAL_TITLE=Solarman
-DASHBOARD_PORTAL_URL=https://globalhome.solarmanpv.com/plant/infos/data
+# Optional external portal button. Without DASHBOARD_PORTAL_URL no portal button is shown.
+# DASHBOARD_PORTAL_TITLE=Portal
+# DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
 
 The full option list is in [vm-dashboard-install.md](./vm-dashboard-install.md) and the commented template is `vm-dashboard-install.env.example`. Define each env key only once; duplicate keys are rejected.

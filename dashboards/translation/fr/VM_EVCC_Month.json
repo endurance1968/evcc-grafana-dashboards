@@ -4875,18 +4875,6 @@
         "tooltip": "",
         "type": "link",
         "url": "$evccUrl"
-      },
-      {
-        "asDropdown": false,
-        "icon": "cloud",
-        "includeVars": false,
-        "keepTime": false,
-        "tags": [],
-        "targetBlank": true,
-        "title": "$inverterPortalTitle",
-        "tooltip": "",
-        "type": "link",
-        "url": "$inverterPortalUrl"
       }
     ],
     "liveNow": false,
@@ -5023,10 +5011,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalTitle",
-          "query": "Solarman",
+          "query": "",
           "current": {
-            "value": "Solarman",
-            "text": "Solarman",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "Nom du portail de l’onduleur",
@@ -5039,10 +5027,10 @@
         "kind": "ConstantVariable",
         "spec": {
           "name": "inverterPortalUrl",
-          "query": "https://globalhome.solarmanpv.com/plant/infos/data",
+          "query": "",
           "current": {
-            "value": "https://globalhome.solarmanpv.com/plant/infos/data",
-            "text": "https://globalhome.solarmanpv.com/plant/infos/data",
+            "value": "",
+            "text": "",
             "selected": false
           },
           "label": "URL du portail de l’onduleur",

@@ -318,7 +318,6 @@
     "homeConsumption": "homeConsumption",
     "info": "info",
     "pvEnergy": "pvEnergy",
-    "Solarman": "Solarman",
     "Battery amortization": "Amortizacion de la bateria",
     "Build": "Build",
     "Build information is set during deployment.": "La informacion de build se establece durante el despliegue.",

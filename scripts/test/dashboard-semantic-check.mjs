@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.02.11
- * Last modified: 2026-06-02
+ * Version: 2026.06.03.1
+ * Last modified: 2026-06-03
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -12,6 +12,7 @@ import {
   dashboardLayoutKind,
   dashboardLinks,
   dashboardTimeSettings,
+  dashboardVariables,
   isV2Dashboard,
 } from "../helper/dashboard-schema.mjs";
 
@@ -21,6 +22,10 @@ const forbiddenTexts = [
   "No numeric fields found",
   "Bar charts require a string or time field",
   "Panel plugin not found",
+];
+const forbiddenRuntimeDefaults = [
+  "Solarman",
+  "globalhome.solarmanpv.com",
 ];
 
 const expectedTimes = {
@@ -527,6 +532,20 @@ function validateMetricGaugeTimeSeries(fileName, panel, failures) {
     assert(String(querySpec.expr || "").includes("running_sum("), failures, `${fileName}: Metric gauges ${refId} must use cumulative range data so the reduced value still represents the selected period`);
   }
 }
+function dashboardVariableName(variable) {
+  return variable?.spec ? String(variable.spec.name || "") : String(variable?.name || "");
+}
+
+function dashboardVariableValue(variable) {
+  return variable?.spec
+    ? String(variable.spec.current?.value ?? variable.spec.query ?? "")
+    : String(variable?.current?.value ?? variable?.query ?? "");
+}
+
+function isPortalDashboardLink(link) {
+  return String(link?.url || "") === "$inverterPortalUrl" || String(link?.title || "") === "$inverterPortalTitle";
+}
+
 function validateDashboard(fileName, dashboard) {
   const failures = [];
   const rawJson = JSON.stringify(dashboard);
@@ -534,6 +553,16 @@ function validateDashboard(fileName, dashboard) {
 
   for (const text of forbiddenTexts) {
     assert(!rawJson.includes(text), failures, `${fileName}: forbidden Grafana error text is present: ${text}`);
+  }
+  for (const text of forbiddenRuntimeDefaults) {
+    assert(!rawJson.includes(text), failures, `${fileName}: private or vendor-specific runtime default is present: ${text}`);
+  }
+  assert(!dashboardLinks(dashboard).some(isPortalDashboardLink), failures, `${fileName}: optional portal link must not be visible by default`);
+  for (const variable of dashboardVariables(dashboard)) {
+    const name = dashboardVariableName(variable);
+    if (["inverterPortalTitle", "inverterPortalUrl"].includes(name)) {
+      assert(dashboardVariableValue(variable) === "", failures, `${fileName}: ${name} must default to an empty value`);
+    }
   }
 
   const expectedTime = expectedTimes[fileName];
