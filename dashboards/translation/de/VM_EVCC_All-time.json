@@ -107,7 +107,7 @@
                         "expr": "sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh[1d]))[$__range:1d])) / 1000",
                         "format": "time_series",
                         "instant": true,
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Bezug",
                         "range": false
                       }
                     },
@@ -232,12 +232,12 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Bezug"
                     },
                     "properties": [
                       {
                         "id": "displayName",
-                        "value": "Netzbezug"
+                        "value": "Bezug"
                       },
                       {
                         "id": "color",
@@ -625,7 +625,7 @@
         "kind": "Panel",
         "spec": {
           "id": 15,
-          "title": "Monatlicher Netzbezug/Jahr",
+          "title": "Monatlicher Bezug/Jahr",
           "description": "",
           "links": [],
           "data": {
@@ -1935,8 +1935,8 @@
                 "overrides": [
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Autarkie"
+                      "id": "byFrameRefID",
+                      "options": "Autarky"
                     },
                     "properties": [
                       {
@@ -1983,8 +1983,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Eigenverbrauch"
+                      "id": "byFrameRefID",
+                      "options": "Self-consumption"
                     },
                     "properties": [
                       {
@@ -2302,7 +2302,7 @@
         "kind": "Panel",
         "spec": {
           "id": 27,
-          "title": "Jährlicher Netzbezug",
+          "title": "Jährlicher Bezug",
           "description": "",
           "links": [],
           "data": {
@@ -4664,7 +4664,7 @@
         "kind": "Panel",
         "spec": {
           "id": 51,
-          "title": "Batterieamortisation",
+          "title": "Speicheramortisation",
           "description": "Bei weniger als 365 Tagen Daten werden die Werte auf ein volles Jahr extrapoliert. Die Genauigkeit hängt dabei vom erfassten Zeitraum ab.",
           "links": [],
           "data": {
@@ -6223,10 +6223,10 @@
           ],
           "multi": false,
           "includeAll": false,
-          "label": "Batterieanschaffungskosten",
+          "label": "Speicheranschaffungskosten",
           "hide": "hideVariable",
           "skipUrlSync": false,
-          "description": "Batterieinvestitionskosten",
+          "description": "Speicherinvestitionskosten",
           "allowCustomValue": true
         }
       },
@@ -6273,7 +6273,7 @@
           ],
           "multi": false,
           "includeAll": false,
-          "label": "Batteriekapazität / Wh",
+          "label": "Speicherkapazität / Wh",
           "hide": "hideVariable",
           "skipUrlSync": false,
           "description": "Nutzbare Heimspeicherkapazität in Wh",

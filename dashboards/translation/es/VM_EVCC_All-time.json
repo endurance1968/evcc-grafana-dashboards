@@ -1935,8 +1935,8 @@
                 "overrides": [
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Autosuficiencia"
+                      "id": "byFrameRefID",
+                      "options": "Autarky"
                     },
                     "properties": [
                       {
@@ -1983,8 +1983,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Autoconsumo"
+                      "id": "byFrameRefID",
+                      "options": "Self-consumption"
                     },
                     "properties": [
                       {

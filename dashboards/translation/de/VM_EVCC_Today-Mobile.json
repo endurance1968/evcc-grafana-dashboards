@@ -919,7 +919,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Bezug"
             },
             "properties": [
               {
@@ -1016,7 +1016,7 @@
           "format": "time_series",
           "hide": false,
           "interval": "$energySampleInterval",
-          "legendFormat": "Netzbezug",
+          "legendFormat": "Bezug",
           "range": true,
           "refId": "gridPowerIn"
         },
@@ -1271,7 +1271,7 @@
           "refId": "prioritySoc"
         }
       ],
-      "title": "Batteriestände",
+      "title": "Speicherstände",
       "transformations": [
         {
           "id": "configFromData",
@@ -1519,8 +1519,8 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
-              "options": "Autarkie"
+              "id": "byFrameRefID",
+              "options": "Autarky"
             },
             "properties": [
               {
@@ -1567,8 +1567,8 @@
           },
           {
             "matcher": {
-              "id": "byName",
-              "options": "Eigenverbrauch"
+              "id": "byFrameRefID",
+              "options": "Self-consumption"
             },
             "properties": [
               {
@@ -2027,7 +2027,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Netzbezug"
+              "options": "Bezug"
             },
             "properties": [
               {
@@ -2163,7 +2163,7 @@
           "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
           "format": "time_series",
           "hide": false,
-          "legendFormat": "Netzbezug",
+          "legendFormat": "Bezug",
           "range": true,
           "refId": "gridEnergyIn"
         },

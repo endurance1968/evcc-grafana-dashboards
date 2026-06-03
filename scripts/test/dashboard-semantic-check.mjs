@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.15
+ * Version: 2026.06.03.18
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -552,7 +552,7 @@ function validateAutarkyGaugeThresholds(fileName, panel, failures) {
   if (panel.type !== "gauge") {
     return;
   }
-  const autarkyOverride = (panel.fieldConfig?.overrides || []).find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "Autarky");
+  const autarkyOverride = (panel.fieldConfig?.overrides || []).find((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === "Autarky");
   if (!autarkyOverride) {
     return;
   }
@@ -566,6 +566,7 @@ function validateAutarkyGaugeThresholds(fileName, panel, failures) {
     { color: "yellow", value: 0.5 },
     { color: "green", value: 0.75 },
   ]), failures, `${fileName}: gauge panel '${panel.title}' Autarky thresholds must be red <=25%, orange <=50%, yellow <=75%, green above`);
+  assert((panel.fieldConfig?.overrides || []).some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === "Self-consumption"), failures, `${fileName}: gauge panel '${panel.title}' Self-consumption override must match stable query refId`);
 }
 
 function validateMetricGaugeTimeSeries(fileName, panel, failures) {
@@ -863,7 +864,13 @@ function main() {
           allFailures.push(`${language}/${fileName}: dashboard file is missing from dashboards/translation`);
           continue;
         }
-        const dashboard = JSON.parse(fs.readFileSync(dashboardPath, "utf8"));
+        const rawDashboard = fs.readFileSync(dashboardPath, "utf8");
+        if (language === "de") {
+          assert(!rawDashboard.includes("Netzbezug"), allFailures, `${language}/${fileName}: use 'Bezug' for explicit grid import labels, not 'Netzbezug'`);
+          assert(!rawDashboard.includes("Grid import"), allFailures, `${language}/${fileName}: German dashboards must not expose the English grid import label`);
+          assert(!/"(title|label|legendFormat|value|description|displayName|text|content)"\s*:\s*"[^"]*Batterie/.test(rawDashboard), allFailures, `${language}/${fileName}: use 'Speicher' for visible storage labels, not 'Batterie'`);
+        }
+        const dashboard = JSON.parse(rawDashboard);
         validateGrafanaTabSlugs(`${language}/${fileName}`, dashboard.spec?.layout, allFailures);
       }
     }
@@ -884,3 +891,4 @@ try {
   console.error(error.message || error);
   process.exit(1);
 }
+

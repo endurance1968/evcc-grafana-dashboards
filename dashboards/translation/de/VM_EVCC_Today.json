@@ -792,7 +792,7 @@
         "kind": "Panel",
         "spec": {
           "id": 66,
-          "title": "Batteriestände",
+          "title": "Speicherstände",
           "description": "Schwarz: Prioritisierungsgrenze für Fahrzeugladung",
           "links": [],
           "data": {
@@ -1190,7 +1190,7 @@
                         "editorMode": "code",
                         "expr": "avg(batterySoc_value{id=\"\"})",
                         "format": "time_series",
-                        "legendFormat": "Batterie SOC",
+                        "legendFormat": "Speicher SOC",
                         "range": true
                       },
                       "datasource": {
@@ -1234,8 +1234,8 @@
                 "overrides": [
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Autarkie"
+                      "id": "byFrameRefID",
+                      "options": "Autarky"
                     },
                     "properties": [
                       {
@@ -1282,8 +1282,8 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
-                      "options": "Eigenverbrauch"
+                      "id": "byFrameRefID",
+                      "options": "Self-consumption"
                     },
                     "properties": [
                       {
@@ -1311,7 +1311,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Batterie SOC"
+                      "options": "Speicher SOC"
                     },
                     "properties": [
                       {
@@ -1358,7 +1358,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Batterie SOC"
+                        "value": "Speicher SOC"
                       }
                     ]
                   }
@@ -1755,7 +1755,7 @@
                         "editorMode": "code",
                         "expr": "sum without(host) (integrate(\n  ((gridPower_value > 0 <$peakPowerLimit) default 0) [$__range:$energySampleInterval]\n) / 3600000)",
                         "format": "time_series",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Bezug",
                         "range": true
                       },
                       "datasource": {
@@ -2025,7 +2025,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Bezug"
                     },
                     "properties": [
                       {
@@ -2166,7 +2166,7 @@
                         "expr": "clamp_min(avg(gridPower_value) < $peakPowerLimit,0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Bezug",
                         "range": true
                       },
                       "datasource": {
@@ -2420,7 +2420,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Bezug"
                     },
                     "properties": [
                       {

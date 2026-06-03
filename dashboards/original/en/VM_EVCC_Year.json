@@ -868,7 +868,7 @@
                 "overrides": [
                   {
                     "matcher": {
-                      "id": "byName",
+                      "id": "byFrameRefID",
                       "options": "Autarky"
                     },
                     "properties": [
@@ -916,7 +916,7 @@
                   },
                   {
                     "matcher": {
-                      "id": "byName",
+                      "id": "byFrameRefID",
                       "options": "Self-consumption"
                     },
                     "properties": [

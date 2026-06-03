@@ -370,7 +370,7 @@
         "kind": "Panel",
         "spec": {
           "id": 12,
-          "title": "Batteriestand",
+          "title": "Speicherstand",
           "description": "",
           "links": [],
           "data": {
@@ -516,7 +516,7 @@
         "kind": "Panel",
         "spec": {
           "id": 13,
-          "title": "Batterieleistung",
+          "title": "Speicherleistung",
           "description": "",
           "links": [],
           "data": {
@@ -2483,7 +2483,7 @@
                         "editorMode": "code",
                         "expr": "clamp_min(avg(gridPower_value offset -$tariffPriceInterval), 0)",
                         "format": "time_series",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Bezug",
                         "range": true
                       },
                       "datasource": {
@@ -2579,7 +2579,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Bezug"
                     },
                     "properties": [
                       {
@@ -3246,7 +3246,7 @@
                         "editorMode": "code",
                         "expr": "clamp_min(avg(gridPower_value), 0)",
                         "format": "time_series",
-                        "legendFormat": "Netzbezug",
+                        "legendFormat": "Bezug",
                         "range": true
                       },
                       "datasource": {
@@ -3342,7 +3342,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Netzbezug"
+                      "options": "Bezug"
                     },
                     "properties": [
                       {
