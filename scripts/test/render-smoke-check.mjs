@@ -1,8 +1,8 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.06.02.4
- * Last modified: 2026-06-02
+ * Version: 2026.06.03.1
+ * Last modified: 2026-06-03
  */
 import path from "node:path";
 import { chromium } from "playwright";
@@ -204,6 +204,10 @@ const criticalPanelsByFile = {
     {
       "id": 13,
       "title": "Battery power"
+    },
+    {
+      "id": 44,
+      "title": "Solar forecast status"
     },
     {
       "id": 35,

@@ -13,6 +13,8 @@ Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf Victoria
 
 ### Verbesserungen
 
+- Today-Details-PV-Tab zeigt im Forecast-Vergleich nun einen sichtbaren Solar-Forecast-Status. Ohne EVCC-`tariffSolar_value` erscheint ein klarer Hinweis statt eines still missverstaendlichen Forecast-Vergleichs.
+
 - Grafana-13-Gauge-Visualisierung aus Forgejo-Issue #7 umgesetzt und vom Hold-Status in den Dashboard-Pfad uebernommen:
   - `3cc765e` Today-Gauges-Dashboard ergaenzt
   - `d052a84` Today-Gauges-Layout vereinfacht

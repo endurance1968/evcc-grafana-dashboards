@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.06.02.1
- * Last modified: 2026-06-02
+ * Version: 2026.06.03.1
+ * Last modified: 2026-06-03
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -267,10 +267,11 @@ function dailyShape(base, day, index) {
 }
 
 function fixtureSeries(now, profile = "default") {
-  if (!["default", "no-aux-ext"].includes(profile)) {
-    throw new Error(`Unsupported fixture profile '${profile}'. Use default or no-aux-ext.`);
+  if (!["default", "no-aux-ext", "no-forecast"].includes(profile)) {
+    throw new Error(`Unsupported fixture profile '${profile}'. Use default, no-aux-ext, or no-forecast.`);
   }
   const includeAuxExt = profile !== "no-aux-ext";
+  const includeForecast = profile !== "no-forecast";
   const series = [];
   const days = uniqueDays(now);
   const dailyValues = [
@@ -340,7 +341,9 @@ function fixtureSeries(now, profile = "default") {
   addSeries(series, "batterySoc_value", { id: "", title: "Total" }, rawValues(76));
   addSeries(series, "batterySoc_value", { id: "bat1", title: "Battery" }, rawValues(80));
   addSeries(series, "chargePower_value", { loadpoint: "LP1" }, rawValues(-700));
-  addSeries(series, "tariffSolar_value", {}, rawValues(6500));
+  if (includeForecast) {
+    addSeries(series, "tariffSolar_value", {}, rawValues(6500));
+  }
   addSeries(series, "tariffGrid_value", {}, rawValues(0.3));
   addSeries(series, "tariffFeedIn_value", {}, rawValues(0.08));
   addSeries(series, "tariffCo2_value", {}, rawValues(320));
@@ -550,8 +553,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.06.02.1");
-    console.log("Last modified: 2026-06-02");
+    console.log("Version:       2026.06.03.1");
+    console.log("Last modified: 2026-06-03");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");

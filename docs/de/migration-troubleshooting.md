@@ -256,6 +256,7 @@ Interpretation:
 - Ergebnis vorhanden: Grafana-Datasource, Zeitbereich und Panel pruefen.
 - Kein Ergebnis: EVCC schreibt aktuell keinen Solar-Forecast. Konfiguriere den Forecast in EVCC oder akzeptiere, dass die Forecast-Panels leer bleiben.
 - Alte Historie ohne Forecast ist kein Importfehler, wenn EVCC damals keinen `tariffSolar_value` geschrieben hat.
+- Im Today-Details-PV-Tab zeigt das Panel `Solar-Forecast Status` sichtbar an, ob in den letzten 24 Stunden EVCC-Forecast-Samples angekommen sind. Die Forecast-Linie in Uebersichtspanels darf dagegen still fehlen.
 ## Leere Grafana-Dashboards
 
 `Today` leer bedeutet meist Rohdaten- oder Datasource-Probleme:

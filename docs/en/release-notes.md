@@ -11,6 +11,8 @@ These notes summarize the first public VictoriaMetrics-based EVCC dashboard rele
 
 ### Improvements
 
+- Today Details PV tab now shows a visible solar forecast status in forecast comparison areas. Without EVCC `tariffSolar_value`, users see a clear explanation instead of a silently incomplete forecast comparison.
+
 - Implemented the Grafana 13 gauge visualization tracked in Forgejo issue #7 and moved it from hold status into the dashboard path:
   - `3cc765e` add the Today Gauges dashboard
   - `d052a84` simplify the Today Gauges layout

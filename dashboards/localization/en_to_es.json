@@ -335,7 +335,11 @@
     "Grid now": "Red ahora",
     "Battery SOC": "SOC batería",
     "Charging now": "Carga ahora",
-    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "Los valores de previsión FV proceden de la configuración de previsión solar de EVCC y se guardan como tariffSolar_value. Si EVCC no tiene proveedor de previsión solar o no hay muestras recientes de tariffSolar_value, esta previsión queda vacía; el panel no consulta directamente Forecast.Solar, Solcast ni Open-Meteo."
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "Los valores de previsión FV proceden de la configuración de previsión solar de EVCC y se guardan como tariffSolar_value. Si EVCC no tiene proveedor de previsión solar o no hay muestras recientes de tariffSolar_value, esta previsión queda vacía; el panel no consulta directamente Forecast.Solar, Solcast ni Open-Meteo.",
+    "Checks whether EVCC has written tariffSolar_value samples in the last 24 hours. Forecast comparison panels can only compare forecast and actual PV when EVCC provides this metric.": "Comprueba si EVCC ha escrito muestras tariffSolar_value en las ultimas 24 horas. Los paneles de comparacion solo pueden comparar prevision y PV real cuando EVCC proporciona esta metrica.",
+    "Forecast data received": "Datos de prevision recibidos",
+    "Solar forecast status": "Estado de prevision solar",
+    "No EVCC forecast data": "Sin datos Forecast EVCC"
   },
   "Heat pump source mix": "Mezcla de fuentes de la bomba de calor",
   "Heat pump title match": "Coincidencia de título de bomba de calor",

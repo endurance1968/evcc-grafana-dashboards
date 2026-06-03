@@ -216,7 +216,7 @@
             "steps": [
               {
                 "color": "orange",
-                "value": 0
+                "value": -11
               },
               {
                 "color": "transparent",
@@ -224,11 +224,14 @@
               },
               {
                 "color": "#7a7a7a4d",
-                "value": 122.12212203
+                "value": 0.001
               }
             ]
           },
-          "unit": "kW"
+          "unit": "kW",
+          "custom": {
+            "neutral": 0
+          }
         },
         "overrides": [
           {
@@ -249,7 +252,7 @@
               },
               {
                 "id": "min",
-                "value": -11
+                "value": 0
               },
               {
                 "id": "max",
@@ -390,11 +393,15 @@
                   "steps": [
                     {
                       "color": "purple",
+                      "value": -6
+                    },
+                    {
+                      "color": "transparent",
                       "value": 0
                     },
                     {
                       "color": "#7a7a7a4d",
-                      "value": 0
+                      "value": 0.001
                     }
                   ]
                 }
@@ -598,11 +605,15 @@
                   "steps": [
                     {
                       "color": "purple",
+                      "value": -6
+                    },
+                    {
+                      "color": "transparent",
                       "value": 0
                     },
                     {
                       "color": "#7a7a7a4d",
-                      "value": 0
+                      "value": 0.001
                     }
                   ]
                 }

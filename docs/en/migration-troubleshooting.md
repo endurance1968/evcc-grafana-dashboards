@@ -254,6 +254,7 @@ Interpretation:
 - Result exists: check Grafana datasource, time range, and panel settings.
 - No result: EVCC is not currently writing a solar forecast. Configure the forecast in EVCC or accept that forecast panels stay empty.
 - Old history without forecast is not an import error if EVCC did not write `tariffSolar_value` at that time.
+- In the Today Details PV tab, the `Solar forecast status` panel visibly shows whether EVCC forecast samples arrived in the last 24 hours. The forecast line in overview panels may still be absent silently.
 ## Empty Grafana Dashboards
 
 `Today` empty usually means raw data or datasource problems:

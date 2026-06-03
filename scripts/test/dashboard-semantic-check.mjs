@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.2
+ * Version: 2026.06.03.9
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -361,6 +361,44 @@ function hasInfluxShape(target) {
 function findPanelByRule(panels, rule) {
   return panels.find((panel) => panel.id === rule.id && panel.title === rule.title && panel.type === rule.type);
 }
+function dashboardGridPositionsById(dashboard) {
+  const out = new Map();
+  if (isV2Dashboard(dashboard)) {
+    const collectItems = (layout) => {
+      if (!layout || typeof layout !== "object") return;
+      if (layout.kind === "GridLayout") {
+        for (const item of layout.spec?.items || []) {
+          const spec = item?.spec || {};
+          const name = spec.element?.name || "";
+          const match = /^panel-(\d+)$/.exec(name);
+          if (match) {
+            out.set(Number(match[1]), {
+              x: spec.x || 0,
+              y: spec.y || 0,
+              w: spec.width || 0,
+              h: spec.height || 0,
+            });
+          }
+        }
+        return;
+      }
+      if (layout.kind === "TabsLayout") {
+        for (const tab of layout.spec?.tabs || []) collectItems(tab?.spec?.layout);
+        return;
+      }
+      if (layout.kind === "RowsLayout") {
+        for (const row of layout.spec?.rows || []) collectItems(row?.spec?.layout);
+      }
+    };
+    collectItems(dashboard.spec?.layout);
+    return out;
+  }
+
+  for (const panel of dashboard.panels || []) {
+    if (panel?.id && panel.gridPos) out.set(panel.id, panel.gridPos);
+  }
+  return out;
+}
 
 function propertyValue(panel, matcherOption, propertyId) {
   for (const override of panel.fieldConfig?.overrides || []) {
@@ -511,12 +549,13 @@ function validateTodayPaletteFallbacks(fileName, dashboard, failures) {
     return;
   }
 
+  const panels = collectDashboardPanels(dashboard);
   const dynamicColorPanels = [
-    { label: "Power", panel: dashboard.panels?.find((panel) => panel.id === 74) },
-    { label: "Power history", panel: dashboard.panels?.find((panel) => panel.id === 2) },
-    { label: "Battery levels", panel: dashboard.panels?.find((panel) => panel.id === 66) },
-    { label: "Energy", panel: dashboard.panels?.find((panel) => panel.title === "Energy") },
-    { label: "Power distribution", panel: dashboard.panels?.find((panel) => panel.id === 75) },
+    { label: "Power", panel: panels.find((panel) => panel.id === 74) },
+    { label: "Power history", panel: panels.find((panel) => panel.id === 2) },
+    { label: "Battery levels", panel: panels.find((panel) => panel.id === 66) },
+    { label: "Energy", panel: panels.find((panel) => panel.title === "Energy") },
+    { label: "Power distribution", panel: panels.find((panel) => panel.id === 75) },
   ];
 
   for (const item of dynamicColorPanels) {
@@ -588,9 +627,15 @@ function validateDashboard(fileName, dashboard) {
     assert(timeSettings?.to === expectedTime.to, failures, `${fileName}: expected time.to=${expectedTime.to}, got ${timeSettings?.to}`);
   }
 
-  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_Today-Details.json"].includes(fileName)) {
+  if (["VM_EVCC_All-time.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_Today-Details.json", "VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json"].includes(fileName)) {
     assert(isV2Dashboard(dashboard), failures, `${fileName}: expected a Grafana v2 dashboard resource`);
-    assert(dashboardLayoutKind(dashboard) === "TabsLayout", failures, `${fileName}: expected layout.kind=TabsLayout, got ${dashboardLayoutKind(dashboard)}`);
+    const expectedLayout = ["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json"].includes(fileName) ? "GridLayout" : "TabsLayout";
+    assert(dashboardLayoutKind(dashboard) === expectedLayout, failures, `${fileName}: expected layout.kind=${expectedLayout}, got ${dashboardLayoutKind(dashboard)}`);
+    for (const [elementName, element] of Object.entries(dashboard.spec?.elements || {})) {
+      if (element?.kind === "Panel") {
+        assert(Array.isArray(element.spec?.data?.spec?.transformations), failures, `${fileName}: ${elementName} must set data.spec.transformations to an array for Grafana 13 v2 deserialization`);
+      }
+    }
   }
 
   validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
@@ -632,6 +677,16 @@ function validateDashboard(fileName, dashboard) {
     const pvStacking = pvPowerPanel?.vizConfig?.spec?.fieldConfig?.defaults?.custom?.stacking;
     assert(pvStacking?.mode === "normal", failures, `${fileName}: PV power panel must stack PV strings additively`);
 
+    const forecastStatusPanel = panels.find((panel) => panel.id === 44 && panel.title === "Solar forecast status" && panel.type === "stat");
+    assert(Boolean(forecastStatusPanel), failures, `${fileName}: missing PV tab Solar forecast status panel`);
+    if (forecastStatusPanel) {
+      const statusExpr = forecastStatusPanel.targets?.[0]?.expr || "";
+      const statusMappings = forecastStatusPanel.fieldConfig?.defaults?.mappings || [];
+      assert(statusExpr.includes("present_over_time(tariffSolar_value[24h])") && statusExpr.includes("or vector(0)"), failures, `${fileName}: Solar forecast status panel must degrade missing tariffSolar_value to a visible zero state`);
+      assert(JSON.stringify(statusMappings).includes("No EVCC forecast data"), failures, `${fileName}: Solar forecast status panel must explain missing EVCC forecast data visibly`);
+      assert(JSON.stringify(statusMappings).includes("Forecast data received"), failures, `${fileName}: Solar forecast status panel must show the OK state when tariffSolar_value exists`);
+    }
+
     const forecastPanel = panels.find((panel) => panel.id === 16 && panel.title === "Forecast" && panel.type === "timeseries");
     assert(Boolean(forecastPanel), failures, `${fileName}: missing PV tab timeseries Forecast panel`);
     if (forecastPanel) {
@@ -643,10 +698,10 @@ function validateDashboard(fileName, dashboard) {
   if (["VM_EVCC_Today.json", "VM_EVCC_Today-Gauges.json", "VM_EVCC_Today-Mobile.json"].includes(fileName)) {
     assert(!rawJson.includes('"libraryPanel"'), failures, `${fileName}: deployed dashboards must not use Grafana library panels`);
     assert(!Object.hasOwn(dashboard, "__elements"), failures, `${fileName}: deployed dashboards must not embed Grafana library panel elements`);
-    const powerHistoryPanel = dashboard.panels?.find((panel) => panel.id === 2);
+    const powerHistoryPanel = panels.find((panel) => panel.id === 2);
     const powerHistoryTargets = powerHistoryPanel?.targets || [];
     assert(powerHistoryTargets.some((target) => target.refId === "pvForecast" && String(target.expr || "").includes("tariffSolar_value")), failures, `${fileName}: Power history panel must include PV forecast target`);
-    assert(String(powerHistoryPanel?.description || "").includes("EVCC") && String(powerHistoryPanel?.description || "").includes("tariffSolar_value") && String(powerHistoryPanel?.description || "").includes("does not fetch"), failures, `${fileName}: Power history panel must explain EVCC tariffSolar_value source and optional no-data behavior`);
+    assert(hasEvccForecastDescription(powerHistoryPanel), failures, `${fileName}: Power history panel must explain EVCC tariffSolar_value source and optional no-data behavior`);
     const powerHistoryOverrides = powerHistoryPanel?.fieldConfig?.overrides || [];
     const forecastOverride = powerHistoryOverrides.find((override) => override?.matcher?.id === "byName" && override?.matcher?.options === "PV forecast");
     const forecastProperties = new Map((forecastOverride?.properties || []).map((property) => [property.id, property.value]));
@@ -658,7 +713,34 @@ function validateDashboard(fileName, dashboard) {
       validateGrafana13GaugeOptions(fileName, panel, failures);
     }
 
-    const powerPanel = dashboard.panels?.find((panel) => panel.id === 74);
+    const powerPanel = panels.find((panel) => panel.id === 74);
+    assert(Boolean(powerPanel), failures, `${fileName}: missing Power gauge panel`);
+    if (powerPanel) {
+      const powerDefaults = powerPanel.fieldConfig?.defaults || {};
+      assert(powerDefaults.min === -11 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a signed -11..11 kW scale for dynamic consumer/loadpoint series`);
+      const defaultThresholds = powerDefaults.thresholds?.steps || [];
+      assert(defaultThresholds.some((step) => step.color === "orange" && step.value === -11), failures, `${fileName}: Power gauge dynamic consumers must color negative consumption as orange`);
+      const loadpointTarget = (powerPanel.targets || []).find((target) => target.refId === "loadpointPowers");
+      assert(Boolean(loadpointTarget), failures, `${fileName}: Power gauge must include loadpointPowers target`);
+      if (loadpointTarget) {
+        const expr = String(loadpointTarget.expr || "");
+        assert(expr.includes("chargePower_value / -1000"), failures, `${fileName}: Power gauge loadpoints must render as negative consumer power like the adjacent Power history graph`);
+        assert(!expr.includes("chargePower_value / 1000"), failures, `${fileName}: Power gauge loadpoints must not render as positive producer power`);
+      }
+      const pvMin = propertyValue(powerPanel, "PV", "min");
+      const pvMax = propertyValue(powerPanel, "PV", "max");
+      assert(pvMin === 0 && pvMax === 11, failures, `${fileName}: Power gauge PV must use a unidirectional 0..11 kW scale`);
+      const expectedSignedGaugeRanges = new Map([
+        ["Grid", [-12, 12]],
+        ["Battery", [-5, 5]],
+        ["Home", [-6, 6]],
+      ]);
+      const homeThresholds = propertyValue(powerPanel, "Home", "thresholds")?.steps || [];
+      assert(homeThresholds.some((step) => step.color === "purple" && step.value === -6), failures, `${fileName}: Power gauge Home must color negative consumption as purple`);
+      for (const [seriesName, [min, max]] of expectedSignedGaugeRanges) {
+        assert(propertyValue(powerPanel, seriesName, "min") === min && propertyValue(powerPanel, seriesName, "max") === max, failures, `${fileName}: Power gauge ${seriesName} must keep signed ${min}..${max} kW scale`);
+      }
+    }
     const expectedDetailTabs = new Map([
       ["PV", "dtab=pv"],
       ["Grid", "dtab=grid"],
@@ -672,14 +754,14 @@ function validateDashboard(fileName, dashboard) {
   }
 
   if (fileName === "VM_EVCC_Today-Gauges.json") {
-    const byId = new Map((dashboard.panels || []).map((panel) => [panel.id, panel]));
-    const bottom = (panel) => (panel?.gridPos?.y || 0) + (panel?.gridPos?.h || 0);
-    assert(byId.get(74)?.gridPos?.h === 27, failures, `${fileName}: Power gauge column must align to bottom row height 27`);
-    assert(byId.get(2)?.gridPos?.h === 24, failures, `${fileName}: Power history panel must leave room for bottom distribution strip`);
-    assert(byId.get(76)?.gridPos?.h === 4, failures, `${fileName}: Metric history panel must be four grid rows high`);
-    assert(byId.get(77)?.gridPos?.y === 16, failures, `${fileName}: Energy panel must start below enlarged Metric history panel`);
-    assert(byId.get(75)?.gridPos?.y === 24, failures, `${fileName}: Power distribution panel must align with right column lower section`);
-    assert(byId.get(73)?.gridPos?.y === 25, failures, `${fileName}: Costs panel must align below Energy panel`);
+    const byId = dashboardGridPositionsById(dashboard);
+    const bottom = (gridPos) => (gridPos?.y || 0) + (gridPos?.h || 0);
+    assert(byId.get(74)?.h === 27, failures, `${fileName}: Power gauge column must align to bottom row height 27`);
+    assert(byId.get(2)?.h === 24, failures, `${fileName}: Power history panel must leave room for bottom distribution strip`);
+    assert(byId.get(76)?.h === 4, failures, `${fileName}: Metric history panel must be four grid rows high`);
+    assert(byId.get(77)?.y === 16, failures, `${fileName}: Energy panel must start below enlarged Metric history panel`);
+    assert(byId.get(75)?.y === 24, failures, `${fileName}: Power distribution panel must align with right column lower section`);
+    assert(byId.get(73)?.y === 25, failures, `${fileName}: Costs panel must align below Energy panel`);
     assert(bottom(byId.get(74)) === 27 && bottom(byId.get(75)) === 27 && bottom(byId.get(73)) === 27, failures, `${fileName}: left, middle, and right columns must share the same bottom edge`);
   }
 

@@ -335,7 +335,11 @@
     "Grid now": "Netz aktuell",
     "Battery SOC": "Batterie SOC",
     "Charging now": "Laden aktuell",
-    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "PV-Prognosewerte kommen aus der EVCC-Solarprognose-Konfiguration und werden als tariffSolar_value gespeichert. Wenn EVCC keinen Solar-Forecast-Provider oder keine aktuellen tariffSolar_value-Samples hat, bleibt diese Prognose leer; das Dashboard ruft Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab."
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "PV-Prognosewerte kommen aus der EVCC-Solarprognose-Konfiguration und werden als tariffSolar_value gespeichert. Wenn EVCC keinen Solar-Forecast-Provider oder keine aktuellen tariffSolar_value-Samples hat, bleibt diese Prognose leer; das Dashboard ruft Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab.",
+    "Checks whether EVCC has written tariffSolar_value samples in the last 24 hours. Forecast comparison panels can only compare forecast and actual PV when EVCC provides this metric.": "Prueft, ob EVCC in den letzten 24 Stunden tariffSolar_value-Samples geschrieben hat. Forecast-Vergleichspanels koennen Prognose und tatsaechliche PV nur vergleichen, wenn EVCC diese Metrik liefert.",
+    "Forecast data received": "Forecast-Daten empfangen",
+    "Solar forecast status": "Solar-Forecast Status",
+    "No EVCC forecast data": "Keine EVCC Forecast Daten"
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

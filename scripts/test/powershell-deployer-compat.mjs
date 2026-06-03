@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.02.1
- * Last modified: 2026-06-02
+ * Version: 2026.06.03.1
+ * Last modified: 2026-06-03
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -12,8 +12,8 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.06.02.1";
-const lastModified = "2026-06-02";
+const version = "2026.06.03.1";
+const lastModified = "2026-06-03";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
 const defaultDashboardFiles = resolveDashboardFiles(manifest);
@@ -137,6 +137,21 @@ function buildHarness(functionSources) {
     "  if (-not ($Value -is [System.Array])) { throw \"$Name is $($Value.GetType().FullName), expected array\" }",
     "  if ($ExpectedCount -ge 0 -and @($Value).Count -ne $ExpectedCount) { throw \"$Name count $(@($Value).Count), expected $ExpectedCount\" }",
     "}",
+    "function Convert-V2PanelToClassicShape([object]$Panel) {",
+    "  $queries = @($Panel.spec.data.spec.queries | ForEach-Object {",
+    "    [pscustomobject]@{",
+    "      refId = $_.spec.refId",
+    "      expr = $_.spec.query.spec.expr",
+    "      datasource = [pscustomobject]@{ uid = $_.spec.query.datasource.name }",
+    "    }",
+    "  })",
+    "  return [pscustomobject]@{",
+    "    title = $Panel.spec.title",
+    "    targets = $queries",
+    "    fieldConfig = $Panel.spec.vizConfig.spec.fieldConfig",
+    "    options = $Panel.spec.vizConfig.spec.options",
+    "  }",
+    "}",
     "function Find-PanelByTitle([object]$Node, [string]$Title) {",
     "  if ($null -eq $Node) { return $null }",
     "  if ($Node -is [System.Array]) {",
@@ -144,6 +159,7 @@ function buildHarness(functionSources) {
     "    return $null",
     "  }",
     "  if ($Node -is [pscustomobject]) {",
+    "    if ($Node.PSObject.Properties['kind'] -and $Node.kind -eq 'Panel' -and $Node.spec.title -eq $Title) { return Convert-V2PanelToClassicShape $Node }",
     "    if ($Node.PSObject.Properties['title'] -and $Node.title -eq $Title -and $Node.PSObject.Properties['targets']) { return $Node }",
     "    foreach ($prop in $Node.PSObject.Properties) { $found = Find-PanelByTitle $prop.Value $Title; if ($null -ne $found) { return $found } }",
     "  }",

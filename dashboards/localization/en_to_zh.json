@@ -335,7 +335,11 @@
     "Grid now": "当前电网",
     "Battery SOC": "电池 SOC",
     "Charging now": "当前充电",
-    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "PV 预测值来自 EVCC 的太阳能预测配置，并保存为 tariffSolar_value。如果 EVCC 没有太阳能预测提供程序，或没有最新的 tariffSolar_value 样本，此预测会保持为空；仪表板不会直接调用 Forecast.Solar、Solcast 或 Open-Meteo。"
+    "PV forecast values come from EVCC solar forecast configuration and are stored as tariffSolar_value. If EVCC has no solar forecast provider or no recent tariffSolar_value samples, this forecast remains empty; the dashboard does not fetch Forecast.Solar, Solcast, or Open-Meteo directly.": "PV 预测值来自 EVCC 的太阳能预测配置，并保存为 tariffSolar_value。如果 EVCC 没有太阳能预测提供程序，或没有最新的 tariffSolar_value 样本，此预测会保持为空；仪表板不会直接调用 Forecast.Solar、Solcast 或 Open-Meteo。",
+    "Checks whether EVCC has written tariffSolar_value samples in the last 24 hours. Forecast comparison panels can only compare forecast and actual PV when EVCC provides this metric.": "检查 EVCC 在过去 24 小时内是否写入 tariffSolar_value 样本。只有 EVCC 提供此指标时，预测对比面板才能比较预测值和实际 PV。",
+    "Forecast data received": "已收到预测数据",
+    "Solar forecast status": "太阳能预测状态",
+    "No EVCC forecast data": "无 EVCC 预测数据"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",
