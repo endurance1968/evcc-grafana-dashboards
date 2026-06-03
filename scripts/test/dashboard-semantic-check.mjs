@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.9
+ * Version: 2026.06.03.10
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -717,28 +717,35 @@ function validateDashboard(fileName, dashboard) {
     assert(Boolean(powerPanel), failures, `${fileName}: missing Power gauge panel`);
     if (powerPanel) {
       const powerDefaults = powerPanel.fieldConfig?.defaults || {};
-      assert(powerDefaults.min === -11 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a signed -11..11 kW scale for dynamic consumer/loadpoint series`);
+      assert(powerDefaults.min === 0 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a positive 0..11 kW scale for dynamic loadpoint series`);
       const defaultThresholds = powerDefaults.thresholds?.steps || [];
-      assert(defaultThresholds.some((step) => step.color === "orange" && step.value === -11), failures, `${fileName}: Power gauge dynamic consumers must color negative consumption as orange`);
+      assert(defaultThresholds.length >= 4 && defaultThresholds.some((step) => step.color === "red" && step.value === 10), failures, `${fileName}: Power gauge dynamic loadpoints must use multiple positive absolute threshold steps`);
       const loadpointTarget = (powerPanel.targets || []).find((target) => target.refId === "loadpointPowers");
       assert(Boolean(loadpointTarget), failures, `${fileName}: Power gauge must include loadpointPowers target`);
       if (loadpointTarget) {
         const expr = String(loadpointTarget.expr || "");
-        assert(expr.includes("chargePower_value / -1000"), failures, `${fileName}: Power gauge loadpoints must render as negative consumer power like the adjacent Power history graph`);
-        assert(!expr.includes("chargePower_value / 1000"), failures, `${fileName}: Power gauge loadpoints must not render as positive producer power`);
+        assert(expr.includes("chargePower_value / 1000"), failures, `${fileName}: Power gauge loadpoints must render as positive charging power`);
+        assert(!expr.includes("chargePower_value / -1000"), failures, `${fileName}: Power gauge loadpoints must not render as signed negative consumer power`);
       }
+      const homeTarget = (powerPanel.targets || []).find((target) => target.refId === "homePower");
+      assert(/homePower_value\)?\s*\/\s*1000/.test(String(homeTarget?.expr || "")), failures, `${fileName}: Power gauge Home must render as positive house consumption`);
+      assert(dashboardVariables(dashboard).some((variable) => dashboardVariableName(variable) === "installedWattPeak"), failures, `${fileName}: Power gauge PV max requires installedWattPeak dashboard variable`);
       const pvMin = propertyValue(powerPanel, "PV", "min");
       const pvMax = propertyValue(powerPanel, "PV", "max");
-      assert(pvMin === 0 && pvMax === 11, failures, `${fileName}: Power gauge PV must use a unidirectional 0..11 kW scale`);
-      const expectedSignedGaugeRanges = new Map([
-        ["Grid", [-12, 12]],
-        ["Battery", [-5, 5]],
-        ["Home", [-6, 6]],
-      ]);
+      assert(pvMin === 0 && pvMax === "$installedWattPeak", failures, `${fileName}: Power gauge PV must use a 0..installedWattPeak kW scale`);
+      const pvThresholds = propertyValue(powerPanel, "PV", "thresholds");
+      assert(pvThresholds?.mode === "percentage" && (pvThresholds.steps || []).length >= 3, failures, `${fileName}: Power gauge PV must use percentage thresholds relative to installedWattPeak`);
+      assert(propertyValue(powerPanel, "Home", "min") === 0 && propertyValue(powerPanel, "Home", "max") === 11, failures, `${fileName}: Power gauge Home must use a positive 0..11 kW scale`);
       const homeThresholds = propertyValue(powerPanel, "Home", "thresholds")?.steps || [];
-      assert(homeThresholds.some((step) => step.color === "purple" && step.value === -6), failures, `${fileName}: Power gauge Home must color negative consumption as purple`);
+      assert(homeThresholds.length >= 4 && homeThresholds.some((step) => step.color === "red" && step.value === 10), failures, `${fileName}: Power gauge Home must use multiple positive absolute threshold steps`);
+      const expectedSignedGaugeRanges = new Map([
+        ["Grid", [-11, 11]],
+        ["Battery", [-11, 11]],
+      ]);
       for (const [seriesName, [min, max]] of expectedSignedGaugeRanges) {
         assert(propertyValue(powerPanel, seriesName, "min") === min && propertyValue(powerPanel, seriesName, "max") === max, failures, `${fileName}: Power gauge ${seriesName} must keep signed ${min}..${max} kW scale`);
+        const thresholds = propertyValue(powerPanel, seriesName, "thresholds")?.steps || [];
+        assert(thresholds.length >= 4 && thresholds.some((step) => step.value < 0) && thresholds.some((step) => step.value > 0), failures, `${fileName}: Power gauge ${seriesName} must use multiple signed threshold steps around zero`);
       }
     }
     const expectedDetailTabs = new Map([
