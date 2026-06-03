@@ -486,7 +486,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#14B8A6"
+                          "fixedColor": "#F8E7A1"
                         }
                       }
                     ]
@@ -813,7 +813,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#14B8A6"
+                          "fixedColor": "#F8E7A1"
                         }
                       }
                     ]

@@ -1,7 +1,7 @@
 /**
  * Script: apply-dashboard-colors.mjs
  * Purpose: Apply the central semantic color palette to original EVCC VM dashboards.
- * Version: 2026.06.03.8
+ * Version: 2026.06.03.9
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -50,26 +50,32 @@ const regexpColorRules = [
 const gaugeThresholdsByMatcher = new Map([
   ["PV", thresholds("percentage", [
     { color: dashboardColors.neutral, value: 0 },
-    { color: dashboardColors.pv, value: 1 },
-    { color: dashboardColors.pvDark, value: 75 },
+    { color: dashboardColors.pvLow, value: 1 },
+    { color: dashboardColors.pv, value: 50 },
+    { color: dashboardColors.pvDark, value: 80 },
   ])],
   ["gridPower", thresholds("absolute", [
-    { color: dashboardColors.feedIn, value: -11 },
+    { color: dashboardColors.gridFeedLow, value: -11 },
+    { color: dashboardColors.gridImport, value: -1 },
     { color: dashboardColors.neutral, value: -0.001 },
     { color: dashboardColors.gridImport, value: 0.001 },
-    { color: dashboardColors.danger, value: 8 },
+    { color: dashboardColors.gridImportHigh, value: 1 },
+    { color: dashboardColors.gridImportDanger, value: 8 },
   ])],
   ["batteryPower", thresholds("absolute", [
-    { color: dashboardColors.storageCharge, value: -11 },
+    { color: dashboardColors.storageChargeLow, value: -11 },
+    { color: dashboardColors.storageCharge, value: -1 },
     { color: dashboardColors.neutral, value: -0.001 },
     { color: dashboardColors.storageDischarge, value: 0.001 },
-    { color: dashboardColors.storageDark, value: 8 },
+    { color: dashboardColors.storageDark, value: 1 },
+    { color: dashboardColors.storageDanger, value: 8 },
   ])],
   ["homePower", thresholds("absolute", [
     { color: dashboardColors.neutral, value: 0 },
-    { color: dashboardColors.home, value: 0.001 },
-    { color: dashboardColors.warning, value: 7 },
-    { color: dashboardColors.danger, value: 10 },
+    { color: dashboardColors.homeLight, value: 0.001 },
+    { color: dashboardColors.home, value: 5 },
+    { color: dashboardColors.homeHigh, value: 8 },
+    { color: dashboardColors.homeDanger, value: 10 },
   ])],
   ["Self-consumption", thresholds("absolute", [
     { color: dashboardColors.selfConsumption, value: null },
@@ -78,9 +84,10 @@ const gaugeThresholdsByMatcher = new Map([
 
 const loadpointDefaults = thresholds("absolute", [
   { color: dashboardColors.neutral, value: 0 },
-  { color: dashboardColors.loadpoint, value: 0.001 },
-  { color: dashboardColors.loadpointHigh, value: 7 },
-  { color: dashboardColors.danger, value: 10 },
+  { color: dashboardColors.loadpointLight, value: 0.001 },
+  { color: dashboardColors.loadpoint, value: 5 },
+  { color: dashboardColors.loadpointHigh, value: 8 },
+  { color: dashboardColors.loadpointDanger, value: 10 },
 ]);
 
 function readJson(filePath) {

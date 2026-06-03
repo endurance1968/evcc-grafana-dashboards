@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.23
+ * Version: 2026.06.03.24
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -442,17 +442,19 @@ function validateSemanticColors(fileName, panel, failures) {
     assertFixedColor(fileName, panel, matcherOption, color, failures);
   }
 
-  assertThresholdContains(fileName, panel, "PV", [dashboardColors.pv, dashboardColors.pvDark], failures);
-  assertThresholdContains(fileName, panel, "gridPower", [dashboardColors.feedIn, dashboardColors.gridImport], failures);
-  assertThresholdContains(fileName, panel, "batteryPower", [dashboardColors.storageCharge, dashboardColors.storageDischarge, dashboardColors.storageDark], failures);
-  assertThresholdContains(fileName, panel, "homePower", [dashboardColors.home], failures);
+  assertThresholdContains(fileName, panel, "PV", [dashboardColors.pvLow, dashboardColors.pv, dashboardColors.pvDark], failures);
+  assertThresholdContains(fileName, panel, "gridPower", [dashboardColors.gridFeedLow, dashboardColors.gridImport, dashboardColors.gridImportHigh, dashboardColors.gridImportDanger], failures);
+  assertThresholdContains(fileName, panel, "batteryPower", [dashboardColors.storageChargeLow, dashboardColors.storageCharge, dashboardColors.storageDischarge, dashboardColors.storageDark, dashboardColors.storageDanger], failures);
+  assertThresholdContains(fileName, panel, "homePower", [dashboardColors.homeLight, dashboardColors.home, dashboardColors.homeHigh, dashboardColors.homeDanger], failures);
   assertThresholdContains(fileName, panel, "Self-consumption", [dashboardColors.selfConsumption], failures);
 
   if (panel.id === 74 && panel.title === "Power") {
     assert(panel.fieldConfig?.defaults?.color?.mode === "thresholds", failures, `${fileName}: Power gauge defaults must use threshold color mode`);
     const defaultThresholds = panel.fieldConfig?.defaults?.thresholds?.steps || [];
+    assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpointLight), failures, `${fileName}: Power gauge dynamic loadpoints must use light-loadpoint orange threshold color`);
     assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpoint), failures, `${fileName}: Power gauge dynamic loadpoints must use loadpoint orange threshold color`);
     assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpointHigh), failures, `${fileName}: Power gauge dynamic loadpoints must use high-loadpoint orange threshold color`);
+    assert(defaultThresholds.some((step) => step.color === dashboardColors.loadpointDanger), failures, `${fileName}: Power gauge dynamic loadpoints must use danger-loadpoint orange threshold color`);
   }
 }
 function hasMonthLabels(panel) {
@@ -809,7 +811,7 @@ function validateDashboard(fileName, dashboard) {
       assert(powerDefaults.min === 0 && powerDefaults.max === 11, failures, `${fileName}: Power gauge defaults must use a positive 0..11 kW scale for dynamic loadpoint series`);
       assert(powerDefaults.color?.mode === "thresholds", failures, `${fileName}: Power gauge defaults must use threshold color mode for dynamic loadpoint series`);
       const defaultThresholds = powerDefaults.thresholds?.steps || [];
-      assert(defaultThresholds.length >= 4 && defaultThresholds.some((step) => step.color === dashboardColors.danger && step.value === 10), failures, `${fileName}: Power gauge dynamic loadpoints must use multiple positive absolute threshold steps`);
+      assert(defaultThresholds.length >= 5 && defaultThresholds.some((step) => step.color === dashboardColors.loadpointDanger && step.value === 10), failures, `${fileName}: Power gauge dynamic loadpoints must use multiple positive absolute threshold steps in the loadpoint color family`);
       const powerGaugeTargetOrder = (powerPanel.targets || []).map((target) => target.refId);
       assert(powerGaugeTargetOrder.slice(0, 5).join(",") === "gridPower,batteryPower,PV,homePower,loadpointPowers", failures, `${fileName}: Power gauge order must be Grid, Battery, PV, Home, then dynamic loadpoints`);
       const loadpointTarget = (powerPanel.targets || []).find((target) => target.refId === "loadpointPowers");
@@ -838,7 +840,7 @@ function validateDashboard(fileName, dashboard) {
       assert(pvThresholds?.mode === "percentage" && (pvThresholds.steps || []).length >= 3, failures, `${fileName}: Power gauge PV must use percentage thresholds relative to its numeric max`);
       assert(propertyValue(powerPanel, "homePower", "min") === 0 && propertyValue(powerPanel, "homePower", "max") === 11, failures, `${fileName}: Power gauge Home must use a positive 0..11 kW scale`);
       const homeThresholds = propertyValue(powerPanel, "homePower", "thresholds")?.steps || [];
-      assert(homeThresholds.length >= 4 && homeThresholds.some((step) => step.color === dashboardColors.danger && step.value === 10), failures, `${fileName}: Power gauge Home must use multiple positive absolute threshold steps`);
+      assert(homeThresholds.length >= 5 && homeThresholds.some((step) => step.color === dashboardColors.homeDanger && step.value === 10), failures, `${fileName}: Power gauge Home must use multiple positive absolute threshold steps in the home color family`);
       const expectedSignedGaugeRanges = new Map([
         ["gridPower", [-11, 11]],
         ["batteryPower", [-11, 11]],

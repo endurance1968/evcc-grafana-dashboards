@@ -1,7 +1,7 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.03.5
+ * Version: 2026.06.03.6
  * Last modified: 2026-06-03
  */
 import fs from "node:fs";
@@ -12,7 +12,7 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.06.03.5";
+const version = "2026.06.03.6";
 const lastModified = "2026-06-03";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
@@ -170,7 +170,7 @@ function buildHarness(functionSources) {
     "if ($null -eq $power) { throw 'Power panel not found' }",
     "Assert-Array $power.targets 'power.targets' 5",
     "Assert-Array $power.fieldConfig.defaults.mappings 'power.fieldConfig.defaults.mappings' 0",
-    "Assert-Array $power.fieldConfig.defaults.thresholds.steps 'power.fieldConfig.defaults.thresholds.steps' 4",
+    "Assert-Array $power.fieldConfig.defaults.thresholds.steps 'power.fieldConfig.defaults.thresholds.steps' 5",
     "Assert-Array $power.options.reduceOptions.calcs 'power.options.reduceOptions.calcs' 1",
     "if ($power.targets[0].datasource.uid -ne 'vm-evcc') { throw \"power.targets[0].datasource.uid is $($power.targets[0].datasource.uid), expected vm-evcc\" }",
     "",

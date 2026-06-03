@@ -191,15 +191,19 @@
                         "value": 0
                       },
                       {
-                        "color": "#FF9830",
+                        "color": "#FFC078",
                         "value": 0.001
                       },
                       {
-                        "color": "#E66A00",
-                        "value": 7
+                        "color": "#FF9830",
+                        "value": 5
                       },
                       {
-                        "color": "red",
+                        "color": "#E66A00",
+                        "value": 8
+                      },
+                      {
+                        "color": "#B84A1C",
                         "value": 10
                       }
                     ]
@@ -227,8 +231,12 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#14B8A6",
+                              "color": "#F8E7A1",
                               "value": -11
+                            },
+                            {
+                              "color": "#E0B400",
+                              "value": -1
                             },
                             {
                               "color": "#7A7A7A4D",
@@ -239,7 +247,11 @@
                               "value": 0.001
                             },
                             {
-                              "color": "red",
+                              "color": "#C98200",
+                              "value": 1
+                            },
+                            {
+                              "color": "#B85C2A",
                               "value": 8
                             }
                           ]
@@ -283,8 +295,12 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#73A7F2",
+                              "color": "#A8CBFF",
                               "value": -11
+                            },
+                            {
+                              "color": "#73A7F2",
+                              "value": -1
                             },
                             {
                               "color": "#7A7A7A4D",
@@ -296,6 +312,10 @@
                             },
                             {
                               "color": "#1F60A8",
+                              "value": 1
+                            },
+                            {
+                              "color": "#174A7C",
                               "value": 8
                             }
                           ]
@@ -353,12 +373,16 @@
                               "value": 0
                             },
                             {
-                              "color": "#2F8F5B",
+                              "color": "#A8DDB5",
                               "value": 1
                             },
                             {
+                              "color": "#2F8F5B",
+                              "value": 50
+                            },
+                            {
                               "color": "#1B5E20",
-                              "value": 75
+                              "value": 80
                             }
                           ]
                         }
@@ -395,15 +419,19 @@
                               "value": 0
                             },
                             {
-                              "color": "#9F7AEA",
+                              "color": "#CDB6F6",
                               "value": 0.001
                             },
                             {
-                              "color": "orange",
-                              "value": 7
+                              "color": "#9F7AEA",
+                              "value": 5
                             },
                             {
-                              "color": "red",
+                              "color": "#7C5BD6",
+                              "value": 8
+                            },
+                            {
+                              "color": "#A44C9C",
                               "value": 10
                             }
                           ]
@@ -2096,7 +2124,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#14B8A6"
+                          "fixedColor": "#F8E7A1"
                         }
                       }
                     ]
@@ -2506,7 +2534,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#14B8A6"
+                          "fixedColor": "#F8E7A1"
                         }
                       }
                     ]
