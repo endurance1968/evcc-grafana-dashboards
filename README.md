@@ -9,9 +9,11 @@ Die Arbeit baut auf den frueheren InfluxDB-basierten EVCC-Dashboards von Carsten
 Vielen Dank an Carsten fuer die starke Vorarbeit. Dieses Repository liefert den VictoriaMetrics-Pfad mit Migration, Tages-Rollups, lokalisierten Dashboard-Varianten und Deploy-Skripten fuer Grafana.
 Ich werde versuchen, den Stand mit dem von Carsten synchron zu halten - von daher kann es immer mal zu breaking changes kommen. evtl. lasst Ihr als via Telegraf weiterhin auch Eure Influx befüllen. Quasi als Fallback falls neu migriert werden muss.
 
-Beispiel-Dashboard:
+Beispiel-Dashboard, automatisch aus der aktuellen Screenshot-Galerie:
 
-![EVCC Dashboard Beispiel](./images/dashboard-example-today.png)
+<a href="./docs/screenshots/README.md">
+  <img src="./docs/screenshots/today.png" alt="EVCC Today Dashboard Beispiel" width="900">
+</a>
 
 Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/screenshots/README.md).
 
