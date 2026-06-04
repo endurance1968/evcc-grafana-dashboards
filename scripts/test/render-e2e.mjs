@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.06.03.1
- * Last modified: 2026-06-03
+ * Version: 2026.06.04.1
+ * Last modified: 2026-06-04
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -64,8 +64,33 @@ async function findFreePort() {
   });
 }
 
+function isSensitiveEnvKey(key) {
+  return /(PASSWORD|PASS|TOKEN|SECRET|KEY)$/i.test(key);
+}
+
+function redactCommandArgs(args) {
+  const redacted = [];
+  for (let i = 0; i < args.length; i += 1) {
+    const current = args[i];
+    if (current === "-e" && i + 1 < args.length) {
+      const envPair = args[i + 1];
+      const separatorIndex = envPair.indexOf("=");
+      if (separatorIndex > 0) {
+        const key = envPair.slice(0, separatorIndex);
+        if (isSensitiveEnvKey(key)) {
+          redacted.push("-e", `${key}=***REDACTED***`);
+          i += 1;
+          continue;
+        }
+      }
+    }
+    redacted.push(current);
+  }
+  return redacted;
+}
+
 function run(command, args, options = {}) {
-  console.log(`$ ${[command, ...args].join(" ")}`);
+  console.log(`$ ${[command, ...redactCommandArgs(args)].join(" ")}`);
   const result = spawnSync(command, args, {
     cwd: repoRoot,
     encoding: "utf8",
@@ -553,8 +578,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.06.03.1");
-    console.log("Last modified: 2026-06-03");
+    console.log("Version:       2026.06.04.1");
+    console.log("Last modified: 2026-06-04");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");
@@ -569,3 +594,4 @@ main().catch((error) => {
   console.error(error.message || error);
   process.exit(1);
 });
+
