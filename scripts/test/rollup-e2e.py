@@ -24,8 +24,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.06.03.1"
-SCRIPT_LAST_MODIFIED = "2026-06-03"
+SCRIPT_VERSION = "2026.06.04.1"
+SCRIPT_LAST_MODIFIED = "2026-06-04"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -65,10 +65,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--docker-network-mode",
         choices=("published", "container"),
-        default=os.environ.get("ROLLUP_E2E_DOCKER_NETWORK_MODE", "published"),
+        default=os.environ.get(
+            "ROLLUP_E2E_DOCKER_NETWORK_MODE",
+            "container" if runs_inside_container() else "published",
+        ),
         help=(
-            "Docker network mode for --docker. 'published' publishes a random host port and is the CI default; "
-            "'container' shares the current container network namespace for older act runner setups."
+            "Docker network mode for --docker. 'published' publishes a random host port; "
+            "'container' shares the current container network namespace and is the default when this test runs inside act or another container."
         ),
     )
     parser.add_argument("--keep-docker", action="store_true", help="Do not stop the Docker container after the test.")
@@ -555,3 +558,4 @@ if __name__ == "__main__":
     except Exception as exc:  # noqa: BLE001 - CLI should print concise failure.
         print(f"ERROR: {exc}", file=sys.stderr)
         raise SystemExit(1)
+
