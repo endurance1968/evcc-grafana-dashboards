@@ -935,7 +935,7 @@
         "kind": "Panel",
         "spec": {
           "id": 24,
-          "title": "Kennzahlen Gauges",
+          "title": "Kennzahlen",
           "description": "",
           "links": [],
           "data": {

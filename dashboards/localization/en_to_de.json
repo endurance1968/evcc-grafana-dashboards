@@ -169,7 +169,7 @@
     "Max odometer: {{vehicle}}": "Max Kilometerstand: {{vehicle}}",
     "Max power filter / W": "Filter für maximale Leistung / W",
     "Maximum power filter in W. Power values above this limit are ignored as outliers.": "Grenze der maximalen Leistung in W. Leistungswerte darüber werden als Ausreißer ignoriert.",
-    "Metric gauges": "Kennzahlen Gauges",
+    "Metric gauges": "Kennzahlen",
     "Metrics": "Kennzahlen",
     "Min": "Min",
     "Min SOC": "Min SOC",
