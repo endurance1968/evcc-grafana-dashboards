@@ -1,14 +1,14 @@
 /**
  * Script: generate-docs-screenshots.mjs
  * Purpose: Generate curated documentation screenshots from a local Grafana instance.
- * Version: 2026.06.04.1
+ * Version: 2026.06.04.4
  * Last modified: 2026-06-04
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { parseArg, sanitizeTag } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.04.1";
+const SCRIPT_VERSION = "2026.06.04.4";
 const SCRIPT_LAST_MODIFIED = "2026-06-04";
 
 const envFile = parseArg("env", ".env.local");
@@ -56,32 +56,51 @@ if (prepare) {
   run("scripts/localization/apply-safe-display-translations.mjs");
 }
 
-if (cleanupBefore) {
-  run("scripts/test/cleanup-grafana.mjs", [`--env=${envFile}`]);
+process.env.GRAFANA_TEST_FOLDER_UID ||= `evcc-docs-${language}`;
+process.env.GRAFANA_TEST_FOLDER_TITLE ||= "EVCC";
+process.env.GRAFANA_DASHBOARD_TITLE_PREFIX_MODE ||= "none";
+
+let workflowError;
+try {
+  run("scripts/test/deploy-dashboards.mjs", [
+    `--env=${envFile}`,
+    `--language=${language}`,
+    "--variant=generated",
+    "--source-mode=localdir",
+    `--source=${source}`,
+    `--tag=${tag}`,
+    `--manifest=${manifest}`,
+    `--purge=${cleanupBefore ? "true" : "false"}`,
+    `--smoke=${smoke ? "true" : "false"}`,
+  ]);
+
+  run("scripts/test/capture-docs-screenshots.mjs", [
+    `--env=${envFile}`,
+    `--manifest=${manifest}`,
+    `--out=${outDir}`,
+    `--theme=${theme}`,
+    `--delete-existing=${deleteExisting}`,
+    ...(dryRun ? ["--dry-run=true"] : []),
+  ]);
+} catch (error) {
+  workflowError = error;
+} finally {
+  if (cleanupFinal) {
+    try {
+      run("scripts/test/cleanup-grafana.mjs", [`--env=${envFile}`]);
+    } catch (cleanupError) {
+      if (workflowError) {
+        console.error(`Cleanup after failed screenshot workflow also failed: ${cleanupError.message || cleanupError}`);
+      } else {
+        workflowError = cleanupError;
+      }
+    }
+  }
 }
 
-run("scripts/test/import-dashboards-raw.mjs", [
-  `--env=${envFile}`,
-  `--source=${source}`,
-  `--tag=${tag}`,
-  `--manifest=${manifest}`,
-]);
-
-if (smoke) {
-  run("scripts/test/smoke-check.mjs", [`--env=${envFile}`, `--manifest=${manifest}`]);
-}
-
-run("scripts/test/capture-docs-screenshots.mjs", [
-  `--env=${envFile}`,
-  `--manifest=${manifest}`,
-  `--out=${outDir}`,
-  `--theme=${theme}`,
-  `--delete-existing=${deleteExisting}`,
-  ...(dryRun ? ["--dry-run=true"] : []),
-]);
-
-if (cleanupFinal) {
-  run("scripts/test/cleanup-grafana.mjs", [`--env=${envFile}`]);
+if (workflowError) {
+  throw workflowError;
 }
 
 console.log("\nDocs screenshot workflow finished.");
+

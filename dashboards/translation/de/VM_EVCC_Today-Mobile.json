@@ -752,7 +752,7 @@
         "x": 0,
         "y": 7
       },
-      "title": "Power history"
+      "title": "Leistungsverlauf"
     },
     {
       "datasource": {
@@ -1051,7 +1051,7 @@
         "x": 0,
         "y": 19
       },
-      "title": "Power distribution"
+      "title": "Leistungsverteilung"
     },
     {
       "datasource": {
@@ -1937,7 +1937,7 @@
         "x": 0,
         "y": 40
       },
-      "title": "Metric history"
+      "title": "Kennzahlenverlauf"
     },
     {
       "datasource": {

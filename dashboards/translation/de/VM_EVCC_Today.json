@@ -496,7 +496,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Power history",
+          "title": "Leistungsverlauf",
           "description": "PV-Prognosewerte kommen aus der EVCC-Solarprognose-Konfiguration und werden als tariffSolar_value gespeichert. Wenn EVCC keinen Solar-Forecast-Provider oder keine aktuellen tariffSolar_value-Samples hat, bleibt diese Prognose leer; das Dashboard ruft Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab.",
           "links": [],
           "data": {
@@ -1482,7 +1482,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Metric history",
+          "title": "Kennzahlenverlauf",
           "description": "",
           "links": [],
           "data": {
@@ -2225,7 +2225,7 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Power distribution",
+          "title": "Leistungsverteilung",
           "description": "",
           "links": [],
           "data": {

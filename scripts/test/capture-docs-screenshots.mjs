@@ -1,7 +1,7 @@
 /**
  * Script: capture-docs-screenshots.mjs
  * Purpose: Capture curated German dashboard screenshots for docs/screenshots.
- * Version: 2026.06.04.1
+ * Version: 2026.06.04.7
  * Last modified: 2026-06-04
  */
 import fs from "node:fs";
@@ -16,7 +16,7 @@ import {
   requireEnv,
 } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.04.1";
+const SCRIPT_VERSION = "2026.06.04.7";
 const SCRIPT_LAST_MODIFIED = "2026-06-04";
 
 loadEnvFile(parseArg("env", ".env.local"));
@@ -27,14 +27,15 @@ const password = requireEnv("GRAFANA_PASSWORD");
 const manifestPath = parseArg("manifest", "tests/artifacts/import-manifest-vm-docs-de.json");
 const outDir = parseArg("out", "docs/screenshots");
 const waitMs = Number(parseArg("wait-ms", optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500")));
+const navigationTimeoutMs = Number(parseArg("navigation-timeout-ms", optionalEnv("GRAFANA_SCREENSHOT_NAVIGATION_TIMEOUT_MS", "90000")));
 const theme = parseArg("theme", "light").trim();
 const deleteExisting = parseArg("delete-existing", "false") === "true";
 const dryRun = parseArg("dry-run", "false") === "true";
 const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "").trim();
 const timeTo = optionalEnv("GRAFANA_TIME_TO", "").trim();
 
-const desktop = { name: "desktop", width: 1728, height: 900 };
-const mobile = { name: "mobile", width: 390, height: 844 };
+const desktop = { name: "desktop", width: 2240, height: 1300 };
+const mobile = { name: "mobile", width: 586, height: 1108 };
 
 const capturePlan = [
   {
@@ -98,7 +99,6 @@ function dashboardPath(dashboard) {
 
 function dashboardUrl(dashboard) {
   const params = new URLSearchParams();
-  params.set("kiosk", "");
   if (theme) {
     params.set("theme", theme);
   }
@@ -106,7 +106,7 @@ function dashboardUrl(dashboard) {
     params.set("from", timeFrom);
     params.set("to", timeTo);
   }
-  const query = params.toString().replace("kiosk=", "kiosk");
+  const query = params.toString();
   return `${baseUrl}${dashboardPath(dashboard)}${query ? `?${query}` : ""}`;
 }
 
@@ -164,6 +164,11 @@ async function login(page) {
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
   await page.waitForLoadState("networkidle");
+  const closeMenu = page.getByLabel("Close menu");
+  if ((await closeMenu.count()) > 0 && await closeMenu.first().isVisible()) {
+    await closeMenu.first().click();
+    await page.waitForTimeout(500);
+  }
 }
 
 async function setToolbarVisibility(page, visible) {
@@ -213,6 +218,42 @@ async function readLayout(page) {
   });
 }
 
+async function measureContentHeight(page) {
+  return page.evaluate(() => {
+    const bottoms = [
+      document.documentElement?.scrollHeight ?? 0,
+      document.body?.scrollHeight ?? 0,
+      document.scrollingElement?.scrollHeight ?? 0,
+    ];
+
+    for (const el of document.querySelectorAll("*")) {
+      if (!(el instanceof HTMLElement)) {
+        continue;
+      }
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) {
+        continue;
+      }
+      const top = Math.max(0, rect.top + window.scrollY);
+      bottoms.push(top + Math.max(rect.height, el.scrollHeight));
+    }
+
+    return Math.ceil(Math.max(...bottoms));
+  });
+}
+
+async function resetAllScrollPositions(page) {
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    for (const el of document.querySelectorAll("*")) {
+      if (el instanceof HTMLElement && el.scrollTop > 0) {
+        el.scrollTop = 0;
+      }
+    }
+  });
+}
 async function waitForPanelContent(page, locator) {
   for (let attempt = 0; attempt < 12; attempt += 1) {
     const state = await locator.evaluate((el) => ({
@@ -230,38 +271,28 @@ async function waitForPanelContent(page, locator) {
 
 async function captureComposed(page, viewport, target) {
   const layout = await readLayout(page);
-  const canvas = new PNG({ width: viewport.width, height: layout.totalHeight });
-  fillCanvas(canvas, parseRgbColor(layout.pageColor));
 
   await setToolbarVisibility(page, true);
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(800);
-
-  const topHeight = Math.min(viewport.height, Math.max(0, layout.bodyTop));
-  if (topHeight > 0) {
-    const topBuffer = await page.screenshot({ clip: { x: 0, y: 0, width: viewport.width, height: topHeight } });
-    const topPng = PNG.sync.read(topBuffer);
-    PNG.bitblt(topPng, canvas, 0, 0, topPng.width, topPng.height, 0, 0);
-  }
-
-  await setToolbarVisibility(page, false);
-  await page.waitForTimeout(200);
-
   for (const panel of layout.panels) {
     const locator = page.locator('.react-grid-item').nth(panel.index);
     await locator.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(150);
     await waitForPanelContent(page, locator);
-    const buffer = await locator.screenshot();
-    const panelPng = PNG.sync.read(buffer);
-    PNG.bitblt(panelPng, canvas, 0, 0, panelPng.width, panelPng.height, panel.left, panel.top);
   }
 
-  await setToolbarVisibility(page, true);
+  await resetAllScrollPositions(page);
+  await page.waitForTimeout(1000);
 
-  const output = PNG.sync.write(trimTransparentBottom(canvas));
+  if (viewport.name === "mobile") {
+    const contentHeight = await measureContentHeight(page);
+    const captureHeight = Math.min(Math.max(contentHeight + 24, viewport.height), 8000);
+    await page.setViewportSize({ width: viewport.width, height: captureHeight });
+    await resetAllScrollPositions(page);
+    await page.waitForTimeout(1000);
+  }
+
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, output);
+  await page.screenshot({ path: target, fullPage: viewport.name !== "mobile" });
 }
 
 async function selectTab(page, tabName) {
@@ -338,6 +369,8 @@ async function main() {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ viewport: { width: desktop.width, height: desktop.height } });
   const page = await context.newPage();
+  page.setDefaultNavigationTimeout(navigationTimeoutMs);
+  page.setDefaultTimeout(navigationTimeoutMs);
 
   await login(page);
 
@@ -359,3 +392,8 @@ main().catch((error) => {
   console.error(error.message || error);
   process.exit(1);
 });
+
+
+
+
+

@@ -1,8 +1,8 @@
 /**
  * Script: import-dashboards-raw.mjs
  * Purpose: Import raw dashboard JSON files into Grafana and emit an import manifest.
- * Version: 2026.04.22.1
- * Last modified: 2026-04-22
+ * Version: 2026.06.04.1
+ * Last modified: 2026-06-04
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -51,6 +51,7 @@ const folderUid = optionalEnv("GRAFANA_TEST_FOLDER_UID", "evcc-test");
 const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Test");
 const manifestOut = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 const titlePrefix = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX", "");
+const titlePrefixMode = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX_MODE", "tag").trim().toLowerCase();
 
 const dsMap = {
   "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
@@ -139,9 +140,16 @@ function namespaceLibraryUid(uid, name = "") {
   return buildUid(tag, uid || name || "library");
 }
 
-function namespaceLibraryName(name = "", uid = "") {
+function titleWithPrefix(title) {
+  if (titlePrefixMode === "none") {
+    return title;
+  }
   const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
-  return `${prefix}${name || uid || "Library panel"}`;
+  return `${prefix}${title}`;
+}
+
+function namespaceLibraryName(name = "", uid = "") {
+  return titleWithPrefix(name || uid || "Library panel");
 }
 
 function namespaceLibraryRefs(node) {
@@ -174,8 +182,7 @@ function prepareClassicDashboard(raw, filePath) {
   const sourceUid = dashboard.uid || path.basename(filePath, ".json");
   dashboard.uid = buildUid(tag, sourceUid, path.basename(filePath, ".json"));
 
-  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
-  dashboard.title = `${prefix}${dashboard.title || path.basename(filePath, ".json")}`;
+  dashboard.title = titleWithPrefix(dashboard.title || path.basename(filePath, ".json"));
   namespaceLibraryRefs(dashboard);
   return dashboard;
 }
@@ -183,8 +190,6 @@ function prepareClassicDashboard(raw, filePath) {
 function prepareV2Dashboard(raw, filePath) {
   const dashboard = JSON.parse(JSON.stringify(raw));
   const sourceUid = dashboardUid(dashboard) || path.basename(filePath, ".json");
-  const prefix = titlePrefix ? `${titlePrefix.trim()} ` : `[${tag.toUpperCase()}] `;
-
   dashboard.metadata ||= {};
   dashboard.metadata.name = buildUid(tag, sourceUid, path.basename(filePath, ".json"));
   dashboard.metadata.annotations = {
@@ -192,7 +197,7 @@ function prepareV2Dashboard(raw, filePath) {
     "grafana.app/folder": folderUid,
   };
   dashboard.spec ||= {};
-  dashboard.spec.title = `${prefix}${dashboardTitle(dashboard) || path.basename(filePath, ".json")}`;
+  dashboard.spec.title = titleWithPrefix(dashboardTitle(dashboard) || path.basename(filePath, ".json"));
   return dashboard;
 }
 
@@ -357,3 +362,4 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
+
