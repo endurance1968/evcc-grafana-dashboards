@@ -21,7 +21,8 @@
     "test:rename-e2e": "node scripts/test/local-checks.mjs --rename-e2e",
     "test:rollup-e2e": "node scripts/test/local-checks.mjs --rollup-e2e",
     "test:rollup-path": "node scripts/test/rollup-path-check.mjs",
-    "test:cross-platform": "node scripts/test/cross-platform-audit.mjs"
+    "test:cross-platform": "node scripts/test/cross-platform-audit.mjs",
+    "screenshots:docs:de": "node scripts/test/generate-docs-screenshots.mjs --language=de --out=docs/screenshots"
   },
   "repository": {
     "type": "git",

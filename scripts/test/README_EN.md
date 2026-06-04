@@ -119,6 +119,22 @@ Outputs:
 - `tests/artifacts/screenshots/vm/<tag>/desktop/*.png`
 - `tests/artifacts/screenshots/vm/<tag>/mobile/*.png`
 
+## generate-docs-screenshots.mjs
+
+Purpose: generate curated German release/documentation screenshots for `docs/screenshots` from a local Grafana instance. The script imports the generated German dashboard set, runs a smoke check, and captures the known dashboard/tab views with stable file names.
+
+Prerequisites: `.env.local` with `GRAFANA_URL`, `GRAFANA_USERNAME`, `GRAFANA_PASSWORD`, `GRAFANA_API_TOKEN`, and `GRAFANA_DS_VM_EVCC_UID`. The Grafana instance must reach a VictoriaMetrics datasource with suitable EVCC data.
+
+```bash
+npm run screenshots:docs:de
+```
+
+Useful options:
+
+- `-- --env=.env` uses another env file.
+- `-- --cleanup-final=true` removes the Grafana test folder after capture.
+- `-- --dry-run=true` checks import and the capture plan without writing PNG files.
+
 ## render-smoke-check.mjs
 
 Checks:

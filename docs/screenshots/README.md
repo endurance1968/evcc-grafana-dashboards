@@ -2,7 +2,7 @@
 
 Englische Version: [English README](./README_EN.md).
 
-Dieser Ordner zeigt Beispiele der aktuellen EVCC/VictoriaMetrics-Dashboards.
+Dieser Ordner zeigt Beispiele der aktuellen EVCC/VictoriaMetrics-Dashboards. Die PNG-Dateien koennen aus einer lokalen Grafana-Instanz mit `npm run screenshots:docs:de` neu erzeugt werden.
 
 ## All-Time
 
@@ -124,13 +124,13 @@ PV-Tab mit PV-Energie, PV-Leistung, Batterie und Forecast.
 
 Netz-Tab mit Grid-/Netzsicht und Einspeise-/Bezugsverlauf.
 
-### Today Details Verbrauch
+### Today Details Haus
 
 <a href="./today-consumption.png" target="_blank" rel="noopener">
-  <img src="./today-consumption.png" alt="Today Details Verbrauch Tab" width="720">
+  <img src="./today-consumption.png" alt="Today Details Haus Tab" width="720">
 </a>
 
-Verbrauch-Tab mit Hausverbrauch und relevanten Verbrauchern.
+Haus-Tab mit Hausverbrauch und relevanten Verbrauchern.
 
 ### Today Details Tarife
 

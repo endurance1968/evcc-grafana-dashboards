@@ -2,7 +2,7 @@
 
 German version: [German README](./README.md).
 
-This directory shows examples of the current EVCC/VictoriaMetrics dashboards.
+This directory shows examples of the current EVCC/VictoriaMetrics dashboards. The PNG files can be regenerated from a local Grafana instance with `npm run screenshots:docs:de`.
 
 ## All-Time
 
@@ -124,13 +124,13 @@ PV tab with PV energy, PV power, battery, and forecast.
 
 Grid tab with import/feed-in visibility and grid history.
 
-### Today Details Consumption
+### Today Details Home
 
 <a href="./today-consumption.png" target="_blank" rel="noopener">
-  <img src="./today-consumption.png" alt="Today Details Consumption Tab" width="720">
+  <img src="./today-consumption.png" alt="Today Details Home Tab" width="720">
 </a>
 
-Consumption tab with home consumption and relevant consumers.
+Home tab with home consumption and relevant consumers.
 
 ### Today Details Tariffs
 
