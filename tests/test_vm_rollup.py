@@ -555,6 +555,60 @@ class VmRollupTests(unittest.TestCase):
         self.assertAlmostEqual(result["grid_import_price_effective_daily"], 24.0, places=6)
         self.assertAlmostEqual(result["grid_import_cost_daily"], 0.12, places=6)
 
+    def test_quarter_hour_price_rollups_prices_hourly_tariffs_on_quarter_hour_buckets(self):
+        bucket_starts = [0, 900, 1800, 2700, 3600, 4500, 5400, 6300]
+        grid_samples = [(timestamp, 1000.0) for timestamp in bucket_starts]
+
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=grid_samples,
+            tariff_samples=[(0, 0.30), (3600, 0.50)],
+            feed_in_tariff_samples=[(0, 0.08)],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=900,
+            bucket_minutes=15,
+        )
+
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.80, places=6)
+        self.assertAlmostEqual(result["grid_import_price_avg_daily"], 40.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 40.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_min_daily"], 30.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_max_daily"], 50.0, places=6)
+
+    def test_quarter_hour_price_rollups_prices_static_tariff_when_sample_is_in_window(self):
+        bucket_starts = [0, 900, 1800, 2700]
+        grid_samples = [(timestamp, 2000.0) for timestamp in bucket_starts]
+
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=grid_samples,
+            tariff_samples=[(0, 0.35)],
+            feed_in_tariff_samples=[(0, 0.08)],
+            bucket_starts=bucket_starts,
+            raw_step_seconds=900,
+            bucket_minutes=15,
+        )
+
+        self.assertAlmostEqual(result["grid_import_cost_daily"], 0.70, places=6)
+        self.assertAlmostEqual(result["grid_import_price_avg_daily"], 35.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_effective_daily"], 35.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_min_daily"], 35.0, places=6)
+        self.assertAlmostEqual(result["grid_import_price_max_daily"], 35.0, places=6)
+
+    def test_quarter_hour_price_rollups_does_not_fabricate_cost_without_tariff(self):
+        result = MODULE.quarter_hour_price_rollups(
+            grid_samples=[(0, 1000.0), (900, 1000.0)],
+            tariff_samples=[],
+            feed_in_tariff_samples=[],
+            bucket_starts=[0, 900],
+            raw_step_seconds=900,
+            bucket_minutes=15,
+        )
+
+        self.assertEqual(result["grid_import_cost_daily"], 0.0)
+        self.assertIsNone(result["grid_import_price_avg_daily"])
+        self.assertIsNone(result["grid_import_price_effective_daily"])
+        self.assertIsNone(result["grid_import_price_min_daily"])
+        self.assertIsNone(result["grid_import_price_max_daily"])
+
     def test_quarter_hour_price_rollups_can_price_counter_import_energy(self):
         result = MODULE.quarter_hour_price_rollups(
             grid_samples=[
