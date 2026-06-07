@@ -73,6 +73,9 @@ Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 - Live-Ingest: [evcc-telegraf-live-ingest.md](./de/evcc-telegraf-live-ingest.md)
 - Schema-Referenz: [design/victoriametrics-schema-reference.md](./de/design/victoriametrics-schema-reference.md)
 - Dashboard-Farbschema: [design/dashboard-color-semantics.md](./de/design/dashboard-color-semantics.md)
+- Investitionskosten fuer effektiven Strompreis: [investment-costs.md](./de/investment-costs.md)
+- SMA-PV-Daten pro Anlage optional importieren: [sma-pv-import.md](./de/sma-pv-import.md)
+- SMA-Energiebilanz als historische EVCC-Rollups importieren: [sma-energy-balance-import.md](./de/sma-energy-balance-import.md)
 - Entscheidung Setup-/Filter-Statuspanel: [design/setup-filter-status-panel-decision.md](./de/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots

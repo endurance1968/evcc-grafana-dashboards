@@ -71,6 +71,9 @@ Use these when the normal migration path reports a problem or when you need oper
 - Live ingest: [evcc-telegraf-live-ingest.md](./en/evcc-telegraf-live-ingest.md)
 - Schema reference: [design/victoriametrics-schema-reference.md](./en/design/victoriametrics-schema-reference.md)
 - Dashboard color semantics: [design/dashboard-color-semantics.md](./en/design/dashboard-color-semantics.md)
+- Investment costs for effective electricity price: [investment-costs.md](./en/investment-costs.md)
+- Optional per-source SMA PV data import: [sma-pv-import.md](./en/sma-pv-import.md)
+- Import SMA energy balance as historic EVCC rollups: [sma-energy-balance-import.md](./en/sma-energy-balance-import.md)
 - Setup/filter status panel decision: [design/setup-filter-status-panel-decision.md](./en/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots

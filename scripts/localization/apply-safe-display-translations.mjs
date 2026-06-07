@@ -1,8 +1,8 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.06.03.1
- * Last modified: 2026-06-03
+ * Version: 2026.06.07.1
+ * Last modified: 2026-06-07
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -118,6 +118,12 @@ function translateString(input, mapping) {
     output = output.split(pair.from).join(pair.to);
   }
   return output;
+}
+
+function translatePromQlDisplayLabels(input, mapping) {
+  return input.replace(/("(?:series|title)"\s*,\s*")([^"\n]+)(")/g, (match, prefix, label, suffix) => {
+    return prefix + translateString(label, mapping) + suffix;
+  });
 }
 
 function isSamePath(pathA, pathB) {
@@ -241,6 +247,11 @@ function translateSafeNode(node, mapping) {
       safePropertyIds.has(node.id)
     ) {
       result[childKey] = translateString(childValue, mapping);
+      continue;
+    }
+
+    if (childKey === "expr" && typeof childValue === "string") {
+      result[childKey] = translatePromQlDisplayLabels(childValue, mapping);
       continue;
     }
 

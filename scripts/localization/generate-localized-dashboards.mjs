@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.06.03.1
- * Last modified: 2026-06-03
+ * Version: 2026.06.07.1
+ * Last modified: 2026-06-07
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -88,7 +88,7 @@ function translateString(input, mapping) {
 }
 
 function translatePromQlSeriesLabels(input, mapping) {
-  return input.replace(/("series"\s*,\s*")([^"\n]+)(")/g, (match, prefix, label, suffix) => {
+  return input.replace(/("(?:series|title)"\s*,\s*")([^"\n]+)(")/g, (match, prefix, label, suffix) => {
     return prefix + translateString(label, mapping) + suffix;
   });
 }

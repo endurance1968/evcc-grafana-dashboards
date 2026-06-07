@@ -1,0 +1,8 @@
+asset_id,asset_type,evcc_title,allocation_percent,commissioning_date,purchase_price_eur,lifetime_years,yearly_opex_eur,watt_peak,capacity_wh,include_in_effective_price,notes
+pv_north_roof,pv,North Roof,,2024-05-01,8200,20,60,7000,,yes,Match EVCC pvPower_value title or SMA mapping target
+pv_south_roof,pv,South Roof,,2024-05-01,8500,20,60,7200,,yes,One row per PV source
+pv_west_balcony,pv,West Balcony,,2025-03-15,650,20,0,800,,yes,Small PV source example
+battery_main,battery,Home Battery,,2024-05-01,9000,20,0,,10000,yes,Included later in system price, not in current PV-only helper
+shared_inverter,pv_shared,North Roof,1/2,2024-05-01,1800,20,0,,,yes,Shared component allocation; all rows with same asset_id should sum to 1
+shared_inverter,pv_shared,South Roof,1/2,2024-05-01,1800,20,0,,,yes,Shared component allocation; helper warns if same asset_id does not sum to 100 percent
+pv_south_roof_inverter_2032,pv,South Roof,,2032-07-01,1600,20,0,7200,,yes,Later replacement investment for the same EVCC PV title
