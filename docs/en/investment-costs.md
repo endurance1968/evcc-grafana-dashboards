@@ -72,6 +72,7 @@ Generated metrics:
 - `evcc_pv_lcoe_daily_ct_per_kwh`
 - `evcc_pv_lcoe_rolling_7d_ct_per_kwh`
 - `evcc_pv_lcoe_yearly_ct_per_kwh`
+- `evcc_pv_lcoe_cost_monthly_eur`
 - `evcc_pv_effective_lcoe_daily_ct_per_kwh`
 - `evcc_pv_effective_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_effective_lcoe_yearly_ct_per_kwh`
@@ -80,6 +81,8 @@ Generated metrics:
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 
 The `Year` dashboard shows these values in the PV tab with two panels: `PV generation costs` on the left for annual values per PV source plus a weighted total and `PV generation cost/week (ct/kWh)` on the right as rolling 7-day time-series lines per PV source in the selected year. Annual coverage is shown directly after the PV title in the left panel, for example `SMA-Nord (43%)`. The dashboard intentionally reads short helper metrics instead of long MetricQL expressions.
+
+The All-time dashboard also shows PV generation costs in the Finances tab: the left panel dynamically calculates weighted values for the selected Grafana time range per PV source plus a total, while the right panel shows annual values as a time series over the selected time range. The dynamic calculation uses monthly helper metrics for cost and energy so a selected year in the All-time dashboard remains consistent with the Year dashboard. The yearly time-series panel only shows years with at least 95% data coverage so partial years do not appear as real cost outliers.
 
 Annual source values below 1 kWh mapped PV energy and weekly windows below 1 kWh mapped PV energy are suppressed to avoid misleading division-by-near-zero results.
 

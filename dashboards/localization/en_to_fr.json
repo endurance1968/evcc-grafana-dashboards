@@ -349,7 +349,10 @@
     "PV generation costs": "Coûts de production PV",
     "PV generation cost/week (ct/kWh)": "Coût de production PV/semaine (ct/kWh)",
     "Rolling 7-day investment-based PV generation cost by PV source. Values are shown only when the 7-day window contains more than 1 kWh mapped PV energy. Battery and grid costs are not included.": "Coût de production PV glissant sur 7 jours par source PV. Les valeurs ne sont affichées que si la fenêtre de 7 jours contient plus de 1 kWh d énergie PV mappée. Les coûts de batterie et de réseau ne sont pas inclus.",
-    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Coût annuel de production PV basé sur l investissement par source PV plus total pondéré. Les valeurs avec moins de 1 kWh d énergie PV annuelle mappée sont omises. Les coûts de batterie et de réseau ne sont pas inclus."
+    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Coût annuel de production PV basé sur l investissement par source PV plus total pondéré. Les valeurs avec moins de 1 kWh d énergie PV annuelle mappée sont omises. Les coûts de batterie et de réseau ne sont pas inclus.",
+    "PV generation cost/year (ct/kWh)": "Coût de production PV/an (ct/kWh)",
+    "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "Coût de production PV basé sur l investissement par source PV plus total pondéré pour la période importée par le helper. Les coûts de batterie et de réseau ne sont pas inclus.",
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Coût annuel de production PV basé sur l investissement par source PV sur la période sélectionnée. Les coûts de batterie et de réseau ne sont pas inclus."
   },
   "Heat pump source mix": "Répartition des sources de la pompe à chaleur",
   "Heat pump title match": "Correspondance du titre de la pompe à chaleur",

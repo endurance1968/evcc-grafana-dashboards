@@ -5687,6 +5687,271 @@
             }
           }
         }
+      },
+      "panel-56": {
+        "kind": "Panel",
+        "spec": {
+          "id": 56,
+          "title": "Coûts de production PV",
+          "description": "Investment-based PV generation cost by PV source plus weighted total for the selected time range. Battery and grid costs are not included.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) by (title) / sum(sum_over_time(evcc_pv_energy_by_title_monthly_wh[$__range])) by (title) * 100000",
+                        "format": "time_series",
+                        "legendFormat": "{{title}}",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "rangeAssetLcoe",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "label_set(sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) / sum(sum_over_time(evcc_pv_energy_by_title_monthly_wh[$__range])) * 100000, \"title\", \"Total\")",
+                        "format": "time_series",
+                        "legendFormat": "{{title}}",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "rangeTotalLcoe",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "bargauge",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayMode": "gradient",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "auto",
+                "text": {
+                  "valueSize": 14
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 2,
+                  "mappings": [],
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "yellow",
+                        "value": 8
+                      },
+                      {
+                        "color": "orange",
+                        "value": 15
+                      },
+                      {
+                        "color": "red",
+                        "value": 25
+                      }
+                    ]
+                  },
+                  "unit": "ct",
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "ct/kWh",
+                    "axisPlacement": "hidden",
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
+      },
+      "panel-57": {
+        "kind": "Panel",
+        "spec": {
+          "id": 57,
+          "title": "Coût de production PV/an (ct/kWh)",
+          "description": "Investment-based annual PV generation cost by PV source over the selected time range. Only near-complete years with at least 95% coverage are shown. Battery and grid costs are not included.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "avg(last_over_time(evcc_pv_lcoe_yearly_ct_per_kwh{coverage=~\"9[5-9]%|100%\"}[370d])) by (title)",
+                        "format": "time_series",
+                        "legendFormat": "{{title}}",
+                        "instant": false,
+                        "range": true
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "yearlyAssetLcoe",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true,
+                  "calcs": []
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "unit": "ct",
+                  "decimals": 2,
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "ct/kWh",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 4,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "yellow",
+                        "value": 8
+                      },
+                      {
+                        "color": "orange",
+                        "value": 15
+                      },
+                      {
+                        "color": "red",
+                        "value": 25
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              }
+            }
+          }
+        }
       }
     },
     "layout": {
@@ -5965,7 +6230,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 13,
+                        "y": 23,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -5978,7 +6243,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 8,
-                        "y": 13,
+                        "y": 23,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -5991,7 +6256,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 16,
-                        "y": 13,
+                        "y": 23,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -6004,7 +6269,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 23,
+                        "y": 33,
                         "width": 12,
                         "height": 7,
                         "element": {
@@ -6016,6 +6281,32 @@
                           "value": "vehicle",
                           "direction": "h",
                           "maxPerRow": 2
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 13,
+                        "width": 8,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-56"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 8,
+                        "y": 13,
+                        "width": 16,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-57"
                         }
                       }
                     }

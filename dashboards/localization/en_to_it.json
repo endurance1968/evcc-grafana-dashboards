@@ -349,7 +349,10 @@
     "PV generation costs": "Costi di generazione FV",
     "PV generation cost/week (ct/kWh)": "Costo di generazione FV/settimana (ct/kWh)",
     "Rolling 7-day investment-based PV generation cost by PV source. Values are shown only when the 7-day window contains more than 1 kWh mapped PV energy. Battery and grid costs are not included.": "Costo di generazione FV rolling su 7 giorni per fonte FV. I valori sono mostrati solo se la finestra di 7 giorni contiene più di 1 kWh di energia FV mappata. I costi di batteria e rete non sono inclusi.",
-    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Costo annuale di generazione FV basato sull investimento per fonte FV più totale ponderato. I valori con meno di 1 kWh di energia FV annuale mappata sono omessi. I costi di batteria e rete non sono inclusi."
+    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Costo annuale di generazione FV basato sull investimento per fonte FV più totale ponderato. I valori con meno di 1 kWh di energia FV annuale mappata sono omessi. I costi di batteria e rete non sono inclusi.",
+    "PV generation cost/year (ct/kWh)": "Costo di generazione FV/anno (ct/kWh)",
+    "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "Costo di generazione FV basato sull investimento per fonte FV più totale ponderato per il periodo importato dall helper. I costi di batteria e rete non sono inclusi.",
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Costo annuo di generazione FV basato sull investimento per fonte FV nel periodo selezionato. I costi di batteria e rete non sono inclusi."
   },
   "Heat pump source mix": "Ripartizione fonti pompa di calore",
   "Heat pump title match": "Corrispondenza titolo pompa di calore",

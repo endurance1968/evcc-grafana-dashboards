@@ -72,6 +72,7 @@ Generierte Metriken:
 - `evcc_pv_lcoe_daily_ct_per_kwh`
 - `evcc_pv_lcoe_rolling_7d_ct_per_kwh`
 - `evcc_pv_lcoe_yearly_ct_per_kwh`
+- `evcc_pv_lcoe_cost_monthly_eur`
 - `evcc_pv_effective_lcoe_daily_ct_per_kwh`
 - `evcc_pv_effective_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_effective_lcoe_yearly_ct_per_kwh`
@@ -80,6 +81,8 @@ Generierte Metriken:
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 
 Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Die Jahresabdeckung wird direkt hinter dem PV-Titel im linken Panel angezeigt, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
+
+Das Gesamtzeitraum-Dashboard zeigt im Finanz-Tab ebenfalls PV-Gestehungskosten: links dynamisch fuer den ausgewaehlten Grafana-Zeitraum gewichtete Werte je PV-Anlage plus Gesamtwert, rechts die Jahreswerte als Zeitreihe ueber den betrachteten Zeitraum. Die dynamische Berechnung nutzt monatliche Helper-Metriken fuer Kosten und Energie, damit ein ausgewaehltes Jahr im Gesamtzeitraum-Dashboard konsistent zum Jahr-Dashboard bleibt. Die rechte Jahres-Zeitreihe zeigt nur Jahre mit mindestens 95% Datenabdeckung, damit Teiljahre nicht als echte Kosten-Ausreisser erscheinen.
 
 Jahreswerte mit weniger als 1 kWh gemappter PV-Energie und Wochenfenster mit weniger als 1 kWh gemappter PV-Energie werden unterdrueckt, damit keine irrefuehrenden Divisionen durch nahezu null entstehen.
 

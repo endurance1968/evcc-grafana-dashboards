@@ -349,7 +349,10 @@
     "PV generation costs": "光伏发电成本",
     "PV generation cost/week (ct/kWh)": "每周光伏发电成本 (ct/kWh)",
     "Rolling 7-day investment-based PV generation cost by PV source. Values are shown only when the 7-day window contains more than 1 kWh mapped PV energy. Battery and grid costs are not included.": "按光伏来源显示滚动 7 天的光伏发电成本。仅当 7 天窗口包含超过 1 kWh 的已映射光伏发电量时才显示。不包含电池和电网成本。",
-    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "按光伏来源显示基于投资的年度光伏发电成本以及加权总计。低于 1 kWh 已映射年度光伏发电量的值会被省略。不包含电池和电网成本。"
+    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "按光伏来源显示基于投资的年度光伏发电成本以及加权总计。低于 1 kWh 已映射年度光伏发电量的值会被省略。不包含电池和电网成本。",
+    "PV generation cost/year (ct/kWh)": "每年光伏发电成本 (ct/kWh)",
+    "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "按光伏来源显示基于投资的光伏发电成本以及辅助导入周期的加权总计。不包含电池和电网成本。",
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "所选时间范围内按光伏来源显示基于投资的年度光伏发电成本。不包含电池和电网成本。"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",

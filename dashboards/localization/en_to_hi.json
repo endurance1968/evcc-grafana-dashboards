@@ -349,7 +349,10 @@
     "PV generation costs": "PV उत्पादन लागत",
     "PV generation cost/week (ct/kWh)": "PV उत्पादन लागत/सप्ताह (ct/kWh)",
     "Rolling 7-day investment-based PV generation cost by PV source. Values are shown only when the 7-day window contains more than 1 kWh mapped PV energy. Battery and grid costs are not included.": "PV स्रोत के अनुसार रोलिंग 7-दिन की PV उत्पादन लागत। मान तभी दिखाए जाते हैं जब 7-दिन की विंडो में 1 kWh से अधिक मैप की गई PV ऊर्जा हो। बैटरी और ग्रिड लागत शामिल नहीं हैं।",
-    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "PV स्रोत के अनुसार वार्षिक निवेश-आधारित PV उत्पादन लागत और भारित कुल। 1 kWh से कम मैप की गई वार्षिक PV ऊर्जा वाले मान छोड़े जाते हैं। बैटरी और ग्रिड लागत शामिल नहीं हैं।"
+    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "PV स्रोत के अनुसार वार्षिक निवेश-आधारित PV उत्पादन लागत और भारित कुल। 1 kWh से कम मैप की गई वार्षिक PV ऊर्जा वाले मान छोड़े जाते हैं। बैटरी और ग्रिड लागत शामिल नहीं हैं।",
+    "PV generation cost/year (ct/kWh)": "PV उत्पादन लागत/वर्ष (ct/kWh)",
+    "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "PV स्रोत के अनुसार निवेश-आधारित PV उत्पादन लागत और helper आयात अवधि के लिए भारित कुल। बैटरी और ग्रिड लागत शामिल नहीं हैं।",
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "चयनित समय सीमा में PV स्रोत के अनुसार वार्षिक निवेश-आधारित PV उत्पादन लागत। बैटरी और ग्रिड लागत शामिल नहीं हैं।"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

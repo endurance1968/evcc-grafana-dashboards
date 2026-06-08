@@ -352,7 +352,10 @@
     "PV generation costs": "PV-Gestehungskosten",
     "PV generation cost/week (ct/kWh)": "PV-Gestehungskosten pro Woche (ct/kWh)",
     "Rolling 7-day investment-based PV generation cost by PV source. Values are shown only when the 7-day window contains more than 1 kWh mapped PV energy. Battery and grid costs are not included.": "Rollierende 7-Tage-PV-Gestehungskosten je PV-Anlage. Werte werden nur angezeigt, wenn das 7-Tage-Fenster mehr als 1 kWh gemappte PV-Energie enthaelt. Speicher- und Netzkosten sind nicht enthalten.",
-    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage plus gewichtetes Gesamt. Werte mit weniger als 1 kWh gemappter PV-Jahresenergie werden ausgeblendet. Speicher- und Netzkosten sind nicht enthalten."
+    "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage plus gewichtetes Gesamt. Werte mit weniger als 1 kWh gemappter PV-Jahresenergie werden ausgeblendet. Speicher- und Netzkosten sind nicht enthalten.",
+    "PV generation cost/year (ct/kWh)": "PV-Gestehungskosten pro Jahr (ct/kWh)",
+    "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "Investitionsbasierte PV-Gestehungskosten je PV-Anlage plus gewichtetes Gesamt fuer die Helper-Importperiode. Speicher- und Netzkosten sind nicht enthalten.",
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage ueber den ausgewaehlten Zeitraum. Speicher- und Netzkosten sind nicht enthalten."
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

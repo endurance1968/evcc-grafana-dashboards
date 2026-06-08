@@ -6482,7 +6482,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "evcc_pv_lcoe_rolling_7d_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}",
+                        "expr": "avg(last_over_time(evcc_pv_lcoe_rolling_7d_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[36h])) by (title)",
                         "format": "time_series",
                         "legendFormat": "{{title}}",
                         "instant": false,

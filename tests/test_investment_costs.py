@@ -335,6 +335,16 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertIn(yearly_key, series)
         self.assertAlmostEqual(series[yearly_key][0][1], 100.0)
 
+        monthly_cost_key = (
+            "evcc_pv_lcoe_cost_monthly_eur",
+            tuple(sorted({
+                "local_year": "2026",
+                "title": "Partial PV",
+            }.items())),
+        )
+        self.assertIn(monthly_cost_key, series)
+        self.assertAlmostEqual(series[monthly_cost_key][0][1], 2.0)
+
         self.assertFalse(any(key[0] == "evcc_pv_lcoe_coverage_ratio" for key in series))
         self.assertFalse(any(key[0] == "evcc_pv_lcoe_partial" for key in series))
         self.assertAlmostEqual(summary["pv_sources"][0]["coverage_ratio"], 2 / 365)
@@ -381,5 +391,4 @@ class InvestmentCostImportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
 
