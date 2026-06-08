@@ -15,7 +15,7 @@ SMA_SPEC.loader.exec_module(SMA_MODULE)
 
 
 class SmaPvImportTests(unittest.TestCase):
-    def test_default_metric_is_evcc_compatible(self):
+    def test_default_metric_is_evcc_compatible_daily_metric(self):
         self.assertEqual(SMA_MODULE.DEFAULT_METRIC, "evcc_pv_energy_by_title_daily_wh")
 
     def write_temp(self, text):
@@ -125,4 +125,3 @@ class SmaPvImportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

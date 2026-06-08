@@ -52,7 +52,6 @@ class InvestmentCostImportTests(unittest.TestCase):
             1.0 / 3.0,
         )
 
-
     def test_build_rollups_can_use_preimported_daily_energy_metric(self):
         assets = [{
             "asset_id": "pv_nord",
@@ -88,6 +87,9 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertEqual(calls, {"title": "SMA-Nord", "metric": "evcc_pv_energy_by_title_daily_wh"})
         self.assertEqual(summary["pv_sources"][0]["energy_kwh"], 1.0)
         self.assertTrue(any(key[0] == "evcc_pv_lcoe_daily_ct_per_kwh" for key in series))
+        self.assertTrue(any(key[0] == "evcc_pv_lcoe_energy_monthly_wh" for key in series))
+        self.assertFalse(any(key[0] == "evcc_pv_energy_by_title_daily_wh" for key in series))
+        self.assertFalse(any(key[0] == "evcc_pv_energy_by_title_monthly_wh" for key in series))
 
 
     def test_optional_sma_energy_rollup_writes_standard_pv_metric(self):
@@ -391,4 +393,3 @@ class InvestmentCostImportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -67,7 +67,6 @@ The helper:
 
 Generated metrics:
 
-- `evcc_pv_energy_by_title_daily_wh`
 - `evcc_pv_investment_cost_daily_eur`
 - `evcc_pv_lcoe_daily_ct_per_kwh`
 - `evcc_pv_lcoe_rolling_7d_ct_per_kwh`
@@ -76,7 +75,7 @@ Generated metrics:
 - `evcc_pv_effective_lcoe_daily_ct_per_kwh`
 - `evcc_pv_effective_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_effective_lcoe_yearly_ct_per_kwh`
-- `evcc_pv_energy_by_title_monthly_wh`
+- `evcc_pv_lcoe_energy_monthly_wh`
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 
@@ -127,11 +126,11 @@ python3 scripts/helper/import-investment-costs.py \
 
 The helper is optional and runs separately from the normal EVCC/VictoriaMetrics rollup. If the investment file changes or the current year should stay up to date in the dashboard, run the helper again after the normal rollup, for example daily via cron or a systemd timer. For completed historical years, one run is enough as long as neither the investment file nor the imported PV energy changes.
 
-Important: The helper writes only its own investment and generation-cost metrics. It does not replace EVCC ingest, SMA import, or the standard rollup.
+Important: The helper writes only its own investment and generation-cost metrics. It does not replace EVCC ingest, SMA import, or the standard rollup. In particular, it does not write or delete `evcc_pv_energy_by_title_daily_wh`; that metric belongs to energy imports or rollups.
 
 ## Advanced Energy Sources
 
-The options `--energy-source daily-metric` and `--energy-source combined` are special cases. They are only relevant when a per-title daily metric such as `evcc_pv_energy_by_title_daily_wh` already exists in VictoriaMetrics and should intentionally be used instead of or in addition to EVCC `pvPower_value`. Normal EVCC setups do not need these variants.
+The options `--energy-source daily-metric` and `--energy-source combined` are special cases. They are relevant when a per-title daily metric such as `evcc_pv_energy_by_title_daily_wh` already exists in VictoriaMetrics and should intentionally be used instead of or in addition to EVCC `pvPower_value`. Normal EVCC setups do not need these variants.
 
 ## Planned System Metrics
 
@@ -158,4 +157,3 @@ The main system metric should still include battery depreciation because the bat
 - If EVCC IDs changed over time, `title` is more stable than `id`.
 - Shared PV costs can be distributed to multiple EVCC titles through `pv_shared`. The helper warns if one shared asset does not sum to 100 %.
 - The file contains financial metadata and should not be committed to a public repository.
-

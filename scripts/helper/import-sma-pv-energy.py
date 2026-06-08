@@ -2,8 +2,8 @@
 """
 Script: import-sma-pv-energy.py
 Purpose: Import exported SMA PV daily energy values into VictoriaMetrics as EVCC-compatible per-title daily rollups.
-Version: 2026.06.07.5
-Last modified: 2026-06-07
+Version: 2026.06.08.2
+Last modified: 2026-06-08
 """
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.07.5"
-SCRIPT_LAST_MODIFIED = "2026-06-07"
+SCRIPT_VERSION = "2026.06.08.2"
+SCRIPT_LAST_MODIFIED = "2026-06-08"
 DEFAULT_METRIC = "evcc_pv_energy_by_title_daily_wh"
 
 
@@ -493,7 +493,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--energy-column", help="energy column for long format; auto-detected when omitted")
     parser.add_argument("--energy-unit", choices=["auto", "wh", "kwh"], default="auto")
     parser.add_argument("--sheet", help="Excel sheet name; defaults to first sheet")
-    parser.add_argument("--metric", default=DEFAULT_METRIC, help="target metric for per-title daily Wh values; defaults to EVCC-compatible evcc_pv_energy_by_title_daily_wh")
+    parser.add_argument("--metric", default=DEFAULT_METRIC, help="target metric for imported per-title daily Wh values; defaults to evcc_pv_energy_by_title_daily_wh")
     parser.add_argument("--timezone", default="Europe/Berlin")
     parser.add_argument("--start", help="first local day, YYYY-MM-DD")
     parser.add_argument("--end", help="exclusive local end day, YYYY-MM-DD")
@@ -565,4 +565,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -352,7 +352,10 @@
     "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Coste anual de generación FV basado en la inversión por fuente FV más total ponderado. Se omiten valores con menos de 1 kWh de energía FV anual asignada. No incluye costes de batería ni de red.",
     "PV generation cost/year (ct/kWh)": "Coste de generación FV/año (ct/kWh)",
     "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "Coste de generación FV basado en la inversión por fuente FV más total ponderado para el periodo importado por el helper. No incluye costes de batería ni de red.",
-    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Coste anual de generación FV basado en la inversión por fuente FV en el intervalo seleccionado. No incluye costes de batería ni de red."
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Coste anual de generación FV basado en la inversión por fuente FV en el intervalo seleccionado. No incluye costes de batería ni de red.",
+    "PV energy/year by source": "Energía FV por año y fuente",
+    "Annual PV energy per PV source over the selected time range. Values come from the per-title monthly PV energy helper metric.": "Energía FV anual por fuente FV en el periodo seleccionado. Los valores proceden de la métrica auxiliar mensual de energía FV por título.",
+    "source": "Fuente"
   },
   "Heat pump source mix": "Mezcla de fuentes de la bomba de calor",
   "Heat pump title match": "Coincidencia de título de bomba de calor",

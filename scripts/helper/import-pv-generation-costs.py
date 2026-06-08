@@ -2,8 +2,8 @@
 """
 Script: import-pv-generation-costs.py
 Purpose: Calculate PV generation cost rollups from existing VictoriaMetrics PV data.
-Version: 2026.06.07.5
-Last modified: 2026-06-07
+Version: 2026.06.08.1
+Last modified: 2026-06-08
 """
 from __future__ import annotations
 
@@ -13,8 +13,8 @@ import sys
 import time
 from pathlib import Path
 
-SCRIPT_VERSION = "2026.06.07.5"
-SCRIPT_LAST_MODIFIED = "2026-06-07"
+SCRIPT_VERSION = "2026.06.08.1"
+SCRIPT_LAST_MODIFIED = "2026-06-08"
 DEFAULT_DAILY_PV_METRIC = "evcc_pv_energy_by_title_daily_wh"
 
 
@@ -127,4 +127,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

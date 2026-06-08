@@ -5708,7 +5708,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) by (title) / sum(sum_over_time(evcc_pv_energy_by_title_monthly_wh[$__range])) by (title) * 100000",
+                        "expr": "sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) by (title) / sum(sum_over_time(evcc_pv_lcoe_energy_monthly_wh[$__range])) by (title) * 100000",
                         "format": "time_series",
                         "legendFormat": "{{title}}",
                         "instant": true,
@@ -5731,7 +5731,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "label_set(sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) / sum(sum_over_time(evcc_pv_energy_by_title_monthly_wh[$__range])) * 100000, \"title\", \"Gesamt\")",
+                        "expr": "label_set(sum(sum_over_time(evcc_pv_lcoe_cost_monthly_eur[$__range])) / sum(sum_over_time(evcc_pv_lcoe_energy_monthly_wh[$__range])) * 100000, \"title\", \"Gesamt\")",
                         "format": "time_series",
                         "legendFormat": "{{title}}",
                         "instant": true,
@@ -5952,6 +5952,201 @@
             }
           }
         }
+      },
+      "panel-58": {
+        "kind": "Panel",
+        "spec": {
+          "id": 58,
+          "title": "PV-Energie pro Jahr je Anlage",
+          "description": "Annual PV energy per PV source over the selected time range. Values come from the canonical per-title daily PV energy metric.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "datasource": {
+                        "name": "vm-evcc"
+                      },
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(sum_over_time(evcc_pv_energy_by_title_daily_wh[$__range])) by (local_year, title) / 1000",
+                        "format": "table",
+                        "instant": true,
+                        "legendFormat": "{{title}}",
+                        "range": false
+                      }
+                    },
+                    "refId": "pvEnergyBySourceYear",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "indexByName": {
+                        "Value": 2,
+                        "local_year": 0,
+                        "title": 1
+                      },
+                      "renameByName": {
+                        "Value": "value",
+                        "local_year": "year",
+                        "title": "Anlage"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "filterFieldsByName",
+                  "spec": {
+                    "options": {
+                      "include": {
+                        "names": [
+                          "year",
+                          "source",
+                          "value"
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "sortBy",
+                  "spec": {
+                    "options": {
+                      "fields": {},
+                      "sort": [
+                        {
+                          "desc": false,
+                          "field": "source"
+                        },
+                        {
+                          "desc": false,
+                          "field": "year"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "groupingToMatrix",
+                  "spec": {
+                    "options": {
+                      "columnField": "year",
+                      "rowField": "source",
+                      "valueField": "value"
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "barchart",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "barRadius": 0.15,
+                "barWidth": 0.88,
+                "fullHighlight": false,
+                "groupWidth": 0.72,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "none",
+                "tooltip": {
+                  "hideZeros": true,
+                  "maxHeight": 600,
+                  "mode": "multi",
+                  "sort": "desc"
+                },
+                "xField": "source",
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 0
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "kWh",
+                  "decimals": 0,
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "value": 0,
+                        "color": "green"
+                      }
+                    ]
+                  },
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "kWh",
+                    "axisPlacement": "auto",
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Anlage"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "string"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "PV source"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "layout": {
@@ -6119,6 +6314,19 @@
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-18"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 30,
+                        "width": 24,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-58"
                         }
                       }
                     }

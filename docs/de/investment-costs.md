@@ -62,12 +62,11 @@ Der Helper:
 2. nutzt eingeschlossene Zeilen mit `asset_type=pv` oder `asset_type=pv_shared`,
 3. prueft bei `pv_shared`, ob die Verteilung je `asset_id` auf 100 % kommt,
 4. gruppiert mehrere Investment-Zeilen mit gleichem `evcc_title`,
-5. liest die gemessene PV-Energie je `evcc_title` aus EVCC-`pvPower_value`, aus einer vorhandenen Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` oder aus einer Kombination beider Quellen,
+5. liest die gemessene PV-Energie je `evcc_title` aus EVCC-`pvPower_value`, aus einer vorhandenen per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` oder aus einer Kombination beider Quellen,
 6. schreibt daraus generierte Metriken nach VictoriaMetrics.
 
 Generierte Metriken:
 
-- `evcc_pv_energy_by_title_daily_wh`
 - `evcc_pv_investment_cost_daily_eur`
 - `evcc_pv_lcoe_daily_ct_per_kwh`
 - `evcc_pv_lcoe_rolling_7d_ct_per_kwh`
@@ -76,13 +75,13 @@ Generierte Metriken:
 - `evcc_pv_effective_lcoe_daily_ct_per_kwh`
 - `evcc_pv_effective_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_effective_lcoe_yearly_ct_per_kwh`
-- `evcc_pv_energy_by_title_monthly_wh`
+- `evcc_pv_lcoe_energy_monthly_wh`
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 
 Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Die Jahresabdeckung wird direkt hinter dem PV-Titel im linken Panel angezeigt, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
 
-Das Gesamtzeitraum-Dashboard zeigt im Finanz-Tab ebenfalls PV-Gestehungskosten: links dynamisch fuer den ausgewaehlten Grafana-Zeitraum gewichtete Werte je PV-Anlage plus Gesamtwert, rechts die Jahreswerte als Zeitreihe ueber den betrachteten Zeitraum. Die dynamische Berechnung nutzt monatliche Helper-Metriken fuer Kosten und Energie, damit ein ausgewaehltes Jahr im Gesamtzeitraum-Dashboard konsistent zum Jahr-Dashboard bleibt. Die rechte Jahres-Zeitreihe zeigt nur Jahre mit mindestens 95% Datenabdeckung, damit Teiljahre nicht als echte Kosten-Ausreisser erscheinen.
+Das Gesamtzeitraum-Dashboard zeigt im Finanz-Tab ebenfalls PV-Gestehungskosten: links dynamisch fuer den ausgewaehlten Grafana-Zeitraum gewichtete Werte je PV-Anlage plus Gesamtwert, rechts die Jahreswerte als Zeitreihe ueber den betrachteten Zeitraum. Die dynamische Berechnung nutzt monatliche Helper-Metriken fuer Kosten und den LCOE-Energie-Nenner, damit ein ausgewaehltes Jahr im Gesamtzeitraum-Dashboard konsistent zum Jahr-Dashboard bleibt. Die rechte Jahres-Zeitreihe zeigt nur Jahre mit mindestens 95% Datenabdeckung, damit Teiljahre nicht als echte Kosten-Ausreisser erscheinen.
 
 Jahreswerte mit weniger als 1 kWh gemappter PV-Energie und Wochenfenster mit weniger als 1 kWh gemappter PV-Energie werden unterdrueckt, damit keine irrefuehrenden Divisionen durch nahezu null entstehen.
 
@@ -127,11 +126,11 @@ python3 scripts/helper/import-investment-costs.py \
 
 Der Helper ist optional und laeuft getrennt vom normalen EVCC/VictoriaMetrics-Rollup. Wenn sich die Investitionsdatei aendert oder das laufende Jahr im Dashboard aktuell bleiben soll, sollte der Helper nach dem normalen Rollup erneut ausgefuehrt werden, zum Beispiel taeglich per Cron oder systemd timer. Fuer abgeschlossene historische Jahre reicht ein einmaliger Lauf, solange sich die Investitionsdatei oder die importierte PV-Energie nicht aendert.
 
-Wichtig: Der Helper schreibt nur seine eigenen Investment- und Gestehungskostenmetriken. Er ersetzt keinen EVCC-Ingest, keinen SMA-Import und keinen Standard-Rollup.
+Wichtig: Der Helper schreibt nur seine eigenen Investment- und Gestehungskostenmetriken. Er ersetzt keinen EVCC-Ingest, keinen SMA-Import und keinen Standard-Rollup. Insbesondere schreibt oder loescht er nicht `evcc_pv_energy_by_title_daily_wh`; diese Metrik gehoert den Energieimporten bzw. Rollups.
 
 ## Erweiterte Energiequellen
 
-Die Optionen `--energy-source daily-metric` und `--energy-source combined` sind Spezialfaelle. Sie sind nur relevant, wenn bereits eine per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` in VictoriaMetrics liegt und bewusst statt oder zusaetzlich zu EVCC-`pvPower_value` verwendet werden soll. Fuer den normalen EVCC-Pfad werden diese Varianten nicht benoetigt.
+Die Optionen `--energy-source daily-metric` und `--energy-source combined` sind Spezialfaelle. Sie sind relevant, wenn bereits eine per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` in VictoriaMetrics liegt und bewusst statt oder zusaetzlich zu EVCC-`pvPower_value` verwendet werden soll. Fuer den normalen EVCC-Pfad werden diese Varianten nicht benoetigt.
 
 ## Geplante Systemkennzahlen
 
@@ -158,4 +157,3 @@ Die Systemkennzahl sollte aber die Speicherabschreibung im Gesamtsystem beruecks
 - Wenn sich EVCC-IDs historisch geaendert haben, ist `title` stabiler als `id`.
 - Gemeinsame PV-Kosten koennen ueber `pv_shared` auf mehrere EVCC-Titel verteilt werden. Der Helper warnt, wenn die Summe je gemeinsamem Asset nicht 100 % ergibt.
 - Die Datei enthaelt finanzielle Stammdaten und sollte nicht in ein oeffentliches Repository committed werden.
-

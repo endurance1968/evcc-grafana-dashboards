@@ -2,7 +2,7 @@
 """
 Script: import-investment-costs.py
 Purpose: Calculate PV investment cost rollups from a local investment file and VictoriaMetrics PV data.
-Version: 2026.06.08.6
+Version: 2026.06.08.7
 Last modified: 2026-06-08
 """
 from __future__ import annotations
@@ -24,13 +24,12 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.08.6"
+SCRIPT_VERSION = "2026.06.08.7"
 SCRIPT_LAST_MODIFIED = "2026-06-08"
 GENERATED_METRICS = [
-    "evcc_pv_energy_by_title_daily_wh",
     "evcc_pv_investment_cost_daily_eur",
     "evcc_pv_lcoe_daily_ct_per_kwh",
-    "evcc_pv_energy_by_title_monthly_wh",
+    "evcc_pv_lcoe_energy_monthly_wh",
     "evcc_pv_investment_cost_monthly_eur",
     "evcc_pv_lcoe_cost_monthly_eur",
     "evcc_pv_lcoe_monthly_ct_per_kwh",
@@ -619,7 +618,6 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
             daily_values = daily_title_values.setdefault(day, new_cost_bucket())
 
             if energy_wh > 0:
-                append_sample(series, "evcc_pv_energy_by_title_daily_wh", energy_labels, ts, energy_wh)
                 monthly_title_totals[month_key]["energy_wh"] += energy_wh
                 monthly_totals.setdefault(month_key, {"energy_wh": 0.0, "cost_eur": 0.0})
                 monthly_totals[month_key]["energy_wh"] += energy_wh
@@ -758,7 +756,7 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                 "local_year": f"{year:04d}",
             }
             ts = timestamp_for_month(year, month, tz)
-            append_sample(series, "evcc_pv_energy_by_title_monthly_wh", labels, ts, energy_wh)
+            append_sample(series, "evcc_pv_lcoe_energy_monthly_wh", labels, ts, energy_wh)
             ratio = coverage_ratio(values["covered_days"], values["expected_days"])
             if cost_eur > 0 and should_write_lcoe(ratio, min_lcoe_coverage_ratio):
                 append_sample(series, "evcc_pv_lcoe_cost_monthly_eur", labels, ts, cost_eur)
@@ -948,4 +946,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

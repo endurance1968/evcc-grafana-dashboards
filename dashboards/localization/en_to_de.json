@@ -355,7 +355,10 @@
     "Investment-based annual PV generation cost by PV source plus weighted total. Values with less than 1 kWh mapped annual PV energy are omitted. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage plus gewichtetes Gesamt. Werte mit weniger als 1 kWh gemappter PV-Jahresenergie werden ausgeblendet. Speicher- und Netzkosten sind nicht enthalten.",
     "PV generation cost/year (ct/kWh)": "PV-Gestehungskosten pro Jahr (ct/kWh)",
     "Investment-based PV generation cost by PV source plus weighted total for the helper import period. Battery and grid costs are not included.": "Investitionsbasierte PV-Gestehungskosten je PV-Anlage plus gewichtetes Gesamt fuer die Helper-Importperiode. Speicher- und Netzkosten sind nicht enthalten.",
-    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage ueber den ausgewaehlten Zeitraum. Speicher- und Netzkosten sind nicht enthalten."
+    "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Investitionsbasierte jaehrliche PV-Gestehungskosten je PV-Anlage ueber den ausgewaehlten Zeitraum. Speicher- und Netzkosten sind nicht enthalten.",
+    "PV energy/year by source": "PV-Energie pro Jahr je Anlage",
+    "Annual PV energy per PV source over the selected time range. Values come from the per-title monthly PV energy helper metric.": "Jaehrliche PV-Energie je PV-Anlage ueber den ausgewaehlten Zeitraum. Die Werte stammen aus der monatlichen PV-Energie-Hilfsmetrik je Titel.",
+    "source": "Anlage"
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

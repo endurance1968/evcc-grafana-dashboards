@@ -11,7 +11,7 @@ EVCC liefert die Live-Leistungsdaten, die die Dashboards heute verwenden. SMA-Ex
 - Erkennen von Mapping-Problemen zwischen EVCC-Titeln und SMA-Portalnamen,
 - Anzeigen historischer PV-Tagesertraege, wenn EVCC selbst fuer diese Jahre keine PV-Tagesdaten enthaelt.
 
-Der SMA-Importer schreibt standardmaessig in die EVCC-kompatible Tagesmetrik:
+Der SMA-Importer schreibt standardmaessig in die EVCC-kompatible per-title Tagesmetrik:
 
 ```text
 evcc_pv_energy_by_title_daily_wh{title="...", local_year="YYYY", local_month="MM"}
@@ -105,7 +105,7 @@ python3 scripts/helper/import-sma-pv-energy.py \
   --write --replace
 ```
 
-`--replace` loescht beim SMA-PV-Importer nur die mit `--metric` ausgewaehlte Zielmetrik. Der Default ist `evcc_pv_energy_by_title_daily_wh`. Das ist fuer einen kontrollierten Neuimport gedacht und veraendert keine EVCC-Rohdaten wie `pvPower_value`.
+`--replace` loescht beim SMA-PV-Importer nur die mit `--metric` ausgewaehlte Zielmetrik. Der Default ist `evcc_pv_energy_by_title_daily_wh`. Das ist fuer einen kontrollierten Neuimport gedacht und veraendert keine EVCC-Rohdaten wie `pvPower_value` und keine vom Kostenhelper erzeugten Investment- oder Gestehungskostenmetriken.
 
 ## Ergebnis pruefen
 
@@ -124,7 +124,7 @@ curl --get "http://localhost:8428/api/v1/query" \
 
 ## Zusammenspiel mit EVCC-Live-PVs
 
-Der SMA-PV-Importer bleibt ein reiner Importer. Er schreibt Tagesertraege je `title` und berechnet keine weiteren Kennzahlen. Wenn im gleichen Zeitraum echte EVCC-Rollups und importierte SMA-Tageswerte existieren, muessen Auswertungen bewusst entscheiden, welche Quelle verwendet wird, damit PV-Ertrag nicht doppelt gezaehlt wird.
+Der SMA-PV-Importer bleibt ein reiner Importer. Er schreibt Tagesertraege je `title` in `evcc_pv_energy_by_title_daily_wh` und berechnet keine weiteren Kennzahlen. Der Investment-Helper liest diese Energie bei Bedarf nur als Quelle und schreibt sie nicht selbst.
 
 ## Sicherheit
 
