@@ -70,35 +70,9 @@ python3 scripts/helper/import-sma-energy-balance.py \
 
 `--replace` loescht nur die von diesem Importer erzeugten Serien mit `source="sma_energy_balance"`. Andere EVCC-Rollups bleiben erhalten.
 
-## Zusammenspiel mit PV-Gestehungskosten
+## Abgrenzung der importierten Daten
 
-Die Energiebilanz ist unabhaengig von der Investment-Datei. Dieses Skript importiert nur historische Tagesenergien fuer Gesamt-PV, Haus, Netz und Speicher. Es erzeugt keine PV-Gestehungskosten und importiert keine PV-Ertraege je einzelner Anlage.
+Dieses Skript importiert nur historische Tagesenergien fuer Gesamt-PV, Haus, Netz und Speicher. Es importiert keine PV-Ertraege je einzelner Anlage und erzeugt keine Leistungszeitreihen.
 
-Wenn zusaetzlich Gestehungskosten ausgewertet werden sollen, ist der Ablauf getrennt:
-
-1. dieses Skript fuer die systemweite SMA-Energiebilanz ausfuehren,
-2. `scripts/helper/import-sma-pv-energy.py` fuer PV-Ertraege je Anlage ausfuehren,
-3. `scripts/helper/import-investment-costs.py` fuer die Kostenmetriken ausfuehren.
-
-Beispiel fuer Schritt 3 nach den Importen:
-
-```bash
-python3 scripts/helper/import-investment-costs.py \
-  --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
-  --start 2015-01-01 \
-  --end 2026-01-01 \
-  --energy-source combined \
-  --combined-energy-conflict prefer-evcc \
-  --skip-titles-without-energy \
-  --write-pv-energy-rollup
-```
-
-Ohne `--write` ist das ein Trockenlauf. Zum Schreiben denselben Kostenlauf mit `--write --replace` starten.
-
-## Datenverantwortung
-
-Fuer historische Jahre ohne EVCC-Daten ist der Import bewusst als EVCC-Simulation gedacht. Fuer Uebergangszeitraeume mit echten EVCC-Rollups sollte der Zeitraum eingeschraenkt werden, damit SMA- und EVCC-Energie nicht doppelt in denselben Dashboards auftauchen.
-
-
+Fuer historische Jahre ohne EVCC-Daten ist der Import bewusst als EVCC-kompatibler Tagesrollup gedacht. Fuer Uebergangszeitraeume mit echten EVCC-Rollups sollte der Importzeitraum eingeschraenkt werden, damit SMA- und EVCC-Energie nicht doppelt in denselben Dashboards auftauchen.
 

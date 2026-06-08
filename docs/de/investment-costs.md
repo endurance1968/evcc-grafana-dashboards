@@ -85,47 +85,22 @@ Jahreswerte mit weniger als 1 kWh gemappter PV-Energie und Wochenfenster mit wen
 
 Wichtig: Die Aussagekraft der Gestehungskosten haengt von vollstaendiger gemappter PV-Energie je `evcc_title` ab. Wenn ein Jahr nur wenige Tage mit `title`-Aufloesung enthaelt, die Investitionskosten aber fuer das ganze Jahr laufen, werden ct/kWh-Werte kuenstlich hoch. Solche Zeitraeume sollten vor der Bewertung ueber die Import-Zusammenfassung oder VictoriaMetrics geprueft werden.
 
-## Getrennter PV-Kostenworkflow
+## Gestehungskosten berechnen
 
-SMA-Importe und Gestehungskosten sind getrennte Schritte. Ein SMA-Importer schreibt nur SMA-Daten; der Investment-Helper berechnet nur Kosten aus bereits vorhandenen VictoriaMetrics-Metriken. Dadurch laesst sich jeder Schritt einzeln pruefen und erneut ausfuehren.
+Fuer normale EVCC-Installationen reicht der Standardpfad ueber EVCC-`pvPower_value`. Der Helper liest die PV-Energie je `evcc_title` direkt aus den vorhandenen EVCC-Rohdaten und schreibt daraus die Kostenmetriken fuer die Dashboards.
 
-Typischer Ablauf:
-
-1. optional systemweite SMA-Energiebilanz fuer alte Jahre importieren,
-2. optional SMA-PV-Tagesertraege je Anlage importieren,
-3. PV-Gestehungskosten aus EVCC, SMA oder einer Kombination beider Energiequellen berechnen.
-
-### 1. Optionale SMA-Energiebilanz importieren
+Trockenlauf:
 
 ```bash
-python3 scripts/helper/import-sma-energy-balance.py \
+python3 scripts/helper/import-investment-costs.py \
   --vm-base-url http://localhost:8428 \
-  --input-dir data/private/sma-portal/Energie/Monate \
-  --start 2015-01-01 \
-  --end 2024-07-01 \
-  --write --replace
+  --investment-file data/private/investments.xlsx \
+  --start 2025-01-01 \
+  --end 2026-01-01 \
+  --energy-source pv-power
 ```
 
-Dieser Schritt schreibt historische EVCC-kompatible Tagesrollups fuer Gesamt-PV, Haus, Netz und Speicher. Er erzeugt keine PV-Kostenmetriken.
-
-### 2. Optionale SMA-PV-Tagesertraege importieren
-
-```bash
-python3 scripts/helper/import-sma-pv-energy.py \
-  --vm-base-url http://localhost:8428 \
-  --format sma-portal-classic-analysis \
-  --input-dir data/private/sma-portal/Analyse/Monate \
-  --map-file data/private/sma-pv-name-map.csv \
-  --require-mapping \
-  --exclude-name-regex '^portal_gesamt$' \
-  --write --replace
-```
-
-Dieser Schritt schreibt die EVCC-kompatible Tagesmetrik `evcc_pv_energy_by_title_daily_wh`. Die Mapping-Datei legt SMA-Namen auf `evcc_title`, damit die Daten spaeter zu den Investment-Zeilen passen.
-
-### 3. Gestehungskosten berechnen
-
-Nur aus vorhandenen EVCC-PV-Daten:
+Schreiben oder Ersetzen der generierten Metriken nur auf der Ziel-VictoriaMetrics-Instanz:
 
 ```bash
 python3 scripts/helper/import-investment-costs.py \
@@ -137,59 +112,11 @@ python3 scripts/helper/import-investment-costs.py \
   --write --replace
 ```
 
-Nur aus bereits EVCC-kompatibel importierten Tagesertraegen je PV-Anlage; die Standardmetrik ist `evcc_pv_energy_by_title_daily_wh`:
+`--replace` ersetzt nur die vom Helper erzeugten Investment-/Kostenmetriken. Die EVCC-Rohdaten bleiben unveraendert.
 
-```bash
-python3 scripts/helper/import-investment-costs.py \
-  --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
-  --start 2015-01-01 \
-  --end 2024-07-01 \
-  --energy-source daily-metric \
-  --skip-titles-without-energy \
-  --write-pv-energy-rollup \
-  --write --replace
-```
+## Erweiterte Energiequellen
 
-EVCC und SMA kombiniert, wobei EVCC bei ueberlappenden Tagen gewinnt und SMA nur Luecken fuellt:
-
-```bash
-python3 scripts/helper/import-investment-costs.py \
-  --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
-  --start 2015-01-01 \
-  --end 2026-01-01 \
-  --energy-source combined \
-  --combined-energy-conflict prefer-evcc \
-  --skip-titles-without-energy \
-  --write-pv-energy-rollup \
-  --write --replace
-```
-
-`import-pv-generation-costs.py` bleibt nur als Kosten-Wrapper fuer bestehende Automationen erhalten. Er importiert keine SMA-Dateien mehr; SMA-Daten muessen vorher mit den SMA-Importskripten in VictoriaMetrics liegen.
-
-## Beispielaufrufe
-
-Trockenlauf:
-
-```bash
-python3 scripts/helper/import-investment-costs.py \
-  --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
-  --start 2025-01-01 \
-  --end 2026-01-01
-```
-
-Schreiben oder Ersetzen der generierten Metriken nur auf der Ziel-VictoriaMetrics-Instanz:
-
-```bash
-python3 scripts/helper/import-investment-costs.py \
-  --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
-  --start 2025-01-01 \
-  --end 2026-01-01 \
-  --write --replace
-```
+Die Optionen `--energy-source daily-metric` und `--energy-source combined` sind Spezialfaelle. Sie sind nur relevant, wenn bereits eine per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` in VictoriaMetrics liegt und bewusst statt oder zusaetzlich zu EVCC-`pvPower_value` verwendet werden soll. Fuer den normalen EVCC-Pfad werden diese Varianten nicht benoetigt.
 
 ## Geplante Systemkennzahlen
 
