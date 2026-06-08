@@ -79,11 +79,17 @@ Generierte Metriken:
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 
-Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
+Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Die Jahresabdeckung wird direkt hinter dem PV-Titel im linken Panel angezeigt, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
 
 Jahreswerte mit weniger als 1 kWh gemappter PV-Energie und Wochenfenster mit weniger als 1 kWh gemappter PV-Energie werden unterdrueckt, damit keine irrefuehrenden Divisionen durch nahezu null entstehen.
 
-Wichtig: Die Aussagekraft der Gestehungskosten haengt von vollstaendiger gemappter PV-Energie je `evcc_title` ab. Wenn ein Jahr nur wenige Tage mit `title`-Aufloesung enthaelt, die Investitionskosten aber fuer das ganze Jahr laufen, werden ct/kWh-Werte kuenstlich hoch. Solche Zeitraeume sollten vor der Bewertung ueber die Import-Zusammenfassung oder VictoriaMetrics geprueft werden.
+Fuer Gestehungskosten zaehlt der Helper Investitionskosten nur fuer Tage in die LCOE-Berechnung, an denen fuer den jeweiligen `evcc_title` auch PV-Energie vorhanden ist. Dadurch werden unvollstaendige Jahresdateien nicht mehr durch volle Jahreskosten kuenstlich aufgeblasen. Die aktiven Investitionskosten bleiben weiterhin als eigene Tages-/Monatsmetriken sichtbar.
+
+Unvollstaendige Abdeckung wird kompakt markiert:
+
+- `evcc_pv_lcoe_yearly_ct_per_kwh` enthaelt zusaetzlich ein Label `coverage`, damit das Dashboard die Abdeckung direkt hinter dem PV-Titel anzeigen kann.
+- `--partial-warning-threshold` steuert den Warnschwellwert, Standard `0.95`.
+- `--min-lcoe-coverage-ratio` kann optional festlegen, ab welcher Abdeckung Monats-, Jahres- und 7-Tage-LCOE-Werte geschrieben werden. Standard `0.0` schreibt die Werte, markiert Teilabdeckung aber sichtbar.
 
 ## Gestehungskosten berechnen
 
@@ -114,6 +120,12 @@ python3 scripts/helper/import-investment-costs.py \
 
 `--replace` ersetzt nur die vom Helper erzeugten Investment-/Kostenmetriken. Die EVCC-Rohdaten bleiben unveraendert.
 
+## Regelmaessige Aktualisierung
+
+Der Helper ist optional und laeuft getrennt vom normalen EVCC/VictoriaMetrics-Rollup. Wenn sich die Investitionsdatei aendert oder das laufende Jahr im Dashboard aktuell bleiben soll, sollte der Helper nach dem normalen Rollup erneut ausgefuehrt werden, zum Beispiel taeglich per Cron oder systemd timer. Fuer abgeschlossene historische Jahre reicht ein einmaliger Lauf, solange sich die Investitionsdatei oder die importierte PV-Energie nicht aendert.
+
+Wichtig: Der Helper schreibt nur seine eigenen Investment- und Gestehungskostenmetriken. Er ersetzt keinen EVCC-Ingest, keinen SMA-Import und keinen Standard-Rollup.
+
 ## Erweiterte Energiequellen
 
 Die Optionen `--energy-source daily-metric` und `--energy-source combined` sind Spezialfaelle. Sie sind nur relevant, wenn bereits eine per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` in VictoriaMetrics liegt und bewusst statt oder zusaetzlich zu EVCC-`pvPower_value` verwendet werden soll. Fuer den normalen EVCC-Pfad werden diese Varianten nicht benoetigt.
@@ -143,7 +155,4 @@ Die Systemkennzahl sollte aber die Speicherabschreibung im Gesamtsystem beruecks
 - Wenn sich EVCC-IDs historisch geaendert haben, ist `title` stabiler als `id`.
 - Gemeinsame PV-Kosten koennen ueber `pv_shared` auf mehrere EVCC-Titel verteilt werden. Der Helper warnt, wenn die Summe je gemeinsamem Asset nicht 100 % ergibt.
 - Die Datei enthaelt finanzielle Stammdaten und sollte nicht in ein oeffentliches Repository committed werden.
-
-
-
 

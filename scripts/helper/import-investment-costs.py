@@ -2,8 +2,8 @@
 """
 Script: import-investment-costs.py
 Purpose: Calculate PV investment cost rollups from a local investment file and VictoriaMetrics PV data.
-Version: 2026.06.07.20
-Last modified: 2026-06-07
+Version: 2026.06.08.4
+Last modified: 2026-06-08
 """
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.07.20"
-SCRIPT_LAST_MODIFIED = "2026-06-07"
+SCRIPT_VERSION = "2026.06.08.4"
+SCRIPT_LAST_MODIFIED = "2026-06-08"
 GENERATED_METRICS = [
     "evcc_pv_energy_by_title_daily_wh",
     "evcc_pv_investment_cost_daily_eur",
@@ -38,6 +38,11 @@ GENERATED_METRICS = [
     "evcc_pv_effective_lcoe_daily_ct_per_kwh",
     "evcc_pv_effective_lcoe_yearly_ct_per_kwh",
     "evcc_pv_effective_lcoe_monthly_ct_per_kwh",
+]
+
+LEGACY_GENERATED_METRICS = [
+    "evcc_pv_lcoe_coverage_ratio",
+    "evcc_pv_lcoe_partial",
 ]
 
 OPS = {
@@ -478,6 +483,15 @@ def iter_days(start_day: dt.date, end_day: dt.date) -> Iterable[dt.date]:
         current += dt.timedelta(days=1)
 
 
+def active_cost_days_for_calendar_year(assets: list[dict[str, Any]], year: int) -> float:
+    year_start = dt.date(year, 1, 1)
+    year_end = dt.date(year + 1, 1, 1)
+    expected_days = 0.0
+    for day in iter_days(year_start, year_end):
+        if any(daily_cost(asset, day) > 0 for asset in assets):
+            expected_days += 1.0
+    return expected_days
+
 def validate_shared_allocations(assets: list[dict[str, Any]], tolerance: float = 0.001) -> list[dict[str, Any]]:
     shared_groups: dict[str, list[dict[str, Any]]] = {}
     for asset in assets:
@@ -501,7 +515,39 @@ def validate_shared_allocations(assets: list[dict[str, Any]], tolerance: float =
         })
     return summaries
 
-def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.date, end_day: dt.date, tz: ZoneInfo, peak_limit: float, sample_interval: str, energy_source: str = "pv-power", pv_energy_metric: str = "evcc_pv_energy_by_title_daily_wh", skip_titles_without_energy: bool = False, write_pv_energy_rollup: bool = False, combined_energy_conflict: str = "prefer-evcc") -> tuple[dict[tuple[str, tuple[tuple[str, str], ...]], list[tuple[int, float]]], dict[str, Any]]:
+def coverage_ratio(covered_days: float, expected_days: float) -> float | None:
+    if expected_days <= 0:
+        return None
+    return max(0.0, min(1.0, covered_days / expected_days))
+
+
+
+def should_write_lcoe(ratio: float | None, min_lcoe_coverage_ratio: float) -> bool:
+    return ratio is None or ratio >= min_lcoe_coverage_ratio
+
+
+def coverage_label(ratio: float | None) -> str:
+    if ratio is None:
+        return "n/a"
+    return f"{round(ratio * 100):.0f}%"
+
+
+def new_cost_bucket() -> dict[str, float]:
+    return {
+        "energy_wh": 0.0,
+        "active_cost_eur": 0.0,
+        "covered_cost_eur": 0.0,
+        "expected_days": 0.0,
+        "covered_days": 0.0,
+    }
+
+
+def add_bucket(target: dict[str, float], source: dict[str, float]) -> None:
+    for key in ("energy_wh", "active_cost_eur", "covered_cost_eur", "expected_days", "covered_days"):
+        target[key] = target.get(key, 0.0) + source.get(key, 0.0)
+
+
+def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.date, end_day: dt.date, tz: ZoneInfo, peak_limit: float, sample_interval: str, energy_source: str = "pv-power", pv_energy_metric: str = "evcc_pv_energy_by_title_daily_wh", skip_titles_without_energy: bool = False, write_pv_energy_rollup: bool = False, combined_energy_conflict: str = "prefer-evcc", min_lcoe_coverage_ratio: float = 0.0, partial_warning_threshold: float = 0.95) -> tuple[dict[tuple[str, tuple[tuple[str, str], ...]], list[tuple[int, float]]], dict[str, Any]]:
     pv_assets = [a for a in assets if a["asset_type"] == "pv" and a["include"]]
     pv_cost_assets = [a for a in assets if a["asset_type"] in {"pv", "pv_shared"} and a["include"]]
     shared_allocation_summaries = validate_shared_allocations(assets)
@@ -514,6 +560,7 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
     monthly_totals: dict[tuple[int, int], dict[str, float]] = {}
     asset_summaries = []
     title_summaries = []
+    coverage_summaries = []
 
     for title, title_assets in sorted(assets_by_title.items()):
         if len(title_assets) == 1:
@@ -542,15 +589,21 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
         if skip_titles_without_energy and not has_positive_energy:
             log(f"Skip title without positive energy samples: {title}")
             continue
+
         title_energy_wh = 0.0
-        title_cost_eur = 0.0
+        title_active_cost_eur = 0.0
+        title_covered_cost_eur = 0.0
+        title_expected_days = 0.0
+        title_covered_days = 0.0
         monthly_title_totals: dict[tuple[int, int], dict[str, float]] = {}
         monthly_asset_costs: dict[tuple[str, tuple[int, int]], float] = {}
-        asset_costs: dict[str, float] = {asset["asset_id"]: 0.0 for asset in title_assets}
+        asset_active_costs: dict[str, float] = {asset["asset_id"]: 0.0 for asset in title_assets}
+        asset_covered_costs: dict[str, float] = {asset["asset_id"]: 0.0 for asset in title_assets}
         daily_title_values: dict[dt.date, dict[str, float]] = {}
 
         for day in iter_days(start_day, end_day):
             energy_wh = max(0.0, energy_by_day.get(day, 0.0))
+            has_energy = energy_wh > 0
             month_key = (day.year, day.month)
             ts = timestamp_for_day(day, tz)
             energy_labels = {
@@ -559,18 +612,21 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                 "local_month": f"{day.month:02d}",
             }
 
+            monthly_title_totals.setdefault(month_key, new_cost_bucket())
+            daily_values = daily_title_values.setdefault(day, new_cost_bucket())
+
             if energy_wh > 0:
                 append_sample(series, "evcc_pv_energy_by_title_daily_wh", energy_labels, ts, energy_wh)
-                monthly_title_totals.setdefault(month_key, {"energy_wh": 0.0, "cost_eur": 0.0})
                 monthly_title_totals[month_key]["energy_wh"] += energy_wh
                 monthly_totals.setdefault(month_key, {"energy_wh": 0.0, "cost_eur": 0.0})
                 monthly_totals[month_key]["energy_wh"] += energy_wh
                 totals.setdefault(day, {"energy_wh": 0.0, "cost_eur": 0.0})
                 totals[day]["energy_wh"] += energy_wh
                 title_energy_wh += energy_wh
-                daily_title_values.setdefault(day, {"energy_wh": 0.0, "cost_eur": 0.0})["energy_wh"] += energy_wh
+                daily_values["energy_wh"] += energy_wh
 
-            daily_title_cost_eur = 0.0
+            daily_active_cost_eur = 0.0
+            daily_asset_costs: list[tuple[dict[str, Any], float]] = []
             for asset in title_assets:
                 cost_eur = daily_cost(asset, day)
                 if cost_eur <= 0:
@@ -583,34 +639,77 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                 }
                 append_sample(series, "evcc_pv_investment_cost_daily_eur", cost_labels, ts, cost_eur)
                 monthly_asset_costs[(asset["asset_id"], month_key)] = monthly_asset_costs.get((asset["asset_id"], month_key), 0.0) + cost_eur
-                asset_costs[asset["asset_id"]] += cost_eur
-                daily_title_cost_eur += cost_eur
+                asset_active_costs[asset["asset_id"]] += cost_eur
+                daily_asset_costs.append((asset, cost_eur))
+                daily_active_cost_eur += cost_eur
 
-            if daily_title_cost_eur > 0:
-                monthly_title_totals.setdefault(month_key, {"energy_wh": 0.0, "cost_eur": 0.0})
-                monthly_title_totals[month_key]["cost_eur"] += daily_title_cost_eur
+            if daily_active_cost_eur > 0:
+                monthly_title_totals[month_key]["active_cost_eur"] += daily_active_cost_eur
+                monthly_title_totals[month_key]["expected_days"] += 1.0
+                title_active_cost_eur += daily_active_cost_eur
+                title_expected_days += 1.0
+                daily_values["active_cost_eur"] += daily_active_cost_eur
+                daily_values["expected_days"] = 1.0
+
+            if daily_active_cost_eur > 0 and has_energy:
+                monthly_title_totals[month_key]["covered_cost_eur"] += daily_active_cost_eur
+                monthly_title_totals[month_key]["covered_days"] += 1.0
                 monthly_totals.setdefault(month_key, {"energy_wh": 0.0, "cost_eur": 0.0})
-                monthly_totals[month_key]["cost_eur"] += daily_title_cost_eur
+                monthly_totals[month_key]["cost_eur"] += daily_active_cost_eur
                 totals.setdefault(day, {"energy_wh": 0.0, "cost_eur": 0.0})
-                totals[day]["cost_eur"] += daily_title_cost_eur
-                title_cost_eur += daily_title_cost_eur
-                daily_title_values.setdefault(day, {"energy_wh": 0.0, "cost_eur": 0.0})["cost_eur"] += daily_title_cost_eur
-                if energy_wh > 0:
-                    append_sample(series, "evcc_pv_lcoe_daily_ct_per_kwh", energy_labels, ts, daily_title_cost_eur / (energy_wh / 1000.0) * 100.0)
+                totals[day]["cost_eur"] += daily_active_cost_eur
+                title_covered_cost_eur += daily_active_cost_eur
+                title_covered_days += 1.0
+                daily_values["covered_cost_eur"] += daily_active_cost_eur
+                daily_values["covered_days"] = 1.0
+                for asset, cost_eur in daily_asset_costs:
+                    asset_covered_costs[asset["asset_id"]] += cost_eur
+                append_sample(series, "evcc_pv_lcoe_daily_ct_per_kwh", energy_labels, ts, daily_active_cost_eur / (energy_wh / 1000.0) * 100.0)
 
         yearly_title_totals: dict[int, dict[str, float]] = {}
-        for day, values in daily_title_values.items():
-            yearly_title_totals.setdefault(day.year, {"energy_wh": 0.0, "cost_eur": 0.0})
-            yearly_title_totals[day.year]["energy_wh"] += values["energy_wh"]
-            yearly_title_totals[day.year]["cost_eur"] += values["cost_eur"]
+        for (year, month), values in sorted(monthly_title_totals.items()):
+            labels = {
+                "title": title,
+                "period": "month",
+                "local_year": f"{year:04d}",
+                "local_month": f"{month:02d}",
+            }
+            month_ratio = coverage_ratio(values["covered_days"], values["expected_days"])
+            if month_ratio is not None and month_ratio < partial_warning_threshold:
+                log(
+                    f"WARNING partial PV energy coverage for {title} {year:04d}-{month:02d}: "
+                    f"covered_days={int(values['covered_days'])}, expected_days={int(values['expected_days'])}, ratio={month_ratio:.3f}"
+                )
+            yearly_title_totals.setdefault(year, new_cost_bucket())
+            add_bucket(yearly_title_totals[year], values)
 
+        title_calendar_expected_days = 0.0
         for year, values in sorted(yearly_title_totals.items()):
+            year_expected_days = active_cost_days_for_calendar_year(title_assets, year)
+            title_calendar_expected_days += year_expected_days
+            ratio = coverage_ratio(values["covered_days"], year_expected_days)
+            if ratio is not None:
+                coverage_summaries.append({
+                    "title": title,
+                    "period": "year",
+                    "local_year": f"{year:04d}",
+                    "covered_days": int(values["covered_days"]),
+                    "expected_days": int(year_expected_days),
+                    "coverage_ratio": ratio,
+                    "partial": ratio < partial_warning_threshold,
+                })
+                if ratio < partial_warning_threshold:
+                    log(
+                        f"WARNING partial PV energy coverage for {title} {year:04d}: "
+                        f"covered_days={int(values['covered_days'])}, expected_days={int(year_expected_days)}, ratio={ratio:.3f}"
+                    )
             energy_wh = values["energy_wh"]
-            cost_eur = values["cost_eur"]
-            if energy_wh <= 1000 or cost_eur <= 0:
+            cost_eur = values["covered_cost_eur"]
+            if energy_wh <= 1000 or cost_eur <= 0 or not should_write_lcoe(ratio, min_lcoe_coverage_ratio):
                 continue
             labels = {
                 "title": title,
+                "coverage": coverage_label(ratio),
                 "local_year": f"{year:04d}",
             }
             append_sample(series, "evcc_pv_lcoe_yearly_ct_per_kwh", labels, timestamp_for_year(year, tz), cost_eur / (energy_wh / 1000.0) * 100.0)
@@ -619,19 +718,25 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
             window_start = day - dt.timedelta(days=6)
             window_energy_wh = 0.0
             window_cost_eur = 0.0
+            window_expected_days = 0.0
+            window_covered_days = 0.0
             current = window_start
             while current <= day:
                 values = daily_title_values.get(current)
                 if values:
                     window_energy_wh += values["energy_wh"]
-                    window_cost_eur += values["cost_eur"]
+                    window_cost_eur += values["covered_cost_eur"]
+                    window_expected_days += values["expected_days"]
+                    window_covered_days += values["covered_days"]
                 current += dt.timedelta(days=1)
-            if window_energy_wh > 1000 and window_cost_eur > 0:
+            ratio = coverage_ratio(window_covered_days, window_expected_days)
+            if window_energy_wh > 1000 and window_cost_eur > 0 and should_write_lcoe(ratio, min_lcoe_coverage_ratio):
                 labels = {
                     "title": title,
                     "local_year": f"{day.year:04d}",
                 }
                 append_sample(series, "evcc_pv_lcoe_rolling_7d_ct_per_kwh", labels, timestamp_for_day(day, tz), window_cost_eur / (window_energy_wh / 1000.0) * 100.0)
+
         for (asset_id, (year, month)), cost_eur in sorted(monthly_asset_costs.items()):
             labels = {
                 "asset_id": asset_id,
@@ -642,7 +747,7 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
 
         for (year, month), values in sorted(monthly_title_totals.items()):
             energy_wh = values["energy_wh"]
-            cost_eur = values["cost_eur"]
+            cost_eur = values["covered_cost_eur"]
             if energy_wh <= 0:
                 continue
             labels = {
@@ -651,25 +756,37 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
             }
             ts = timestamp_for_month(year, month, tz)
             append_sample(series, "evcc_pv_energy_by_title_monthly_wh", labels, ts, energy_wh)
-            if cost_eur > 0:
+            ratio = coverage_ratio(values["covered_days"], values["expected_days"])
+            if cost_eur > 0 and should_write_lcoe(ratio, min_lcoe_coverage_ratio):
                 append_sample(series, "evcc_pv_lcoe_monthly_ct_per_kwh", labels, ts, cost_eur / (energy_wh / 1000.0) * 100.0)
 
+        title_ratio = coverage_ratio(title_covered_days, title_calendar_expected_days or title_expected_days)
         title_summaries.append({
             "title": title,
             "investment_rows": len(title_assets),
             "energy_kwh": title_energy_wh / 1000.0,
-            "cost_eur": title_cost_eur,
-            "lcoe_ct_per_kwh": (title_cost_eur / (title_energy_wh / 1000.0) * 100.0) if title_energy_wh > 0 else None,
+            "active_cost_eur": title_active_cost_eur,
+            "covered_cost_eur": title_covered_cost_eur,
+            "cost_eur": title_covered_cost_eur,
+            "coverage_ratio": title_ratio,
+            "covered_days": int(title_covered_days),
+            "expected_days": int(title_calendar_expected_days or title_expected_days),
+            "partial": (title_ratio is not None and title_ratio < partial_warning_threshold),
+            "lcoe_ct_per_kwh": (title_covered_cost_eur / (title_energy_wh / 1000.0) * 100.0) if title_energy_wh > 0 and should_write_lcoe(title_ratio, min_lcoe_coverage_ratio) else None,
             "energy_merge": energy_merge_stats,
         })
         for asset in title_assets:
-            asset_cost_eur = asset_costs[asset["asset_id"]]
+            asset_active_cost_eur = asset_active_costs[asset["asset_id"]]
+            asset_covered_cost_eur = asset_covered_costs[asset["asset_id"]]
             asset_summaries.append({
                 "asset_id": asset["asset_id"],
                 "title": title,
                 "energy_kwh": title_energy_wh / 1000.0,
-                "cost_eur": asset_cost_eur,
-                "lcoe_ct_per_kwh": (asset_cost_eur / (title_energy_wh / 1000.0) * 100.0) if title_energy_wh > 0 else None,
+                "active_cost_eur": asset_active_cost_eur,
+                "covered_cost_eur": asset_covered_cost_eur,
+                "cost_eur": asset_covered_cost_eur,
+                "coverage_ratio": title_ratio,
+                "lcoe_ct_per_kwh": (asset_covered_cost_eur / (title_energy_wh / 1000.0) * 100.0) if title_energy_wh > 0 and should_write_lcoe(title_ratio, min_lcoe_coverage_ratio) else None,
             })
 
     if write_pv_energy_rollup:
@@ -727,12 +844,15 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
     summary = {
         "assets": asset_summaries,
         "pv_sources": title_summaries,
+        "coverage": coverage_summaries,
         "shared_allocations": shared_allocation_summaries,
         "series": len(series),
         "samples": sum(len(v) for v in series.values()),
         "start": start_day.isoformat(),
         "end_exclusive": end_day.isoformat(),
         "write_pv_energy_rollup": write_pv_energy_rollup,
+        "min_lcoe_coverage_ratio": min_lcoe_coverage_ratio,
+        "partial_warning_threshold": partial_warning_threshold,
     }
     return series, summary
 
@@ -767,6 +887,8 @@ def main() -> int:
     parser.add_argument("--skip-titles-without-energy", action="store_true", help="skip investment titles with no energy samples in the selected energy source")
     parser.add_argument("--combined-energy-conflict", choices=["prefer-evcc", "prefer-daily-metric", "sum", "error"], default="prefer-evcc", help="how --energy-source=combined handles days where EVCC pvPower and the daily metric both have energy")
     parser.add_argument("--write-pv-energy-rollup", action="store_true", help="also write evcc_pv_energy_daily_wh from the selected daily PV energy source for standard PV dashboard panels")
+    parser.add_argument("--min-lcoe-coverage-ratio", type=float, default=0.0, help="minimum covered/expected cost-day ratio required before writing monthly/yearly/rolling LCOE values")
+    parser.add_argument("--partial-warning-threshold", type=float, default=0.95, help="coverage ratio below which summaries and warnings mark a period as partial")
     parser.add_argument("--batch-size", type=int, default=200)
     parser.add_argument("--replace", action="store_true", help="delete generated evcc_pv_* investment metrics before writing")
     parser.add_argument("--write", action="store_true", help="write generated metrics to VictoriaMetrics")
@@ -797,12 +919,12 @@ def main() -> int:
     log(f"PV cost rows: {len(pv_cost_assets)}")
     log(f"Range: {start_day} .. {end_day} (exclusive), timezone={args.timezone}")
     log(f"Energy source: {args.energy_source}" + (f" ({args.pv_energy_metric})" if args.energy_source in {"daily-metric", "combined"} else ""))
-    series, summary = build_rollups(args.vm_base_url, assets, start_day, end_day, tz, args.peak_power_limit, args.sample_interval, args.energy_source, args.pv_energy_metric, args.skip_titles_without_energy, args.write_pv_energy_rollup, args.combined_energy_conflict)
+    series, summary = build_rollups(args.vm_base_url, assets, start_day, end_day, tz, args.peak_power_limit, args.sample_interval, args.energy_source, args.pv_energy_metric, args.skip_titles_without_energy, args.write_pv_energy_rollup, args.combined_energy_conflict, args.min_lcoe_coverage_ratio, args.partial_warning_threshold)
     log(json.dumps(summary, indent=2, ensure_ascii=False))
 
     if args.write:
         if args.replace:
-            for metric in GENERATED_METRICS:
+            for metric in GENERATED_METRICS + LEGACY_GENERATED_METRICS:
                 log(f"Delete existing metric: {metric}")
                 delete_metric(args.vm_base_url, metric)
             if args.write_pv_energy_rollup:
@@ -820,15 +942,6 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-
-
-
-
-
-
-
 
 
 

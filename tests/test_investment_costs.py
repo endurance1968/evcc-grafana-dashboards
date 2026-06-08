@@ -295,6 +295,90 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertEqual(summary["pv_sources"], [])
         self.assertEqual(summary["assets"], [])
 
+    def test_partial_title_coverage_prorates_lcoe_costs_and_marks_partial(self):
+        assets = [{
+            "asset_id": "pv_partial",
+            "asset_type": "pv",
+            "include": True,
+            "evcc_title": "Partial PV",
+            "commissioning_date": INVESTMENT_MODULE.dt.date(2026, 1, 1),
+            "purchase_price_eur": 365.25,
+            "lifetime_years": 1.0,
+            "yearly_opex_eur": 0.0,
+            "allocation_percent": 1.0,
+        }]
+        original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
+        try:
+            def fake_fetch(_base_url, _asset, start_day, _end_day, _tz, _metric):
+                return {
+                    start_day: 1000.0,
+                    start_day + INVESTMENT_MODULE.dt.timedelta(days=1): 1000.0,
+                }
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = fake_fetch
+            series, summary = INVESTMENT_MODULE.build_rollups(
+                "http://vm.invalid",
+                assets,
+                INVESTMENT_MODULE.dt.date(2026, 1, 1),
+                INVESTMENT_MODULE.dt.date(2026, 1, 11),
+                INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
+                30000.0,
+                "30s",
+                energy_source="daily-metric",
+            )
+        finally:
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = original
+
+        yearly_key = (
+            "evcc_pv_lcoe_yearly_ct_per_kwh",
+            tuple(sorted({"coverage": "1%", "local_year": "2026", "title": "Partial PV"}.items())),
+        )
+        self.assertIn(yearly_key, series)
+        self.assertAlmostEqual(series[yearly_key][0][1], 100.0)
+
+        self.assertFalse(any(key[0] == "evcc_pv_lcoe_coverage_ratio" for key in series))
+        self.assertFalse(any(key[0] == "evcc_pv_lcoe_partial" for key in series))
+        self.assertAlmostEqual(summary["pv_sources"][0]["coverage_ratio"], 2 / 365)
+        self.assertEqual(summary["pv_sources"][0]["partial"], True)
+        self.assertEqual(summary["pv_sources"][0]["covered_days"], 2)
+        self.assertEqual(summary["pv_sources"][0]["expected_days"], 365)
+        self.assertAlmostEqual(summary["pv_sources"][0]["covered_cost_eur"], 2.0)
+        self.assertAlmostEqual(summary["pv_sources"][0]["active_cost_eur"], 10.0)
+
+    def test_min_lcoe_coverage_ratio_can_suppress_partial_lcoe_values(self):
+        assets = [{
+            "asset_id": "pv_partial",
+            "asset_type": "pv",
+            "include": True,
+            "evcc_title": "Partial PV",
+            "commissioning_date": INVESTMENT_MODULE.dt.date(2026, 1, 1),
+            "purchase_price_eur": 365.25,
+            "lifetime_years": 1.0,
+            "yearly_opex_eur": 0.0,
+            "allocation_percent": 1.0,
+        }]
+        original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
+        try:
+            def fake_fetch(_base_url, _asset, start_day, _end_day, _tz, _metric):
+                return {start_day: 2000.0}
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = fake_fetch
+            series, summary = INVESTMENT_MODULE.build_rollups(
+                "http://vm.invalid",
+                assets,
+                INVESTMENT_MODULE.dt.date(2026, 1, 1),
+                INVESTMENT_MODULE.dt.date(2026, 1, 11),
+                INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
+                30000.0,
+                "30s",
+                energy_source="daily-metric",
+                min_lcoe_coverage_ratio=0.5,
+            )
+        finally:
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = original
+
+        yearly_keys = [key for key in series if key[0] == "evcc_pv_lcoe_yearly_ct_per_kwh"]
+        self.assertEqual(yearly_keys, [])
+        self.assertEqual(summary["pv_sources"][0]["lcoe_ct_per_kwh"], None)
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -6343,7 +6343,7 @@
                         "editorMode": "code",
                         "expr": "last_over_time(evcc_pv_lcoe_yearly_ct_per_kwh{local_year=\"${__from:date:YYYY}\"}[$__range])",
                         "format": "time_series",
-                        "legendFormat": "{{title}}",
+                        "legendFormat": "{{title}} ({{coverage}})",
                         "instant": true,
                         "range": false
                       },
