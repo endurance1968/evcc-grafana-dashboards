@@ -37,7 +37,7 @@ Die Excel-/CSV-Datei ergaenzt dazu die Stammdaten, die EVCC nicht kennen kann: K
 | `evcc_title` | Exakter EVCC-/VictoriaMetrics-Titel passend zu `pvPower_value{title="..."}`. Fuer PV und `pv_shared` ist dieser Wert Pflicht, weil darueber Kosten und Energie gemappt werden. |
 | `allocation_percent` | Anteil als Zahl von `0` bis `1`, nur fuer `pv_shared` Pflicht. `1` bedeutet 100 %, `0.5` bedeutet 50 %. Brueche wie `1/3` sind erlaubt. Alle eingeschlossenen Zeilen mit gleicher `asset_id` sollten zusammen `1.0` ergeben; der Helper gibt sonst eine Warnung aus. |
 | `commissioning_date` | Inbetriebnahmedatum dieser Investitionszeile im Format `YYYY-MM-DD`. Ab diesem Tag beginnt die Abschreibung fuer genau diese Zeile. |
-| `purchase_price_eur` | Anschaffungskosten in Euro. Rabatte oder Foerderungen sollten vorher abgezogen werden, wenn sie die Investition mindern sollen. |
+| `purchase_price_eur` | Anschaffungskosten in Euro. Rabatte oder Foerderungen sollten vorher abgezogen werden, wenn sie die Investition mindern sollen. Hier muss ein berechneter Zahlenwert stehen. Zellreferenz-Formeln wie `=F13/22*12` sind in CSV-Dateien nicht auswertbar und werden nur bei XLSX-Dateien genutzt, wenn die Datei einen gespeicherten berechneten Zellwert enthaelt. |
 | `lifetime_years` | Abschreibungsdauer in Jahren. Fuer PV und Speicher ist als einfache Annahme `20` sinnvoll. Nach Ablauf dieser Dauer erzeugt diese Investitionszeile keine weiteren Jahreskosten. |
 | `yearly_opex_eur` | Optionale laufende Kosten pro Jahr, zum Beispiel Wartung, Versicherung oder Portalgebuehren. `0` ist erlaubt. |
 | `watt_peak` | Installierte PV-Leistung in Wp. Fuer `asset_type=pv` Pflicht, fuer `pv_shared` nicht noetig. |
@@ -93,6 +93,14 @@ Unvollstaendige Abdeckung wird kompakt markiert:
 - `--partial-warning-threshold` steuert den Warnschwellwert, Standard `0.95`.
 - `--min-lcoe-coverage-ratio` kann optional festlegen, ab welcher Abdeckung Monats-, Jahres- und 7-Tage-LCOE-Werte geschrieben werden. Standard `0.0` schreibt die Werte, markiert Teilabdeckung aber sichtbar.
 
+## Excel- und CSV-Formeln
+
+Die Investment-Datei sollte fuer alle Pflichtfelder echte Werte enthalten. Besonders `purchase_price_eur`, `commissioning_date` und `lifetime_years` duerfen im produktiven Lauf nicht von ungeprueften Tabellenformeln abhaengen.
+
+Der Helper kann einfache numerische Ausdruecke ohne Zellreferenzen auswerten, zum Beispiel `1/3` oder `=1/3` fuer `allocation_percent`. Formeln mit Zellreferenzen, Bereichen oder Arbeitsblattbezuegen wie `=F13/22*12`, `=SUMME(F2:F5)` oder `=Sheet2!A1` werden nicht selbst berechnet. Bei XLSX-Dateien liest der Helper zuerst den von Excel/LibreOffice gespeicherten Ergebniswert; existiert dieser nicht, faellt er auf die Formel zurueck und die Zeile kann als unvollstaendig uebersprungen werden.
+
+Empfehlung: Nach Aenderungen in Excel/LibreOffice die Datei speichern, schliessen und mit einem Trockenlauf pruefen. Wenn CSV verwendet wird, Formeln mit Zellreferenzen, Bereichen oder Arbeitsblattbezuegen vor dem Export durch Werte ersetzen. Einfache Brueche wie `1/3` bleiben erlaubt. Der Trockenlauf meldet fehlende Pflichtfelder wie `purchase_price_eur`, bevor Daten geschrieben werden.
+
 ## Gestehungskosten berechnen
 
 Fuer normale EVCC-Installationen reicht der Standardpfad ueber EVCC-`pvPower_value`. Der Helper liest die PV-Energie je `evcc_title` direkt aus den vorhandenen EVCC-Rohdaten und schreibt daraus die Kostenmetriken fuer die Dashboards.
@@ -131,6 +139,8 @@ Wichtig: Der Helper schreibt nur seine eigenen Investment- und Gestehungskostenm
 ## Erweiterte Energiequellen
 
 Die Optionen `--energy-source daily-metric` und `--energy-source combined` sind Spezialfaelle. Sie sind relevant, wenn bereits eine per-title Tagesmetrik wie `evcc_pv_energy_by_title_daily_wh` in VictoriaMetrics liegt und bewusst statt oder zusaetzlich zu EVCC-`pvPower_value` verwendet werden soll. Fuer den normalen EVCC-Pfad werden diese Varianten nicht benoetigt.
+
+Wenn historische Importdaten und aktuelle EVCC-Rohdaten gemeinsam ausgewertet werden sollen, ist `combined` der passende Modus. Beispiel: SMA-Portal-Tagesdaten liefern alte Jahre in `evcc_pv_energy_by_title_daily_wh`, waehrend EVCC ab einem spaeteren Zeitpunkt Live-Daten als `pvPower_value{title="..."}` schreibt. Dann kann der Helper mit `--energy-source combined --combined-energy-conflict prefer-evcc` historische Tageswerte und aktuelle EVCC-Werte zusammenfuehren. Dabei bleiben SMA-/Importdaten und Investment-Kostenberechnung technisch getrennt: der Importer schreibt Energie, der Kostenhelper liest Energie und schreibt nur Kostenmetriken.
 
 ## Geplante Systemkennzahlen
 

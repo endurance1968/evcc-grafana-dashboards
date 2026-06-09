@@ -37,7 +37,7 @@ The Excel/CSV file adds metadata EVCC cannot know: commissioning date, purchase 
 | `evcc_title` | Exact EVCC/VictoriaMetrics title matching `pvPower_value{title="..."}`. Mandatory for PV and `pv_shared`, because this maps cost to energy. |
 | `allocation_percent` | Share as a number from `0` to `1`, mandatory only for `pv_shared`. `1` means 100 %, `0.5` means 50 %. Fractions such as `1/3` are accepted. All included rows with the same `asset_id` should sum to `1.0`; otherwise the helper prints a warning. |
 | `commissioning_date` | Commissioning date of this investment row in `YYYY-MM-DD` format. Depreciation starts on this date for this row only. |
-| `purchase_price_eur` | Purchase cost in EUR. Subtract grants or rebates beforehand if they should reduce the investment basis. |
+| `purchase_price_eur` | Purchase cost in EUR. Subtract grants or rebates beforehand if they should reduce the investment basis. This must be a calculated numeric value. Cell-reference formulas such as `=F13/22*12` cannot be evaluated from CSV files and are only usable from XLSX files when the workbook contains a saved calculated cell value. |
 | `lifetime_years` | Depreciation lifetime in years. `20` is a reasonable simple assumption for PV and batteries. After this period, this investment row no longer contributes yearly costs. |
 | `yearly_opex_eur` | Optional yearly operating costs, such as maintenance, insurance, or portal fees. `0` is allowed. |
 | `watt_peak` | Installed PV power in Wp. Mandatory for `asset_type=pv`, not needed for `pv_shared`. |
@@ -93,6 +93,14 @@ Incomplete coverage is marked compactly:
 - `--partial-warning-threshold` controls the warning threshold, default `0.95`.
 - `--min-lcoe-coverage-ratio` can optionally require a minimum coverage before monthly, yearly, and 7-day LCOE values are written. The default `0.0` writes values while still marking partial coverage.
 
+## Excel And CSV Formulas
+
+The investment file should contain real values for all required fields. In particular, `purchase_price_eur`, `commissioning_date`, and `lifetime_years` should not depend on unchecked spreadsheet formulas during production runs.
+
+The helper can evaluate simple numeric expressions without cell references, for example `1/3` or `=1/3` for `allocation_percent`. It does not calculate formulas with cell references, ranges, or worksheet references such as `=F13/22*12`, `=SUM(F2:F5)`, or `=Sheet2!A1`. For XLSX files, the helper first reads the calculated value saved by Excel/LibreOffice; if no saved value exists, it falls back to the formula text and the row can be skipped as incomplete.
+
+Recommendation: After editing in Excel/LibreOffice, save and close the file and run a dry run. If CSV is used, replace formulas with cell references, ranges, or worksheet references with values before exporting. Simple fractions such as `1/3` remain supported. The dry run reports missing required fields such as `purchase_price_eur` before anything is written.
+
 ## Calculate Generation Costs
 
 For normal EVCC installations, the standard path through EVCC `pvPower_value` is enough. The helper reads PV energy per `evcc_title` directly from existing EVCC raw data and writes the cost metrics used by the dashboards.
@@ -131,6 +139,8 @@ Important: The helper writes only its own investment and generation-cost metrics
 ## Advanced Energy Sources
 
 The options `--energy-source daily-metric` and `--energy-source combined` are special cases. They are relevant when a per-title daily metric such as `evcc_pv_energy_by_title_daily_wh` already exists in VictoriaMetrics and should intentionally be used instead of or in addition to EVCC `pvPower_value`. Normal EVCC setups do not need these variants.
+
+Use `combined` when historic import data and current EVCC raw data should be evaluated together. Example: SMA Portal daily data provides old years in `evcc_pv_energy_by_title_daily_wh`, while EVCC later writes live data as `pvPower_value{title="..."}`. In that case, run the helper with `--energy-source combined --combined-energy-conflict prefer-evcc` to merge historic daily values and current EVCC values. SMA/import data and investment-cost calculation remain technically separate: importers write energy, the cost helper reads energy and writes only cost metrics.
 
 ## Planned System Metrics
 
