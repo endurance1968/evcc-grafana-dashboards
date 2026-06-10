@@ -31,7 +31,7 @@ Erforderlich:
 - laufende VictoriaMetrics-Instanz
 - aktuelle EVCC-Rohdaten in VictoriaMetrics
 - Grafana-Service-Account-Token
-- Internetzugriff auf GitHub fuer die Default-Deploy-Quelle
+- Zugriff auf den gewaehlten Dashboard- und Skript-Raw-Endpunkt, zum Beispiel GitHub oder ein lokales Forgejo
 
 Empfohlen:
 
@@ -89,25 +89,39 @@ Fuer ein einfaches lokales Deployment reicht in der aktuellen Organisation norma
 
 ## 3. Deployer herunterladen
 
+Die Beispiele nutzen GitHub als `BASE`. Fuer ein lokales Forgejo-Repository setze `BASE` stattdessen auf den Raw-Root, typischerweise `http://<server:port>/<owner>/<repo>/raw/branch/main`.
+
 Linux / Raspberry Pi:
 
 ```bash
-curl -fsSLo deploy-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-python.sh
-curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo-Beispiel:
+# BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+curl -fsSLo deploy-python.sh "$BASE/scripts/deploy-python.sh"
+curl -fsSLo vm-dashboard-install.env.example "$BASE/scripts/vm-dashboard-install.env.example"
 chmod +x deploy-python.sh
 ```
 
 Windows / PowerShell:
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy.ps1 -OutFile deploy.ps1
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
+$Base = "https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo-Beispiel:
+# $Base = "http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+Invoke-WebRequest "$Base/scripts/deploy.ps1" -OutFile deploy.ps1
+Invoke-WebRequest "$Base/scripts/vm-dashboard-install.env.example" -OutFile vm-dashboard-install.env.example
 ```
 
 Optionaler Bash-Deployer:
 
 ```bash
-curl -fsSLo deploy-bash.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-bash.sh
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo-Beispiel:
+# BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+curl -fsSLo deploy-bash.sh "$BASE/scripts/deploy-bash.sh"
 chmod +x deploy-bash.sh
 sudo apt install -y jq
 ```

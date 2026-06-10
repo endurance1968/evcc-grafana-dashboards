@@ -2,19 +2,20 @@
 
 Diese Datei beschreibt, wie Investitionskosten fuer PV-Anlagen, Speicher und gemeinsame Systemkomponenten gepflegt werden koennen. Ziel ist eine spaetere Berechnung des effektiven Strompreises aus realen EVCC/VictoriaMetrics-Daten und lokalen Investitionsdaten.
 
-## Dateiablage
+## Was bedeutet LCOE?
 
-Die oeffentlichen Vorlagen liegen hier:
+LCOE steht fuer `Levelized Cost of Energy`, auf Deutsch meist Stromgestehungskosten. Die Kennzahl rechnet die Kosten einer Anlage auf die erzeugte Energie um und wird hier in `ct/kWh` angezeigt. Vereinfacht gesagt: Wenn eine PV-Anlage ueber ihre Nutzungsdauer Anschaffungskosten und laufende Kosten verursacht, verteilt LCOE diese Kosten auf die tatsaechlich erzeugten Kilowattstunden.
+
+In diesem Projekt ist LCOE zuerst als PV-Erzeugungskosten pro EVCC-PV-Titel umgesetzt. Die Berechnung nutzt lokale Investmentdaten, die gemessene PV-Erzeugung und eine lineare Abschreibung ueber die angegebene Lebensdauer. Batterie, Netzbezug, Einspeiseverguetung und Eigenverbrauch werden dadurch nicht automatisch eingepreist; sie bleiben eigene Auswertungen bzw. spaetere Erweiterungen.
+
+## Investment-Datei vorbereiten
+
+Nutze eine der Vorlagen aus dem Repository oder aus dem heruntergeladenen Release-Paket:
 
 - `data/examples/investments.example.xlsx` fuer manuelle Pflege in Excel, LibreOffice oder OnlyOffice
 - `data/examples/investments.example.csv` als skriptfreundliche Textvariante mit denselben Spalten
 
-Echte Werte sollten lokal abgelegt werden und nicht ins Git-Repository gelangen:
-
-- bevorzugt: `data/private/investments.xlsx`
-- alternativ: `data/private/investments.csv`
-
-`data/private/` ist fuer private Installationsdaten vorgesehen und wird durch `.gitignore` ausgeschlossen.
+Kopiere die Vorlage auf dein VictoriaMetrics-/Rollup-System und trage dort deine echten Werte ein. In den folgenden Beispielen liegt die produktive Datei unter `/etc/evcc-investments.xlsx`; du kannst jeden anderen lokalen Pfad verwenden, solange derselbe Pfad spaeter in der Helper-Konfiguration steht.
 
 ## Grundidee
 
@@ -58,7 +59,7 @@ Die aktuelle Umsetzung ist `scripts/helper/import-investment-costs.py`. Sie bere
 
 Der Helper:
 
-1. liest `data/private/investments.xlsx` oder `.csv`,
+1. liest die konfigurierte Investment-Datei im XLSX- oder CSV-Format,
 2. nutzt eingeschlossene Zeilen mit `asset_type=pv` oder `asset_type=pv_shared`,
 3. prueft bei `pv_shared`, ob die Verteilung je `asset_id` auf 100 % kommt,
 4. gruppiert mehrere Investment-Zeilen mit gleichem `evcc_title`,
@@ -117,7 +118,7 @@ Trockenlauf:
 ```bash
 python3 scripts/helper/import-investment-costs.py \
   --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
+  --investment-file /etc/evcc-investments.xlsx \
   --start 2025-01-01 \
   --end 2026-01-01 \
   --energy-source pv-power
@@ -128,7 +129,7 @@ Schreiben oder Ersetzen der generierten Metriken nur auf der Ziel-VictoriaMetric
 ```bash
 python3 scripts/helper/import-investment-costs.py \
   --vm-base-url http://localhost:8428 \
-  --investment-file data/private/investments.xlsx \
+  --investment-file /etc/evcc-investments.xlsx \
   --start 2025-01-01 \
   --end 2026-01-01 \
   --energy-source pv-power \
@@ -139,7 +140,62 @@ python3 scripts/helper/import-investment-costs.py \
 
 ## Regelmaessige Aktualisierung
 
-Der Helper ist optional und laeuft getrennt vom normalen EVCC/VictoriaMetrics-Rollup. Wenn sich die Investitionsdatei aendert oder das laufende Jahr im Dashboard aktuell bleiben soll, sollte der Helper nach dem normalen Rollup erneut ausgefuehrt werden, zum Beispiel taeglich per Cron oder systemd timer. Fuer abgeschlossene historische Jahre reicht ein einmaliger Lauf, solange sich die Investitionsdatei oder die importierte PV-Energie nicht aendert.
+Der Helper ist optional und laeuft getrennt vom normalen EVCC/VictoriaMetrics-Rollup. Fuer den normalen Betrieb reicht ein woechentlicher Lauf, wenn das laufende Jahr im Dashboard aktuell bleiben soll. Der taegliche EVCC/VictoriaMetrics-Rollup kann weiter wie bisher laufen; der Investment-Helper wird separat und idealerweise zeitlich nach einem abgeschlossenen Tagesrollup gestartet. Fuer abgeschlossene historische Jahre reicht ein einmaliger Lauf, solange sich die Investitionsdatei oder die importierte PV-Energie nicht aendert.
+
+Ein Cron-tauglicher Wrapper liegt unter `scripts/helper/evcc-vm-investment-weekly.sh`; die passende Vorlage ist `scripts/helper/evcc-vm-investment-weekly.conf.example`. Die Dateien koennen entweder aus einem lokalen Repository-Checkout installiert oder direkt von GitHub bzw. einem lokalen Forgejo-Raw-Endpunkt heruntergeladen werden.
+
+Installation aus einem vorhandenen Repo-Checkout:
+
+```bash
+sudo apt install -y python3-openpyxl
+sudo mkdir -p /opt/evcc-vm-migration
+sudo install -m 0755 scripts/helper/import-investment-costs.py /opt/evcc-vm-migration/import-investment-costs.py
+sudo install -m 0755 scripts/helper/evcc-vm-investment-weekly.sh /usr/local/bin/evcc-vm-investment-weekly.sh
+sudo install -m 0640 scripts/helper/evcc-vm-investment-weekly.conf.example /etc/evcc-vm-investment-costs.conf
+sudo nano /etc/evcc-vm-investment-costs.conf
+```
+
+Installation ohne Repo-Checkout per Download. Fuer GitHub bleibt `BASE` wie unten gesetzt. Fuer Forgejo wird `BASE` auf den Repository-Raw-Pfad gesetzt, typischerweise `http://<server:port>/<owner>/<repo>/raw/branch/main`:
+
+```bash
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Alternative Forgejo-Beispiel:
+# BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+sudo apt install -y python3-openpyxl
+sudo mkdir -p /opt/evcc-vm-migration
+curl -fsSLo /tmp/import-investment-costs.py "$BASE/scripts/helper/import-investment-costs.py"
+curl -fsSLo /tmp/evcc-vm-investment-weekly.sh "$BASE/scripts/helper/evcc-vm-investment-weekly.sh"
+curl -fsSLo /tmp/evcc-vm-investment-weekly.conf.example "$BASE/scripts/helper/evcc-vm-investment-weekly.conf.example"
+sudo install -m 0755 /tmp/import-investment-costs.py /opt/evcc-vm-migration/import-investment-costs.py
+sudo install -m 0755 /tmp/evcc-vm-investment-weekly.sh /usr/local/bin/evcc-vm-investment-weekly.sh
+sudo install -m 0640 /tmp/evcc-vm-investment-weekly.conf.example /etc/evcc-vm-investment-costs.conf
+sudo nano /etc/evcc-vm-investment-costs.conf
+```
+
+Minimal muss in `/etc/evcc-vm-investment-costs.conf` der Pfad zu deiner lokalen Investment-Datei gesetzt werden, zum Beispiel:
+
+```bash
+VM_BASE_URL=http://127.0.0.1:8428
+INVESTMENT_FILE=/etc/evcc-investments.xlsx
+ENERGY_SOURCE=pv-power
+```
+
+Fuer Installationen mit historischen per-title Tagesdaten, zum Beispiel aus SMA-Importen, kann stattdessen `combined` genutzt werden:
+
+```bash
+ENERGY_SOURCE=combined
+COMBINED_ENERGY_CONFLICT=prefer-evcc
+PV_ENERGY_METRIC=evcc_pv_energy_by_title_daily_wh
+```
+
+Woechentlicher Cron-Beispieljob, Sonntag 06:15 Uhr:
+
+```cron
+15 6 * * 0 /usr/local/bin/evcc-vm-investment-weekly.sh >> /var/log/evcc-vm-investment-costs.log 2>&1
+```
+
+Der Wrapper nutzt ein Lockfile, damit kein zweiter Investment-Lauf parallel startet. Standardmaessig schreibt er mit `--write --replace` und ersetzt nur die vom Investment-Helper erzeugten Metriken. EVCC-Rohdaten und normale Rollup-Metriken werden nicht geloescht.
 
 Wichtig: Der Helper schreibt nur seine eigenen Investment- und Gestehungskostenmetriken. Er ersetzt keinen EVCC-Ingest, keinen SMA-Import und keinen Standard-Rollup. Insbesondere schreibt oder loescht er nicht `evcc_pv_energy_by_title_daily_wh`; diese Metrik gehoert den Energieimporten bzw. Rollups.
 

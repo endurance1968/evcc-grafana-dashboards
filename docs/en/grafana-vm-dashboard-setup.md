@@ -29,7 +29,7 @@ Required:
 - running VictoriaMetrics instance
 - current EVCC raw data in VictoriaMetrics
 - Grafana service-account token
-- internet access to GitHub for the default deploy source
+- access to the selected dashboard and script raw endpoint, for example GitHub or a local Forgejo
 
 Recommended:
 
@@ -87,25 +87,39 @@ For a simple local deployment, `Admin` in the current organization is usually en
 
 ## 3. Download The Deployer
 
+The examples use GitHub as `BASE`. For a local Forgejo repository, set `BASE` to the raw repository root instead, typically `http://<server:port>/<owner>/<repo>/raw/branch/main`.
+
 Linux / Raspberry Pi:
 
 ```bash
-curl -fsSLo deploy-python.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-python.sh
-curl -fsSLo vm-dashboard-install.env.example https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo example:
+# BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+curl -fsSLo deploy-python.sh "$BASE/scripts/deploy-python.sh"
+curl -fsSLo vm-dashboard-install.env.example "$BASE/scripts/vm-dashboard-install.env.example"
 chmod +x deploy-python.sh
 ```
 
 Windows / PowerShell:
 
 ```powershell
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy.ps1 -OutFile deploy.ps1
-Invoke-WebRequest https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/vm-dashboard-install.env.example -OutFile vm-dashboard-install.env.example
+$Base = "https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo example:
+# $Base = "http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+Invoke-WebRequest "$Base/scripts/deploy.ps1" -OutFile deploy.ps1
+Invoke-WebRequest "$Base/scripts/vm-dashboard-install.env.example" -OutFile vm-dashboard-install.env.example
 ```
 
 Optional Bash deployer:
 
 ```bash
-curl -fsSLo deploy-bash.sh https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main/scripts/deploy-bash.sh
+BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/main"
+# Forgejo example:
+# BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
+
+curl -fsSLo deploy-bash.sh "$BASE/scripts/deploy-bash.sh"
 chmod +x deploy-bash.sh
 sudo apt install -y jq
 ```

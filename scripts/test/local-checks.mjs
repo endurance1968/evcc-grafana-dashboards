@@ -1,8 +1,8 @@
 /**
  * Script: local-checks.mjs
  * Purpose: Run the local deterministic validation checks for this repository.
- * Version: 2026.06.07.4
- * Last modified: 2026-06-07
+ * Version: 2026.06.10.1
+ * Last modified: 2026-06-10
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -31,7 +31,7 @@ const pythonScripts = [
 ];
 
 function logHeader() {
-  console.log("local-checks.mjs v2026.06.07.4 (last modified 2026-06-07)");
+  console.log("local-checks.mjs v2026.06.10.1 (last modified 2026-06-10)");
 }
 
 function commandExists(command, args = ["--version"]) {
@@ -195,6 +195,7 @@ function runOptionalBashSyntaxChecks() {
   }
   run(bash, ["-n", "scripts/deploy-bash.sh"]);
   run(bash, ["-n", "scripts/deploy-python.sh"]);
+  run(bash, ["-n", "scripts/helper/evcc-vm-investment-weekly.sh"]);
 }
 
 function main() {

@@ -17,6 +17,9 @@ Aktuelle Rollup-Dateien:
 - `rollup/evcc-vm-rollup.py`
 - `rollup/evcc-vm-rollup.conf.example`
 - `rollup/evcc-vm-rollup-prod.conf.example`
+- `helper/evcc-vm-investment-weekly.sh`
+- `helper/evcc-vm-investment-weekly.conf.example`
+- `helper/import-investment-costs.py`
 - `helper/check_data.py`
 - `helper/compare_import_coverage.py`
 - `helper/compare_labelsets.py`

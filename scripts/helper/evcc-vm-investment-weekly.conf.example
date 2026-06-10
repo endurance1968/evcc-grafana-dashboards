@@ -1,0 +1,38 @@
+# EVCC VictoriaMetrics PV investment/generation-cost weekly cron defaults
+# Copy to /etc/evcc-vm-investment-costs.conf and adjust locally.
+# This is a shell environment file sourced by evcc-vm-investment-weekly.sh.
+
+# Runtime
+PYTHON_BIN=/usr/bin/python3
+HELPER_SCRIPT=/opt/evcc-vm-migration/import-investment-costs.py
+VM_BASE_URL=http://127.0.0.1:8428
+INVESTMENT_FILE=/etc/evcc-investments.xlsx
+TIMEZONE=Europe/Berlin
+LOCK_FILE=/var/lock/evcc-vm-investment-costs.lock
+
+# Date range. END_DAY is exclusive. Empty START_DAY lets the helper use the
+# earliest PV commissioning date from the investment file. The default END_DAY
+# in the script is today, so the completed days up to yesterday are recalculated.
+START_DAY=
+# END_DAY=2026-01-01
+
+# Normal EVCC-only installations use pv-power.
+ENERGY_SOURCE=pv-power
+
+# Use this instead if historical per-title daily PV energy was imported, for
+# example from SMA Portal, and current EVCC pvPower_value should win on overlap:
+# ENERGY_SOURCE=combined
+# COMBINED_ENERGY_CONFLICT=prefer-evcc
+# PV_ENERGY_METRIC=evcc_pv_energy_by_title_daily_wh
+
+PEAK_POWER_LIMIT=30000
+SAMPLE_INTERVAL=30s
+MIN_LCOE_COVERAGE_RATIO=0.0
+PARTIAL_WARNING_THRESHOLD=0.95
+BATCH_SIZE=200
+SKIP_TITLES_WITHOUT_ENERGY=true
+WRITE_PV_ENERGY_ROLLUP=false
+
+# Production cron should normally write and replace only helper-generated metrics.
+WRITE=true
+REPLACE=true
