@@ -2,8 +2,8 @@
 """
 Script: import-investment-costs.py
 Purpose: Calculate PV investment cost rollups from a local investment file and VictoriaMetrics PV data.
-Version: 2026.06.08.7
-Last modified: 2026-06-08
+Version: 2026.06.10.4
+Last modified: 2026-06-10
 """
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.08.7"
-SCRIPT_LAST_MODIFIED = "2026-06-08"
+SCRIPT_VERSION = "2026.06.10.4"
+SCRIPT_LAST_MODIFIED = "2026-06-10"
 GENERATED_METRICS = [
     "evcc_pv_investment_cost_daily_eur",
     "evcc_pv_lcoe_daily_ct_per_kwh",
@@ -36,6 +36,11 @@ GENERATED_METRICS = [
     "evcc_pv_lcoe_yearly_ct_per_kwh",
     "evcc_pv_lcoe_period_ct_per_kwh",
     "evcc_pv_lcoe_rolling_7d_ct_per_kwh",
+    "evcc_pv_installed_watt_peak_yearly",
+    "evcc_pv_energy_by_title_yearly_wh",
+    "evcc_pv_specific_yield_yearly_kwh_per_kwp",
+    "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp",
+    "evcc_pv_specific_yield_rolling_7d_kwh_per_kwp",
     "evcc_pv_effective_lcoe_daily_ct_per_kwh",
     "evcc_pv_effective_lcoe_yearly_ct_per_kwh",
     "evcc_pv_effective_lcoe_period_ct_per_kwh",
@@ -494,6 +499,28 @@ def active_cost_days_for_calendar_year(assets: list[dict[str, Any]], year: int) 
             expected_days += 1.0
     return expected_days
 
+def installed_watt_peak_for_day(assets: list[dict[str, Any]], day: dt.date) -> float:
+    total = 0.0
+    for asset in assets:
+        watt_peak = float(asset.get("watt_peak") or 0.0)
+        if watt_peak <= 0 or day < asset["commissioning_date"]:
+            continue
+        total += watt_peak * float(asset.get("allocation_percent", 1.0))
+    return total
+
+
+def average_installed_watt_peak_for_range(assets: list[dict[str, Any]], start_day: dt.date, end_day: dt.date) -> float:
+    total_watt_days = 0.0
+    days = 0
+    for day in iter_days(start_day, end_day):
+        total_watt_days += installed_watt_peak_for_day(assets, day)
+        days += 1
+    return total_watt_days / days if days else 0.0
+
+
+def average_installed_watt_peak_for_calendar_year(assets: list[dict[str, Any]], year: int) -> float:
+    return average_installed_watt_peak_for_range(assets, dt.date(year, 1, 1), dt.date(year + 1, 1, 1))
+
 def validate_shared_allocations(assets: list[dict[str, Any]], tolerance: float = 0.001) -> list[dict[str, Any]]:
     shared_groups: dict[str, list[dict[str, Any]]] = {}
     for asset in assets:
@@ -706,8 +733,27 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                     )
             energy_wh = values["energy_wh"]
             cost_eur = values["covered_cost_eur"]
+            peak_labels = {
+                "title": title,
+                "local_year": f"{year:04d}",
+            }
+            installed_watt_peak = average_installed_watt_peak_for_calendar_year(title_assets, year)
+            if energy_wh > 1000 and ratio is not None and ratio >= partial_warning_threshold:
+                append_sample(series, "evcc_pv_energy_by_title_yearly_wh", peak_labels, timestamp_for_year(year, tz), energy_wh)
+            if energy_wh > 1000 and installed_watt_peak > 0:
+                yield_labels = {
+                    "title": title,
+                    "coverage": coverage_label(ratio),
+                    "local_year": f"{year:04d}",
+                }
+                append_sample(series, "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp", yield_labels, timestamp_for_year(year, tz), energy_wh / installed_watt_peak)
+                if ratio >= partial_warning_threshold:
+                    append_sample(series, "evcc_pv_installed_watt_peak_yearly", peak_labels, timestamp_for_year(year, tz), installed_watt_peak)
+                    append_sample(series, "evcc_pv_specific_yield_yearly_kwh_per_kwp", peak_labels, timestamp_for_year(year, tz), energy_wh / installed_watt_peak)
+
             if energy_wh <= 1000 or cost_eur <= 0 or not should_write_lcoe(ratio, min_lcoe_coverage_ratio):
                 continue
+
             labels = {
                 "title": title,
                 "coverage": coverage_label(ratio),
@@ -731,12 +777,16 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                     window_covered_days += values["covered_days"]
                 current += dt.timedelta(days=1)
             ratio = coverage_ratio(window_covered_days, window_expected_days)
-            if window_energy_wh > 1000 and window_cost_eur > 0 and should_write_lcoe(ratio, min_lcoe_coverage_ratio):
+            if window_energy_wh > 1000:
                 labels = {
                     "title": title,
                     "local_year": f"{day.year:04d}",
                 }
-                append_sample(series, "evcc_pv_lcoe_rolling_7d_ct_per_kwh", labels, timestamp_for_day(day, tz), window_cost_eur / (window_energy_wh / 1000.0) * 100.0)
+                window_watt_peak = average_installed_watt_peak_for_range(title_assets, window_start, day + dt.timedelta(days=1))
+                if window_watt_peak > 0:
+                    append_sample(series, "evcc_pv_specific_yield_rolling_7d_kwh_per_kwp", labels, timestamp_for_day(day, tz), window_energy_wh / window_watt_peak)
+                if window_cost_eur > 0 and should_write_lcoe(ratio, min_lcoe_coverage_ratio):
+                    append_sample(series, "evcc_pv_lcoe_rolling_7d_ct_per_kwh", labels, timestamp_for_day(day, tz), window_cost_eur / (window_energy_wh / 1000.0) * 100.0)
 
         for (asset_id, (year, month)), cost_eur in sorted(monthly_asset_costs.items()):
             labels = {

@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.03.32
- * Last modified: 2026-06-03
+ * Version: 2026.06.10.1
+ * Last modified: 2026-06-10
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -190,6 +190,22 @@ const criticalPanels = {
       "title": "Days with highest yield",
       "type": "table",
       "minTargets": 1
+    },
+    {
+      "id": 58,
+      "title": "PV energy/year by source",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "source",
+      "exprIncludes": "evcc_pv_energy_by_title_yearly_wh"
+    },
+    {
+      "id": 59,
+      "title": "PV specific yield/year by source",
+      "type": "barchart",
+      "minTargets": 1,
+      "xField": "source",
+      "exprIncludes": "evcc_pv_specific_yield_yearly_kwh_per_kwp"
     }
   ],
   "VM_EVCC_Year.json": [
@@ -227,7 +243,36 @@ const criticalPanels = {
       "minTargets": 1,
       "xField": "month",
       "batterySplit": true
+    },
+    {
+      "id": 77,
+      "title": "PV generation costs",
+      "type": "bargauge",
+      "minTargets": 1,
+      "exprIncludes": "evcc_pv_lcoe_yearly_ct_per_kwh"
+    },
+    {
+      "id": 78,
+      "title": "PV generation cost/week (ct/kWh)",
+      "type": "timeseries",
+      "minTargets": 1,
+      "exprIncludes": "evcc_pv_lcoe_rolling_7d_ct_per_kwh"
+    },
+    {
+      "id": 79,
+      "title": "PV specific yield (kWh/kWp)",
+      "type": "bargauge",
+      "minTargets": 1,
+      "exprIncludes": "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp"
+    },
+    {
+      "id": 80,
+      "title": "PV specific yield/week (kWh/kWp)",
+      "type": "timeseries",
+      "minTargets": 1,
+      "exprIncludes": "evcc_pv_specific_yield_rolling_7d_kwh_per_kwp"
     }
+
   ],
   "VM_EVCC_Month.json": [
     {
@@ -677,6 +722,70 @@ function validateMetricGaugeTimeSeries(fileName, panel, failures) {
     assert(String(querySpec.expr || "").includes("running_sum("), failures, `${fileName}: Metric gauges ${refId} must use cumulative range data so the reduced value still represents the selected period`);
   }
 }
+function findRowsWithPanelIds(layout, requiredPanelIds) {
+  const matches = [];
+  const requiredNames = new Set(requiredPanelIds.map((id) => "panel-" + id));
+
+  function visit(currentLayout) {
+    if (!currentLayout || typeof currentLayout !== "object") {
+      return;
+    }
+    if (currentLayout.kind === "TabsLayout") {
+      for (const tab of currentLayout.spec?.tabs || []) {
+        visit(tab?.spec?.layout);
+      }
+      return;
+    }
+    if (currentLayout.kind === "RowsLayout") {
+      for (const row of currentLayout.spec?.rows || []) {
+        const itemNames = new Set((row?.spec?.layout?.spec?.items || []).map((item) => item?.spec?.element?.name));
+        const hasAllPanels = [...requiredNames].every((name) => itemNames.has(name));
+        if (hasAllPanels) {
+          matches.push(row);
+        }
+        visit(row?.spec?.layout);
+      }
+      return;
+    }
+    for (const item of currentLayout.spec?.items || []) {
+      visit(item?.spec?.layout);
+    }
+  }
+
+  visit(layout);
+  return matches;
+}
+
+function validateInvestmentConditionalRow(fileName, dashboard, failures) {
+  const expectedRows = new Map([
+    ["VM_EVCC_Year.json", [77, 78, 79, 80]],
+    ["VM_EVCC_All-time.json", [56, 57]],
+  ]);
+  const expectedPanelIds = expectedRows.get(fileName);
+  if (!expectedPanelIds) {
+    return;
+  }
+
+  const variable = dashboardVariables(dashboard).find((item) => dashboardVariableName(item) === "hasInvestmentData");
+  const spec = variable?.spec || {};
+  assert(variable?.kind === "QueryVariable", failures, fileName + ": investment visibility helper must be a QueryVariable");
+  assert(spec.hide === "hideVariable", failures, fileName + ": investment visibility helper must be hidden");
+  assert(spec.skipUrlSync === true, failures, fileName + ": investment visibility helper must stay out of dashboard URLs");
+  assert(spec.includeAll === true, failures, fileName + ": investment visibility helper must include All so Grafana initializes conditional rows reliably");
+  assert(spec.current?.value === "$__all", failures, fileName + ": investment visibility helper must default to $__all");
+  assert(spec.query?.spec?.query === "label_values(evcc_pv_lcoe_yearly_ct_per_kwh, title)", failures, fileName + ": investment visibility helper must detect investment rollup data by title label");
+
+  const rows = findRowsWithPanelIds(dashboard.spec?.layout, expectedPanelIds);
+  assert(rows.length === 1, failures, fileName + ": investment panels " + expectedPanelIds.join(", ") + " must be grouped into exactly one conditional row");
+  const row = rows[0];
+  assert(row?.spec?.title === "PV generation costs", failures, fileName + ": investment row must be titled PV generation costs");
+  const condition = row?.spec?.conditionalRendering;
+  const item = condition?.spec?.items?.[0];
+  assert(condition?.kind === "ConditionalRenderingGroup", failures, fileName + ": investment row must use Grafana conditional rendering");
+  assert(condition?.spec?.visibility === "show" && condition?.spec?.condition === "and", failures, fileName + ": investment row must only show when the helper variable has data");
+  assert(item?.kind === "ConditionalRenderingVariable", failures, fileName + ": investment row conditional must be variable-based");
+  assert(item?.spec?.variable === "hasInvestmentData" && item?.spec?.operator === "matches" && item?.spec?.value === ".+", failures, fileName + ": investment row must match non-empty investment data helper values");
+}
 function dashboardVariableName(variable) {
   return variable?.spec ? String(variable.spec.name || "") : String(variable?.name || "");
 }
@@ -731,6 +840,7 @@ function validateDashboard(fileName, dashboard) {
   }
 
   validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
+  validateInvestmentConditionalRow(fileName, dashboard, failures);
   validateTodayPaletteFallbacks(fileName, dashboard, failures);
   for (const panel of panels) {
     validateSemanticColors(fileName, panel, failures);
@@ -955,6 +1065,10 @@ function validateDashboard(fileName, dashboard) {
     assert(panelTargetCount(panel) >= rule.minTargets, failures, `${fileName}: critical panel '${rule.title}' has ${panelTargetCount(panel)} target(s), expected >= ${rule.minTargets}`);
     if (rule.xField) {
       assert(panel.options?.xField === rule.xField, failures, `${fileName}: critical panel '${rule.title}' expected xField=${rule.xField}, got ${panel.options?.xField}`);
+    }
+    if (rule.exprIncludes) {
+      const expr = (panel.targets || []).map(targetExpr).join("\n");
+      assert(expr.includes(rule.exprIncludes), failures, `${fileName}: critical panel '${rule.title}' query must include ${rule.exprIncludes}`);
     }
     if (rule.monthLabels) {
       assert(hasMonthLabels(panel), failures, `${fileName}: critical panel '${rule.title}' is missing 01..12 month value mappings`);

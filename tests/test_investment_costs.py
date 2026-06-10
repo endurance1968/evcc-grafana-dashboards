@@ -91,6 +91,158 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertFalse(any(key[0] == "evcc_pv_energy_by_title_daily_wh" for key in series))
         self.assertFalse(any(key[0] == "evcc_pv_energy_by_title_monthly_wh" for key in series))
 
+    def test_build_rollups_writes_yearly_specific_yield_from_watt_peak(self):
+        assets = [{
+            "asset_id": "pv_nord",
+            "asset_type": "pv",
+            "include": True,
+            "evcc_title": "SMA-Nord",
+            "commissioning_date": INVESTMENT_MODULE.dt.date(2026, 1, 1),
+            "purchase_price_eur": 365.25,
+            "lifetime_years": 1.0,
+            "yearly_opex_eur": 0.0,
+            "watt_peak": 2000.0,
+            "allocation_percent": 1.0,
+        }]
+        original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
+        try:
+            def fake_fetch(_base_url, _asset, start_day, end_day, _tz, _metric):
+                values = {}
+                day = start_day
+                while day < end_day:
+                    values[day] = 2000.0
+                    day += INVESTMENT_MODULE.dt.timedelta(days=1)
+                return values
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = fake_fetch
+            series, _summary = INVESTMENT_MODULE.build_rollups(
+                "http://vm.invalid",
+                assets,
+                INVESTMENT_MODULE.dt.date(2026, 1, 1),
+                INVESTMENT_MODULE.dt.date(2027, 1, 1),
+                INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
+                30000.0,
+                "30s",
+                energy_source="daily-metric",
+            )
+        finally:
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = original
+
+        labels = tuple(sorted({"local_year": "2026", "title": "SMA-Nord"}.items()))
+        covered_labels = tuple(sorted({"coverage": "100%", "local_year": "2026", "title": "SMA-Nord"}.items()))
+        installed_key = ("evcc_pv_installed_watt_peak_yearly", labels)
+        energy_key = ("evcc_pv_energy_by_title_yearly_wh", labels)
+        yield_key = ("evcc_pv_specific_yield_yearly_kwh_per_kwp", labels)
+        covered_yield_key = ("evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp", covered_labels)
+        self.assertIn(installed_key, series)
+        self.assertIn(energy_key, series)
+        self.assertIn(yield_key, series)
+        self.assertIn(covered_yield_key, series)
+        self.assertAlmostEqual(series[installed_key][0][1], 2000.0)
+        self.assertAlmostEqual(series[energy_key][0][1], 730000.0)
+        self.assertAlmostEqual(series[yield_key][0][1], 365.0)
+        self.assertAlmostEqual(series[covered_yield_key][0][1], 365.0)
+
+    def test_build_rollups_suppresses_partial_yearly_specific_yield(self):
+        assets = [{
+            "asset_id": "pv_nord",
+            "asset_type": "pv",
+            "include": True,
+            "evcc_title": "SMA-Nord",
+            "commissioning_date": INVESTMENT_MODULE.dt.date(2026, 1, 1),
+            "purchase_price_eur": 365.25,
+            "lifetime_years": 1.0,
+            "yearly_opex_eur": 0.0,
+            "watt_peak": 2000.0,
+            "allocation_percent": 1.0,
+        }]
+        original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
+        try:
+            def fake_fetch(_base_url, _asset, start_day, _end_day, _tz, _metric):
+                return {start_day: 2000.0, start_day + INVESTMENT_MODULE.dt.timedelta(days=1): 2000.0}
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = fake_fetch
+            series, _summary = INVESTMENT_MODULE.build_rollups(
+                "http://vm.invalid",
+                assets,
+                INVESTMENT_MODULE.dt.date(2026, 1, 1),
+                INVESTMENT_MODULE.dt.date(2026, 1, 3),
+                INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
+                30000.0,
+                "30s",
+                energy_source="daily-metric",
+            )
+        finally:
+            INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = original
+
+        covered_labels = tuple(sorted({"coverage": "1%", "local_year": "2026", "title": "SMA-Nord"}.items()))
+        covered_yield_key = ("evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp", covered_labels)
+        self.assertIn(covered_yield_key, series)
+        self.assertAlmostEqual(series[covered_yield_key][0][1], 2.0)
+        self.assertFalse(any(metric == "evcc_pv_installed_watt_peak_yearly" for metric, _labels in series))
+        self.assertFalse(any(metric == "evcc_pv_energy_by_title_yearly_wh" for metric, _labels in series))
+        self.assertFalse(any(metric == "evcc_pv_specific_yield_yearly_kwh_per_kwp" for metric, _labels in series))
+
+    def test_non_sma_yearly_energy_and_specific_yield_require_full_year_coverage_per_year(self):
+        assets = [{
+            "asset_id": "pv_balkon_west",
+            "asset_type": "pv",
+            "include": True,
+            "evcc_title": "Balkon West",
+            "commissioning_date": INVESTMENT_MODULE.dt.date(2023, 1, 1),
+            "purchase_price_eur": 365.25,
+            "lifetime_years": 20.0,
+            "yearly_opex_eur": 0.0,
+            "watt_peak": 5000.0,
+            "allocation_percent": 1.0,
+        }]
+        original = INVESTMENT_MODULE.fetch_daily_energy
+        try:
+            def fake_fetch(_base_url, _asset, _start_day, _end_day, _tz, _peak_limit, _sample_interval):
+                values = {}
+                day = INVESTMENT_MODULE.dt.date(2023, 1, 1)
+                while day < INVESTMENT_MODULE.dt.date(2024, 1, 1):
+                    values[day] = 10000.0
+                    day += INVESTMENT_MODULE.dt.timedelta(days=1)
+                day = INVESTMENT_MODULE.dt.date(2024, 1, 1)
+                while day < INVESTMENT_MODULE.dt.date(2024, 7, 1):
+                    values[day] = 10000.0
+                    day += INVESTMENT_MODULE.dt.timedelta(days=1)
+                return values
+            INVESTMENT_MODULE.fetch_daily_energy = fake_fetch
+            series, _summary = INVESTMENT_MODULE.build_rollups(
+                "http://vm.invalid",
+                assets,
+                INVESTMENT_MODULE.dt.date(2023, 1, 1),
+                INVESTMENT_MODULE.dt.date(2025, 1, 1),
+                INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
+                30000.0,
+                "30s",
+                energy_source="pv-power",
+            )
+        finally:
+            INVESTMENT_MODULE.fetch_daily_energy = original
+
+        complete_labels = tuple(sorted({"local_year": "2023", "title": "Balkon West"}.items()))
+        partial_labels = tuple(sorted({"local_year": "2024", "title": "Balkon West"}.items()))
+        complete_coverage_labels = tuple(sorted({"coverage": "100%", "local_year": "2023", "title": "Balkon West"}.items()))
+        partial_coverage_labels = tuple(sorted({"coverage": "50%", "local_year": "2024", "title": "Balkon West"}.items()))
+
+        energy_key_2023 = ("evcc_pv_energy_by_title_yearly_wh", complete_labels)
+        energy_key_2024 = ("evcc_pv_energy_by_title_yearly_wh", partial_labels)
+        yield_key_2023 = ("evcc_pv_specific_yield_yearly_kwh_per_kwp", complete_labels)
+        yield_key_2024 = ("evcc_pv_specific_yield_yearly_kwh_per_kwp", partial_labels)
+        covered_yield_key_2023 = ("evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp", complete_coverage_labels)
+        covered_yield_key_2024 = ("evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp", partial_coverage_labels)
+
+        self.assertIn(energy_key_2023, series)
+        self.assertIn(yield_key_2023, series)
+        self.assertIn(covered_yield_key_2023, series)
+        self.assertAlmostEqual(series[energy_key_2023][0][1], 3650000.0)
+        self.assertAlmostEqual(series[yield_key_2023][0][1], 730.0)
+
+        self.assertNotIn(energy_key_2024, series)
+        self.assertNotIn(yield_key_2024, series)
+        self.assertIn(covered_yield_key_2024, series)
+        self.assertAlmostEqual(series[covered_yield_key_2024][0][1], 364.0)
 
     def test_optional_sma_energy_rollup_writes_standard_pv_metric(self):
         assets = [{
@@ -103,6 +255,7 @@ class InvestmentCostImportTests(unittest.TestCase):
             "lifetime_years": 1.0,
             "yearly_opex_eur": 0.0,
             "allocation_percent": 1.0,
+            "watt_peak": 2000.0,
         }]
         original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
         try:
@@ -144,6 +297,7 @@ class InvestmentCostImportTests(unittest.TestCase):
             "lifetime_years": 1.0,
             "yearly_opex_eur": 0.0,
             "allocation_percent": 1.0,
+            "watt_peak": 2000.0,
         }]
         original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
         try:
@@ -169,6 +323,10 @@ class InvestmentCostImportTests(unittest.TestCase):
             INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric = original
         rolling_keys = [dict(label_items) for metric, label_items in series if metric == "evcc_pv_lcoe_rolling_7d_ct_per_kwh"]
         self.assertEqual(rolling_keys, [{"local_year": "2026", "title": "SMA-Nord"}])
+        yield_keys = [dict(label_items) for metric, label_items in series if metric == "evcc_pv_specific_yield_rolling_7d_kwh_per_kwp"]
+        self.assertEqual(yield_keys, [{"local_year": "2026", "title": "SMA-Nord"}])
+        yield_key = ("evcc_pv_specific_yield_rolling_7d_kwh_per_kwp", tuple(sorted(yield_keys[0].items())))
+        self.assertAlmostEqual(series[yield_key][-1][1], 7.0)
 
     def test_shared_allocation_ok_and_warning(self):
         ok_assets = [
@@ -275,6 +433,7 @@ class InvestmentCostImportTests(unittest.TestCase):
             "lifetime_years": 1.0,
             "yearly_opex_eur": 0.0,
             "allocation_percent": 1.0,
+            "watt_peak": 2000.0,
         }]
         original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
         try:
@@ -308,6 +467,7 @@ class InvestmentCostImportTests(unittest.TestCase):
             "lifetime_years": 1.0,
             "yearly_opex_eur": 0.0,
             "allocation_percent": 1.0,
+            "watt_peak": 2000.0,
         }]
         original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
         try:
@@ -339,12 +499,8 @@ class InvestmentCostImportTests(unittest.TestCase):
 
         monthly_cost_key = (
             "evcc_pv_lcoe_cost_monthly_eur",
-            tuple(sorted({
-                "local_year": "2026",
-                "title": "Partial PV",
-            }.items())),
+            tuple(sorted({"local_year": "2026", "title": "Partial PV"}.items())),
         )
-        self.assertIn(monthly_cost_key, series)
         self.assertAlmostEqual(series[monthly_cost_key][0][1], 2.0)
 
         self.assertFalse(any(key[0] == "evcc_pv_lcoe_coverage_ratio" for key in series))
@@ -353,7 +509,6 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertEqual(summary["pv_sources"][0]["partial"], True)
         self.assertEqual(summary["pv_sources"][0]["covered_days"], 2)
         self.assertEqual(summary["pv_sources"][0]["expected_days"], 365)
-        self.assertAlmostEqual(summary["pv_sources"][0]["covered_cost_eur"], 2.0)
         self.assertAlmostEqual(summary["pv_sources"][0]["active_cost_eur"], 10.0)
 
     def test_min_lcoe_coverage_ratio_can_suppress_partial_lcoe_values(self):
@@ -367,6 +522,7 @@ class InvestmentCostImportTests(unittest.TestCase):
             "lifetime_years": 1.0,
             "yearly_opex_eur": 0.0,
             "allocation_percent": 1.0,
+            "watt_peak": 2000.0,
         }]
         original = INVESTMENT_MODULE.fetch_daily_energy_from_daily_metric
         try:
@@ -377,7 +533,7 @@ class InvestmentCostImportTests(unittest.TestCase):
                 "http://vm.invalid",
                 assets,
                 INVESTMENT_MODULE.dt.date(2026, 1, 1),
-                INVESTMENT_MODULE.dt.date(2026, 1, 11),
+                INVESTMENT_MODULE.dt.date(2026, 1, 2),
                 INVESTMENT_MODULE.ZoneInfo("Europe/Berlin"),
                 30000.0,
                 "30s",

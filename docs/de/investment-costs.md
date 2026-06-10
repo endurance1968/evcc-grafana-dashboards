@@ -78,10 +78,17 @@ Generierte Metriken:
 - `evcc_pv_lcoe_energy_monthly_wh`
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
+- `evcc_pv_installed_watt_peak_yearly`
+- `evcc_pv_energy_by_title_yearly_wh`
+- `evcc_pv_specific_yield_yearly_kwh_per_kwp`
+- `evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp`
+- `evcc_pv_specific_yield_rolling_7d_kwh_per_kwp`
 
-Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Die Jahresabdeckung wird direkt hinter dem PV-Titel im linken Panel angezeigt, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
+Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Kosten-Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Direkt darunter stehen analog `PV-spezifischer Ertrag (kWh/kWp)` und `PV-spezifischer Ertrag pro Woche (kWh/kWp)`. Der linke spezifische Jahresertrag nutzt die Coverage-Variante der Helper-Metrik und zeigt auch laufende Teiljahre mit der Jahresabdeckung direkt hinter dem PV-Titel an, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
 
 Das Gesamtzeitraum-Dashboard zeigt im Finanz-Tab ebenfalls PV-Gestehungskosten: links dynamisch fuer den ausgewaehlten Grafana-Zeitraum gewichtete Werte je PV-Anlage plus Gesamtwert, rechts die Jahreswerte als Zeitreihe ueber den betrachteten Zeitraum. Die dynamische Berechnung nutzt monatliche Helper-Metriken fuer Kosten und den LCOE-Energie-Nenner, damit ein ausgewaehltes Jahr im Gesamtzeitraum-Dashboard konsistent zum Jahr-Dashboard bleibt. Die rechte Jahres-Zeitreihe zeigt nur Jahre mit mindestens 95% Datenabdeckung, damit Teiljahre nicht als echte Kosten-Ausreisser erscheinen.
+
+Im Energie-Tab des Gesamtzeitraum-Dashboards nutzt `PV-Energie pro Jahr und Quelle` die Helper-Metrik `evcc_pv_energy_by_title_yearly_wh`; auch dieses Panel zeigt nur Jahre mit mindestens 95% Datenabdeckung. Das Panel `PV-spezifischer Ertrag pro Jahr und Quelle` nutzt die Helper-Metrik `evcc_pv_specific_yield_yearly_kwh_per_kwp`. Sie kombiniert die gemessene Jahresenergie je `evcc_title` mit dem zeitgewichteten `watt_peak` aus der Investment-Datei. Jahreswerte werden nur geschrieben, wenn die Jahresabdeckung mindestens 95% erreicht; unvollstaendige Jahre verschwinden dadurch aus dem Panel statt als ungenaue Balken zu erscheinen. Dadurch koennen PV-Anlagen ueber Jahre hinweg als kWh/kWp verglichen werden, ohne lange Dashboard-Queries zu bauen.
 
 Jahreswerte mit weniger als 1 kWh gemappter PV-Energie und Wochenfenster mit weniger als 1 kWh gemappter PV-Energie werden unterdrueckt, damit keine irrefuehrenden Divisionen durch nahezu null entstehen.
 
