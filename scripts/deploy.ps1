@@ -31,9 +31,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.03.5'
+$ScriptVersion = '2026.06.10.1'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-06-03'
+$ScriptLastModified = '2026-06-10'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -624,8 +624,16 @@ function Import-V2Dashboard($Dashboard) {
   $raw = Ensure-V2FolderAnnotation $Dashboard.raw
   $path = Get-DashboardPath $raw
   $existing = Invoke-GrafanaApi GET $path -Allow404
-  if ($null -ne $existing -and $existing.metadata.resourceVersion) {
-    $raw.metadata.resourceVersion = $existing.metadata.resourceVersion
+  $existingResourceVersion = $null
+  if ($null -ne $existing -and $null -ne $existing.metadata -and $null -ne $existing.metadata.PSObject.Properties['resourceVersion']) {
+    $existingResourceVersion = $existing.metadata.resourceVersion
+  }
+  if (-not [string]::IsNullOrWhiteSpace([string]$existingResourceVersion)) {
+    if ($null -eq $raw.metadata.PSObject.Properties['resourceVersion']) {
+      $raw.metadata | Add-Member -NotePropertyName resourceVersion -NotePropertyValue $existingResourceVersion -Force
+    } else {
+      $raw.metadata.resourceVersion = $existingResourceVersion
+    }
     Invoke-GrafanaApi PUT $path $raw | Out-Null
     return
   }
@@ -924,3 +932,4 @@ foreach ($dashboard in $dashboards) {
 Write-Host ''
 Write-Host 'Install finished.' -ForegroundColor Green
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
+

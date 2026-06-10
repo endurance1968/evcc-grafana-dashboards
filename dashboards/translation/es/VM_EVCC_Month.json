@@ -954,7 +954,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  gridImport = running_sum(sum(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))),\n  homeEnergy = running_sum(sum(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))),\n  loadpointEnergy = running_sum(sum(last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))\n)\nclamp_max(clamp_min(1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001), 0), 1)",
+                        "expr": "WITH (\n  gridImport = running_sum(sum(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))),\n  homeEnergy = running_sum(sum(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]))),\n  loadpointEnergy = running_sum(sum(last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or vector(0))\n)\nclamp_max(clamp_min(1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001), 0), 1)",
                         "format": "time_series",
                         "legendFormat": "Autosuficiencia",
                         "range": true,
