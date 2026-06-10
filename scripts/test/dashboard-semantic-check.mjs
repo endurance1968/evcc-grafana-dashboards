@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.10.1
+ * Version: 2026.06.10.2
  * Last modified: 2026-06-10
  */
 import fs from "node:fs";
@@ -1061,6 +1061,7 @@ function validateDashboard(fileName, dashboard) {
     if (panel.type === "barchart") {
       assert(Boolean(panel.options?.xField), failures, `${fileName}: barchart '${panel.title || panel.id}' has no xField`);
     }
+    validateTransformationFieldReferences(fileName, panel, failures);
   }
 
   for (const rule of criticalPanels[fileName] || []) {
@@ -1088,6 +1089,71 @@ function validateDashboard(fileName, dashboard) {
   return failures;
 }
 
+function fieldsFromOrganizeOptions(options) {
+  const renameByName = options.renameByName || {};
+  const sourceNames = new Set([
+    ...Object.keys(options.indexByName || {}),
+    ...Object.keys(renameByName),
+  ]);
+  if (sourceNames.size === 0) {
+    return null;
+  }
+  return new Set([...sourceNames].map((field) => renameByName[field] || field));
+}
+
+function validateKnownField(fileName, panel, failures, fields, field, context) {
+  if (!fields || !field) {
+    return;
+  }
+  assert(fields.has(field), failures, `${fileName}: panel '${panel.title}' ${context} references missing transformed field '${field}'`);
+}
+
+function validateTransformationFieldReferences(fileName, panel, failures) {
+  const transformations = panel.rawElement?.spec?.data?.spec?.transformations || [];
+  if (!Array.isArray(transformations) || transformations.length === 0) {
+    return;
+  }
+
+  let fields = null;
+  for (const transformation of transformations) {
+    const group = transformation?.group || transformation?.kind || "";
+    const options = transformation?.spec?.options || transformation?.options || {};
+
+    if (group === "organize") {
+      fields = fieldsFromOrganizeOptions(options);
+      continue;
+    }
+
+    if (group === "filterFieldsByName") {
+      const includeNames = options.include?.names;
+      if (Array.isArray(includeNames)) {
+        for (const name of includeNames) {
+          validateKnownField(fileName, panel, failures, fields, name, "filterFieldsByName");
+        }
+        fields = fields ? new Set(includeNames.filter((name) => fields.has(name))) : new Set(includeNames);
+      }
+      continue;
+    }
+
+    if (group === "sortBy") {
+      for (const sort of options.sort || []) {
+        validateKnownField(fileName, panel, failures, fields, sort?.field, "sortBy");
+      }
+      continue;
+    }
+
+    if (group === "groupingToMatrix") {
+      for (const [role, field] of [["rowField", options.rowField], ["columnField", options.columnField], ["valueField", options.valueField]]) {
+        validateKnownField(fileName, panel, failures, fields, field, `groupingToMatrix ${role}`);
+      }
+      fields = new Set(options.rowField ? [options.rowField] : []);
+    }
+  }
+
+  if (panel.options?.xField && fields) {
+    assert(fields.has(panel.options.xField), failures, `${fileName}: panel '${panel.title}' xField '${panel.options.xField}' is not available after transformations`);
+  }
+}
 function main() {
   const manifest = readDeployManifest(repoRoot);
   const files = manifestFilesUnion(manifest).sort((a, b) => a.localeCompare(b));
@@ -1124,6 +1190,9 @@ function main() {
           assert(!/"(title|label|legendFormat|value|description|displayName|text|content)"\s*:\s*"[^"]*Batterie/.test(rawDashboard), allFailures, `${language}/${fileName}: use 'Speicher' for visible storage labels, not 'Batterie'`);
         }
         const dashboard = JSON.parse(rawDashboard);
+        for (const panel of collectDashboardPanels(dashboard)) {
+          validateTransformationFieldReferences(`${language}/${fileName}`, panel, allFailures);
+        }
         validateGrafanaTabSlugs(`${language}/${fileName}`, dashboard.spec?.layout, allFailures);
       }
     }

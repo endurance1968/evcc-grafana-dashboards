@@ -1,8 +1,8 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.06.07.1
- * Last modified: 2026-06-07
+ * Version: 2026.06.10.1
+ * Last modified: 2026-06-10
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -224,12 +224,20 @@ function translatedXField(node, translatedNode, mapping) {
   return translatedTargets.some((target) => target?.legendFormat === nextXField) ? nextXField : "";
 }
 
-function translateSafeNode(node, mapping) {
+function pathIncludes(pathParts, key) {
+  return pathParts.includes(key);
+}
+
+function translateSafeNode(node, mapping, pathParts = []) {
   if (Array.isArray(node)) {
-    return node.map((item) => translateSafeNode(item, mapping));
+    return node.map((item, index) => translateSafeNode(item, mapping, [...pathParts, index]));
   }
 
   if (!node || typeof node !== "object") {
+    return node;
+  }
+
+  if (pathIncludes(pathParts, "transformations")) {
     return node;
   }
 
@@ -262,7 +270,7 @@ function translateSafeNode(node, mapping) {
 
     if (childKey === "targets" && Array.isArray(childValue)) {
       result[childKey] = childValue.map((target, targetIndex) => {
-        const translatedTarget = translateSafeNode(target, mapping);
+        const translatedTarget = translateSafeNode(target, mapping, [...pathParts, childKey, targetIndex]);
         if (!target || typeof target !== "object" || typeof target.alias !== "string") {
           return translatedTarget;
         }
@@ -284,7 +292,7 @@ function translateSafeNode(node, mapping) {
       continue;
     }
 
-    result[childKey] = translateSafeNode(childValue, mapping);
+    result[childKey] = translateSafeNode(childValue, mapping, [...pathParts, childKey]);
   }
 
   const nextXField = translatedXField(node, result, mapping);

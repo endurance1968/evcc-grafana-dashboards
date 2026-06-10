@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.06.07.1
- * Last modified: 2026-06-07
+ * Version: 2026.06.10.1
+ * Last modified: 2026-06-10
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -93,27 +93,33 @@ function translatePromQlSeriesLabels(input, mapping) {
   });
 }
 
-function translateJsonNode(node, mapping) {
+function pathIncludes(pathParts, key) {
+  return pathParts.includes(key);
+}
+
+function translateJsonNode(node, mapping, pathParts = []) {
   if (Array.isArray(node)) {
-    return node.map((item) => translateJsonNode(item, mapping));
+    return node.map((item, index) => translateJsonNode(item, mapping, [...pathParts, index]));
   }
 
   if (node && typeof node === "object") {
     const result = {};
     for (const [key, value] of Object.entries(node)) {
+      const childPath = [...pathParts, key];
+      const isInsideTransformation = pathIncludes(pathParts, "transformations");
       const isSafeName = key !== "name" || (typeof value === "string" && value.startsWith("EVCC:"));
       const isPropertyValueForTranslatableId =
         key === "value" && typeof node.id === "string" && translatableKeys.has(node.id);
 
       if (
         typeof value === "string" &&
-        ((translatableKeys.has(key) && isSafeName) || isPropertyValueForTranslatableId)
+        (!isInsideTransformation && ((translatableKeys.has(key) && isSafeName) || isPropertyValueForTranslatableId))
       ) {
         result[key] = translateString(value, mapping);
       } else if (key === "expr" && typeof value === "string") {
         result[key] = translatePromQlSeriesLabels(value, mapping);
       } else {
-        result[key] = translateJsonNode(value, mapping);
+        result[key] = translateJsonNode(value, mapping, childPath);
       }
     }
     return result;
