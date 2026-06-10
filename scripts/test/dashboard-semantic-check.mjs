@@ -758,11 +758,16 @@ function findRowsWithPanelIds(layout, requiredPanelIds) {
 
 function validateInvestmentConditionalRow(fileName, dashboard, failures) {
   const expectedRows = new Map([
-    ["VM_EVCC_Year.json", [77, 78, 79, 80]],
-    ["VM_EVCC_All-time.json", [56, 57]],
+    ["VM_EVCC_Year.json", [
+      { title: "PV generation costs", panelIds: [77, 78, 79, 80] },
+    ]],
+    ["VM_EVCC_All-time.json", [
+      { title: "PV generation costs", panelIds: [56, 57] },
+      { title: "PV source yearly output", panelIds: [58, 59] },
+    ]],
   ]);
-  const expectedPanelIds = expectedRows.get(fileName);
-  if (!expectedPanelIds) {
+  const expectedRowSpecs = expectedRows.get(fileName);
+  if (!expectedRowSpecs) {
     return;
   }
 
@@ -775,16 +780,18 @@ function validateInvestmentConditionalRow(fileName, dashboard, failures) {
   assert(spec.current?.value === "$__all", failures, fileName + ": investment visibility helper must default to $__all");
   assert(spec.query?.spec?.query === "label_values(evcc_pv_lcoe_yearly_ct_per_kwh, title)", failures, fileName + ": investment visibility helper must detect investment rollup data by title label");
 
-  const rows = findRowsWithPanelIds(dashboard.spec?.layout, expectedPanelIds);
-  assert(rows.length === 1, failures, fileName + ": investment panels " + expectedPanelIds.join(", ") + " must be grouped into exactly one conditional row");
-  const row = rows[0];
-  assert(row?.spec?.title === "PV generation costs", failures, fileName + ": investment row must be titled PV generation costs");
-  const condition = row?.spec?.conditionalRendering;
-  const item = condition?.spec?.items?.[0];
-  assert(condition?.kind === "ConditionalRenderingGroup", failures, fileName + ": investment row must use Grafana conditional rendering");
-  assert(condition?.spec?.visibility === "show" && condition?.spec?.condition === "and", failures, fileName + ": investment row must only show when the helper variable has data");
-  assert(item?.kind === "ConditionalRenderingVariable", failures, fileName + ": investment row conditional must be variable-based");
-  assert(item?.spec?.variable === "hasInvestmentData" && item?.spec?.operator === "matches" && item?.spec?.value === ".+", failures, fileName + ": investment row must match non-empty investment data helper values");
+  for (const expected of expectedRowSpecs) {
+    const rows = findRowsWithPanelIds(dashboard.spec?.layout, expected.panelIds);
+    assert(rows.length === 1, failures, fileName + ": investment panels " + expected.panelIds.join(", ") + " must be grouped into exactly one conditional row");
+    const row = rows[0];
+    assert(row?.spec?.title === expected.title, failures, fileName + ": investment row must be titled " + expected.title);
+    const condition = row?.spec?.conditionalRendering;
+    const item = condition?.spec?.items?.[0];
+    assert(condition?.kind === "ConditionalRenderingGroup", failures, fileName + ": investment row " + expected.title + " must use Grafana conditional rendering");
+    assert(condition?.spec?.visibility === "show" && condition?.spec?.condition === "and", failures, fileName + ": investment row " + expected.title + " must only show when the helper variable has data");
+    assert(item?.kind === "ConditionalRenderingVariable", failures, fileName + ": investment row " + expected.title + " conditional must be variable-based");
+    assert(item?.spec?.variable === "hasInvestmentData" && item?.spec?.operator === "matches" && item?.spec?.value === ".+", failures, fileName + ": investment row " + expected.title + " must match non-empty investment data helper values");
+  }
 }
 function dashboardVariableName(variable) {
   return variable?.spec ? String(variable.spec.name || "") : String(variable?.name || "");
