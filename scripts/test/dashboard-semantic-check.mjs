@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.10.2
- * Last modified: 2026-06-10
+ * Version: 2026.06.11.1
+ * Last modified: 2026-06-11
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -197,7 +197,7 @@ const criticalPanels = {
       "type": "barchart",
       "minTargets": 1,
       "xField": "source",
-      "exprIncludes": "evcc_pv_energy_by_title_yearly_wh"
+      "exprIncludes": "evcc_pv_energy_by_title_yearly_with_coverage_wh"
     },
     {
       "id": 59,
@@ -205,7 +205,7 @@ const criticalPanels = {
       "type": "barchart",
       "minTargets": 1,
       "xField": "source",
-      "exprIncludes": "evcc_pv_specific_yield_yearly_kwh_per_kwp"
+      "exprIncludes": "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp"
     }
   ],
   "VM_EVCC_Year.json": [
@@ -1213,3 +1213,4 @@ try {
   console.error(error.message || error);
   process.exit(1);
 }
+

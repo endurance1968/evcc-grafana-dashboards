@@ -2,8 +2,8 @@
 """
 Script: import-investment-costs.py
 Purpose: Calculate PV investment cost rollups from a local investment file and VictoriaMetrics PV data.
-Version: 2026.06.10.4
-Last modified: 2026-06-10
+Version: 2026.06.11.1
+Last modified: 2026-06-11
 """
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.10.4"
-SCRIPT_LAST_MODIFIED = "2026-06-10"
+SCRIPT_VERSION = "2026.06.11.1"
+SCRIPT_LAST_MODIFIED = "2026-06-11"
 GENERATED_METRICS = [
     "evcc_pv_investment_cost_daily_eur",
     "evcc_pv_lcoe_daily_ct_per_kwh",
@@ -38,6 +38,7 @@ GENERATED_METRICS = [
     "evcc_pv_lcoe_rolling_7d_ct_per_kwh",
     "evcc_pv_installed_watt_peak_yearly",
     "evcc_pv_energy_by_title_yearly_wh",
+    "evcc_pv_energy_by_title_yearly_with_coverage_wh",
     "evcc_pv_specific_yield_yearly_kwh_per_kwp",
     "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp",
     "evcc_pv_specific_yield_rolling_7d_kwh_per_kwp",
@@ -740,6 +741,12 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
             installed_watt_peak = average_installed_watt_peak_for_calendar_year(title_assets, year)
             if energy_wh > 1000 and ratio is not None and ratio >= partial_warning_threshold:
                 append_sample(series, "evcc_pv_energy_by_title_yearly_wh", peak_labels, timestamp_for_year(year, tz), energy_wh)
+                energy_coverage_labels = {
+                    "title": title,
+                    "coverage": coverage_label(ratio),
+                    "local_year": f"{year:04d}",
+                }
+                append_sample(series, "evcc_pv_energy_by_title_yearly_with_coverage_wh", energy_coverage_labels, timestamp_for_year(year, tz), energy_wh)
             if energy_wh > 1000 and installed_watt_peak > 0:
                 yield_labels = {
                     "title": title,
@@ -996,3 +1003,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
