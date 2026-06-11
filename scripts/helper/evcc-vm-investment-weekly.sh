@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Script: evcc-vm-investment-weekly.sh
 # Purpose: Cron-safe weekly PV investment/generation-cost rollup for production VictoriaMetrics.
-# Version: 2026.06.10.1
-# Last modified: 2026-06-10
+# Version: 2026.06.11.1
+# Last modified: 2026-06-11
 set -euo pipefail
 
-SCRIPT_VERSION="2026.06.10.1"
-SCRIPT_LAST_MODIFIED="2026-06-10"
+SCRIPT_VERSION="2026.06.11.1"
+SCRIPT_LAST_MODIFIED="2026-06-11"
 CONFIG_FILE="${EVCC_VM_INVESTMENT_CONFIG:-/etc/evcc-vm-investment-costs.conf}"
 
 if [[ -f "$CONFIG_FILE" ]]; then
@@ -34,6 +34,7 @@ fi
 : "${WRITE:=true}"
 : "${REPLACE:=true}"
 : "${LOCK_FILE:=/var/lock/evcc-vm-investment-costs.lock}"
+: "${MIN_HELPER_VERSION:=2026.06.11.1}"
 
 is_true() {
   case "${1,,}" in
@@ -52,6 +53,17 @@ if [[ ! -f "$HELPER_SCRIPT" ]]; then
 fi
 if [[ ! -f "$INVESTMENT_FILE" ]]; then
   log "ERROR: investment file not found: $INVESTMENT_FILE"
+  exit 2
+fi
+
+helper_version=$(grep -E '^SCRIPT_VERSION = "[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.[0-9]+"' "$HELPER_SCRIPT" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/')
+if [[ -z "$helper_version" ]]; then
+  log "ERROR: could not determine helper version from: $HELPER_SCRIPT"
+  exit 2
+fi
+if [[ "$(printf '%s\n%s\n' "$MIN_HELPER_VERSION" "$helper_version" | sort -V | head -n 1)" != "$MIN_HELPER_VERSION" ]]; then
+  log "ERROR: helper script is too old: $helper_version; required at least $MIN_HELPER_VERSION"
+  log "Update both import-investment-costs.py and evcc-vm-investment-weekly.sh from the same repository revision."
   exit 2
 fi
 

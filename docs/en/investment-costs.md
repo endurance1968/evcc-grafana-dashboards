@@ -89,7 +89,7 @@ The `Year` dashboard shows these values in the PV tab with two cost panels: `PV 
 
 The All-time dashboard also shows PV generation costs in the Finances tab: the left panel dynamically calculates weighted values for the selected Grafana time range per PV source plus a total, while the right panel shows annual values as a time series over the selected time range. The dynamic calculation uses monthly helper metrics for cost and energy so a selected year in the All-time dashboard remains consistent with the Year dashboard. The yearly time-series panel only shows years with at least 95% data coverage so partial years do not appear as real cost outliers.
 
-In the Energy tab of the All-time dashboard, `PV energy/year by source` uses the helper metric `evcc_pv_energy_by_title_yearly_wh`; this panel also shows only years with at least 95% data coverage. The `PV specific yield/year by source` panel uses the helper metric `evcc_pv_specific_yield_yearly_kwh_per_kwp`. It combines measured annual energy per `evcc_title` with time-weighted `watt_peak` metadata from the investment file. Yearly values are written only when annual coverage reaches at least 95%; incomplete years therefore disappear from the panel instead of showing misleading bars. This allows PV sources to be compared across years as kWh/kWp without long dashboard queries.
+In the Energy tab of the All-time dashboard, `PV energy/year by source` and `PV specific yield/year by source` use helper metrics with annual coverage. Both panels also show partial years so available historical data remains visible. The carried coverage value helps judge whether an annual bar is complete or only a partial year. This allows PV sources to be compared across years without long dashboard queries.
 
 Annual source values below 1 kWh mapped PV energy and weekly windows below 1 kWh mapped PV energy are suppressed to avoid misleading division-by-near-zero results.
 
@@ -142,7 +142,7 @@ python3 scripts/helper/import-investment-costs.py \
 
 The helper is optional and runs separately from the normal EVCC/VictoriaMetrics rollup. For regular operation, a weekly run is enough when the current year should stay reasonably up to date in the dashboard. The normal EVCC/VictoriaMetrics rollup can continue to run daily; start the investment helper separately and preferably after a completed daily rollup. For completed historical years, one run is enough as long as neither the investment file nor imported PV energy changes.
 
-A cron-friendly wrapper is stored in `scripts/helper/evcc-vm-investment-weekly.sh`; the matching template is `scripts/helper/evcc-vm-investment-weekly.conf.example`. The files can be installed either from a local repository checkout or downloaded directly from GitHub or a local Forgejo raw endpoint.
+A cron-friendly wrapper is stored in `scripts/helper/evcc-vm-investment-weekly.sh`; the matching template is `scripts/helper/evcc-vm-investment-weekly.conf.example`. The files can be installed either from a local repository checkout or downloaded directly from GitHub or a local Forgejo raw endpoint. Always update the wrapper and Python helper together from the same repository revision; the wrapper exits with a clear error if the installed helper is too old.
 
 Install from an existing repository checkout:
 

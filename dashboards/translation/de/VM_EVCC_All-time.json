@@ -5958,7 +5958,7 @@
         "spec": {
           "id": 58,
           "title": "PV-Energie pro Jahr je Anlage",
-          "description": "Annual PV energy per PV source over the selected time range. Only near-complete years with at least 95% coverage are shown; coverage is carried as a per-source/year label for Grafana tooltips where supported.",
+          "description": "Annual PV energy per source. Partial years are shown as measured; use the coverage label where available to judge whether a year is complete.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5976,7 +5976,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "(avg(last_over_time(evcc_pv_energy_by_title_yearly_with_coverage_wh{coverage=~\"9[5-9]%|100%\"}[$__range])) by (local_year, title, coverage) / 1000) or label_set((avg(last_over_time(evcc_pv_energy_by_title_yearly_wh[$__range])) by (local_year, title) / 1000), \"coverage\", \"n/a\")",
+                        "expr": "(avg(last_over_time(evcc_pv_energy_by_title_yearly_with_coverage_wh[$__range])) by (local_year, title, coverage) / 1000) or label_set((avg(last_over_time(evcc_pv_energy_by_title_yearly_wh[$__range])) by (local_year, title) / 1000), \"coverage\", \"n/a\")",
                         "format": "table",
                         "instant": true,
                         "legendFormat": "{{title}}",
@@ -6156,7 +6156,7 @@
         "spec": {
           "id": 59,
           "title": "PV specific yield/year by source",
-          "description": "Annual PV yield normalized to the installed kWp per PV source over the selected time range. Only near-complete years with at least 95% coverage are shown; coverage is carried as a per-source/year label for Grafana tooltips where supported.",
+          "description": "Annual PV specific yield per source. Partial years are shown as measured; use the coverage label where available to judge whether a year is complete.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6174,7 +6174,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(last_over_time(evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp{coverage=~\"9[5-9]%|100%\"}[$__range])) by (local_year, title, coverage) or label_set(avg(last_over_time(evcc_pv_specific_yield_yearly_kwh_per_kwp[$__range])) by (local_year, title), \"coverage\", \"n/a\")",
+                        "expr": "avg(last_over_time(evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp[$__range])) by (local_year, title, coverage) or label_set(avg(last_over_time(evcc_pv_specific_yield_yearly_kwh_per_kwp[$__range])) by (local_year, title), \"coverage\", \"n/a\")",
                         "format": "table",
                         "instant": true,
                         "legendFormat": "{{title}}",
