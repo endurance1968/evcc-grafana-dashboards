@@ -1,5 +1,7 @@
 import importlib.util
+import os
 import pathlib
+import tempfile
 import sys
 import unittest
 
@@ -54,6 +56,23 @@ class EnergyComparisonValidationTests(unittest.TestCase):
         self.assertAlmostEqual(rows[0].reference_kwh, 1686.32)
         self.assertAlmostEqual(rows[0].candidate_eur, 467.79)
         self.assertAlmostEqual(rows[0].delta_eur, -12.39)
+
+    def test_default_tibber_influx_csv_ignores_current_evcc_agg_snapshots(self):
+        original_dir = VALIDATE_MODULE.DEFAULT_TIBBER_DIR
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmp = pathlib.Path(tmpdir)
+            baseline = tmp / "tibber-influx-cost-monthly-only-2025-04_2026-03-without-2025-10.csv"
+            current = tmp / "tibber-influx-cost-monthly-only-2026-04_2026-05-current-evcc-agg.csv"
+            baseline.write_text("month,tibber_kwh,influx_kwh,tibber_eur,influx_eur\n", encoding="utf-8")
+            current.write_text("month,tibber_kwh,influx_kwh,tibber_eur,influx_eur\n", encoding="utf-8")
+            os.utime(baseline, (1000, 1000))
+            os.utime(current, (2000, 2000))
+
+            VALIDATE_MODULE.DEFAULT_TIBBER_DIR = tmp
+            try:
+                self.assertEqual(VALIDATE_MODULE.default_tibber_influx_csv(), baseline)
+            finally:
+                VALIDATE_MODULE.DEFAULT_TIBBER_DIR = original_dir
 
     def test_cost_evaluation_flags_out_of_tolerance_rows(self):
         rows = [

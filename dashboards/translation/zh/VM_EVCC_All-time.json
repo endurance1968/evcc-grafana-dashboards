@@ -5958,7 +5958,7 @@
         "spec": {
           "id": 58,
           "title": "按来源统计的年光伏发电量",
-          "description": "Annual PV energy per source. Partial years are shown as measured; use the coverage label where available to judge whether a year is complete.",
+          "description": "Annual PV energy per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5976,7 +5976,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "(avg(last_over_time(evcc_pv_energy_by_title_yearly_with_coverage_wh[$__range])) by (local_year, title, coverage) / 1000) or label_set((avg(last_over_time(evcc_pv_energy_by_title_yearly_wh[$__range])) by (local_year, title) / 1000), \"coverage\", \"n/a\")",
+                        "expr": "avg(last_over_time(evcc_pv_energy_by_title_yearly_with_coverage_wh[$__range])) by (local_year, title) / 1000 or avg(last_over_time(evcc_pv_energy_by_title_yearly_wh[$__range])) by (local_year, title) / 1000",
                         "format": "table",
                         "instant": true,
                         "legendFormat": "{{title}}",
@@ -5996,14 +5996,12 @@
                     "options": {
                       "excludeByName": {},
                       "indexByName": {
-                        "Value": 3,
-                        "coverage": 2,
+                        "Value": 2,
                         "local_year": 0,
                         "title": 1
                       },
                       "renameByName": {
                         "Value": "value",
-                        "coverage": "coverage",
                         "local_year": "year",
                         "title": "source"
                       }
@@ -6019,7 +6017,6 @@
                         "names": [
                           "year",
                           "source",
-                          "coverage",
                           "value"
                         ]
                       }
@@ -6035,11 +6032,11 @@
                       "sort": [
                         {
                           "desc": false,
-                          "field": "source"
+                          "field": "year"
                         },
                         {
                           "desc": false,
-                          "field": "year"
+                          "field": "source"
                         }
                       ]
                     }
@@ -6156,7 +6153,7 @@
         "spec": {
           "id": 59,
           "title": "PV specific yield/year by source",
-          "description": "Annual PV specific yield per source. Partial years are shown as measured; use the coverage label where available to judge whether a year is complete.",
+          "description": "Annual PV specific yield per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6174,7 +6171,7 @@
                       },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(last_over_time(evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp[$__range])) by (local_year, title, coverage) or label_set(avg(last_over_time(evcc_pv_specific_yield_yearly_kwh_per_kwp[$__range])) by (local_year, title), \"coverage\", \"n/a\")",
+                        "expr": "avg(last_over_time(evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp[$__range])) by (local_year, title) or avg(last_over_time(evcc_pv_specific_yield_yearly_kwh_per_kwp[$__range])) by (local_year, title)",
                         "format": "table",
                         "instant": true,
                         "legendFormat": "{{title}}",
@@ -6194,14 +6191,12 @@
                     "options": {
                       "excludeByName": {},
                       "indexByName": {
-                        "Value": 3,
-                        "coverage": 2,
+                        "Value": 2,
                         "local_year": 0,
                         "title": 1
                       },
                       "renameByName": {
                         "Value": "value",
-                        "coverage": "coverage",
                         "local_year": "year",
                         "title": "source"
                       }
@@ -6217,7 +6212,6 @@
                         "names": [
                           "year",
                           "source",
-                          "coverage",
                           "value"
                         ]
                       }
@@ -6233,11 +6227,11 @@
                       "sort": [
                         {
                           "desc": false,
-                          "field": "source"
+                          "field": "year"
                         },
                         {
                           "desc": false,
-                          "field": "year"
+                          "field": "source"
                         }
                       ]
                     }

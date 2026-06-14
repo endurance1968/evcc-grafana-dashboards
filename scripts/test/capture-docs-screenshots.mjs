@@ -1,8 +1,8 @@
 /**
  * Script: capture-docs-screenshots.mjs
  * Purpose: Capture curated German dashboard screenshots for docs/screenshots.
- * Version: 2026.06.04.7
- * Last modified: 2026-06-04
+ * Version: 2026.06.14.6
+ * Last modified: 2026-06-14
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,8 +16,8 @@ import {
   requireEnv,
 } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.04.7";
-const SCRIPT_LAST_MODIFIED = "2026-06-04";
+const SCRIPT_VERSION = "2026.06.14.6";
+const SCRIPT_LAST_MODIFIED = "2026-06-14";
 
 loadEnvFile(parseArg("env", ".env.local"));
 
@@ -35,6 +35,7 @@ const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "").trim();
 const timeTo = optionalEnv("GRAFANA_TIME_TO", "").trim();
 
 const desktop = { name: "desktop", width: 2240, height: 1300 };
+const desktopTall = { name: "desktop-tall", width: 2240, height: 1700 };
 const mobile = { name: "mobile", width: 586, height: 1108 };
 
 const capturePlan = [
@@ -42,14 +43,14 @@ const capturePlan = [
     match: "VM_EVCC_All-time.json",
     captures: [
       { file: "alltime-energy.png", tab: "Energie", viewport: desktop },
-      { file: "alltime-finances.png", tab: "Finanzen", viewport: desktop },
+      { file: "alltime-finances.png", tab: "Finanzen", viewport: desktopTall },
       { file: "alltime-planthealth.png", tab: "Anlagengesundheit", viewport: desktop },
     ],
   },
   {
     match: "VM_EVCC_Year.json",
     captures: [
-      { file: "year-pv.png", tab: "PV", viewport: desktop },
+      { file: "year-pv.png", tab: "PV", viewport: desktopTall },
       { file: "year-home.png", tab: "Haus", viewport: desktop },
       { file: "year-battery.png", tab: "Speicher", viewport: desktop },
       { file: "year-consumers.png", tab: "Verbraucher", viewport: desktop },
@@ -158,15 +159,53 @@ function trimTransparentBottom(png) {
   return trimmed;
 }
 
+function pixelDistance(png, x, y, color) {
+  const index = (png.width * y + x) * 4;
+  return Math.max(
+    Math.abs(png.data[index] - color.r),
+    Math.abs(png.data[index + 1] - color.g),
+    Math.abs(png.data[index + 2] - color.b),
+  );
+}
+
+function trimBackgroundBottom(png, backgroundColor, options = {}) {
+  const bottomPadding = options.bottomPadding ?? 24;
+  const ignoredRightPx = options.ignoredRightPx ?? 96;
+  const maxX = Math.max(1, png.width - ignoredRightPx);
+  let lastContentRow = png.height - 1;
+  rowSearch: for (; lastContentRow >= 0; lastContentRow -= 1) {
+    let changedPixels = 0;
+    for (let x = 0; x < maxX; x += 1) {
+      if (pixelDistance(png, x, lastContentRow, backgroundColor) > 8) {
+        changedPixels += 1;
+        if (changedPixels >= 24) {
+          break rowSearch;
+        }
+      }
+    }
+  }
+
+  const trimmedHeight = Math.min(png.height, Math.max(1, lastContentRow + 1 + bottomPadding));
+  if (trimmedHeight >= png.height) {
+    return png;
+  }
+  const trimmed = new PNG({ width: png.width, height: trimmedHeight });
+  PNG.bitblt(png, trimmed, 0, 0, png.width, trimmedHeight, 0, 0);
+  return trimmed;
+}
+
 async function login(page) {
   await page.goto(`${baseUrl}/login`, { waitUntil: "domcontentloaded" });
   await page.fill('input[name="user"]', username);
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
   await page.waitForLoadState("networkidle");
+  await page.keyboard.press("Escape").catch(() => {});
   const closeMenu = page.getByLabel("Close menu");
   if ((await closeMenu.count()) > 0 && await closeMenu.first().isVisible()) {
-    await closeMenu.first().click();
+    await closeMenu.first().click({ force: true }).catch(async () => {
+      await page.keyboard.press("Escape").catch(() => {});
+    });
     await page.waitForTimeout(500);
   }
 }
@@ -283,16 +322,31 @@ async function captureComposed(page, viewport, target) {
   await resetAllScrollPositions(page);
   await page.waitForTimeout(1000);
 
-  if (viewport.name === "mobile") {
+  let captureHeight = viewport.height;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
     const contentHeight = await measureContentHeight(page);
-    const captureHeight = Math.min(Math.max(contentHeight + 24, viewport.height), 8000);
+    const nextHeight = Math.min(Math.max(contentHeight + 80, viewport.height), 12000);
+    if (nextHeight <= captureHeight + 8) {
+      captureHeight = nextHeight;
+      break;
+    }
+    captureHeight = nextHeight;
     await page.setViewportSize({ width: viewport.width, height: captureHeight });
     await resetAllScrollPositions(page);
     await page.waitForTimeout(1000);
   }
+  await page.setViewportSize({ width: viewport.width, height: captureHeight });
+  await resetAllScrollPositions(page);
+  await page.waitForTimeout(1000);
 
   fs.mkdirSync(path.dirname(target), { recursive: true });
   await page.screenshot({ path: target, fullPage: viewport.name !== "mobile" });
+
+  const png = PNG.sync.read(fs.readFileSync(target));
+  const trimmed = trimBackgroundBottom(trimTransparentBottom(png), parseRgbColor(layout.pageColor));
+  if (trimmed.height !== png.height) {
+    fs.writeFileSync(target, PNG.sync.write(trimmed));
+  }
 }
 
 async function selectTab(page, tabName) {
@@ -392,6 +446,13 @@ main().catch((error) => {
   console.error(error.message || error);
   process.exit(1);
 });
+
+
+
+
+
+
+
 
 
 

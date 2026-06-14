@@ -6,22 +6,24 @@ Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf Victoria
 
 ## VNext (unreleased)
 
+### Neue Funktionen
 
-### Dokumentation und Diagnose
+- PV-Gestehungskosten (LCOE) sind jetzt als optionale Finanz-Panels in `Year` und `All-time` verfuegbar. Die Auswertung nutzt eine Investment-Datei, unterstuetzt mehrere Investitionen pro Anlage, lineare Abschreibung je Position, geteilte Investments und zeigt die Datenabdeckung direkt im Anlagenlabel. Commits: `b7b1638`, `2e463c1`, `3d61f5d`, `126ae00`, `bfb43fd`.
+- Ein woechentlicher Investment-Helper fuer Linux-Produktionssysteme kann die LCOE-Metriken parallel zum normalen EVCC-Rollup aktualisieren. Wenn keine Investment-Metriken vorhanden sind, werden die optionalen Panels automatisch ausgeblendet. Commits: `67d6497`, `0192569`.
+- Historische PV-Ertraege aus externen Quellen koennen EVCC-kompatibel als taegliche PV-Energie pro `title` importiert werden. Der enthaltene SMA-Portal-Importer ist ein Beispielpfad fuer historische Anlagen; Investment-Berechnung und Energieimport bleiben voneinander getrennt. Commits: `b7b1638`, `a863616`.
+- `Year` und `All-time` enthalten neue PV-Anlagenvergleiche fuer Jahresenergie und spezifischen Ertrag (`kWh/kWp`). Fuer den spezifischen Ertrag wird bevorzugt die Anlagenleistung aus den Investmentdaten genutzt; bestehende Installationen fallen weiter auf `installedWattPeak` zurueck. Commits: `8e6be9b`, `85d821c`, `2e4bd12`.
 
-- Forgejo-Issue #6 umgesetzt: EVCC-Forecast-Datenfluss fuer `tariffSolar_value`, No-Data-Verhalten und VictoriaMetrics-Pruefkommandos dokumentiert; Forecast-Panels erklaeren nun direkt, dass der Solar-Forecast aus EVCC kommen muss.
+### Dashboard-Verbesserungen
 
-### Verbesserungen
+- `Today` nutzt die Grafana-13-Sparkline-Gauges als Standarduebersicht. Die alte separate Today-Gauges-Variante wurde in den normalen Today-Pfad uebernommen.
+- Autarkie, Eigenverbrauch und Speicher-SOC verwenden konsistente Sparkline-Gauges und ein einheitliches Farbschema ueber die Dashboards hinweg.
+- Forecast-Vergleichspanels zeigen bei fehlenden EVCC-Forecast-Daten einen direkten Hinweis im betroffenen Panel statt still leerer Vergleichsdaten.
+- Jahres- und Monatsdashboards zeigen partielle PV-Daten mit Coverage-Hinweis, statt sinnvolle Teiljahre pauschal auszublenden.
 
-- Today-Details-PV-Tab zeigt im Forecast-Vergleich nun einen sichtbaren Solar-Forecast-Status. Ohne EVCC-`tariffSolar_value` erscheint ein klarer Hinweis statt eines still missverstaendlichen Forecast-Vergleichs.
+### Qualitaet und Validierung
 
-- Grafana-13-Gauge-Visualisierung aus Forgejo-Issue #7 umgesetzt und vom Hold-Status in den Dashboard-Pfad uebernommen:
-  - `3cc765e` Today-Gauges-Dashboard ergaenzt
-  - `d052a84` Today-Gauges-Layout vereinfacht
-  - `43cdb86` Gauge-Links auf passende Today-Details-Tabs gesetzt
-  - `bf9999c` Grafana-Tab-State und Sparkline-Gauges verwendet
-  - `61a7e71` Autarkie-/Eigenverbrauchs-Metriken auf Sparkline-Gauges umgestellt
-  - `5f08c29` Sparkline-Darstellung der Metric-Gauges stabilisiert
+- Der Energievergleich waehlt fuer Tibber-vs-Influx nicht mehr automatisch lokale `current-evcc-agg`-Snapshots als Release-Baseline. Solche Dateien bleiben manuell auswertbar, blockieren aber nicht mehr den reproduzierbaren Release-Pfad.
+- Lokale Release-Pruefungen decken statische Dashboard-Semantik, MetricsQL-Readback, Lokalisierungs-Idempotenz, PowerShell-Kompatibilitaet und Grafana-Render-E2E gegen disposable Docker-Instanzen ab.
 
 ## Unterstuetzte Installationspfade
 

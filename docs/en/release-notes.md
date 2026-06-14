@@ -4,22 +4,24 @@ These notes summarize the first public VictoriaMetrics-based EVCC dashboard rele
 
 ## VNext (unreleased)
 
+### New Features
 
-### Documentation And Diagnostics
+- PV generation costs (LCOE) are now available as optional finance panels in `Year` and `All-time`. The calculation uses an investment file, supports multiple investments per asset, linear depreciation per position, shared investments, and shows data coverage directly in the asset label. Commits: `b7b1638`, `2e463c1`, `3d61f5d`, `126ae00`, `bfb43fd`.
+- A weekly investment helper for Linux production systems can refresh the LCOE metrics alongside the regular EVCC rollup. If no investment metrics exist, the optional panels are hidden automatically. Commits: `67d6497`, `0192569`.
+- Historic PV yield from external sources can be imported as EVCC-compatible daily PV energy by `title`. The included SMA Portal importer is one example path for historic systems; investment calculation and energy import remain separate. Commits: `b7b1638`, `a863616`.
+- `Year` and `All-time` include new PV asset comparisons for yearly energy and specific yield (`kWh/kWp`). Specific yield prefers asset peak power from investment data and keeps the existing `installedWattPeak` fallback for older installations. Commits: `8e6be9b`, `85d821c`, `2e4bd12`.
 
-- Implemented Forgejo issue #6: documented the EVCC forecast data flow for `tariffSolar_value`, no-data behavior, and VictoriaMetrics check commands; forecast panels now explain directly that the solar forecast must come from EVCC.
+### Dashboard Improvements
 
-### Improvements
+- `Today` now uses Grafana 13 sparkline gauges as the default overview. The former separate Today Gauges variant has been folded into the normal Today dashboard path.
+- Autarky, self-consumption, and storage SOC use consistent sparkline gauges and a shared color scheme across dashboards.
+- Forecast comparison panels show a direct message inside the affected panel when EVCC forecast data is missing instead of silently empty comparison data.
+- Year and month dashboards show partial PV data with coverage labels instead of hiding useful partial years by default.
 
-- Today Details PV tab now shows a visible solar forecast status in forecast comparison areas. Without EVCC `tariffSolar_value`, users see a clear explanation instead of a silently incomplete forecast comparison.
+### Quality And Validation
 
-- Implemented the Grafana 13 gauge visualization tracked in Forgejo issue #7 and moved it from hold status into the dashboard path:
-  - `3cc765e` add the Today Gauges dashboard
-  - `d052a84` simplify the Today Gauges layout
-  - `43cdb86` link gauges to the matching Today Details tabs
-  - `bf9999c` use Grafana tab state and sparkline gauges
-  - `61a7e71` switch autonomy/self-consumption metric panels to sparkline gauges
-  - `5f08c29` stabilize metric-gauge sparkline rendering
+- The energy comparison validator no longer auto-selects local `current-evcc-agg` snapshots as the Tibber-vs-Influx release baseline. Those files remain available for explicit manual analysis, but they no longer block the reproducible release path.
+- Local release checks cover static dashboard semantics, MetricsQL readback, localization idempotency, PowerShell compatibility, and Grafana render E2E against disposable Docker instances.
 
 ## Supported Installation Paths
 

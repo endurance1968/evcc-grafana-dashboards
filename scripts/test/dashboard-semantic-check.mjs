@@ -197,7 +197,8 @@ const criticalPanels = {
       "type": "barchart",
       "minTargets": 1,
       "xField": "source",
-      "exprIncludes": "evcc_pv_energy_by_title_yearly_with_coverage_wh"
+      "exprIncludes": "evcc_pv_energy_by_title_yearly_with_coverage_wh",
+      "sortFields": ["year", "source"]
     },
     {
       "id": 59,
@@ -205,7 +206,8 @@ const criticalPanels = {
       "type": "barchart",
       "minTargets": 1,
       "xField": "source",
-      "exprIncludes": "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp"
+      "exprIncludes": "evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp",
+      "sortFields": ["year", "source"]
     }
   ],
   "VM_EVCC_Year.json": [
@@ -512,6 +514,12 @@ function validateSemanticColors(fileName, panel, failures) {
   return mappings.some((item) => item?.type === "value" && item.options?.["1"]?.text === "01" && item.options?.["12"]?.text === "12");
 }
 
+function hasSortFields(panel, expectedFields) {
+  const transformations = panel.rawElement?.spec?.data?.spec?.transformations || [];
+  const sortBy = transformations.find((transformation) => transformation?.group === "sortBy");
+  const actualFields = (sortBy?.spec?.options?.sort || []).map((sort) => sort?.field);
+  return expectedFields.every((field, index) => actualFields[index] === field);
+}
 function hasBatterySplit(panel) {
   const expr = (panel.targets || []).map(targetExpr).join("\n");
   const dischargeStacking = propertyValue(panel, "Battery discharge", "custom.stacking");
@@ -1077,6 +1085,9 @@ function validateDashboard(fileName, dashboard) {
     if (rule.exprIncludes) {
       const expr = (panel.targets || []).map(targetExpr).join("\n");
       assert(expr.includes(rule.exprIncludes), failures, `${fileName}: critical panel '${rule.title}' query must include ${rule.exprIncludes}`);
+    }
+    if (rule.sortFields) {
+      assert(hasSortFields(panel, rule.sortFields), failures, `${fileName}: critical panel '${rule.title}' must sort transformed rows by ${rule.sortFields.join(", ")} before grouping`);
     }
     if (rule.monthLabels) {
       assert(hasMonthLabels(panel), failures, `${fileName}: critical panel '${rule.title}' is missing 01..12 month value mappings`);

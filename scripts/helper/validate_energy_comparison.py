@@ -170,7 +170,8 @@ def default_tibber_vm_json() -> Optional[Path]:
 
 def default_tibber_influx_csv() -> Optional[Path]:
     paths = sorted(DEFAULT_TIBBER_DIR.glob("tibber-influx-cost-monthly*.csv"), key=lambda item: item.stat().st_mtime, reverse=True)
-    return paths[0] if paths else None
+    baseline_paths = [path for path in paths if "current-evcc-agg" not in path.name]
+    return baseline_paths[0] if baseline_paths else None
 
 
 def default_vrm_json() -> Optional[Path]:
