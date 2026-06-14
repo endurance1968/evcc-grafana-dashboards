@@ -2,7 +2,7 @@
 
 These notes summarize the first public VictoriaMetrics-based EVCC dashboard release.
 
-## VNext (unreleased)
+## V2026-06-14
 
 ### New Features
 
@@ -116,3 +116,4 @@ Release validation covered:
 - German tab-navigation dashboard screenshots for every active tab
 - Grafana localization spot-checks for `de`, `fr`, and `zh`
 - local static/unit/dashboard checks via `npm test`
+

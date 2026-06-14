@@ -4,7 +4,7 @@ Englische Version: [release-notes.md](../en/release-notes.md).
 
 Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf VictoriaMetrics-Basis zusammen.
 
-## VNext (unreleased)
+## V2026-06-14
 
 ### Neue Funktionen
 
@@ -118,3 +118,4 @@ Die Release-Validierung deckte ab:
 - deutsche Screenshots der Dashboards mit Tab-Navigation fuer jeden aktiven Tab
 - Grafana-Lokalisierungs-Spot-Checks fuer `de`, `fr` und `zh`
 - lokale statische/unit/dashboard Checks via `npm test`
+
