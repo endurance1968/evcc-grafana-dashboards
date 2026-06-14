@@ -183,7 +183,7 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertFalse(any(metric == "evcc_pv_energy_by_title_yearly_wh" for metric, _labels in series))
         self.assertFalse(any(metric == "evcc_pv_specific_yield_yearly_kwh_per_kwp" for metric, _labels in series))
 
-    def test_non_sma_yearly_energy_and_specific_yield_require_full_year_coverage_per_year(self):
+    def test_non_sma_yearly_energy_and_specific_yield_keep_partial_coverage_per_year(self):
         assets = [{
             "asset_id": "pv_balkon_west",
             "asset_type": "pv",
@@ -230,6 +230,7 @@ class InvestmentCostImportTests(unittest.TestCase):
 
         energy_key_2023 = ("evcc_pv_energy_by_title_yearly_wh", complete_labels)
         covered_energy_key_2023 = ("evcc_pv_energy_by_title_yearly_with_coverage_wh", complete_coverage_labels)
+        covered_energy_key_2024 = ("evcc_pv_energy_by_title_yearly_with_coverage_wh", partial_coverage_labels)
         energy_key_2024 = ("evcc_pv_energy_by_title_yearly_wh", partial_labels)
         yield_key_2023 = ("evcc_pv_specific_yield_yearly_kwh_per_kwp", complete_labels)
         yield_key_2024 = ("evcc_pv_specific_yield_yearly_kwh_per_kwp", partial_labels)
@@ -244,7 +245,8 @@ class InvestmentCostImportTests(unittest.TestCase):
         self.assertAlmostEqual(series[yield_key_2023][0][1], 730.0)
 
         self.assertNotIn(energy_key_2024, series)
-        self.assertFalse(any(metric == "evcc_pv_energy_by_title_yearly_with_coverage_wh" and dict(label_items) == dict(partial_coverage_labels) for metric, label_items in series))
+        self.assertIn(covered_energy_key_2024, series)
+        self.assertAlmostEqual(series[covered_energy_key_2024][0][1], 1820000.0)
         self.assertNotIn(yield_key_2024, series)
         self.assertIn(covered_yield_key_2024, series)
         self.assertAlmostEqual(series[covered_yield_key_2024][0][1], 364.0)
