@@ -829,7 +829,7 @@
         "spec": {
           "id": 22,
           "title": "Specific yield",
-          "description": "",
+          "description": "Monthly PV yield normalized to installed kWp. Uses investment asset watt_peak values when available and falls back to installedWattPeak.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -844,32 +844,13 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000",
+                        "expr": "(sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000 / (last_over_time(evcc_pv_nominal_power_total_yearly_wp{local_year=\"${__from:date:YYYY}\"}[370d]) / 1000)) or (sum(sum_over_time(((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])))[$__range:1d])) / 1000 / $installedWattPeak)",
                         "format": "table",
-                        "legendFormat": "PV",
+                        "legendFormat": "Specific yield",
                         "range": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "pvEnergy",
-                    "hidden": true
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "__expr__",
-                      "version": "v0",
-                      "spec": {
-                        "expression": "$pvEnergy / $installedWattPeak",
-                        "type": "math"
-                      },
-                      "datasource": {
-                        "name": "__expr__"
                       }
                     },
                     "refId": "specificYield",

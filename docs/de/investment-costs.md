@@ -80,12 +80,14 @@ Generierte Metriken:
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_installed_watt_peak_yearly`
+- `evcc_pv_nominal_power_total_yearly_wp`
+- `evcc_pv_specific_yield_total_yearly_with_coverage_kwh_per_kwp`
 - `evcc_pv_energy_by_title_yearly_wh`
 - `evcc_pv_specific_yield_yearly_kwh_per_kwp`
 - `evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp`
 - `evcc_pv_specific_yield_rolling_7d_kwh_per_kwp`
 
-Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Kosten-Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Direkt darunter stehen analog `PV-spezifischer Ertrag (kWh/kWp)` und `PV-spezifischer Ertrag pro Woche (kWh/kWp)`. Der linke spezifische Jahresertrag nutzt die Coverage-Variante der Helper-Metrik und zeigt auch laufende Teiljahre mit der Jahresabdeckung direkt hinter dem PV-Titel an, z. B. `SMA-Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke.
+Das `Jahr`-Dashboard zeigt diese Werte im PV-Tab mit zwei Kosten-Panels: links `PV-Gestehungskosten` mit Jahreswerten pro PV-Anlage plus gewichteter Gesamtwert und rechts `PV-Gestehungskosten pro Woche (ct/kWh)` als rollierende 7-Tage-Zeitreihen je PV-Anlage im ausgewaehlten Jahr. Direkt darunter stehen analog `PV-spezifischer Ertrag (kWh/kWp)` und `PV-spezifischer Ertrag pro Woche (kWh/kWp)`. Der linke spezifische Jahresertrag nutzt die Coverage-Variante der Helper-Metrik und zeigt auch laufende Teiljahre mit der Jahresabdeckung direkt hinter dem PV-Titel an, z. B. `PV-Anlage Nord (43%)`. Die Dashboards lesen dafuer bewusst kurze Helper-Metriken statt langer MetricQL-Ausdruecke. Die zusammenfassenden Kacheln fuer den spezifischen Ertrag nutzen die aus den Assetdaten berechnete Gesamt-Nennleistung; `installedWattPeak` bleibt nur Fallback fuer Installationen ohne Investment-Rollup und als Deploy-Wert fuer PV-Leistungsskalen.
 
 Das Gesamtzeitraum-Dashboard zeigt im Finanz-Tab ebenfalls PV-Gestehungskosten: links dynamisch fuer den ausgewaehlten Grafana-Zeitraum gewichtete Werte je PV-Anlage plus Gesamtwert, rechts die Jahreswerte als Zeitreihe ueber den betrachteten Zeitraum. Die dynamische Berechnung nutzt monatliche Helper-Metriken fuer Kosten und den LCOE-Energie-Nenner, damit ein ausgewaehltes Jahr im Gesamtzeitraum-Dashboard konsistent zum Jahr-Dashboard bleibt. Die rechte Jahres-Zeitreihe zeigt nur Jahre mit mindestens 95% Datenabdeckung, damit Teiljahre nicht als echte Kosten-Ausreisser erscheinen.
 

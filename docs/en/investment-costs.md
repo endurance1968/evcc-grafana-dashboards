@@ -80,12 +80,14 @@ Generated metrics:
 - `evcc_pv_investment_cost_monthly_eur`
 - `evcc_pv_lcoe_monthly_ct_per_kwh`
 - `evcc_pv_installed_watt_peak_yearly`
+- `evcc_pv_nominal_power_total_yearly_wp`
+- `evcc_pv_specific_yield_total_yearly_with_coverage_kwh_per_kwp`
 - `evcc_pv_energy_by_title_yearly_wh`
 - `evcc_pv_specific_yield_yearly_kwh_per_kwp`
 - `evcc_pv_specific_yield_yearly_with_coverage_kwh_per_kwp`
 - `evcc_pv_specific_yield_rolling_7d_kwh_per_kwp`
 
-The `Year` dashboard shows these values in the PV tab with two cost panels: `PV generation costs` on the left for annual values per PV source plus a weighted total and `PV generation cost/week (ct/kWh)` on the right as rolling 7-day time-series lines per PV source in the selected year. Directly below, it mirrors the layout with `PV specific yield (kWh/kWp)` and `PV specific yield/week (kWh/kWp)`. The left annual specific-yield panel uses the coverage variant of the helper metric and also shows partial current years with annual coverage directly after the PV title, for example `SMA-Nord (43%)`. The dashboard intentionally reads short helper metrics instead of long MetricQL expressions.
+The `Year` dashboard shows these values in the PV tab with two cost panels: `PV generation costs` on the left for annual values per PV source plus a weighted total and `PV generation cost/week (ct/kWh)` on the right as rolling 7-day time-series lines per PV source in the selected year. Directly below, it mirrors the layout with `PV specific yield (kWh/kWp)` and `PV specific yield/week (kWh/kWp)`. The left annual specific-yield panel uses the coverage variant of the helper metric and also shows partial current years with annual coverage directly after the PV title, for example `PV source north (43%)`. The dashboard intentionally reads short helper metrics instead of long MetricQL expressions. The summary specific-yield panels use the total nominal PV power calculated from asset data; `installedWattPeak` remains only a fallback for installations without the investment rollup and a deploy-time value for PV power scales.
 
 The All-time dashboard also shows PV generation costs in the Finances tab: the left panel dynamically calculates weighted values for the selected Grafana time range per PV source plus a total, while the right panel shows annual values as a time series over the selected time range. The dynamic calculation uses monthly helper metrics for cost and energy so a selected year in the All-time dashboard remains consistent with the Year dashboard. The yearly time-series panel only shows years with at least 95% data coverage so partial years do not appear as real cost outliers.
 

@@ -2,8 +2,8 @@
 """
 Script: import-investment-costs.py
 Purpose: Calculate PV investment cost rollups from a local investment file and VictoriaMetrics PV data.
-Version: 2026.06.11.2
-Last modified: 2026-06-11
+Version: 2026.06.14.1
+Last modified: 2026-06-14
 """
 from __future__ import annotations
 
@@ -24,8 +24,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.11.2"
-SCRIPT_LAST_MODIFIED = "2026-06-11"
+SCRIPT_VERSION = "2026.06.14.1"
+SCRIPT_LAST_MODIFIED = "2026-06-14"
 GENERATED_METRICS = [
     "evcc_pv_investment_cost_daily_eur",
     "evcc_pv_lcoe_daily_ct_per_kwh",
@@ -37,6 +37,8 @@ GENERATED_METRICS = [
     "evcc_pv_lcoe_period_ct_per_kwh",
     "evcc_pv_lcoe_rolling_7d_ct_per_kwh",
     "evcc_pv_installed_watt_peak_yearly",
+    "evcc_pv_nominal_power_total_yearly_wp",
+    "evcc_pv_specific_yield_total_yearly_with_coverage_kwh_per_kwp",
     "evcc_pv_energy_by_title_yearly_wh",
     "evcc_pv_energy_by_title_yearly_with_coverage_wh",
     "evcc_pv_specific_yield_yearly_kwh_per_kwp",
@@ -323,7 +325,7 @@ def delete_metric(base_url: str, metric: str) -> None:
 
 
 def pv_energy_rollup_source_label(energy_source: str) -> str:
-    return "sma" if energy_source == "daily-metric" else ("combined" if energy_source == "combined" else "helper")
+    return "daily-metric" if energy_source == "daily-metric" else ("combined" if energy_source == "combined" else "helper")
 
 def active_until(asset: dict[str, Any]) -> dt.date:
     start = asset["commissioning_date"]
@@ -591,6 +593,7 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
     asset_summaries = []
     title_summaries = []
     coverage_summaries = []
+    yearly_specific_yield_totals: dict[int, dict[str, float]] = {}
 
     for title, title_assets in sorted(assets_by_title.items()):
         if len(title_assets) == 1:
@@ -749,6 +752,17 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                 if ratio is not None and ratio >= partial_warning_threshold:
                     append_sample(series, "evcc_pv_energy_by_title_yearly_wh", peak_labels, timestamp_for_year(year, tz), energy_wh)
             if energy_wh > 1000 and installed_watt_peak > 0:
+                yearly_total = yearly_specific_yield_totals.setdefault(year, {
+                    "energy_wh": 0.0,
+                    "watt_peak": 0.0,
+                    "coverage_weighted": 0.0,
+                    "coverage_weight": 0.0,
+                })
+                yearly_total["energy_wh"] += energy_wh
+                yearly_total["watt_peak"] += installed_watt_peak
+                if ratio is not None:
+                    yearly_total["coverage_weighted"] += ratio * installed_watt_peak
+                    yearly_total["coverage_weight"] += installed_watt_peak
                 yield_labels = {
                     "title": title,
                     "coverage": coverage_label(ratio),
@@ -849,6 +863,20 @@ def build_rollups(base_url: str, assets: list[dict[str, Any]], start_day: dt.dat
                 "coverage_ratio": title_ratio,
                 "lcoe_ct_per_kwh": (asset_covered_cost_eur / (title_energy_wh / 1000.0) * 100.0) if title_energy_wh > 0 and should_write_lcoe(title_ratio, min_lcoe_coverage_ratio) else None,
             })
+
+    for year, values in sorted(yearly_specific_yield_totals.items()):
+        energy_wh = values["energy_wh"]
+        watt_peak = values["watt_peak"]
+        if energy_wh <= 1000 or watt_peak <= 0:
+            continue
+        ratio = coverage_ratio(values["coverage_weighted"], values["coverage_weight"])
+        labels = {
+            "scope": "pv",
+            "coverage": coverage_label(ratio),
+            "local_year": f"{year:04d}",
+        }
+        append_sample(series, "evcc_pv_nominal_power_total_yearly_wp", labels, timestamp_for_year(year, tz), watt_peak)
+        append_sample(series, "evcc_pv_specific_yield_total_yearly_with_coverage_kwh_per_kwp", labels, timestamp_for_year(year, tz), energy_wh / watt_peak)
 
     if write_pv_energy_rollup:
         source_label = pv_energy_rollup_source_label(energy_source)
@@ -990,9 +1018,13 @@ def main() -> int:
                 log(f"Delete existing metric: {metric}")
                 delete_metric(args.vm_base_url, metric)
             if args.write_pv_energy_rollup:
-                selector = f'evcc_pv_energy_daily_wh{{source="{pv_energy_rollup_source_label(args.energy_source)}"}}'
-                log(f"Delete existing helper PV energy rollup: {selector}")
-                delete_series(args.vm_base_url, selector)
+                source_labels = [pv_energy_rollup_source_label(args.energy_source)]
+                if args.energy_source == "daily-metric":
+                    source_labels.append("sma")
+                for source_label in dict.fromkeys(source_labels):
+                    selector = f'evcc_pv_energy_daily_wh{{source="{source_label}"}}'
+                    log(f"Delete existing helper PV energy rollup: {selector}")
+                    delete_series(args.vm_base_url, selector)
         batches = import_series(args.vm_base_url, series, args.batch_size)
         log(f"Imported batches: {batches}")
     else:
