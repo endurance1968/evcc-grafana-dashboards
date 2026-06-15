@@ -2,6 +2,16 @@
 
 These notes summarize the first public VictoriaMetrics-based EVCC dashboard release.
 
+## Unreleased
+
+### New Features
+
+- EVCC green share is documented as a first-class KPI and treated in KPI sections as EVCC's home green share. The value is based on EVCC's `greenShareHome_value` and treats PV plus battery discharge as green available power.
+
+### User Notes
+
+- Long-range green-share panels in month, year, and all-time dashboards require the regular EVCC VM rollup for the affected date ranges. The current long-range values are trend KPIs based on daily EVCC ratios, not an external renewable-tariff or CO2 assessment.
+
 ## V2026-06-14
 
 ### New Features
@@ -116,4 +126,6 @@ Release validation covered:
 - German tab-navigation dashboard screenshots for every active tab
 - Grafana localization spot-checks for `de`, `fr`, and `zh`
 - local static/unit/dashboard checks via `npm test`
+
+
 

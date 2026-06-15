@@ -4,6 +4,16 @@ Englische Version: [release-notes.md](../en/release-notes.md).
 
 Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf VictoriaMetrics-Basis zusammen.
 
+## Unreleased
+
+### Neue Funktionen
+
+- EVCC-Gruenanteil wird als eigener KPI dokumentiert und in den Kennzahlenbereichen als EVCC-Haus-Gruenanteil verstanden. Der Wert basiert auf EVCCs `greenShareHome_value` und zaehlt PV plus Batterieentladung als gruen verfuegbare Leistung.
+
+### Hinweise fuer Nutzer
+
+- Fuer Langzeit-Gruenanteil in Monats-, Jahres- und Gesamtzeitraum-Dashboards muss der normale EVCC-VM-Rollup fuer die gewuenschten Zeitraeume gelaufen sein. Die aktuellen Langzeitwerte sind Trend-KPIs aus taeglichen EVCC-Ratios, keine externe Oekostrom- oder CO2-Bewertung.
+
 ## V2026-06-14
 
 ### Neue Funktionen
@@ -118,4 +128,6 @@ Die Release-Validierung deckte ab:
 - deutsche Screenshots der Dashboards mit Tab-Navigation fuer jeden aktiven Tab
 - Grafana-Lokalisierungs-Spot-Checks fuer `de`, `fr` und `zh`
 - lokale statische/unit/dashboard Checks via `npm test`
+
+
 

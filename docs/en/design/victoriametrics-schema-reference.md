@@ -175,6 +175,18 @@ These raw metrics are also in active use:
 
 Note: `tariffSolar_value` is optional and exists only when EVCC itself has a solar forecast configured. `greenShareHome_value` is optional and exists only when EVCC writes the green-share KPI. The dashboards do not call Forecast.Solar, Solcast, Open-Meteo, or external green-share services directly; they only display samples written by EVCC.
 
+### EVCC Green Share
+
+Green share follows EVCC semantics and is not an external renewable-tariff or CO2 indicator. EVCC calculates the current green share from available PV power plus positive battery power. Battery discharge therefore counts as green available power; battery charging counts as consumption before loadpoints receive the remaining green share.
+
+EVCC allocates green available power conceptually in this order:
+
+1. home consumption
+2. battery charging
+3. loadpoints
+
+`greenShareHome_value` therefore describes EVCC's green share for home consumption as a ratio `0..1`. In short-range `Today` views this is a direct EVCC KPI. For month, year, and all-time views the rollup currently writes `evcc_green_share_home_daily_ratio` as a daily mean. These long-range values are intended as a trend KPI. If green share is later used for billing-grade or energy-weighted analysis, add a dedicated energy-weighted rollup metric instead of averaging daily percentages unweighted.
+
 ## Production daily rollup families
 
 The production prefix is currently `evcc`.
@@ -383,3 +395,4 @@ When adding a new raw metric or rollup family, keep these rules:
 5. Reuse `local_year` and `local_month` only when they materially simplify long-range dashboard queries.
 6. Avoid `local_day` or `local_date` on stored daily rollups.
 7. Prefer dashboard-side aggregation unless the result is reused often or expensive to compute repeatedly.
+

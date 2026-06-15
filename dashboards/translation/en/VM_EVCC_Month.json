@@ -5005,7 +5005,7 @@
                         "x": 5,
                         "y": 13,
                         "width": 19,
-                        "height": 6,
+                        "height": 8,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-6"

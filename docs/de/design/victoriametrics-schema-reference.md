@@ -177,6 +177,18 @@ Diese Rohmetriken sind ebenfalls aktiv genutzt:
 
 Hinweis: `tariffSolar_value` ist optional und entsteht nur, wenn EVCC selbst einen Solar-Forecast konfiguriert hat. `greenShareHome_value` ist optional und entsteht nur, wenn EVCC die Gruenanteil-KPI schreibt. Die Dashboards rufen Forecast.Solar, Solcast, Open-Meteo oder externe Gruenanteil-Dienste nicht direkt ab; sie zeigen nur die von EVCC geschriebenen Samples an.
 
+### EVCC-Gruenanteil
+
+Der Gruenanteil folgt der EVCC-Semantik und ist kein externer Oekostrom- oder CO2-Indikator. EVCC berechnet den aktuellen Gruenanteil aus verfuegbarer PV-Leistung plus positiver Batterieleistung. Batterieentladung zaehlt damit als gruen verfuegbare Leistung; Batterieladung zaehlt als Verbrauch, bevor Ladepunkte den verbleibenden Gruenanteil erhalten.
+
+EVCC verteilt gruen verfuegbare Leistung modellhaft in dieser Reihenfolge:
+
+1. Hausverbrauch
+2. Batterieladung
+3. Ladepunkte
+
+`greenShareHome_value` beschreibt deshalb den EVCC-Gruenanteil fuer den Hausverbrauch als Ratio `0..1`. Fuer kurzfristige `Today`-Ansichten ist das ein direkter EVCC-KPI. Fuer Monats-, Jahres- und Gesamtzeitraeume wird daraus aktuell `evcc_green_share_home_daily_ratio` als taeglicher Mittelwert erzeugt. Diese Langzeitwerte sind als Trend-KPI gedacht. Wenn der Gruenanteil spaeter fuer abrechnungs- oder energiegewichtete Auswertungen verwendet wird, sollte eine eigene energiegewichtete Rollup-Metrik erzeugt werden, statt Tages-Prozentwerte ungewichtet zu mitteln.
+
 ## Produktions-Rollupfamilien pro Tag
 
 Der Produktionspraefix ist aktuell `evcc`.
@@ -385,3 +397,4 @@ Beim Hinzufuegen einer neuen Rohmetrik oder Rollup-Familie gelten diese Regeln:
 5. `local_year` und `local_month` nur wiederverwenden, wenn sie Langzeit-Dashboardqueries spuerbar vereinfachen.
 6. `local_day` oder `local_date` auf gespeicherten taeglichen Rollups vermeiden.
 7. Dashboardseitige Aggregation bevorzugen, ausser das Ergebnis wird oft wiederverwendet oder ist teuer wiederholt zu berechnen.
+
