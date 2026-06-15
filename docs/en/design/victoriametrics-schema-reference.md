@@ -65,6 +65,7 @@ Examples:
 - `tariffFeedIn_value`
 - `tariffPriceLoadpoints_value`
 - `tariffSolar_value`
+- `greenShareHome_value`
 
 ### Layer 2: daily rollups
 
@@ -170,8 +171,9 @@ These raw metrics are also in active use:
 | `tariffFeedIn_value` | Feed-in tariff | Export credit and battery opportunity cost |
 | `tariffPriceLoadpoints_value` | Loadpoint charging tariff | Vehicle charging cost |
 | `tariffSolar_value` | Solar forecast | `Today` and `Today - Details` PV forecast panels |
+| `greenShareHome_value` | EVCC green share for home consumption as ratio `0..1` | KPI gauges/history in `Today*`, daily rollup for long-range KPI panels |
 
-Note: `tariffSolar_value` is an optional EVCC raw value. It exists only when EVCC itself has a solar forecast configured. The dashboards do not call Forecast.Solar, Solcast, or Open-Meteo directly; they only display forecast samples written by EVCC.
+Note: `tariffSolar_value` is optional and exists only when EVCC itself has a solar forecast configured. `greenShareHome_value` is optional and exists only when EVCC writes the green-share KPI. The dashboards do not call Forecast.Solar, Solcast, Open-Meteo, or external green-share services directly; they only display samples written by EVCC.
 
 ## Production daily rollup families
 
@@ -194,6 +196,7 @@ The production prefix is currently `evcc`.
 | `evcc_grid_export_daily_wh` | `local_year`, `local_month` | Daily grid export energy |
 | `evcc_battery_charge_daily_wh` | `local_year`, `local_month` | Daily battery charge energy |
 | `evcc_battery_discharge_daily_wh` | `local_year`, `local_month` | Daily battery discharge energy |
+| `evcc_green_share_home_daily_ratio` | `local_year`, `local_month` | Daily mean EVCC green share for home consumption, ratio `0..1` |
 
 ### Daily finance and price baselines
 

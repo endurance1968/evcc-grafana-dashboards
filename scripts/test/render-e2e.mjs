@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.06.04.1
- * Last modified: 2026-06-04
+ * Version: 2026.06.15.1
+ * Last modified: 2026-06-15
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -311,6 +311,7 @@ function fixtureSeries(now, profile = "default") {
     ["evcc_battery_discharge_daily_wh", {}, 900],
     ["evcc_battery_soc_daily_min_pct", {}, 35],
     ["evcc_battery_soc_daily_max_pct", {}, 95],
+    ["evcc_green_share_home_daily_ratio", {}, 0.86],
     ["evcc_grid_import_price_avg_daily_ct_per_kwh", {}, 30],
     ["evcc_grid_import_price_effective_daily_ct_per_kwh", {}, 31],
     ["evcc_grid_import_price_min_daily_ct_per_kwh", {}, 22],
@@ -356,6 +357,7 @@ function fixtureSeries(now, profile = "default") {
     rawTimestamps.push(now.getTime());
   }
   const rawValues = (value) => rawTimestamps.map((timestamp, index) => ({ timestamp, value: value + index }));
+  const boundedRatioValues = (value) => rawTimestamps.map((timestamp, index) => ({ timestamp, value: Math.min(1, value + (index % 8) * 0.005) }));
   addSeries(series, "pvPower_value", { id: "", title: "Gesamt" }, rawValues(5000));
   addSeries(series, "pvPower_value", { id: "pv1", title: "PV 1" }, rawValues(2200));
   addSeries(series, "pvPower_value", { id: "pv2", title: "PV 2" }, rawValues(1800));
@@ -365,6 +367,7 @@ function fixtureSeries(now, profile = "default") {
   addSeries(series, "batteryPower_value", { id: "" }, rawValues(400));
   addSeries(series, "batterySoc_value", { id: "", title: "Total" }, rawValues(76));
   addSeries(series, "batterySoc_value", { id: "bat1", title: "Battery" }, rawValues(80));
+  addSeries(series, "greenShareHome_value", {}, boundedRatioValues(0.82));
   addSeries(series, "chargePower_value", { loadpoint: "LP1" }, rawValues(-700));
   if (includeForecast) {
     addSeries(series, "tariffSolar_value", {}, rawValues(6500));
@@ -578,8 +581,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.06.04.1");
-    console.log("Last modified: 2026-06-04");
+    console.log("Version:       2026.06.15.1");
+    console.log("Last modified: 2026-06-15");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");
@@ -594,4 +597,3 @@ main().catch((error) => {
   console.error(error.message || error);
   process.exit(1);
 });
-

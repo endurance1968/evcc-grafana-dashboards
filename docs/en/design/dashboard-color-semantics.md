@@ -43,6 +43,10 @@ The central technical source is `scripts/helper/dashboard-colors.mjs`. Color cha
 | Self-consumption medium | Soft violet | `#DFA8D8` | medium range in self-consumption gauge thresholds |
 | Self-consumption | Red violet | `#A44C9C` | self-consumption gauge and history, close to the home-consumption color family |
 | Self-consumption high | Dark violet | `#7C3A75` | high range in self-consumption gauge thresholds |
+| Green share low | Very light teal | `#D7F4E8` | low range in green-share gauge thresholds |
+| Green share medium | Soft teal | `#8AD7BD` | medium range in green-share gauge thresholds |
+| Green share | Teal green | `#43A67A` | EVCC green-share gauge and history |
+| Green share high | Dark teal green | `#217A55` | high range in green-share gauge thresholds |
 | Purchase / costs | Red | `red` | electricity cost, purchase, negative cost perspective |
 | Sold / compensation | Green | `green` | feed-in compensation or sold energy |
 
@@ -65,13 +69,14 @@ Gauge thresholds stay within the same color family:
 - Loadpoints use orange shades.
 - Autarky uses green shades instead of traffic-light colors.
 - Self-consumption uses violet/red-violet shades close to the home color family.
+- Green share uses teal-green shades so it is visually related to PV/autarky but still distinct.
 - Storage SOC uses blue shades matching the storage base color.
 
 ## Maintenance Notes
 
-New panels should first be classified semantically: PV, grid import, feed-in, storage, home, loadpoint, autarky, self-consumption, or costs. Then use the same color as documented here.
+New panels should first be classified semantically: PV, grid import, feed-in, storage, home, loadpoint, autarky, self-consumption, green share, or costs. Then use the same color as documented here.
 
-Static protection lives in `scripts/test/dashboard-semantic-check.mjs`. The check prevents central series such as PV, grid, feed-in, storage, home, autarky, and self-consumption from drifting back to inconsistent colors.
+Static protection lives in `scripts/test/dashboard-semantic-check.mjs`. The check prevents central series such as PV, grid, feed-in, storage, home, autarky, self-consumption, and green share from drifting back to inconsistent colors.
 
 Recommended workflow after color changes:
 

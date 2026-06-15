@@ -1553,6 +1553,60 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Green share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "#D7F4E8",
+                      "value": null
+                    },
+                    {
+                      "color": "#8AD7BD",
+                      "value": 0.25
+                    },
+                    {
+                      "color": "#43A67A",
+                      "value": 0.5
+                    },
+                    {
+                      "color": "#217A55",
+                      "value": 0.75
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Groen aandeel"
+              },
+              {
+                "id": "min",
+                "value": 0
+              },
+              {
+                "id": "max",
+                "value": 1
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1682,6 +1736,18 @@
           "legendFormat": "Eigenverbruik",
           "range": false,
           "refId": "Self-consumption"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM}"
+          },
+          "editorMode": "code",
+          "expr": "range_avg(greenShareHome_value)",
+          "format": "time_series",
+          "legendFormat": "Groen aandeel",
+          "range": true,
+          "refId": "Green share"
         }
       ],
       "title": "Kengetallen",
@@ -1689,7 +1755,7 @@
       "type": "gauge",
       "id": 64,
       "gridPos": {
-        "h": 6,
+        "h": 8,
         "w": 24,
         "x": 0,
         "y": 34
@@ -1818,6 +1884,63 @@
                 "value": "watth"
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Green share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#43A67A"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Autarky"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#73BF69"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Self-consumption"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "#A44C9C"
+                }
+              }
+            ]
           }
         ]
       },
@@ -1926,6 +2049,18 @@
           "expression": "($pvEnergy - $gridEnergyOut) / $pvEnergy",
           "refId": "Self-consumption",
           "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "victoriametrics-metrics-datasource",
+            "uid": "${DS_VM}"
+          },
+          "editorMode": "code",
+          "expr": "avg(greenShareHome_value)",
+          "format": "time_series",
+          "legendFormat": "Groen aandeel",
+          "range": true,
+          "refId": "Green share"
         }
       ],
       "transparent": false,
@@ -1935,7 +2070,7 @@
         "h": 2,
         "w": 24,
         "x": 0,
-        "y": 40
+        "y": 42
       },
       "title": "Metric history"
     },
@@ -2273,7 +2408,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 42
+        "y": 44
       }
     }
   ],

@@ -355,7 +355,8 @@
     "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Jaarlijkse investeringsgebaseerde PV-opwekkingskosten per PV-bron over de geselecteerde periode. Batterij- en netkosten zijn niet inbegrepen.",
     "PV energy/year by source": "PV-energie per jaar per bron",
     "Annual PV energy per PV source over the selected time range. Values come from the per-title monthly PV energy helper metric.": "Jaarlijkse PV-energie per PV-bron over de geselecteerde periode. De waarden komen uit de maandelijkse PV-energiehulpmeter per titel.",
-    "source": "Bron"
+    "source": "Bron",
+    "Green share": "Groen aandeel"
   },
   "Heat pump source mix": "Verdeling energiebronnen warmtepomp",
   "Heat pump title match": "Warmtepomp titelmatch",

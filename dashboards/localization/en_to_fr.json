@@ -355,7 +355,8 @@
     "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "Coût annuel de production PV basé sur l investissement par source PV sur la période sélectionnée. Les coûts de batterie et de réseau ne sont pas inclus.",
     "PV energy/year by source": "Énergie PV par an et par source",
     "Annual PV energy per PV source over the selected time range. Values come from the per-title monthly PV energy helper metric.": "Énergie PV annuelle par source PV sur la période sélectionnée. Les valeurs proviennent de la métrique auxiliaire mensuelle par titre.",
-    "source": "Source"
+    "source": "Source",
+    "Green share": "Part verte"
   },
   "Heat pump source mix": "Répartition des sources de la pompe à chaleur",
   "Heat pump title match": "Correspondance du titre de la pompe à chaleur",

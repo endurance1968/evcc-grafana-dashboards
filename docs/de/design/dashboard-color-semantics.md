@@ -43,6 +43,10 @@ Die zentrale technische Quelle ist `scripts/helper/dashboard-colors.mjs`. Aender
 | Eigenverbrauch mittel | Weichviolett | `#DFA8D8` | mittlerer Bereich in Eigenverbrauch-Gauge-Schwellen |
 | Eigenverbrauch | Rotviolett | `#A44C9C` | Eigenverbrauchs-Gauge und Verlauf, nahe an der Hausverbrauchsfarbe |
 | Eigenverbrauch hoch | Dunkelviolett | `#7C3A75` | hoher Bereich in Eigenverbrauch-Gauge-Schwellen |
+| Gruenanteil niedrig | Sehr helles Tuerkisgruen | `#D7F4E8` | niedriger Bereich in Gruenanteil-Gauge-Schwellen |
+| Gruenanteil mittel | Weiches Tuerkisgruen | `#8AD7BD` | mittlerer Bereich in Gruenanteil-Gauge-Schwellen |
+| Gruenanteil | Tuerkisgruen | `#43A67A` | EVCC-Gruenanteil-Gauge und Verlauf |
+| Gruenanteil hoch | Dunkles Tuerkisgruen | `#217A55` | hoher Bereich in Gruenanteil-Gauge-Schwellen |
 | Einkauf / Kosten | Rot | `red` | Stromkosten, Einkauf, negative Kostensicht |
 | Verkauf / Verguetung | Gruen | `green` | Einspeiseverguetung oder Verkauf |
 
@@ -65,13 +69,14 @@ Gauge-Schwellen bleiben innerhalb derselben Farbfamilie:
 - Ladepunkte nutzen orange Abstufungen.
 - Autarkie nutzt gruene Abstufungen statt Ampelfarben.
 - Eigenverbrauch nutzt violette/rotviolette Abstufungen nahe an der Haus-Farbfamilie.
+- Gruenanteil nutzt tuerkisgruene Abstufungen, damit er PV/Autarkie optisch nah bleibt, aber unterscheidbar ist.
 - Speicher-SOC nutzt blaue Abstufungen passend zur Speicher-Grundfarbe.
 
 ## Pflegehinweise
 
-Neue Panels sollen zuerst semantisch eingeordnet werden: PV, Netzbezug, Einspeisung, Speicher, Haus, Ladepunkt, Autarkie, Eigenverbrauch oder Kosten. Danach soll dieselbe Farbe wie in dieser Referenz verwendet werden.
+Neue Panels sollen zuerst semantisch eingeordnet werden: PV, Netzbezug, Einspeisung, Speicher, Haus, Ladepunkt, Autarkie, Eigenverbrauch, Gruenanteil oder Kosten. Danach soll dieselbe Farbe wie in dieser Referenz verwendet werden.
 
-Die statische Absicherung liegt in `scripts/test/dashboard-semantic-check.mjs`. Der Check verhindert, dass zentrale Serien wie PV, Netz, Einspeisung, Speicher, Haus, Autarkie und Eigenverbrauch wieder unterschiedliche Farben bekommen.
+Die statische Absicherung liegt in `scripts/test/dashboard-semantic-check.mjs`. Der Check verhindert, dass zentrale Serien wie PV, Netz, Einspeisung, Speicher, Haus, Autarkie, Eigenverbrauch und Gruenanteil wieder unterschiedliche Farben bekommen.
 
 Empfohlener Ablauf nach Farbaenderungen:
 

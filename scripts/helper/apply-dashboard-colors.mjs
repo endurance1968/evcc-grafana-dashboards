@@ -1,8 +1,8 @@
 /**
  * Script: apply-dashboard-colors.mjs
  * Purpose: Apply the central semantic color palette to original EVCC VM dashboards.
- * Version: 2026.06.03.19
- * Last modified: 2026-06-03
+ * Version: 2026.06.15.1
+ * Last modified: 2026-06-15
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -36,6 +36,10 @@ const exactColorByName = new Map([
   ["Autarky", dashboardColors.autarky],
   ["Autarkie", dashboardColors.autarky],
   ["Self-consumption", dashboardColors.selfConsumption],
+  ["Green share", dashboardColors.greenShare],
+  ["GreenShare", dashboardColors.greenShare],
+  ["Gruenanteil", dashboardColors.greenShare],
+  ["Grünanteil", dashboardColors.greenShare],
   ["Purchased", dashboardColors.purchase],
   ["Sold", dashboardColors.sold],
 ]);
@@ -89,6 +93,12 @@ const gaugeThresholdsByMatcher = new Map([
     { color: dashboardColors.selfConsumptionMid, value: 0.25 },
     { color: dashboardColors.selfConsumption, value: 0.5 },
     { color: dashboardColors.selfConsumptionDark, value: 0.75 },
+  ])],
+  ["Green share", thresholds("absolute", [
+    { color: dashboardColors.greenShareLow, value: null },
+    { color: dashboardColors.greenShareMid, value: 0.25 },
+    { color: dashboardColors.greenShare, value: 0.5 },
+    { color: dashboardColors.greenShareDark, value: 0.75 },
   ])],
   ["Battery SOC", thresholds("absolute", [
     { color: dashboardColors.storageSocLow, value: null },

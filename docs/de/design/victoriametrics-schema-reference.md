@@ -67,6 +67,7 @@ Beispiele:
 - `tariffFeedIn_value`
 - `tariffPriceLoadpoints_value`
 - `tariffSolar_value`
+- `greenShareHome_value`
 
 ### Schicht 2: taegliche Rollups
 
@@ -172,8 +173,9 @@ Diese Rohmetriken sind ebenfalls aktiv genutzt:
 | `tariffFeedIn_value` | Einspeisetarif | Exportgutschrift und Batterie-Opportunitaetskosten |
 | `tariffPriceLoadpoints_value` | Ladetarif am Loadpoint | Fahrzeugladekosten |
 | `tariffSolar_value` | Solarprognose | PV-Prognosepanels in `Today` und `Today - Details` |
+| `greenShareHome_value` | EVCC-Gruenanteil fuer Hausverbrauch als Ratio `0..1` | KPI-Gauges/Verlauf in `Today*`, taegliches Rollup fuer Langzeit-KPI-Panels |
 
-Hinweis: `tariffSolar_value` ist ein optionaler EVCC-Rohwert. Er entsteht nur, wenn EVCC selbst einen Solar-Forecast konfiguriert hat. Die Dashboards rufen Forecast.Solar, Solcast oder Open-Meteo nicht direkt ab; sie zeigen nur die von EVCC geschriebenen Forecast-Samples an.
+Hinweis: `tariffSolar_value` ist optional und entsteht nur, wenn EVCC selbst einen Solar-Forecast konfiguriert hat. `greenShareHome_value` ist optional und entsteht nur, wenn EVCC die Gruenanteil-KPI schreibt. Die Dashboards rufen Forecast.Solar, Solcast, Open-Meteo oder externe Gruenanteil-Dienste nicht direkt ab; sie zeigen nur die von EVCC geschriebenen Samples an.
 
 ## Produktions-Rollupfamilien pro Tag
 
@@ -196,6 +198,7 @@ Der Produktionspraefix ist aktuell `evcc`.
 | `evcc_grid_export_daily_wh` | `local_year`, `local_month` | taegliche Netzeinspeiseenergie |
 | `evcc_battery_charge_daily_wh` | `local_year`, `local_month` | taegliche Batterieladeenergie |
 | `evcc_battery_discharge_daily_wh` | `local_year`, `local_month` | taegliche Batterieentladeenergie |
+| `evcc_green_share_home_daily_ratio` | `local_year`, `local_month` | taeglicher Mittelwert des EVCC-Gruenanteils fuer Hausverbrauch, Ratio `0..1` |
 
 ### Taegliche Finanz- und Preis-Baselines
 

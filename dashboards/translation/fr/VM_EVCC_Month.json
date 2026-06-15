@@ -968,6 +968,32 @@
                     "refId": "Self-consumption",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "WITH (\n  greenShare = sum(last_over_time(evcc_green_share_home_daily_ratio{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])),\n  sumGreenShare = running_sum(greenShare),\n  countGreenShare = running_sum((greenShare * 0) + 1)\n)\nsumGreenShare / clamp_min(countGreenShare, 1)",
+                        "format": "time_series",
+                        "legendFormat": "Part verte",
+                        "range": true,
+                        "interval": "1d"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "victoriametrics-metrics-datasource-1"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "Green share",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
@@ -980,8 +1006,8 @@
             "version": "12.3.3",
             "spec": {
               "options": {
-                "minVizHeight": 75,
-                "minVizWidth": 75,
+                "minVizHeight": 98,
+                "minVizWidth": 150,
                 "orientation": "auto",
                 "reduceOptions": {
                   "calcs": [
@@ -994,7 +1020,8 @@
                 "showThresholdMarkers": true,
                 "sizing": "auto",
                 "text": {
-                  "titleSize": 12
+                  "titleSize": 9,
+                  "valueSize": 22
                 },
                 "shape": "gauge",
                 "sparkline": true,
@@ -1130,6 +1157,60 @@
                         }
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "Green share"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#D7F4E8",
+                              "value": null
+                            },
+                            {
+                              "color": "#8AD7BD",
+                              "value": 0.25
+                            },
+                            {
+                              "color": "#43A67A",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "#217A55",
+                              "value": 0.75
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Part verte"
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
+                      }
+                    ]
                   }
                 ]
               }
@@ -1193,10 +1274,39 @@
                     "refId": "Self-consumption",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "last_over_time(evcc_green_share_home_daily_ratio{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])",
+                        "format": "time_series",
+                        "legendFormat": "Part verte",
+                        "range": true,
+                        "interval": "1d"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "victoriametrics-metrics-datasource-1"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "Green share",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
-              "queryOptions": {}
+              "queryOptions": {
+                "interval": "1d",
+                "maxDataPoints": 32
+              }
             }
           },
           "vizConfig": {
@@ -1317,6 +1427,25 @@
                       {
                         "id": "displayName",
                         "value": "Autoconsommation"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "Green share"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#43A67A"
+                        }
                       }
                     ]
                   }
@@ -4863,7 +4992,7 @@
                         "x": 0,
                         "y": 13,
                         "width": 5,
-                        "height": 6,
+                        "height": 8,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-24"

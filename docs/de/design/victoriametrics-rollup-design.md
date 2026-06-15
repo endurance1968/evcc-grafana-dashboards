@@ -89,6 +89,7 @@ Beispiele:
 - `evcc_aux_energy_daily_wh{title="..."}`
 - `evcc_battery_soc_daily_min_pct`
 - `evcc_battery_soc_daily_max_pct`
+- `evcc_green_share_home_daily_ratio`
 
 ### Layer 3: optionale monatliche Rollups
 

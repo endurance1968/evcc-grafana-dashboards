@@ -355,7 +355,8 @@
     "Investment-based annual PV generation cost by PV source over the selected time range. Battery and grid costs are not included.": "चयनित समय सीमा में PV स्रोत के अनुसार वार्षिक निवेश-आधारित PV उत्पादन लागत। बैटरी और ग्रिड लागत शामिल नहीं हैं।",
     "PV energy/year by source": "स्रोत के अनुसार वार्षिक PV ऊर्जा",
     "Annual PV energy per PV source over the selected time range. Values come from the per-title monthly PV energy helper metric.": "चयनित समय सीमा में प्रत्येक PV स्रोत की वार्षिक ऊर्जा। मान शीर्षक-आधारित मासिक PV ऊर्जा helper metric से आते हैं।",
-    "source": "स्रोत"
+    "source": "स्रोत",
+    "Green share": "हरित हिस्सा"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

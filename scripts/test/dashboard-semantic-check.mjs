@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.11.1
- * Last modified: 2026-06-11
+ * Version: 2026.06.15.2
+ * Last modified: 2026-06-15
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -177,7 +177,7 @@ const criticalPanels = {
       "id": 24,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 2
+      "minTargets": 3
     },
     {
       "id": 28,
@@ -221,7 +221,7 @@ const criticalPanels = {
       "id": 44,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 2
+      "minTargets": 3
     },
     {
       "id": 47,
@@ -287,7 +287,7 @@ const criticalPanels = {
       "id": 24,
       "title": "Metric gauges",
       "type": "gauge",
-      "minTargets": 2
+      "minTargets": 3
     },
     {
       "id": 25,
@@ -481,6 +481,7 @@ function validateSemanticColors(fileName, panel, failures) {
     ["maxSoc", dashboardColors.storageSocDark],
     ["Autarky", dashboardColors.autarky],
     ["Self-consumption", dashboardColors.selfConsumption],
+    ["Green share", dashboardColors.greenShare],
     ["Battery SOC", dashboardColors.storageSocDark],
     ["Purchased", dashboardColors.purchase],
     ["Sold", dashboardColors.sold],
@@ -496,6 +497,7 @@ function validateSemanticColors(fileName, panel, failures) {
   assertThresholdContains(fileName, panel, "homePower", [dashboardColors.homeLight, dashboardColors.home, dashboardColors.homeHigh, dashboardColors.homeDanger], failures);
   assertThresholdContains(fileName, panel, "Autarky", [dashboardColors.autarkyLow, dashboardColors.autarkyMid, dashboardColors.autarky, dashboardColors.autarkyDark], failures);
   assertThresholdContains(fileName, panel, "Self-consumption", [dashboardColors.selfConsumptionLow, dashboardColors.selfConsumptionMid, dashboardColors.selfConsumption, dashboardColors.selfConsumptionDark], failures);
+  assertThresholdContains(fileName, panel, "Green share", [dashboardColors.greenShareLow, dashboardColors.greenShareMid, dashboardColors.greenShare, dashboardColors.greenShareDark], failures);
   assertThresholdContains(fileName, panel, "Battery SOC", [dashboardColors.storageSocLow, dashboardColors.storageSocMid, dashboardColors.storageSoc, dashboardColors.storageSocDark], failures);
   assertThresholdContains(fileName, panel, "minSoc", [dashboardColors.storageSocLow, dashboardColors.storageSocMid, dashboardColors.storageSoc, dashboardColors.storageSocDark], failures);
   assertThresholdContains(fileName, panel, "maxSoc", [dashboardColors.storageSocLow, dashboardColors.storageSocMid, dashboardColors.storageSoc, dashboardColors.storageSocDark], failures);
@@ -700,15 +702,17 @@ function validateAutarkyGaugeThresholds(fileName, panel, failures) {
   ]), failures, `${fileName}: gauge panel '${panel.title}' Autarky thresholds must stay within the green autarky color family`);
   assert(properties.get("color")?.mode === "thresholds", failures, `${fileName}: gauge panel '${panel.title}' Autarky must use threshold color mode`);
   assert((panel.fieldConfig?.overrides || []).some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === "Self-consumption"), failures, `${fileName}: gauge panel '${panel.title}' Self-consumption override must match stable query refId`);
+  assert((panel.fieldConfig?.overrides || []).some((override) => override?.matcher?.id === "byFrameRefID" && override?.matcher?.options === "Green share"), failures, `${fileName}: gauge panel '${panel.title}' Green share override must match stable query refId`);
 }
 
 function validateMetricHistoryOverrides(fileName, panel, failures) {
-  if (fileName !== "VM_EVCC_Today.json" || panel.id !== 76 || panel.title !== "Metric history") {
+  if (!["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName) || panel.id !== 76 || panel.title !== "Metric history") {
     return;
   }
   const expected = new Map([
     ["Autarky", dashboardColors.autarky],
     ["Self-consumption", dashboardColors.selfConsumption],
+    ["Green share", dashboardColors.greenShare],
   ]);
   for (const [refId, color] of expected) {
     const override = (panel.fieldConfig?.overrides || []).find((item) => item?.matcher?.id === "byFrameRefID" && item?.matcher?.options === refId);
@@ -719,7 +723,7 @@ function validateMetricHistoryOverrides(fileName, panel, failures) {
 }
 
 function validateMetricGaugeTimeSeries(fileName, panel, failures) {
-  for (const refId of ["Autarky", "Self-consumption"]) {
+  for (const refId of ["Autarky", "Self-consumption", "Green share"]) {
     const target = panel.targets?.find((item) => item.refId === refId);
     const querySpec = target?.raw?.spec?.query?.spec || {};
     assert(Boolean(target), failures, `${fileName}: Metric gauges must query ${refId}`);
@@ -943,7 +947,7 @@ function validateDashboard(fileName, dashboard) {
       validateGrafana13GaugeOptions(fileName, panel, failures);
       validateAutarkyGaugeThresholds(fileName, panel, failures);
     }
-    for (const panel of panels.filter((item) => fileName === "VM_EVCC_Today.json" && item.id === 76 && item.title === "Metric history")) {
+    for (const panel of panels.filter((item) => ["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json"].includes(fileName) && item.id === 76 && item.title === "Metric history")) {
       validateMetricHistoryOverrides(fileName, panel, failures);
     }
 
@@ -1042,7 +1046,8 @@ function validateDashboard(fileName, dashboard) {
     assert(byId.get(74)?.h === 27, failures, `${fileName}: Power gauge column must align to bottom row height 27`);
     assert(byId.get(2)?.h === 24, failures, `${fileName}: Power history panel must leave room for bottom distribution strip`);
     assert(byId.get(76)?.h === 4, failures, `${fileName}: Metric history panel must be four grid rows high`);
-    assert(byId.get(77)?.y === 16, failures, `${fileName}: Energy panel must start below enlarged Metric history panel`);
+    assert(byId.get(64)?.h === 7, failures, `${fileName}: Metric gauges panel must be seven grid rows high for four KPI gauges`);
+    assert(byId.get(77)?.y === 18 && byId.get(77)?.h === 7, failures, `${fileName}: Energy panel must fit below KPI and Metric history panels`);
     assert(byId.get(75)?.y === 24, failures, `${fileName}: Power distribution panel must align with right column lower section`);
     assert(byId.get(73)?.y === 25, failures, `${fileName}: Costs panel must align below Energy panel`);
     assert(bottom(byId.get(74)) === 27 && bottom(byId.get(75)) === 27 && bottom(byId.get(73)) === 27, failures, `${fileName}: left, middle, and right columns must share the same bottom edge`);

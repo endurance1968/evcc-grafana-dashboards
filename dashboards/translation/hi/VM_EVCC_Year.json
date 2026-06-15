@@ -784,6 +784,32 @@
                     "refId": "Self-consumption",
                     "hidden": false
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "WITH (\n  greenShare = sum(last_over_time(evcc_green_share_home_daily_ratio{local_year=\"${__from:date:YYYY}\"}[1d])),\n  sumGreenShare = running_sum(greenShare),\n  countGreenShare = running_sum((greenShare * 0) + 1)\n)\nsumGreenShare / clamp_min(countGreenShare, 1)",
+                        "format": "time_series",
+                        "legendFormat": "हरित हिस्सा",
+                        "range": true,
+                        "interval": "1d"
+                      },
+                      "labels": {
+                        "grafana.app/export-label": "victoriametrics-metrics-datasource-1"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "Green share",
+                    "hidden": false
+                  }
                 }
               ],
               "transformations": [],
@@ -796,8 +822,8 @@
             "version": "12.3.3",
             "spec": {
               "options": {
-                "minVizHeight": 200,
-                "minVizWidth": 200,
+                "minVizHeight": 98,
+                "minVizWidth": 150,
                 "orientation": "auto",
                 "reduceOptions": {
                   "calcs": [
@@ -810,7 +836,8 @@
                 "showThresholdMarkers": true,
                 "sizing": "auto",
                 "text": {
-                  "titleSize": 12
+                  "titleSize": 9,
+                  "valueSize": 22
                 },
                 "shape": "gauge",
                 "sparkline": true,
@@ -946,6 +973,60 @@
                         }
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "Green share"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#D7F4E8",
+                              "value": null
+                            },
+                            {
+                              "color": "#8AD7BD",
+                              "value": 0.25
+                            },
+                            {
+                              "color": "#43A67A",
+                              "value": 0.5
+                            },
+                            {
+                              "color": "#217A55",
+                              "value": 0.75
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "हरित हिस्सा"
+                      },
+                      {
+                        "id": "min",
+                        "value": 0
+                      },
+                      {
+                        "id": "max",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "thresholds"
+                        }
+                      }
+                    ]
                   }
                 ]
               }
@@ -976,7 +1057,7 @@
                         "format": "table",
                         "instant": true,
                         "range": false,
-                        "expr": "WITH (\n  gridImport = sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  homeEnergy = sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  loadpointEnergy = (sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) or (homeEnergy * 0),\n  pvEnergy = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  gridExport = sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  autarky = label_set(1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001), \"series\", \"आत्मनिर्भरता\"),\n  selfConsumption = label_set((pvEnergy - gridExport) / pvEnergy, \"series\", \"स्व-उपभोग\")\n)\nautarky or selfConsumption"
+                        "expr": "WITH (\n  gridImport = sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  homeEnergy = sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  loadpointEnergy = (sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) or (homeEnergy * 0),\n  pvEnergy = sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  gridExport = sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  greenShareSum = sum(sum_over_time((last_over_time(evcc_green_share_home_daily_ratio{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  greenShareCount = sum(count_over_time((last_over_time(evcc_green_share_home_daily_ratio{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month),\n  autarky = label_set(1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001), \"series\", \"आत्मनिर्भरता\"),\n  selfConsumption = label_set((pvEnergy - gridExport) / pvEnergy, \"series\", \"स्व-उपभोग\"),\n  greenShare = label_set(greenShareSum / clamp_min(greenShareCount, 1), \"series\", \"हरित हिस्सा\")\n)\nautarky or selfConsumption or greenShare"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -1166,6 +1247,25 @@
                         "value": {
                           "mode": "fixed",
                           "fixedColor": "#A44C9C"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "हरित हिस्सा"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#43A67A"
                         }
                       }
                     ]
@@ -7194,7 +7294,7 @@
                                   "x": 0,
                                   "y": 13,
                                   "width": 5,
-                                  "height": 6,
+                                  "height": 8,
                                   "element": {
                                     "kind": "ElementReference",
                                     "name": "panel-44"
@@ -7207,7 +7307,7 @@
                                   "x": 5,
                                   "y": 13,
                                   "width": 19,
-                                  "height": 6,
+                                  "height": 8,
                                   "element": {
                                     "kind": "ElementReference",
                                     "name": "panel-25"
@@ -7218,7 +7318,7 @@
                                 "kind": "GridLayoutItem",
                                 "spec": {
                                   "x": 0,
-                                  "y": 19,
+                                  "y": 21,
                                   "width": 5,
                                   "height": 7,
                                   "element": {
@@ -7231,7 +7331,7 @@
                                 "kind": "GridLayoutItem",
                                 "spec": {
                                   "x": 5,
-                                  "y": 19,
+                                  "y": 21,
                                   "width": 19,
                                   "height": 7,
                                   "element": {

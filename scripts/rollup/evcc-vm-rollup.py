@@ -20,8 +20,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.05.17.1"
-SCRIPT_LAST_MODIFIED = "2026-05-17"
+SCRIPT_VERSION = "2026.06.15.1"
+SCRIPT_LAST_MODIFIED = "2026-06-15"
 
 PROFILE_FAMILY_LABELS = (
     ("positive_energy_s", "Positive energy rollups"),
@@ -672,6 +672,15 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             phase="phase-3",
             implemented=True,
             group_labels=("title",),
+        ),
+        RollupMetric(
+            key="green_share_home_daily",
+            record=record_name(settings, "green_share_home_daily_ratio"),
+            expr=f"avg(avg_over_time({selector('greenShareHome_value', root)}[1d]))",
+            description="Daily mean of EVCC green share for home consumption as ratio 0..1.",
+            phase="phase-1",
+            implemented=True,
+            group_labels=(),
         ),
         RollupMetric(
             key="battery_soc_daily_min",
@@ -3903,8 +3912,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-
-
-

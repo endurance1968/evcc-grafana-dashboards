@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.03.6
- * Last modified: 2026-06-03
+ * Version: 2026.06.15.1
+ * Last modified: 2026-06-15
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -176,7 +176,7 @@ function buildHarness(functionSources) {
     "",
     "$metric = Find-PanelByTitle $rewritten 'Metrics'",
     "if ($null -eq $metric) { throw 'Metrics panel not found' }",
-    "Assert-Array $metric.targets 'metric.targets' 8",
+    "Assert-Array $metric.targets 'metric.targets' 9",
     "Assert-Array $metric.fieldConfig.defaults.links 'metric.fieldConfig.defaults.links' 0",
     "Assert-Array $metric.fieldConfig.defaults.mappings 'metric.fieldConfig.defaults.mappings' 0",
     "Assert-Array $metric.fieldConfig.defaults.thresholds.steps 'metric.fieldConfig.defaults.thresholds.steps' 1",

@@ -87,6 +87,13 @@ class VmRollupTests(unittest.TestCase):
         self.assertIn('pvPower_value{id!="",title=""}', query)
         self.assertIn('or avg(pvPower_value{id=""})', query)
 
+    def test_green_share_home_rollup_uses_evcc_ratio_metric(self):
+        item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "green_share_home_daily")
+        self.assertEqual(item.record, "evcc_green_share_home_daily_ratio")
+        self.assertEqual(item.group_labels, ())
+        self.assertIn("greenShareHome_value", item.expr)
+        self.assertIn("avg_over_time", item.expr)
+
     def test_battery_soc_rollups_collapse_to_single_series(self):
         catalog = MODULE.build_catalog(self.settings)
         min_item = next(metric for metric in catalog if metric.key == "battery_soc_daily_min")
