@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.15.1
- * Last modified: 2026-06-15
+ * Version: 2026.06.16.1
+ * Last modified: 2026-06-16
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -12,8 +12,8 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.06.03.6";
-const lastModified = "2026-06-03";
+const version = "2026.06.16.1";
+const lastModified = "2026-06-16";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
 const defaultDashboardFiles = resolveDashboardFiles(manifest);
@@ -176,7 +176,7 @@ function buildHarness(functionSources) {
     "",
     "$metric = Find-PanelByTitle $rewritten 'Metrics'",
     "if ($null -eq $metric) { throw 'Metrics panel not found' }",
-    "Assert-Array $metric.targets 'metric.targets' 9",
+    "Assert-Array $metric.targets 'metric.targets' 8",
     "Assert-Array $metric.fieldConfig.defaults.links 'metric.fieldConfig.defaults.links' 0",
     "Assert-Array $metric.fieldConfig.defaults.mappings 'metric.fieldConfig.defaults.mappings' 0",
     "Assert-Array $metric.fieldConfig.defaults.thresholds.steps 'metric.fieldConfig.defaults.thresholds.steps' 1",

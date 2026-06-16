@@ -1253,28 +1253,6 @@
                     "refId": "Green share",
                     "hidden": false
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "avg(batterySoc_value{id=\"\"})",
-                        "format": "time_series",
-                        "legendFormat": "SOC batteria",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "batterySoc",
-                    "hidden": false
-                  }
                 }
               ],
               "transformations": []
@@ -1404,64 +1382,6 @@
                         "value": {
                           "mode": "thresholds"
                         }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "SOC batteria"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percent"
-                      },
-                      {
-                        "id": "decimals",
-                        "value": 0
-                      },
-                      {
-                        "id": "min",
-                        "value": 0
-                      },
-                      {
-                        "id": "max",
-                        "value": 100
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "thresholds"
-                        }
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "#D6E8FF",
-                              "value": null
-                            },
-                            {
-                              "color": "#A8CBFF",
-                              "value": 15
-                            },
-                            {
-                              "color": "#73A7F2",
-                              "value": 35
-                            },
-                            {
-                              "color": "#3274D9",
-                              "value": 80
-                            }
-                          ]
-                        }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "SOC batteria"
                       }
                     ]
                   },
