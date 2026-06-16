@@ -496,7 +496,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Power history",
+          "title": "पावर इतिहास",
           "description": "PV forecast values EVCC solar forecast configuration से आते हैं और tariffSolar_value के रूप में stored होते हैं. अगर EVCC में solar forecast provider नहीं है या recent tariffSolar_value samples नहीं हैं, तो यह forecast खाली रहता है; dashboard Forecast.Solar, Solcast या Open-Meteo को सीधे fetch नहीं करता.",
           "links": [],
           "data": {
@@ -1562,7 +1562,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Metric history",
+          "title": "मीट्रिक इतिहास",
           "description": "",
           "links": [],
           "data": {
@@ -2349,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Power distribution",
+          "title": "पावर वितरण",
           "description": "",
           "links": [],
           "data": {

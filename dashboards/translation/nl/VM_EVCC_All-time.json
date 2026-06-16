@@ -5685,7 +5685,7 @@
         "spec": {
           "id": 55,
           "title": "Gemiddelde jaarlijkse specifieke opbrengst",
-          "description": "Average yearly PV yield normalized to installed kWp. Uses investment asset watt_peak values when available and falls back to installedWattPeak.",
+          "description": "Gemiddelde jaarlijkse PV-opbrengst genormaliseerd naar geinstalleerde kWp. Gebruikt watt_peak-waarden uit investeringsassets indien beschikbaar, anders installedWattPeak.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5774,7 +5774,7 @@
         "spec": {
           "id": 56,
           "title": "PV-opwekkingskosten",
-          "description": "Investment-based PV generation cost by PV source plus weighted total for the selected time range. Battery and grid costs are not included.",
+          "description": "Investeringsgebaseerde PV-opwekkingskosten per PV-bron plus gewogen totaal voor de gekozen periode. Batterij- en netkosten zijn niet inbegrepen.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5915,7 +5915,7 @@
         "spec": {
           "id": 57,
           "title": "PV-opwekkingskosten/jaar (ct/kWh)",
-          "description": "Investment-based annual PV generation cost by PV source over the selected time range. Only near-complete years with at least 95% coverage are shown. Battery and grid costs are not included.",
+          "description": "Jaarlijkse investeringsgebaseerde PV-opwekkingskosten per PV-bron over de gekozen periode. Alleen bijna volledige jaren met minimaal 95% dekking worden getoond. Batterij- en netkosten zijn niet inbegrepen.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6039,7 +6039,7 @@
         "spec": {
           "id": 58,
           "title": "PV-energie per jaar per bron",
-          "description": "Annual PV energy per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "description": "Jaarlijkse PV-energie per bron. Deel-jaren worden getoond zoals gemeten; gebruik volledige jaarperiodes voor genormaliseerde jaarvergelijkingen.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6219,7 +6219,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "PV-bron"
                       }
                     ]
                   }
@@ -6233,8 +6233,8 @@
         "kind": "Panel",
         "spec": {
           "id": 59,
-          "title": "PV specific yield/year by source",
-          "description": "Annual PV specific yield per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "title": "Specifieke PV-opbrengst/jaar per bron",
+          "description": "Jaarlijkse specifieke PV-opbrengst per bron. Deel-jaren worden getoond zoals gemeten; gebruik volledige jaarperiodes voor genormaliseerde jaarvergelijkingen.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6414,7 +6414,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "PV-bron"
                       }
                     ]
                   }
@@ -6440,7 +6440,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Energy summary",
+                        "title": "Energieoverzicht",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6610,7 +6610,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "PV source yearly output",
+                        "title": "Jaaropbrengst per PV-bron",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6842,7 +6842,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Finance summary",
+                        "title": "Financieel overzicht",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -7021,11 +7021,11 @@
             "text": "Alle",
             "value": "$__all"
           },
-          "label": "Investment data present",
+          "label": "Investeringsdata aanwezig",
           "hide": "hideVariable",
           "refresh": "onDashboardLoad",
           "skipUrlSync": true,
-          "description": "Internal helper variable used to hide PV generation cost panels when no investment rollup metrics exist.",
+          "description": "Interne hulpvariabele om PV-opwekkingskostenpanelen te verbergen wanneer er geen investeringsrollup-metingen bestaan.",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

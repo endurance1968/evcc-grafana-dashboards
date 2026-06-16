@@ -496,7 +496,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Power history",
+          "title": "Historique de puissance",
           "description": "Les valeurs de prévision PV proviennent de la configuration de prévision solaire EVCC et sont stockées sous tariffSolar_value. Si EVCC n’a pas de fournisseur de prévision solaire ou pas d’échantillons tariffSolar_value récents, cette prévision reste vide ; le tableau de bord n’interroge pas directement Forecast.Solar, Solcast ou Open-Meteo.",
           "links": [],
           "data": {
@@ -1562,7 +1562,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Metric history",
+          "title": "Historique des indicateurs",
           "description": "",
           "links": [],
           "data": {
@@ -2349,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Power distribution",
+          "title": "Repartition de puissance",
           "description": "",
           "links": [],
           "data": {

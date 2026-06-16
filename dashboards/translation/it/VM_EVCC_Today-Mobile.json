@@ -752,7 +752,7 @@
         "x": 0,
         "y": 7
       },
-      "title": "Power history"
+      "title": "Storico potenza"
     },
     {
       "datasource": {
@@ -1051,7 +1051,7 @@
         "x": 0,
         "y": 19
       },
-      "title": "Power distribution"
+      "title": "Distribuzione potenza"
     },
     {
       "datasource": {
@@ -2072,7 +2072,7 @@
         "x": 0,
         "y": 42
       },
-      "title": "Metric history"
+      "title": "Storico metriche"
     },
     {
       "datasource": {

@@ -496,7 +496,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Power history",
+          "title": "Vermogenshistorie",
           "description": "PV-verwachtingswaarden komen uit de EVCC-configuratie voor zonneprognoses en worden opgeslagen als tariffSolar_value. Als EVCC geen solar-forecast-provider of geen recente tariffSolar_value-samples heeft, blijft deze forecast leeg; het dashboard haalt Forecast.Solar, Solcast of Open-Meteo niet direct op.",
           "links": [],
           "data": {
@@ -1562,7 +1562,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Metric history",
+          "title": "Metriekhistorie",
           "description": "",
           "links": [],
           "data": {
@@ -2349,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Power distribution",
+          "title": "Vermogensverdeling",
           "description": "",
           "links": [],
           "data": {

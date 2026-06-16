@@ -829,7 +829,7 @@
         "spec": {
           "id": 22,
           "title": "单位收益",
-          "description": "Monthly PV yield normalized to installed kWp. Uses investment asset watt_peak values when available and falls back to installedWattPeak.",
+          "description": "按装机 kWp 归一化的月度光伏收益。优先使用投资资产的 watt_peak 值，否则回退到 installedWattPeak。",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5076,25 +5076,12 @@
                           "name": "panel-37"
                         }
                       }
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          {
-            "kind": "TabsLayoutTab",
-            "spec": {
-              "title": "Consumers - 用能设备",
-              "layout": {
-                "kind": "GridLayout",
-                "spec": {
-                  "items": [
+                    },
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 0,
+                        "y": 22,
                         "width": 4,
                         "height": 10,
                         "element": {
@@ -5107,7 +5094,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 4,
-                        "y": 0,
+                        "y": 22,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -5120,7 +5107,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 12,
-                        "y": 0,
+                        "y": 22,
                         "width": 4,
                         "height": 10,
                         "element": {
@@ -5133,7 +5120,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 16,
-                        "y": 0,
+                        "y": 22,
                         "width": 8,
                         "height": 10,
                         "element": {
@@ -5141,12 +5128,25 @@
                           "name": "panel-42"
                         }
                       }
-                    },
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "title": "Finances - 财务",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 0,
-                        "y": 10,
+                        "y": 0,
                         "width": 5,
                         "height": 18,
                         "element": {
@@ -5159,7 +5159,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 5,
-                        "y": 10,
+                        "y": 0,
                         "width": 19,
                         "height": 11,
                         "element": {
@@ -5172,7 +5172,7 @@
                       "kind": "GridLayoutItem",
                       "spec": {
                         "x": 5,
-                        "y": 21,
+                        "y": 11,
                         "width": 19,
                         "height": 7,
                         "element": {

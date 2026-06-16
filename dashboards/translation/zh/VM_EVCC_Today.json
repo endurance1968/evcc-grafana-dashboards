@@ -496,7 +496,7 @@
         "kind": "Panel",
         "spec": {
           "id": 2,
-          "title": "Power history",
+          "title": "功率历史",
           "description": "PV 预测值来自 EVCC 的太阳能预测配置，并保存为 tariffSolar_value。如果 EVCC 没有太阳能预测提供程序，或没有最新的 tariffSolar_value 样本，此预测会保持为空；仪表板不会直接调用 Forecast.Solar、Solcast 或 Open-Meteo。",
           "links": [],
           "data": {
@@ -1562,7 +1562,7 @@
         "kind": "Panel",
         "spec": {
           "id": 76,
-          "title": "Metric history",
+          "title": "指标历史",
           "description": "",
           "links": [],
           "data": {
@@ -2349,7 +2349,7 @@
         "kind": "Panel",
         "spec": {
           "id": 75,
-          "title": "Power distribution",
+          "title": "功率分布",
           "description": "",
           "links": [],
           "data": {

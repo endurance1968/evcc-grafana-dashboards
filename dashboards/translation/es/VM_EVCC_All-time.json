@@ -5685,7 +5685,7 @@
         "spec": {
           "id": 55,
           "title": "Rendimiento específico anual medio",
-          "description": "Average yearly PV yield normalized to installed kWp. Uses investment asset watt_peak values when available and falls back to installedWattPeak.",
+          "description": "Rendimiento FV anual medio normalizado a kWp instalado. Usa valores watt_peak de activos de inversion si existen; si no, installedWattPeak.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5774,7 +5774,7 @@
         "spec": {
           "id": 56,
           "title": "Costes de generación FV",
-          "description": "Investment-based PV generation cost by PV source plus weighted total for the selected time range. Battery and grid costs are not included.",
+          "description": "Coste de generacion FV basado en inversiones por fuente FV mas total ponderado para el rango seleccionado. No incluye costes de bateria ni red.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5915,7 +5915,7 @@
         "spec": {
           "id": 57,
           "title": "Coste de generación FV/año (ct/kWh)",
-          "description": "Investment-based annual PV generation cost by PV source over the selected time range. Only near-complete years with at least 95% coverage are shown. Battery and grid costs are not included.",
+          "description": "Coste anual de generacion FV basado en inversiones por fuente FV en el rango seleccionado. Solo se muestran anos casi completos con al menos 95% de cobertura. No incluye costes de bateria ni red.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6039,7 +6039,7 @@
         "spec": {
           "id": 58,
           "title": "Energía FV por año y fuente",
-          "description": "Annual PV energy per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "description": "Energia FV anual por fuente. Los anos parciales se muestran tal como se midieron; use rangos anuales completos para comparaciones normalizadas.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6219,7 +6219,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "Fuente FV"
                       }
                     ]
                   }
@@ -6233,8 +6233,8 @@
         "kind": "Panel",
         "spec": {
           "id": 59,
-          "title": "PV specific yield/year by source",
-          "description": "Annual PV specific yield per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "title": "Rendimiento especifico FV/ano por fuente",
+          "description": "Rendimiento especifico FV anual por fuente. Los anos parciales se muestran tal como se midieron; use rangos anuales completos para comparaciones normalizadas.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6414,7 +6414,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "Fuente FV"
                       }
                     ]
                   }
@@ -6440,7 +6440,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Energy summary",
+                        "title": "Resumen de energia",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6610,7 +6610,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "PV source yearly output",
+                        "title": "Produccion anual por fuente FV",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6842,7 +6842,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Finance summary",
+                        "title": "Resumen financiero",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -7021,11 +7021,11 @@
             "text": "Todos",
             "value": "$__all"
           },
-          "label": "Investment data present",
+          "label": "Datos de inversion presentes",
           "hide": "hideVariable",
           "refresh": "onDashboardLoad",
           "skipUrlSync": true,
-          "description": "Internal helper variable used to hide PV generation cost panels when no investment rollup metrics exist.",
+          "description": "Variable interna usada para ocultar paneles de coste de generacion FV cuando no existen metricas de rollup de inversiones.",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",

@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.15.2
- * Last modified: 2026-06-15
+ * Version: 2026.06.16.1
+ * Last modified: 2026-06-16
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -771,7 +771,8 @@ function findRowsWithPanelIds(layout, requiredPanelIds) {
 function validateInvestmentConditionalRow(fileName, dashboard, failures) {
   const expectedRows = new Map([
     ["VM_EVCC_Year.json", [
-      { title: "PV generation costs", panelIds: [77, 78, 79, 80] },
+      { title: "PV generation costs", panelIds: [77, 78] },
+      { title: "PV specific yield", panelIds: [79, 80] },
     ]],
     ["VM_EVCC_All-time.json", [
       { title: "PV generation costs", panelIds: [56, 57] },

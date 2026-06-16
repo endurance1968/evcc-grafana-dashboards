@@ -5685,7 +5685,7 @@
         "spec": {
           "id": 55,
           "title": "औसत वार्षिक विशिष्ट उपज",
-          "description": "Average yearly PV yield normalized to installed kWp. Uses investment asset watt_peak values when available and falls back to installedWattPeak.",
+          "description": "स्थापित kWp पर सामान्यीकृत औसत वार्षिक PV उपज। उपलब्ध होने पर investment asset watt_peak मानों का उपयोग करता है, अन्यथा installedWattPeak पर लौटता है।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5774,7 +5774,7 @@
         "spec": {
           "id": 56,
           "title": "PV उत्पादन लागत",
-          "description": "Investment-based PV generation cost by PV source plus weighted total for the selected time range. Battery and grid costs are not included.",
+          "description": "चयनित अवधि के लिए प्रति PV स्रोत निवेश-आधारित PV generation cost और weighted total। Battery और grid costs शामिल नहीं हैं।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -5915,7 +5915,7 @@
         "spec": {
           "id": 57,
           "title": "PV उत्पादन लागत/वर्ष (ct/kWh)",
-          "description": "Investment-based annual PV generation cost by PV source over the selected time range. Only near-complete years with at least 95% coverage are shown. Battery and grid costs are not included.",
+          "description": "चयनित अवधि में प्रति PV स्रोत निवेश-आधारित वार्षिक PV generation cost। केवल कम से कम 95% coverage वाले लगभग पूर्ण वर्ष दिखाए जाते हैं। Battery और grid costs शामिल नहीं हैं।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6039,7 +6039,7 @@
         "spec": {
           "id": 58,
           "title": "स्रोत के अनुसार वार्षिक PV ऊर्जा",
-          "description": "Annual PV energy per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "description": "प्रति स्रोत वार्षिक PV ऊर्जा। आंशिक वर्षों को मापे गए रूप में दिखाया जाता है; सामान्यीकृत वार्षिक तुलना के लिए पूर्ण वर्ष अवधि का उपयोग करें।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6219,7 +6219,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "PV स्रोत"
                       }
                     ]
                   }
@@ -6233,8 +6233,8 @@
         "kind": "Panel",
         "spec": {
           "id": 59,
-          "title": "PV specific yield/year by source",
-          "description": "Annual PV specific yield per source. Partial years are shown as measured; use complete-year ranges for normalized year-to-year comparisons.",
+          "title": "स्रोत अनुसार PV विशिष्ट उपज/वर्ष",
+          "description": "प्रति स्रोत वार्षिक PV विशिष्ट उपज। आंशिक वर्षों को मापे गए रूप में दिखाया जाता है; सामान्यीकृत वार्षिक तुलना के लिए पूर्ण वर्ष अवधि का उपयोग करें।",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -6414,7 +6414,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "PV source"
+                        "value": "PV स्रोत"
                       }
                     ]
                   }
@@ -6440,7 +6440,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Energy summary",
+                        "title": "ऊर्जा सारांश",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6610,7 +6610,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "PV source yearly output",
+                        "title": "PV स्रोत वार्षिक उत्पादन",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -6842,7 +6842,7 @@
                     {
                       "kind": "RowsLayoutRow",
                       "spec": {
-                        "title": "Finance summary",
+                        "title": "वित्त सारांश",
                         "hideHeader": true,
                         "layout": {
                           "kind": "GridLayout",
@@ -7021,11 +7021,11 @@
             "text": "सभी",
             "value": "$__all"
           },
-          "label": "Investment data present",
+          "label": "निवेश डेटा उपलब्ध",
           "hide": "hideVariable",
           "refresh": "onDashboardLoad",
           "skipUrlSync": true,
-          "description": "Internal helper variable used to hide PV generation cost panels when no investment rollup metrics exist.",
+          "description": "आंतरिक helper variable, जो investment rollup metrics न होने पर PV generation cost panels छिपाता है।",
           "query": {
             "kind": "DataQuery",
             "group": "victoriametrics-metrics-datasource",
