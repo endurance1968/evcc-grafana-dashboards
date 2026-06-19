@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.16.1
- * Last modified: 2026-06-16
+ * Version: 2026.06.19.1
+ * Last modified: 2026-06-19
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -883,6 +883,38 @@ function validateDashboard(fileName, dashboard) {
     assert(topLevelTabs.includes("Home"), failures, `${fileName}: Today Details must use Home as the house tab title`);
     assert(!topLevelTabs.includes("Consumption"), failures, `${fileName}: Today Details must not use the old Consumption tab title`);
 
+    const gridControlTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Grid control");
+    assert(Boolean(gridControlTab), failures, `${fileName}: Today Details must include the optional Grid control tab`);
+    if (gridControlTab) {
+      const condition = gridControlTab.spec?.conditionalRendering;
+      const item = condition?.spec?.items?.[0];
+      assert(condition?.kind === "ConditionalRenderingGroup", failures, `${fileName}: Grid control tab must use Grafana conditional rendering`);
+      assert(condition?.spec?.visibility === "show" && condition?.spec?.condition === "and", failures, `${fileName}: Grid control tab must only show when audit data is present`);
+      assert(item?.kind === "ConditionalRenderingVariable", failures, `${fileName}: Grid control tab conditional must be variable-based`);
+      assert(item?.spec?.variable === "hasGridControlData" && item?.spec?.operator === "matches" && item?.spec?.value === ".+", failures, `${fileName}: Grid control tab must match non-empty audit data helper values`);
+      for (const text of ["Manual", "Manuelle", "Simulator", "MQTT", "eebus"]) {
+        assert(!rawJson.includes(text), failures, `${fileName}: Grid control support must not include simulator control text ${text}`);
+      }
+      for (const metric of [
+        "evcc_audit_site_grid_import_power_w",
+        "evcc_audit_site_grid_export_power_w",
+        "evcc_audit_hems_effective_max_consumption_power_w",
+        "evcc_audit_hems_effective_max_production_power_w",
+        "evcc_audit_gridsession_event_start_timestamp_seconds",
+      ]) {
+        assert(rawJson.includes(metric), failures, `${fileName}: Grid control support must query ${metric}`);
+      }
+      assert(rawJson.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: Grid control support must use the optional audit datasource placeholder`);
+    }
+    const gridControlVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlData");
+    assert(Boolean(gridControlVariable), failures, `${fileName}: Grid control tab must be backed by hidden hasGridControlData variable`);
+    if (gridControlVariable) {
+      const gridControlVariableRaw = JSON.stringify(gridControlVariable);
+      assert(gridControlVariableRaw.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: hasGridControlData must query the optional audit datasource placeholder`);
+      assert(gridControlVariableRaw.includes("evcc_audit_hems_effective_max_consumption_power_w") && gridControlVariableRaw.includes("evcc_audit_hems_effective_max_production_power_w"), failures, `${fileName}: hasGridControlData must detect active external consumption/feed-in limits`);
+      assert(gridControlVariableRaw.includes("evcc_audit_gridsession_event_start_timestamp_seconds"), failures, `${fileName}: hasGridControlData must detect EVCC control events`);
+    }
+
 
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];
@@ -905,7 +937,7 @@ function validateDashboard(fileName, dashboard) {
     const pvStacking = pvPowerPanel?.vizConfig?.spec?.fieldConfig?.defaults?.custom?.stacking;
     assert(pvStacking?.mode === "normal", failures, `${fileName}: PV power panel must stack PV strings additively`);
 
-    const forecastStatusPanel = panels.find((panel) => panel.id === 44 || panel.title === "Solar forecast status");
+    const forecastStatusPanel = panels.find((panel) => panel.title === "Solar forecast status");
     assert(!forecastStatusPanel, failures, `${fileName}: PV tab must not use a separate Solar forecast status panel`);
 
     const forecastBarPanel = panels.find((panel) => panel.id === 35 && panel.title === "Forecast" && panel.type === "barchart");

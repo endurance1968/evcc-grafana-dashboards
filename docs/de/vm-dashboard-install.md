@@ -24,6 +24,7 @@ Defaults:
 - Dashboards: feste Grafana-13-Tab-Navigation-Liste aus `dashboards/deploy-manifest.json`
 - Ordner UID/Titel: `evcc` / `EVCC`
 - Datasource UID: `vm-evcc`
+- optionale Audit-Datasource UID fuer EVCC-SmartMeterCtrl/§14a: leer, faellt auf `vm-evcc` zurueck
 - vor Import loeschen: `false`
 
 Grafana 13.0.1 oder neuer ist erforderlich. Dashboard-Set-Auswahl wird nicht mehr unterstuetzt; die Deployer nutzen immer die feste Tab-Navigation-Dateiliste aus `dashboards/deploy-manifest.json`.
@@ -37,6 +38,8 @@ GRAFANA_URL=http://<deine-grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
 GRAFANA_API_TOKEN=<service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# Optional, nur bei separater Audit-Datasource fuer EVCC-SmartMeterCtrl/§14a:
+GRAFANA_DS_VM_EVCC_AUDIT_UID=
 ```
 
 `GRAFANA_API_TOKEN` ist die bevorzugte Einstellung fuer Grafana-13-Service-Account-Tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` wird als Alias akzeptiert, wenn `GRAFANA_API_TOKEN` leer ist.
@@ -95,9 +98,13 @@ DASHBOARD_LOCAL_DIR=/path/to/evcc-grafana-dashboards/dashboards/translation/de
 GRAFANA_FOLDER_UID=evcc
 GRAFANA_FOLDER_TITLE=EVCC
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# Optional, nur bei separater Audit-Datasource fuer EVCC-SmartMeterCtrl/§14a:
+GRAFANA_DS_VM_EVCC_AUDIT_UID=
 ```
 
 Wenn deine Datasource-UID nicht `vm-evcc` ist, setze `GRAFANA_DS_VM_EVCC_UID` vor dem Deployment.
+
+Der Daily-Details-Tab fuer externe Netz-/§14a-Steuerung nutzt Audit-Metriken aus EVCC-SmartMeterCtrl. Standardmaessig sucht der Deployer diese Metriken in derselben Datasource wie EVCC. Wenn der Audit-Collector in eine separate VictoriaMetrics schreibt, setze `GRAFANA_DS_VM_EVCC_AUDIT_UID` auf die entsprechende Grafana-Datasource-UID. Der Tab wird nur angezeigt, wenn im gewaehlten Zeitraum Audit-Metriken eine aktive externe Begrenzung oder ein EVCC-Steuerevent liefern. Die Tabelle wird aus `evcc_audit_gridsession_event_start_timestamp_seconds` gefuellt; Felder wie Start, Ende, Art, Status und Limit stammen aus den Labels dieser Metrik.
 
 ### Grafana-Theme optional setzen
 

@@ -3,9 +3,9 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.03.5"
+SCRIPT_VERSION="2026.06.19.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-03"
+SCRIPT_LAST_MODIFIED="2026-06-19"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -79,6 +79,7 @@ GRAFANA_SERVICE_ACCOUNT_TOKEN=""
 GRAFANA_USER=""
 GRAFANA_PASSWORD=""
 GRAFANA_DS_VM_EVCC_UID="vm-evcc"
+GRAFANA_DS_VM_EVCC_AUDIT_UID=""
 GRAFANA_FOLDER_UID="evcc"
 GRAFANA_FOLDER_TITLE="EVCC"
 GRAFANA_THEME=""
@@ -171,6 +172,10 @@ else
   PURGE_EFFECTIVE="$PURGE"
 fi
 
+
+if [[ -z "${GRAFANA_DS_VM_EVCC_AUDIT_UID//[[:space:]]/}" ]]; then
+  GRAFANA_DS_VM_EVCC_AUDIT_UID="$GRAFANA_DS_VM_EVCC_UID"
+fi
 
 DASHBOARD_SOURCE_MODE="${DASHBOARD_SOURCE_MODE,,}"
 FIXED_DASHBOARD_FILES=(
@@ -588,7 +593,7 @@ print_dashboard_overrides() {
   done
 }
 
-replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end)'
+replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "string" and . == "${DS_VM-EVCC-AUDIT}" then $auditDs elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end)'
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
@@ -632,17 +637,19 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_portal_link "$raw_file" "$DASHBOARD_PORTAL_URL"
 
   tmp_ds_file="$raw_file.ds"
-  jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" "$replace_ds_filter" "$raw_file" > "$tmp_ds_file"
+  jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" --arg auditDs "$GRAFANA_DS_VM_EVCC_AUDIT_UID" "$replace_ds_filter" "$raw_file" > "$tmp_ds_file"
   mv "$tmp_ds_file" "$raw_file"
   ensure_v2_folder_annotation "$raw_file"
 
-  jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" '
+  jq --arg ds "$GRAFANA_DS_VM_EVCC_UID" --arg auditDs "$GRAFANA_DS_VM_EVCC_AUDIT_UID" '
     def is_v2: .kind == "Dashboard" and ((.apiVersion // "") | startswith("dashboard.grafana.app/v2"));
     if is_v2 then [] else
       [.__inputs[]? | select(.name and .type) |
         if .type == "datasource" then
           if .name == "DS_VM-EVCC" then
             {name: .name, type: .type, pluginId: .pluginId, value: $ds}
+          elif .name == "DS_VM-EVCC-AUDIT" then
+            {name: .name, type: .type, pluginId: .pluginId, value: $auditDs}
           elif .pluginId == "__expr__" then
             {name: .name, type: .type, pluginId: .pluginId, value: "__expr__"}
           else
@@ -654,7 +661,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
     end
   ' "$raw_file" > "$inputs_file"
 
-  jq -c --arg ds "$GRAFANA_DS_VM_EVCC_UID" "(.__elements // {}) | to_entries[]? | {uid: .value.uid, name: .value.name, kind: (.value.kind // 1), model: (.value.model | $replace_ds_filter)}" "$raw_file" |
+  jq -c --arg ds "$GRAFANA_DS_VM_EVCC_UID" --arg auditDs "$GRAFANA_DS_VM_EVCC_AUDIT_UID" "(.__elements // {}) | to_entries[]? | {uid: .value.uid, name: .value.name, kind: (.value.kind // 1), model: (.value.model | $replace_ds_filter)}" "$raw_file" |
   while IFS= read -r entry; do
     uid=$(printf '%s' "$entry" | jq -r '.uid')
     printf '%s' "$entry" > "$LIB_DIR/$uid.json"
@@ -679,6 +686,7 @@ echo "Grafana version: $(grafana_version)"
 echo "Auth mode: $(auth_mode)"
 echo "Folder: $GRAFANA_FOLDER_TITLE ($GRAFANA_FOLDER_UID)"
 echo "Datasource UID: $GRAFANA_DS_VM_EVCC_UID"
+echo "Audit datasource UID: $GRAFANA_DS_VM_EVCC_AUDIT_UID"
 if [[ "$GRAFANA_THEME_CONFIGURED" == "true" ]]; then
   if truthy "$PURGE_ONLY"; then
     echo "Grafana theme: $(grafana_theme_display "$GRAFANA_THEME_NORMALIZED") (not applied in purge-only mode)"

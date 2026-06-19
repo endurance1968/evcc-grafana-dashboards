@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.03.5"
+SCRIPT_VERSION="2026.06.19.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-03"
+SCRIPT_LAST_MODIFIED="2026-06-19"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -89,6 +89,7 @@ settings = {
     "GRAFANA_USER": "",
     "GRAFANA_PASSWORD": "",
     "GRAFANA_DS_VM_EVCC_UID": "vm-evcc",
+    "GRAFANA_DS_VM_EVCC_AUDIT_UID": "",
     "GRAFANA_FOLDER_UID": "evcc",
     "GRAFANA_FOLDER_TITLE": "EVCC",
     "GRAFANA_THEME": "",
@@ -165,6 +166,9 @@ if "DEPLOY_PURGE_ONLY" in settings and not is_truthy(settings.get("PURGE_ONLY", 
 
 if not settings["GRAFANA_API_TOKEN"] and settings.get("GRAFANA_SERVICE_ACCOUNT_TOKEN"):
     settings["GRAFANA_API_TOKEN"] = settings["GRAFANA_SERVICE_ACCOUNT_TOKEN"]
+
+if not settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"].strip():
+    settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"] = settings["GRAFANA_DS_VM_EVCC_UID"]
 
 settings["DASHBOARD_SOURCE_MODE"] = (settings.get("DASHBOARD_SOURCE_MODE") or "github").strip().lower()
 FIXED_DASHBOARD_FILES = [
@@ -343,7 +347,11 @@ def get_source_text(filename):
 
 def replace_ds(node):
     if isinstance(node, str):
-        return settings["GRAFANA_DS_VM_EVCC_UID"] if node == "${DS_VM-EVCC}" else node
+        if node == "${DS_VM-EVCC}":
+            return settings["GRAFANA_DS_VM_EVCC_UID"]
+        if node == "${DS_VM-EVCC-AUDIT}":
+            return settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"]
+        return node
     if isinstance(node, list):
         return [replace_ds(item) for item in node]
     if isinstance(node, dict):
@@ -395,6 +403,8 @@ def build_inputs(raw):
         if item["type"] == "datasource":
             if item["name"] == "DS_VM-EVCC":
                 value = settings["GRAFANA_DS_VM_EVCC_UID"]
+            elif item["name"] == "DS_VM-EVCC-AUDIT":
+                value = settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"]
             elif item.get("pluginId") == "__expr__":
                 value = "__expr__"
             else:
@@ -669,6 +679,7 @@ print(f"Grafana version: {grafana_version()}")
 print(f"Auth mode: {auth_mode()}")
 print(f"Folder: {settings['GRAFANA_FOLDER_TITLE']} ({settings['GRAFANA_FOLDER_UID']})")
 print(f"Datasource UID: {settings['GRAFANA_DS_VM_EVCC_UID']}")
+print(f"Audit datasource UID: {settings['GRAFANA_DS_VM_EVCC_AUDIT_UID']}")
 if grafana_theme is not None:
     action = "not applied in purge-only mode" if purge_only else "will update org preference"
     print(f"Grafana theme: {grafana_theme_display(grafana_theme)} ({action})")

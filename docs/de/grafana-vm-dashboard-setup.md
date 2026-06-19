@@ -147,6 +147,8 @@ GRAFANA_URL=http://<deine-grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
 GRAFANA_API_TOKEN=<dein_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# optional, nur bei separater Audit-Datasource fuer EVCC-SmartMeterCtrl/§14a:
+GRAFANA_DS_VM_EVCC_AUDIT_UID=
 # optional: GRAFANA_THEME=dark oder GRAFANA_THEME=light
 DASHBOARD_LANGUAGE=de
 DASHBOARD_VARIANT=gen

@@ -22,6 +22,7 @@ Defaults:
 - dashboards: fixed Grafana 13 tab-navigation list from `dashboards/deploy-manifest.json`
 - folder UID/title: `evcc` / `EVCC`
 - datasource UID: `vm-evcc`
+- optional audit datasource UID for EVCC-SmartMeterCtrl/§14a: empty, falls back to `vm-evcc`
 - purge before import: `false`
 
 Grafana 13.0.1 or newer is required. Dashboard set selection is no longer supported; the deployers always use the fixed tab-navigation file list from `dashboards/deploy-manifest.json`.
@@ -35,6 +36,8 @@ GRAFANA_URL=http://<your-grafana-ip>:3000
 GRAFANA_AUTH_MODE=auto
 GRAFANA_API_TOKEN=<service_account_token>
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# Optional, only when EVCC-SmartMeterCtrl/§14a audit metrics use a separate datasource:
+GRAFANA_DS_VM_EVCC_AUDIT_UID=
 ```
 
 `GRAFANA_API_TOKEN` is the preferred setting for Grafana 13 service-account tokens. `GRAFANA_SERVICE_ACCOUNT_TOKEN` is accepted as an alias if `GRAFANA_API_TOKEN` is empty.
@@ -93,9 +96,13 @@ DASHBOARD_LOCAL_DIR=/path/to/evcc-grafana-dashboards/dashboards/translation/de
 GRAFANA_FOLDER_UID=evcc
 GRAFANA_FOLDER_TITLE=EVCC
 GRAFANA_DS_VM_EVCC_UID=vm-evcc
+# Optional, only when EVCC-SmartMeterCtrl/§14a audit metrics use a separate datasource:
+GRAFANA_DS_VM_EVCC_AUDIT_UID=
 ```
 
 If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before deployment.
+
+The Daily Details tab for external grid/§14a control uses audit metrics from EVCC-SmartMeterCtrl. By default the deployer looks for these metrics in the same datasource as EVCC. If the audit collector writes to a separate VictoriaMetrics instance, set `GRAFANA_DS_VM_EVCC_AUDIT_UID` to that Grafana datasource UID. The tab is shown only when audit metrics report an active external limit or an EVCC control event in the selected time range. The table is filled from `evcc_audit_gridsession_event_start_timestamp_seconds`; fields such as start, end, type, status, and limit come from that metric's labels.
 
 ### Optionally Set The Grafana Theme
 

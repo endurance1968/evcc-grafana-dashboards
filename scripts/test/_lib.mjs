@@ -87,9 +87,14 @@ export function deepReplaceDataSourcePlaceholders(node, map) {
     out[k] = deepReplaceDataSourcePlaceholders(v, map);
   }
   if (out.group === "victoriametrics-metrics-datasource" && out.datasource && typeof out.datasource === "object") {
-    out.datasource = { ...out.datasource, name: map["DS_VM-EVCC"] || out.datasource.name };
-    if ("uid" in out.datasource) {
-      out.datasource.uid = map["DS_VM-EVCC"] || out.datasource.uid;
+    const auditDs = map["DS_VM-EVCC-AUDIT"];
+    const normalDs = map["DS_VM-EVCC"];
+    const targetDs = auditDs && out.datasource.name === auditDs ? auditDs : normalDs;
+    if (targetDs) {
+      out.datasource = { ...out.datasource, name: targetDs };
+      if ("uid" in out.datasource) {
+        out.datasource.uid = targetDs;
+      }
     }
   }
   return out;

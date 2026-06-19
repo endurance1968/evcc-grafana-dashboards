@@ -55,6 +55,7 @@ const titlePrefixMode = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX_MODE", "tag"
 
 const dsMap = {
   "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
+  "DS_VM-EVCC-AUDIT": optionalEnv("GRAFANA_DS_VM_EVCC_AUDIT_UID", optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc")),
 };
 
 function buildInputs(raw) {

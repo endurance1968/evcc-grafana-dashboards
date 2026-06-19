@@ -13,6 +13,7 @@ param(
   [string]$purge = "",
   [string]$purgeonly = "",
   [string]$datasourceuid,
+  [string]$auditdatasourceuid,
   [string]$language,
   [string]$variant,
   [string]$sourcemode,
@@ -31,9 +32,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.10.1'
+$ScriptVersion = '2026.06.19.1'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-06-10'
+$ScriptLastModified = '2026-06-19'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -299,6 +300,7 @@ function Replace-DatasourcePlaceholders($Node) {
   if ($null -eq $Node) { return $Node }
   if ($Node -is [string]) {
     if ($Node -eq '${DS_VM-EVCC}') { return $settings.GRAFANA_DS_VM_EVCC_UID }
+    if ($Node -eq '${DS_VM-EVCC-AUDIT}') { return $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID }
     return $Node
   }
   if ($Node -is [System.Collections.IEnumerable] -and -not ($Node -is [hashtable]) -and -not ($Node -is [pscustomobject])) {
@@ -312,9 +314,10 @@ function Replace-DatasourcePlaceholders($Node) {
     if ($out.ContainsKey('group') -and [string]$out['group'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('datasource') -and ($out['datasource'] -is [hashtable] -or $out['datasource'] -is [pscustomobject])) {
       $datasource = @{}
       foreach ($prop in $out['datasource'].PSObject.Properties) { $datasource[$prop.Name] = $prop.Value }
-      $datasource['name'] = $settings.GRAFANA_DS_VM_EVCC_UID
+      $targetDatasource = if ([string]$datasource['name'] -eq [string]$settings.GRAFANA_DS_VM_EVCC_AUDIT_UID) { $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID } else { $settings.GRAFANA_DS_VM_EVCC_UID }
+      $datasource['name'] = $targetDatasource
       if ($datasource.ContainsKey('uid')) {
-        $datasource['uid'] = $settings.GRAFANA_DS_VM_EVCC_UID
+        $datasource['uid'] = $targetDatasource
       }
       $out['datasource'] = [pscustomobject]$datasource
     }
@@ -376,7 +379,7 @@ function Build-Inputs($Raw) {
   foreach ($input in $rawInputs) {
     if ($null -eq $input -or -not $input.name -or -not $input.type) { continue }
     if ($input.type -eq 'datasource') {
-      $value = if ($input.name -eq 'DS_VM-EVCC') { $settings.GRAFANA_DS_VM_EVCC_UID } elseif ($input.pluginId -eq '__expr__') { '__expr__' } else { '' }
+      $value = if ($input.name -eq 'DS_VM-EVCC') { $settings.GRAFANA_DS_VM_EVCC_UID } elseif ($input.name -eq 'DS_VM-EVCC-AUDIT') { $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID } elseif ($input.pluginId -eq '__expr__') { '__expr__' } else { '' }
       if (-not $value) { throw "Missing datasource mapping for input $($input.name)" }
       $inputs += @{ name = $input.name; type = $input.type; pluginId = $input.pluginId; value = $value }
     } else {
@@ -655,6 +658,7 @@ $settings = @{
   GRAFANA_USER = ''
   GRAFANA_PASSWORD = ''
   GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'
+  GRAFANA_DS_VM_EVCC_AUDIT_UID = ''
   GRAFANA_FOLDER_UID = 'evcc'
   GRAFANA_FOLDER_TITLE = 'EVCC'
   GRAFANA_THEME = ''
@@ -694,7 +698,7 @@ $settings = @{
 
 $fileSettings = Load-DotEnv $config
 foreach ($entry in $fileSettings.GetEnumerator()) { $settings[$entry.Key] = $entry.Value }
-foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','GRAFANA_THEME','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_RAW_BASE_URL','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
+foreach ($key in @('GRAFANA_URL','GRAFANA_AUTH_MODE','GRAFANA_API_TOKEN','GRAFANA_SERVICE_ACCOUNT_TOKEN','GRAFANA_USER','GRAFANA_PASSWORD','GRAFANA_DS_VM_EVCC_UID','GRAFANA_DS_VM_EVCC_AUDIT_UID','GRAFANA_FOLDER_UID','GRAFANA_FOLDER_TITLE','GRAFANA_THEME','DASHBOARD_SOURCE_MODE','GITHUB_REPO','GITHUB_REF','DASHBOARD_LANGUAGE','DASHBOARD_VARIANT','DASHBOARD_RAW_BASE_URL','DASHBOARD_LOCAL_DIR','PURGE','PURGE_ONLY','DEPLOY_PURGE','DEPLOY_PURGE_ONLY','DASHBOARD_FILTER_PEAK_POWER_LIMIT','DASHBOARD_ENERGY_SAMPLE_INTERVAL','DASHBOARD_TARIFF_PRICE_INTERVAL','DASHBOARD_FILTER_ENERGY_SAMPLE_INTERVAL','DASHBOARD_FILTER_TARIFF_PRICE_INTERVAL','DASHBOARD_INSTALLED_WATT_PEAK','DASHBOARD_VEHICLE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_COST_PER_L','DASHBOARD_STORAGE_CAPACITY_WH','DASHBOARD_ICE_CONSUMPTION_L_PER_100KM','DASHBOARD_FUEL_PRICE_PER_L','DASHBOARD_PV_PURCHASE_PRICE','DASHBOARD_BATTERY_PURCHASE_PRICE','DASHBOARD_RUNNING_COSTS_YEARLY','DASHBOARD_BATTERY_CAPACITY_WH','DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX','DASHBOARD_FILTER_LOADPOINT_BLOCKLIST','DASHBOARD_FILTER_EXT_BLOCKLIST','DASHBOARD_FILTER_AUX_BLOCKLIST','DASHBOARD_FILTER_VEHICLE_BLOCKLIST','DASHBOARD_EVCC_URL','DASHBOARD_PORTAL_TITLE','DASHBOARD_PORTAL_URL')) {
   $envValue = [Environment]::GetEnvironmentVariable($key)
   if ($envValue) { $settings[$key] = $envValue }
 }
@@ -706,6 +710,8 @@ Merge-Setting $settings 'GRAFANA_USER' $user
 Merge-Setting $settings 'GRAFANA_PASSWORD' $password
 Merge-Setting $settings 'GRAFANA_THEME' $theme
 Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_UID' $datasourceuid
+Merge-Setting $settings 'GRAFANA_DS_VM_EVCC_AUDIT_UID' $auditdatasourceuid
+if ([string]::IsNullOrWhiteSpace([string]$settings.GRAFANA_DS_VM_EVCC_AUDIT_UID)) { $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID = $settings.GRAFANA_DS_VM_EVCC_UID }
 Merge-Setting $settings 'DASHBOARD_LANGUAGE' $language
 Merge-Setting $settings 'DASHBOARD_VARIANT' $variant
 Merge-Setting $settings 'DASHBOARD_SOURCE_MODE' $sourcemode
@@ -771,6 +777,7 @@ Write-Host "Grafana version: $grafanaVersion"
 Write-Host "Auth mode: $(Resolve-GrafanaAuthMode)"
 Write-Host "Folder: $($settings.GRAFANA_FOLDER_TITLE) ($($settings.GRAFANA_FOLDER_UID))"
 Write-Host "Datasource UID: $($settings.GRAFANA_DS_VM_EVCC_UID)"
+Write-Host "Audit datasource UID: $($settings.GRAFANA_DS_VM_EVCC_AUDIT_UID)"
 if ($grafanaThemeConfigured) {
   $action = if ($purgeOnlyEnabled) { 'not applied in purge-only mode' } else { 'will update org preference' }
   Write-Host "Grafana theme: $(Get-GrafanaThemeDisplay -ThemeValue $grafanaTheme) ($action)"
