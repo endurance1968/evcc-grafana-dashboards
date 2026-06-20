@@ -5770,7 +5770,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (group, name, kind) (evcc_audit_control_group_power_w)",
+                        "expr": "max by (name, kind) (evcc_audit_control_group_power_w)",
                         "format": "time_series",
                         "legendFormat": "{{name}}",
                         "range": true
