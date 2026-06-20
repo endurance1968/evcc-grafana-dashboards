@@ -21,7 +21,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.20.3"
+SCRIPT_VERSION = "2026.06.20.4"
 SCRIPT_LAST_MODIFIED = "2026-06-20"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
@@ -141,7 +141,7 @@ class ControlGroup:
     group_id: str
     name: str
     kind: str
-    loadpoints: tuple[int, ...] = ()
+    loadpoints: tuple[str, ...] = ()
 
 
 LOADPOINT_CONTROL_GROUP_KINDS = {"loadpoint", "loadpoints", "heat_pump", "heat_pumps"}
@@ -169,7 +169,7 @@ def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
         group_id, name, kind, members = parts
         normalized_kind = normalize_control_group_kind(kind)
         if normalized_kind in LOADPOINT_CONTROL_GROUP_KINDS:
-            loadpoints = tuple(int(part.strip()) for part in members.replace(",", "+").split("+") if part.strip())
+            loadpoints = tuple(part.strip() for part in members.replace(",", "+").split("+") if part.strip())
             if not loadpoints:
                 raise ValueError(f"Control group {group_id!r} with kind {kind!r} needs at least one loadpoint member")
         elif normalized_kind == "battery_grid_charge":
@@ -414,7 +414,7 @@ def build_state_metrics(
     if grid_export_power is not None:
         lines.append(metric("evcc_audit_vnb_production_margin_w", effective_max_production_power - grid_export_power, labels))
 
-    loadpoint_powers: dict[int, float] = {}
+    loadpoint_powers: dict[str, float] = {}
     loadpoints = state.get("loadpoints") if isinstance(state.get("loadpoints"), list) else []
     for index, loadpoint in enumerate(loadpoints, start=1):
         if not isinstance(loadpoint, dict):
@@ -422,7 +422,8 @@ def build_state_metrics(
         lp_name = str(loadpoint.get("title") or loadpoint.get("name") or index)
         charge_power = number(loadpoint.get("chargePower"))
         if charge_power is not None:
-            loadpoint_powers[index] = charge_power
+            loadpoint_powers[str(index)] = charge_power
+            loadpoint_powers[lp_name] = charge_power
         lp_labels = {"site": site_id, "loadpoint": str(index), "name": lp_name}
         for field, name in [
             ("chargePower", "evcc_audit_loadpoint_charge_power_w"),

@@ -78,10 +78,10 @@ When the collector runs directly on the VictoriaMetrics host, `VM_WRITE_URL=http
 
 `EVCC_14A_CONTROL_GROUPS` describes only the groups that should be shown as controllable in the `Grid control` tab. The collector does not infer groups automatically from EVCC names. If a loadpoint or heat pump is not actually controllable, do not list it here.
 
-Example for two individually named loadpoints, one heat pump represented as an EVCC loadpoint, and battery grid charging:
+Example for two loadpoints as one combined group, one heat pump represented as an EVCC loadpoint, and battery grid charging:
 
 ```env
-EVCC_14A_CONTROL_GROUPS=wallbox1|Carport Corner|loadpoint|1;wallbox2|Carport Stairs|loadpoint|2;wp1|Heat pump|heat_pump|3;battery|Battery grid charge|battery_grid_charge|
+EVCC_14A_CONTROL_GROUPS=wallboxes|Loadpoints|loadpoints|Carport Corner+Carport Stairs;wp1|Heat pump|heat_pump|Heat pump;battery|Battery grid charge|battery_grid_charge|
 ```
 
 Syntax:
@@ -92,8 +92,8 @@ id|display name|kind|members;id2|display name|kind|members2
 
 Supported kinds:
 
-- `loadpoint` / `loadpoints`: members are EVCC loadpoint numbers, for example `1` or `1+2`
-- `heat_pump`: members are EVCC loadpoint numbers for heat pumps represented as EVCC loadpoints
+- `loadpoint` / `loadpoints`: members are visible EVCC loadpoint names, for example `Carport Corner`, or optional EVCC loadpoint numbers like `1`. Combine multiple members with `+`.
+- `heat_pump`: members are visible EVCC loadpoint names for heat pumps represented as EVCC loadpoints
 - `battery_grid_charge`: members stay empty
 
 For the minimum-power calculation, the collector uses the number of configured groups by default. Set `EVCC_14A_CONTROL_UNITS` when the legal or technical unit count differs:

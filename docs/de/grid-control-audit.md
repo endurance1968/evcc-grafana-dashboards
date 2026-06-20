@@ -78,10 +78,10 @@ Wenn der Collector direkt auf dem VictoriaMetrics-Host laeuft, ist `VM_WRITE_URL
 
 `EVCC_14A_CONTROL_GROUPS` beschreibt ausschliesslich die Gruppen, die im Tab `Netzsteuerung` als steuerbar angezeigt werden sollen. Der Collector leitet daraus keine Gruppen automatisch aus EVCC-Namen ab. Wenn ein Ladepunkt oder eine Waermepumpe nicht steuerbar ist, nimm sie hier nicht auf.
 
-Beispiel fuer zwei einzeln benannte Ladepunkte, eine als EVCC-Ladepunkt gemessene Waermepumpe und Batterie-Netzladung:
+Beispiel fuer zwei Ladepunkte als gemeinsame Gruppe, eine als EVCC-Ladepunkt gemessene Waermepumpe und Batterie-Netzladung:
 
 ```env
-EVCC_14A_CONTROL_GROUPS=wallbox1|Carport Ecke|loadpoint|1;wallbox2|Carport Treppe|loadpoint|2;wp1|Daikin-WP|heat_pump|3;battery|Batterie Netzladung|battery_grid_charge|
+EVCC_14A_CONTROL_GROUPS=wallboxes|Ladepunkte|loadpoints|Carport Ecke+Carport Treppe;wp1|Daikin-WP|heat_pump|Daikin-WP;battery|Batterie Netzladung|battery_grid_charge|
 ```
 
 Syntax:
@@ -92,8 +92,8 @@ id|Anzeigename|Typ|Mitglieder;id2|Anzeigename|Typ|Mitglieder2
 
 Unterstuetzte Typen:
 
-- `loadpoint` / `loadpoints`: Mitglieder sind EVCC-Ladepunktnummern, zum Beispiel `1` oder `1+2`
-- `heat_pump`: Mitglieder sind EVCC-Ladepunktnummern fuer Waermepumpen, die in EVCC als Ladepunkt erscheinen
+- `loadpoint` / `loadpoints`: Mitglieder sind sichtbare EVCC-Ladepunktnamen, zum Beispiel `Carport Ecke`, oder optional EVCC-Ladepunktnummern wie `1`. Mehrere Mitglieder werden mit `+` kombiniert.
+- `heat_pump`: Mitglieder sind sichtbare EVCC-Ladepunktnamen fuer Waermepumpen, die in EVCC als Ladepunkt erscheinen
 - `battery_grid_charge`: Mitglieder bleiben leer
 
 Fuer die Mindestleistungsberechnung nutzt der Collector standardmaessig die Anzahl der konfigurierten Gruppen. Setze `EVCC_14A_CONTROL_UNITS`, wenn die rechtliche oder technische Anzahl davon abweicht:

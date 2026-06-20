@@ -44,23 +44,23 @@ class GridControlAuditTests(unittest.TestCase):
         self.assertIn('evcc_audit_hems_effective_max_production_power_w{site="home"} 800.0', text)
 
     def test_control_group_and_minimum_power_metrics(self):
-        groups = MODULE.parse_control_groups("wallbox1|Garage|loadpoint|1;wp1|Heat pump|heat_pump|2;battery|Battery|battery_grid_charge|")
+        groups = MODULE.parse_control_groups("wallboxes|Loadpoints|loadpoints|Garage+Carport;wp1|Heat pump|heat_pump|Heat pump;battery|Battery|battery_grid_charge|")
         state = {
             "site": {"gridPower": 1000, "batteryGridChargeActive": True},
             "battery": {"power": -900},
-            "loadpoints": [{"chargePower": 1500}, {"chargePower": 2500}],
+            "loadpoints": [{"title": "Garage", "chargePower": 1500}, {"title": "Carport", "chargePower": 2500}, {"title": "Heat pump", "chargePower": 900}],
         }
         metrics = MODULE.build_state_metrics(state, "home", groups, control_unit_count=None)
         text = "\n".join(metrics)
 
-        self.assertIn('evcc_audit_control_group_power_w{group="wallbox1",kind="loadpoint",name="Garage",site="home"} 1500.0', text)
-        self.assertIn('evcc_audit_control_group_power_w{group="wp1",kind="heat_pump",name="Heat pump",site="home"} 2500.0', text)
+        self.assertIn('evcc_audit_control_group_power_w{group="wallboxes",kind="loadpoints",name="Loadpoints",site="home"} 4000.0', text)
+        self.assertIn('evcc_audit_control_group_power_w{group="wp1",kind="heat_pump",name="Heat pump",site="home"} 900.0', text)
         self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 900.0', text)
         self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 7560.0', text)
 
     def test_control_group_legacy_loadpoints_alias_still_works(self):
         groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2")
-        state = {"loadpoints": [{"chargePower": 1000}, {"chargePower": 2000}]}
+        state = {"loadpoints": [{"title": "A", "chargePower": 1000}, {"title": "B", "chargePower": 2000}]}
         metrics = MODULE.build_state_metrics(state, "home", groups)
         text = "\n".join(metrics)
 
