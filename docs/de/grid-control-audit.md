@@ -76,31 +76,30 @@ Wenn der Collector direkt auf dem VictoriaMetrics-Host laeuft, ist `VM_WRITE_URL
 
 ## Optional: steuerbare Gruppen benennen
 
-Wenn du im Dashboard sehen moechtest, welche steuerbaren Gruppen wie viel Leistung aufnehmen, setze `EVCC_14A_CONTROL_GROUPS`.
+`EVCC_14A_CONTROL_GROUPS` beschreibt ausschliesslich die Gruppen, die im Tab `Netzsteuerung` als steuerbar angezeigt werden sollen. Der Collector leitet daraus keine Gruppen automatisch aus EVCC-Namen ab. Wenn ein Ladepunkt oder eine Waermepumpe nicht steuerbar ist, nimm sie hier nicht auf.
 
-Beispiel fuer zwei Ladepunkte und Batterie-Netzladung:
+Beispiel fuer zwei einzeln benannte Ladepunkte, eine als EVCC-Ladepunkt gemessene Waermepumpe und Batterie-Netzladung:
 
 ```env
-EVCC_14A_CONTROL_GROUPS=lp|Ladepunkte|loadpoints|1+2;battery|Batterie Netzladung|battery_grid_charge|
+EVCC_14A_CONTROL_GROUPS=wallbox1|Carport Ecke|loadpoint|1;wallbox2|Carport Treppe|loadpoint|2;wp1|Daikin-WP|heat_pump|3;battery|Batterie Netzladung|battery_grid_charge|
 ```
 
 Syntax:
 
 ```text
-id|Anzeigename|Typ|Mitglieder;id2|Anzeigename|Typ|Mitglieder
+id|Anzeigename|Typ|Mitglieder;id2|Anzeigename|Typ|Mitglieder2
 ```
 
 Unterstuetzte Typen:
 
-- `loadpoints`: Mitglieder sind EVCC-Ladepunktnummern, zum Beispiel `1+2`
+- `loadpoint` / `loadpoints`: Mitglieder sind EVCC-Ladepunktnummern, zum Beispiel `1` oder `1+2`
+- `heat_pump`: Mitglieder sind EVCC-Ladepunktnummern fuer Waermepumpen, die in EVCC als Ladepunkt erscheinen
 - `battery_grid_charge`: Mitglieder bleiben leer
 
-Fuer die Mindestleistungsberechnung nutzt der Collector standardmaessig die Anzahl der konfigurierten Gruppen. Falls du das explizit setzen willst:
+Fuer die Mindestleistungsberechnung nutzt der Collector standardmaessig die Anzahl der konfigurierten Gruppen. Setze `EVCC_14A_CONTROL_UNITS`, wenn die rechtliche oder technische Anzahl davon abweicht:
 
 ```env
-EVCC_14A_CONTROL_UNITS=2
-EVCC_14A_MIN_POWER_BASE_W=4200
-EVCC_14A_ADDITIONAL_UNIT_FACTOR=0.4
+EVCC_14A_CONTROL_UNITS=4
 ```
 
 ## Einmaliger Test

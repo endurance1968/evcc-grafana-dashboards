@@ -905,6 +905,10 @@ function validateDashboard(fileName, dashboard) {
         assert(rawJson.includes(metric), failures, `${fileName}: Grid control support must query ${metric}`);
       }
       assert(rawJson.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: Grid control support must use the optional audit datasource placeholder`);
+      assert(rawJson.includes('evcc_audit_control_group_power_w'), failures, `${fileName}: Controllable groups panel must query explicit collector control groups`);
+      assert(!rawJson.includes('evcc_audit_control_group_power_w{kind!=\\"loadpoints\\"}'), failures, `${fileName}: Controllable groups panel must not hide configured loadpoint groups`);
+      assert(!rawJson.includes('evcc_audit_loadpoint_charge_power_w{name!~\\"$heatPumpLoadpointRegex\\"}'), failures, `${fileName}: Controllable groups panel must not infer controllable loadpoints from names`);
+      assert(!rawJson.includes('evcc_audit_loadpoint_charge_power_w{name=~\\"$heatPumpLoadpointRegex\\"}'), failures, `${fileName}: Controllable groups panel must not infer controllable heat pumps from names`);
     }
     const gridControlVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlData");
     assert(Boolean(gridControlVariable), failures, `${fileName}: Grid control tab must be backed by hidden hasGridControlData variable`);
@@ -919,7 +923,7 @@ function validateDashboard(fileName, dashboard) {
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];
     assert(loadpointTab?.spec?.layout?.kind === "RowsLayout", failures, `${fileName}: loadpoint tab must use RowsLayout so panels repeat as a group`);
-    assert(loadpointRows.length === 1, failures, `${fileName}: loadpoint tab must contain exactly one repeated row`);
+    assert(loadpointRows.length === 2, failures, `${fileName}: loadpoint tab must contain one repeated loadpoint row and one optional heat-pump row`);
     const loadpointRow = loadpointRows[0];
     const repeat = loadpointRow?.spec?.repeat;
     assert(repeat?.mode === "variable" && repeat?.value === "loadpoint", failures, `${fileName}: loadpoint row must repeat by loadpoint`);
@@ -928,6 +932,21 @@ function validateDashboard(fileName, dashboard) {
     for (const item of loadpointItems) {
       assert(!item.spec?.repeat, failures, `${fileName}: loadpoint panel item ${item.spec?.element?.name || "?"} must not repeat independently`);
     }
+    const heatPumpLoadpointRow = loadpointRows[1];
+    assert(heatPumpLoadpointRow?.spec?.title === "Heat pump loadpoints", failures, `${fileName}: loadpoint tab must contain an optional Heat pump loadpoints row`);
+    const heatPumpCondition = heatPumpLoadpointRow?.spec?.conditionalRendering;
+    const heatPumpConditionItem = heatPumpCondition?.spec?.items?.[0];
+    assert(heatPumpCondition?.kind === "ConditionalRenderingGroup", failures, `${fileName}: heat-pump loadpoint row must use Grafana conditional rendering`);
+    assert(heatPumpCondition?.spec?.visibility === "show" && heatPumpCondition?.spec?.condition === "and", failures, `${fileName}: heat-pump loadpoint row must only show when matching data is present`);
+    assert(heatPumpConditionItem?.kind === "ConditionalRenderingVariable", failures, `${fileName}: heat-pump loadpoint row conditional must be variable-based`);
+    assert(heatPumpConditionItem?.spec?.variable === "hasHeatPumpLoadpointData" && heatPumpConditionItem?.spec?.operator === "matches" && heatPumpConditionItem?.spec?.value === ".+", failures, `${fileName}: heat-pump loadpoint row must match non-empty heat-pump helper values`);
+    const heatPumpLoadpointVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasHeatPumpLoadpointData");
+    assert(Boolean(heatPumpLoadpointVariable), failures, `${fileName}: heat-pump loadpoint row must be backed by hidden hasHeatPumpLoadpointData variable`);
+    assert(heatPumpLoadpointVariable?.spec?.includeAll === true, failures, `${fileName}: heat-pump loadpoint helper must include All so Grafana initializes conditional rows reliably`);
+    assert(heatPumpLoadpointVariable?.spec?.current?.value === "$__all", failures, `${fileName}: heat-pump loadpoint helper must default to $__all`);
+    assert(heatPumpLoadpointVariable?.spec?.query?.spec?.query === 'label_values(chargePower_value{loadpoint=~"$heatPumpLoadpointRegex",loadpoint!~"$loadpointBlocklist"}, loadpoint)', failures, `${fileName}: heat-pump loadpoint helper must detect matching chargePower loadpoints`);
+    assert(rawJson.includes("heatPumpLoadpointRegex"), failures, `${fileName}: heat-pump loadpoint filtering must use heatPumpLoadpointRegex`);
+    assert(rawJson.includes('loadpoint!~\\"$heatPumpLoadpointRegex\\"') || rawJson.includes('loadpoint !~ \\"$heatPumpLoadpointRegex\\"'), failures, `${fileName}: normal loadpoint queries must exclude heat-pump loadpoints`);
 
     const pvPowerPanel = dashboard.spec?.elements?.["panel-27"]?.spec;
     const pvPowerQueries = pvPowerPanel?.data?.spec?.queries || [];

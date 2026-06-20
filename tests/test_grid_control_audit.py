@@ -44,7 +44,7 @@ class GridControlAuditTests(unittest.TestCase):
         self.assertIn('evcc_audit_hems_effective_max_production_power_w{site="home"} 800.0', text)
 
     def test_control_group_and_minimum_power_metrics(self):
-        groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2;battery|Battery|battery_grid_charge|")
+        groups = MODULE.parse_control_groups("wallbox1|Garage|loadpoint|1;wp1|Heat pump|heat_pump|2;battery|Battery|battery_grid_charge|")
         state = {
             "site": {"gridPower": 1000, "batteryGridChargeActive": True},
             "battery": {"power": -900},
@@ -53,9 +53,18 @@ class GridControlAuditTests(unittest.TestCase):
         metrics = MODULE.build_state_metrics(state, "home", groups, control_unit_count=None)
         text = "\n".join(metrics)
 
-        self.assertIn('evcc_audit_control_group_power_w{group="lp",kind="loadpoints",name="Loadpoints",site="home"} 4000.0', text)
+        self.assertIn('evcc_audit_control_group_power_w{group="wallbox1",kind="loadpoint",name="Garage",site="home"} 1500.0', text)
+        self.assertIn('evcc_audit_control_group_power_w{group="wp1",kind="heat_pump",name="Heat pump",site="home"} 2500.0', text)
         self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 900.0', text)
-        self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 5880.0', text)
+        self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 7560.0', text)
+
+    def test_control_group_legacy_loadpoints_alias_still_works(self):
+        groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2")
+        state = {"loadpoints": [{"chargePower": 1000}, {"chargePower": 2000}]}
+        metrics = MODULE.build_state_metrics(state, "home", groups)
+        text = "\n".join(metrics)
+
+        self.assertIn('evcc_audit_control_group_power_w{group="lp",kind="loadpoints",name="Loadpoints",site="home"} 3000.0', text)
 
     def test_gridsession_event_metric_contains_table_labels(self):
         sessions = [

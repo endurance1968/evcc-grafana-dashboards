@@ -7132,7 +7132,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Correspondance du point de charge de la pompe à chaleur",
+          "label": "Filtre de point de charge pompe à chaleur",
           "hide": "hideVariable",
           "skipUrlSync": false
         }

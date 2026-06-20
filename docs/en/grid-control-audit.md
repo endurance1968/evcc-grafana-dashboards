@@ -76,31 +76,30 @@ When the collector runs directly on the VictoriaMetrics host, `VM_WRITE_URL=http
 
 ## Optional: Name Controllable Groups
 
-Set `EVCC_14A_CONTROL_GROUPS` when you want the dashboard to show how much power each controllable group currently uses.
+`EVCC_14A_CONTROL_GROUPS` describes only the groups that should be shown as controllable in the `Grid control` tab. The collector does not infer groups automatically from EVCC names. If a loadpoint or heat pump is not actually controllable, do not list it here.
 
-Example for two loadpoints and battery grid charging:
+Example for two individually named loadpoints, one heat pump represented as an EVCC loadpoint, and battery grid charging:
 
 ```env
-EVCC_14A_CONTROL_GROUPS=lp|Loadpoints|loadpoints|1+2;battery|Battery grid charge|battery_grid_charge|
+EVCC_14A_CONTROL_GROUPS=wallbox1|Carport Corner|loadpoint|1;wallbox2|Carport Stairs|loadpoint|2;wp1|Heat pump|heat_pump|3;battery|Battery grid charge|battery_grid_charge|
 ```
 
 Syntax:
 
 ```text
-id|Display name|Kind|Members;id2|Display name|Kind|Members
+id|display name|kind|members;id2|display name|kind|members2
 ```
 
 Supported kinds:
 
-- `loadpoints`: members are EVCC loadpoint numbers, for example `1+2`
+- `loadpoint` / `loadpoints`: members are EVCC loadpoint numbers, for example `1` or `1+2`
+- `heat_pump`: members are EVCC loadpoint numbers for heat pumps represented as EVCC loadpoints
 - `battery_grid_charge`: members stay empty
 
-For the minimum-power calculation, the collector uses the number of configured groups by default. Override this explicitly when needed:
+For the minimum-power calculation, the collector uses the number of configured groups by default. Set `EVCC_14A_CONTROL_UNITS` when the legal or technical unit count differs:
 
 ```env
-EVCC_14A_CONTROL_UNITS=2
-EVCC_14A_MIN_POWER_BASE_W=4200
-EVCC_14A_ADDITIONAL_UNIT_FACTOR=0.4
+EVCC_14A_CONTROL_UNITS=4
 ```
 
 ## One-Shot Test

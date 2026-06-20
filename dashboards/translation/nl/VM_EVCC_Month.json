@@ -4837,7 +4837,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Warmtepomp-laadpuntmatch",
+          "label": "Warmtepomp-laadpuntfilter",
           "hide": "hideVariable",
           "skipUrlSync": false
         }

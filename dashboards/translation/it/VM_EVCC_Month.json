@@ -4837,7 +4837,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Corrispondenza del punto di ricarica della pompa di calore",
+          "label": "Filtro punto di carico pompa di calore",
           "hide": "hideVariable",
           "skipUrlSync": false
         }

@@ -21,7 +21,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.20.2"
+SCRIPT_VERSION = "2026.06.20.3"
 SCRIPT_LAST_MODIFIED = "2026-06-20"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
@@ -144,6 +144,18 @@ class ControlGroup:
     loadpoints: tuple[int, ...] = ()
 
 
+LOADPOINT_CONTROL_GROUP_KINDS = {"loadpoint", "loadpoints", "heat_pump", "heat_pumps"}
+
+
+def normalize_control_group_kind(kind: str) -> str:
+    normalized = kind.strip().lower().replace("-", "_")
+    aliases = {
+        "heatpump": "heat_pump",
+        "heatpumps": "heat_pump",
+    }
+    return aliases.get(normalized, normalized)
+
+
 def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
     """Parse env syntax: id|name|kind|members;id2|name2|kind2|members2."""
     groups: list[ControlGroup] = []
@@ -151,13 +163,15 @@ def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
         raw_group = raw_group.strip()
         if not raw_group:
             continue
-        parts = [part.strip() for part in raw_group.split("|")]
+        parts = [part.strip() for part in raw_group.split("|", 3)]
         if len(parts) != 4:
-            raise ValueError(f"Invalid control group definition: {raw_group!r}")
+            raise ValueError(f"Invalid control group syntax: {raw_group!r}")
         group_id, name, kind, members = parts
-        normalized_kind = kind.lower()
-        if normalized_kind == "loadpoints":
+        normalized_kind = normalize_control_group_kind(kind)
+        if normalized_kind in LOADPOINT_CONTROL_GROUP_KINDS:
             loadpoints = tuple(int(part.strip()) for part in members.replace(",", "+").split("+") if part.strip())
+            if not loadpoints:
+                raise ValueError(f"Control group {group_id!r} with kind {kind!r} needs at least one loadpoint member")
         elif normalized_kind == "battery_grid_charge":
             loadpoints = ()
         else:
@@ -430,7 +444,7 @@ def build_state_metrics(
 
     for group in control_groups:
         group_labels = {"site": site_id, "group": group.group_id, "name": group.name, "kind": group.kind}
-        if group.kind == "loadpoints":
+        if group.kind in LOADPOINT_CONTROL_GROUP_KINDS:
             values = [loadpoint_powers[index] for index in group.loadpoints if index in loadpoint_powers]
             if values:
                 lines.append(metric("evcc_audit_control_group_power_w", sum(values), group_labels))

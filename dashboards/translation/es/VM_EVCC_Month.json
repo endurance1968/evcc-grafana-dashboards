@@ -4837,7 +4837,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Coincidencia del punto de carga de la bomba de calor",
+          "label": "Filtro de punto de carga de bomba de calor",
           "hide": "hideVariable",
           "skipUrlSync": false
         }

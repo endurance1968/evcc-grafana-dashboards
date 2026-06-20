@@ -7132,7 +7132,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "Wärmepumpen-Loadpoint-Muster",
+          "label": "Wärmepumpen-Ladepunkt-Erkennung",
           "hide": "hideVariable",
           "skipUrlSync": false
         }

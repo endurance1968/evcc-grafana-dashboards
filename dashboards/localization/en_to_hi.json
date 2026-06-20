@@ -407,7 +407,14 @@
     "Controllable groups": "नियंत्रण योग्य समूह",
     "{{name}}": "{{name}}",
     "{{type}} {{limit_w}} W": "{{type}} {{limit_w}} W",
-    "Internal helper variable. Shows the grid-control tab only when EVCC audit metrics report an active external limit or control event in the selected time range.": "आंतरिक सहायक वैरिएबल। चयनित समय सीमा में EVCC ऑडिट मेट्रिक सक्रिय बाहरी सीमा या नियंत्रण इवेंट रिपोर्ट करें तभी ग्रिड नियंत्रण टैब दिखाता है।"
+    "Internal helper variable. Shows the grid-control tab only when EVCC audit metrics report an active external limit or control event in the selected time range.": "आंतरिक सहायक वैरिएबल। चयनित समय सीमा में EVCC ऑडिट मेट्रिक सक्रिय बाहरी सीमा या नियंत्रण इवेंट रिपोर्ट करें तभी ग्रिड नियंत्रण टैब दिखाता है।",
+    "Heat pump": "हीट पंप",
+    "Heat pump loadpoints": "हीट पंप लोडपॉइंट",
+    "Heat pump currents/phase": "हीट पंप करंट/फेज",
+    "Heat pump phases": "हीट पंप फेज",
+    "Heat pump active phases": "हीट पंप सक्रिय फेज",
+    "Heat pump power": "हीट पंप पावर",
+    "Heat pump loadpoint data": "हीट पंप लोडपॉइंट डेटा"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

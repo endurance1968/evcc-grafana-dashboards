@@ -4837,7 +4837,7 @@
             "text": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*",
             "value": "(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
           },
-          "label": "热泵负载点匹配",
+          "label": "热泵充电点匹配",
           "hide": "hideVariable",
           "skipUrlSync": false
         }
