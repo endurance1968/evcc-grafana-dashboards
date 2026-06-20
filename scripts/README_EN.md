@@ -18,6 +18,9 @@ Current rollup files:
 - `helper/evcc-vm-investment-weekly.sh`
 - `helper/evcc-vm-investment-weekly.conf.example`
 - `helper/import-investment-costs.py`
+- `helper/collect-evcc-grid-control-audit.py`
+- `helper/evcc-grid-control-audit.env.example`
+- `helper/evcc-grid-control-audit.service.example`
 - `helper/check_data.py`
 - `helper/compare_import_coverage.py`
 - `helper/compare_labelsets.py`

@@ -11,6 +11,7 @@ import { spawnSync } from "node:child_process";
 const repoRoot = process.cwd();
 const pythonScripts = [
   "scripts/helper/check_data.py",
+  "scripts/helper/collect-evcc-grid-control-audit.py",
   "scripts/helper/compare_import_coverage.py",
   "scripts/helper/compare_labelsets.py",
   "scripts/helper/compare_tibber_vm.py",

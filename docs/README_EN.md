@@ -69,6 +69,7 @@ Use these when the normal migration path reports a problem or when you need oper
 - Migration validation notes: [migration-validation-notes.md](./en/migration-validation-notes.md)
 - Rollup design: [design/victoriametrics-rollup-design.md](./en/design/victoriametrics-rollup-design.md)
 - Live ingest: [evcc-telegraf-live-ingest.md](./en/evcc-telegraf-live-ingest.md)
+- Optional grid-control audit collector: [grid-control-audit.md](./en/grid-control-audit.md)
 - Schema reference: [design/victoriametrics-schema-reference.md](./en/design/victoriametrics-schema-reference.md)
 - Dashboard color semantics: [design/dashboard-color-semantics.md](./en/design/dashboard-color-semantics.md)
 - Investment costs for effective electricity price: [investment-costs.md](./en/investment-costs.md)

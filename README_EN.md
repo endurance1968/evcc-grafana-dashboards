@@ -21,6 +21,7 @@ More dashboard examples are available in the [screenshot gallery](./docs/screens
 - Grafana 13 TAB dashboards as the supported navigation model
 - deploy scripts for first-time imports and later updates
 - a rollup script for daily long-range dashboard metrics
+- an optional [grid-control audit collector](./docs/en/grid-control-audit.md) for the Daily Details tab
 - documentation for InfluxDB to VictoriaMetrics migration
 - end-user guides for VictoriaMetrics, EVCC/Telegraf live ingest, Grafana, migration, and dashboard deployment
 - curated release notes and screenshots for the recommended Grafana 13 TAB dashboards

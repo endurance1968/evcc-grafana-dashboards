@@ -71,6 +71,7 @@ Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 - Migrations-Validierungsnotizen: [migration-validation-notes.md](./de/migration-validation-notes.md)
 - Rollup-Design: [design/victoriametrics-rollup-design.md](./de/design/victoriametrics-rollup-design.md)
 - Live-Ingest: [evcc-telegraf-live-ingest.md](./de/evcc-telegraf-live-ingest.md)
+- Optionaler Netzsteuerungs-Audit-Collector: [grid-control-audit.md](./de/grid-control-audit.md)
 - Schema-Referenz: [design/victoriametrics-schema-reference.md](./de/design/victoriametrics-schema-reference.md)
 - Dashboard-Farbschema: [design/dashboard-color-semantics.md](./de/design/dashboard-color-semantics.md)
 - Investitionskosten fuer effektiven Strompreis: [investment-costs.md](./de/investment-costs.md)

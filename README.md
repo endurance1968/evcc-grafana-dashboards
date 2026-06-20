@@ -24,6 +24,7 @@ Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/s
 - Grafana-13-TAB-Dashboards als unterstuetztes Navigationsmodell
 - Deploy-Skripte fuer Erstimport und Updates
 - ein Rollup-Skript fuer taegliche Langzeit-Metriken
+- einen optionalen [Netzsteuerungs-Audit-Collector](./docs/de/grid-control-audit.md) fuer den Daily-Details-Tab
 - Dokumentation fuer die Migration von InfluxDB nach VictoriaMetrics
 - Installations- und Betriebsanleitungen fuer VictoriaMetrics, EVCC/Telegraf-Live-Ingest, Grafana, Migration und Dashboard-Deployment
 - Release Notes und Screenshots fuer die empfohlenen Grafana-13-TAB-Dashboards
