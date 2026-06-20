@@ -96,10 +96,28 @@ Unterstuetzte Typen:
 - `heat_pump`: Mitglieder sind sichtbare EVCC-Ladepunktnamen fuer Waermepumpen, die in EVCC als Ladepunkt erscheinen
 - `battery_grid_charge`: Mitglieder bleiben leer
 
-Fuer die Mindestleistungsberechnung nutzt der Collector standardmaessig die Anzahl der konfigurierten Gruppen. Setze `EVCC_14A_CONTROL_UNITS`, wenn die rechtliche oder technische Anzahl davon abweicht:
+Fuer die Mindestleistungsberechnung nutzt der Collector standardmaessig die Anzahl der konfigurierten Gruppen. Das ist nur eine technische Voreinstellung. Entscheidend ist, wie viele steuerbare Verbrauchseinrichtungen der Netzbetreiber beziehungsweise die Elektroinstallation tatsaechlich als steuerbar behandelt.
+
+Wenn zwei Ladepunkte gemeinsam gesteuert werden und netzseitig als eine steuerbare Einheit gelten, konfiguriere sie als eine Gruppe und setze die Anzahl explizit auf `1`:
 
 ```env
-EVCC_14A_CONTROL_UNITS=4
+EVCC_14A_CONTROL_GROUPS=wallboxes|Ladepunkte|loadpoints|Carport Ecke+Carport Treppe
+EVCC_14A_CONTROL_UNITS=1
+```
+
+Wenn dieselben zwei Ladepunkte als zwei separat steuerbare Verbrauchseinrichtungen gelten, kann die Anzeige trotzdem eine gemeinsame Gruppe bleiben; setze dann aber die rechtliche Anzahl auf `2`:
+
+```env
+EVCC_14A_CONTROL_GROUPS=wallboxes|Ladepunkte|loadpoints|Carport Ecke+Carport Treppe
+EVCC_14A_CONTROL_UNITS=2
+```
+
+Der Mindestleistungswert ist eine Schaetzung fuer das Dashboard, kein rechtsverbindlicher Nachweis. Standard ist `EVCC_14A_MIN_POWER_MODE=ems`. Dabei nutzt der Collector die GZF-Tabelle fuer EMS-Steuerung: eine Einheit 4,2 kW, zwei Einheiten 7,56 kW, drei Einheiten 10,5 kW. Fuer direkte Einzelsteuerung kannst du `direct` setzen; dann rechnet der Collector 4,2 kW je Einheit. Wenn der Netzbetreiber oder Installateur einen konkreten Wert vorgibt, setze diesen direkt:
+
+```env
+EVCC_14A_MIN_POWER_MODE=ems
+# Alternative: direct
+# EVCC_14A_MIN_POWER_OVERRIDE_W=10500
 ```
 
 ## Einmaliger Test

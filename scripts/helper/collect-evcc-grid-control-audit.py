@@ -21,7 +21,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.20.4"
+SCRIPT_VERSION = "2026.06.20.5"
 SCRIPT_LAST_MODIFIED = "2026-06-20"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
@@ -180,10 +180,45 @@ def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
     return tuple(groups)
 
 
-def minimum_allowed_power_w(unit_count: int, base_w: float = 4200.0, additional_factor: float = 0.4) -> float:
+def simultaneity_factor(unit_count: int) -> float:
+    if unit_count <= 1:
+        return 0.0
+    if unit_count == 2:
+        return 0.8
+    if unit_count == 3:
+        return 0.75
+    if unit_count == 4:
+        return 0.7
+    if unit_count == 5:
+        return 0.65
+    if unit_count == 6:
+        return 0.6
+    if unit_count == 7:
+        return 0.55
+    if unit_count == 8:
+        return 0.5
+    return 0.45
+
+
+def minimum_allowed_power_w(
+    unit_count: int,
+    base_w: float = 4200.0,
+    mode: str = "ems",
+    override_w: float | None = None,
+    additional_factor: float = 0.4,
+) -> float:
+    if override_w is not None:
+        return max(override_w, 0.0)
     if unit_count <= 0:
         return 0.0
-    return base_w + max(unit_count - 1, 0) * additional_factor * base_w
+    normalized_mode = mode.strip().lower().replace("-", "_")
+    if normalized_mode in {"direct", "direct_control", "per_unit"}:
+        return unit_count * base_w
+    if normalized_mode in {"linear", "custom_factor", "legacy"}:
+        return base_w + max(unit_count - 1, 0) * additional_factor * base_w
+    if normalized_mode != "ems":
+        raise ValueError(f"Unsupported minimum power mode: {mode!r}")
+    return base_w + max(unit_count - 1, 0) * simultaneity_factor(unit_count) * base_w
 
 
 def http_get_json(url: str, timeout: float, user_agent: str) -> Any:
@@ -339,6 +374,8 @@ def build_state_metrics(
     control_groups: tuple[ControlGroup, ...] = (),
     control_unit_count: int | None = None,
     minimum_base_w: float = 4200.0,
+    minimum_mode: str = "ems",
+    minimum_override_w: float | None = None,
     additional_unit_factor: float = 0.4,
 ) -> list[str]:
     labels = {"site": site_id}
@@ -457,7 +494,7 @@ def build_state_metrics(
 
     effective_unit_count = control_unit_count if control_unit_count is not None else len(control_groups)
     if effective_unit_count > 0:
-        minimum_power = minimum_allowed_power_w(effective_unit_count, minimum_base_w, additional_unit_factor)
+        minimum_power = minimum_allowed_power_w(effective_unit_count, minimum_base_w, minimum_mode, minimum_override_w, additional_unit_factor)
         lines.append(metric("evcc_audit_control_units", effective_unit_count, labels))
         lines.append(metric("evcc_audit_minimum_allowed_power_w", minimum_power, labels))
         if grid_import_power is not None:
@@ -522,6 +559,8 @@ def collect_once(args: argparse.Namespace) -> list[str]:
         control_groups=control_groups,
         control_unit_count=args.control_units,
         minimum_base_w=args.minimum_base_w,
+        minimum_mode=args.minimum_mode,
+        minimum_override_w=args.minimum_override_w,
         additional_unit_factor=args.additional_unit_factor,
     )
     lines.append(metric("evcc_audit_collector_last_success_timestamp_seconds", int(time.time()), {"site": args.site, "source": "evcc_state"}))
@@ -558,7 +597,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--control-groups", default=env("EVCC_14A_CONTROL_GROUPS"), help="optional control groups: id|name|kind|members;...")
     parser.add_argument("--control-units", type=parse_optional_int, default=parse_optional_int(env("EVCC_14A_CONTROL_UNITS")), help="override number of controllable units for minimum power calculation")
     parser.add_argument("--minimum-base-w", type=float, default=float(env("EVCC_14A_MIN_POWER_BASE_W", "4200")), help="minimum allowed power for one unit")
-    parser.add_argument("--additional-unit-factor", type=float, default=float(env("EVCC_14A_ADDITIONAL_UNIT_FACTOR", "0.4")), help="additional unit factor for minimum allowed power")
+    parser.add_argument("--minimum-mode", choices=["ems", "direct", "linear"], default=env("EVCC_14A_MIN_POWER_MODE", "ems"), help="minimum power formula: ems uses the GZF table, direct uses one base value per unit, linear keeps the custom factor formula")
+    parser.add_argument("--minimum-override-w", type=parse_optional_float, default=parse_optional_float(env("EVCC_14A_MIN_POWER_OVERRIDE_W")), help="explicit minimum power override in W")
+    parser.add_argument("--additional-unit-factor", type=float, default=float(env("EVCC_14A_ADDITIONAL_UNIT_FACTOR", "0.4")), help="additional unit factor for --minimum-mode linear")
     parser.add_argument("--user-agent", default=env("HTTP_USER_AGENT", DEFAULT_USER_AGENT), help="HTTP User-Agent")
     parser.add_argument("--audit-dir", default=env("AUDIT_DATA_DIR", "/var/lib/evcc-grid-control-audit"), help="local directory for the cumulative intervention CSV")
     parser.add_argument("--no-local-csv", dest="local_csv", action="store_false", default=env("LOCAL_EVENT_CSV", "true").lower() not in {"0", "false", "no", "off"}, help="disable the local cumulative intervention CSV")

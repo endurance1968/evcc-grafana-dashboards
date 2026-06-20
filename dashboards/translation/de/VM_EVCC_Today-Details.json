@@ -4976,7 +4976,7 @@
                         "editorMode": "code",
                         "expr": "max by (site) (evcc_audit_minimum_allowed_power_w)",
                         "format": "time_series",
-                        "legendFormat": "Berechnetes Minimum",
+                        "legendFormat": "Mindestleistung Schätzung",
                         "range": true
                       },
                       "datasource": {
@@ -5146,7 +5146,7 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Berechnetes Minimum"
+                      "options": "Mindestleistung Schätzung"
                     },
                     "properties": [
                       {
@@ -5422,7 +5422,7 @@
                         "editorMode": "code",
                         "expr": "max by (site) (evcc_audit_minimum_allowed_power_w) - max by (site) (avg_over_time(evcc_audit_site_grid_import_power_w[15m]))",
                         "format": "time_series",
-                        "legendFormat": "Mindestreserve Ø 15 min",
+                        "legendFormat": "Geschätzte Reserve Ø 15 min",
                         "range": true
                       },
                       "datasource": {

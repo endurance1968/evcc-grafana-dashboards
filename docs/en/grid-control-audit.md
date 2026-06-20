@@ -96,10 +96,28 @@ Supported kinds:
 - `heat_pump`: members are visible EVCC loadpoint names for heat pumps represented as EVCC loadpoints
 - `battery_grid_charge`: members stay empty
 
-For the minimum-power calculation, the collector uses the number of configured groups by default. Set `EVCC_14A_CONTROL_UNITS` when the legal or technical unit count differs:
+For the minimum-power calculation, the collector uses the number of configured groups by default. This is only a technical default. The relevant value is how many controllable consumption units the grid operator or electrical installation actually treats as controllable.
+
+If two loadpoints are controlled together and count as one controllable unit from the grid side, configure them as one group and set the unit count explicitly to `1`:
 
 ```env
-EVCC_14A_CONTROL_UNITS=4
+EVCC_14A_CONTROL_GROUPS=wallboxes|Loadpoints|loadpoints|Carport Corner+Carport Stairs
+EVCC_14A_CONTROL_UNITS=1
+```
+
+If the same two loadpoints count as two separately controllable consumption units, the dashboard can still show them as one combined group; set the legal unit count to `2`:
+
+```env
+EVCC_14A_CONTROL_GROUPS=wallboxes|Loadpoints|loadpoints|Carport Corner+Carport Stairs
+EVCC_14A_CONTROL_UNITS=2
+```
+
+The minimum-power value is a dashboard estimate, not legally binding evidence. The default is `EVCC_14A_MIN_POWER_MODE=ems`. The collector then uses the GZF table for EMS control: one unit 4.2 kW, two units 7.56 kW, three units 10.5 kW. For direct per-unit control, set `direct`; the collector then uses 4.2 kW per unit. If the grid operator or installer provides a concrete value, set it directly:
+
+```env
+EVCC_14A_MIN_POWER_MODE=ems
+# Alternative: direct
+# EVCC_14A_MIN_POWER_OVERRIDE_W=10500
 ```
 
 ## One-Shot Test

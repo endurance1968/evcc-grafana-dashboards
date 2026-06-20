@@ -56,7 +56,18 @@ class GridControlAuditTests(unittest.TestCase):
         self.assertIn('evcc_audit_control_group_power_w{group="wallboxes",kind="loadpoints",name="Loadpoints",site="home"} 4000.0', text)
         self.assertIn('evcc_audit_control_group_power_w{group="wp1",kind="heat_pump",name="Heat pump",site="home"} 900.0', text)
         self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 900.0', text)
-        self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 7560.0', text)
+        self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 10500.0', text)
+
+    def test_minimum_allowed_power_uses_gzf_table_for_ems_mode(self):
+        self.assertEqual(MODULE.minimum_allowed_power_w(1), 4200.0)
+        self.assertEqual(MODULE.minimum_allowed_power_w(2), 7560.0)
+        self.assertEqual(MODULE.minimum_allowed_power_w(3), 10500.0)
+        self.assertEqual(MODULE.minimum_allowed_power_w(9), 19320.0)
+
+    def test_minimum_allowed_power_supports_direct_and_override_modes(self):
+        self.assertEqual(MODULE.minimum_allowed_power_w(2, mode="direct"), 8400.0)
+        self.assertEqual(MODULE.minimum_allowed_power_w(4, mode="linear", additional_factor=0.4), 9240.0)
+        self.assertEqual(MODULE.minimum_allowed_power_w(99, override_w=6300), 6300.0)
 
     def test_control_group_legacy_loadpoints_alias_still_works(self):
         groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2")
