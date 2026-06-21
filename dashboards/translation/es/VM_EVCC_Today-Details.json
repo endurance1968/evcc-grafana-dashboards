@@ -5549,7 +5549,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#5794F2"
+                          "fixedColor": "#E02F44"
                         }
                       }
                     ]
@@ -5587,7 +5587,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "#8AB8FF"
+                          "fixedColor": "#299C46"
                         }
                       }
                     ]
@@ -5618,7 +5618,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_desc(\n  (\n    (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\"})\n      or\n      (\n        max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\"})\n        unless on(event_id)\n        max by (event_id) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\"})\n      )\n    ) >= (time() - 604800)\n  ) <= time()\n)",
+                        "expr": "sort_desc(\n  (\n    (\n      (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status!=\"active\"}[7d]))\n      or\n      label_set(\n        (\n          max by (event_id, start, end, type, status, limit_w, grid_power_start_w, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\", status!=\"active\"}[7d]))\n          unless on(event_id)\n          max by (event_id) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status!=\"active\"}[7d]))\n        ),\n        \"intervention_source\", \"-\"\n      )\n    )\n      or\n      (\n        (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status=\"active\"}[7d]))\n      or\n      label_set(\n        (\n          max by (event_id, start, end, type, status, limit_w, grid_power_start_w, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\", status=\"active\"}[7d]))\n          unless on(event_id)\n          max by (event_id) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status=\"active\"}[7d]))\n        ),\n        \"intervention_source\", \"-\"\n      )\n    )\n        unless on(start, type, limit_w, grid_power_start_w, intervention_source)\n        (\n        max by (start, type, limit_w, grid_power_start_w, intervention_source) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", status=\"finished\", intervention_source!=\"\"}[7d]))\n        or\n        label_set(\n          max by (start, type, limit_w, grid_power_start_w) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", status=\"finished\", intervention_source=\"\"}[7d])),\n          \"intervention_source\", \"-\"\n        )\n      )\n      )\n    ) >= (time() - 604800)\n  ) <= time()\n)",
                         "format": "table",
                         "legendFormat": "{{type}} {{limit_w}} W",
                         "range": false,
@@ -5629,7 +5629,8 @@
                       }
                     },
                     "refId": "events",
-                    "hidden": false
+                    "hidden": false,
+                    "expr": "sort_desc(\n  (\n    (\n      (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status!=\"active\"}[7d]))\n      or\n      label_set(\n        (\n          max by (event_id, start, end, type, status, limit_w, grid_power_start_w, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\", status!=\"active\"}[7d]))\n          unless on(event_id)\n          max by (event_id) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status!=\"active\"}[7d]))\n        ),\n        \"intervention_source\", \"-\"\n      )\n    )\n      or\n      (\n        (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status=\"active\"}[7d]))\n      or\n      label_set(\n        (\n          max by (event_id, start, end, type, status, limit_w, grid_power_start_w, source_ski) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\", status=\"active\"}[7d]))\n          unless on(event_id)\n          max by (event_id) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\", status=\"active\"}[7d]))\n        ),\n        \"intervention_source\", \"-\"\n      )\n    )\n        unless on(start, type, limit_w, grid_power_start_w, intervention_source)\n        (\n        max by (start, type, limit_w, grid_power_start_w, intervention_source) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", status=\"finished\", intervention_source!=\"\"}[7d]))\n        or\n        label_set(\n          max by (start, type, limit_w, grid_power_start_w) (max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", status=\"finished\", intervention_source=\"\"}[7d])),\n          \"intervention_source\", \"-\"\n        )\n      )\n      )\n    ) >= (time() - 604800)\n  ) <= time()\n)"
                   }
                 }
               ],
@@ -5746,7 +5747,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 120
+                        "value": 160
                       }
                     ]
                   },
@@ -5758,7 +5759,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 120
+                        "value": 160
                       }
                     ]
                   },
@@ -6917,45 +6918,6 @@
             }
           ]
         }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
-          "name": "hasGridControlData",
-          "label": "Datos de control de red",
-          "description": "Variable auxiliar interna. Muestra la pestaña de control de red solo cuando las metricas de auditoria de EVCC notifican un limite externo activo o un evento de control en el intervalo seleccionado.",
-          "hide": "hideVariable",
-          "skipUrlSync": true,
-          "refresh": "onTimeRangeChanged",
-          "query": {
-            "kind": "DataQuery",
-            "group": "victoriametrics-metrics-datasource",
-            "version": "v0",
-            "datasource": {
-              "name": "${DS_VM-EVCC-AUDIT}"
-            },
-            "spec": {
-              "editorMode": "code",
-              "query": "query_result((max(max_over_time(evcc_audit_hems_effective_max_consumption_power_w[$__range])) > 0) or (max(max_over_time(evcc_audit_hems_effective_max_production_power_w[$__range])) > 0) or (count(max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds[$__range])) > 0))",
-              "expr": "query_result((max(max_over_time(evcc_audit_hems_effective_max_consumption_power_w[$__range])) > 0) or (max(max_over_time(evcc_audit_hems_effective_max_production_power_w[$__range])) > 0) or (count(max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds[$__range])) > 0))",
-              "qryType": 1,
-              "refId": "VariableQueryEditor-VariableQuery"
-            }
-          },
-          "definition": "query_result((max(max_over_time(evcc_audit_hems_effective_max_consumption_power_w[$__range])) > 0) or (max(max_over_time(evcc_audit_hems_effective_max_production_power_w[$__range])) > 0) or (count(max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds[$__range])) > 0))",
-          "regex": "",
-          "regexApplyTo": "value",
-          "sort": "disabled",
-          "current": {
-            "selected": false,
-            "text": "",
-            "value": ""
-          },
-          "options": [],
-          "multi": false,
-          "includeAll": false,
-          "allowCustomValue": true
-        }
       }
     ],
     "layout": {
@@ -7397,23 +7359,6 @@
                           "kind": "ElementReference",
                           "name": "panel-49"
                         }
-                      }
-                    }
-                  ]
-                }
-              },
-              "conditionalRendering": {
-                "kind": "ConditionalRenderingGroup",
-                "spec": {
-                  "visibility": "show",
-                  "condition": "and",
-                  "items": [
-                    {
-                      "kind": "ConditionalRenderingVariable",
-                      "spec": {
-                        "variable": "hasGridControlData",
-                        "operator": "matches",
-                        "value": ".+"
                       }
                     }
                   ]

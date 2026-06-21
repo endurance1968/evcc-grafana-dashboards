@@ -1740,7 +1740,7 @@
         {
           "datasource": {
             "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM}"
+            "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
           "expr": "range_avg(greenShareHome_value)",
@@ -2053,7 +2053,7 @@
         {
           "datasource": {
             "type": "victoriametrics-metrics-datasource",
-            "uid": "${DS_VM}"
+            "uid": "${DS_VM-EVCC}"
           },
           "editorMode": "code",
           "expr": "avg(greenShareHome_value)",

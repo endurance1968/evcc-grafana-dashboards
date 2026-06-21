@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.19.1
- * Last modified: 2026-06-19
+ * Version: 2026.06.21.1
+ * Last modified: 2026-06-21
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -886,12 +886,7 @@ function validateDashboard(fileName, dashboard) {
     const gridControlTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Grid control");
     assert(Boolean(gridControlTab), failures, `${fileName}: Today Details must include the optional Grid control tab`);
     if (gridControlTab) {
-      const condition = gridControlTab.spec?.conditionalRendering;
-      const item = condition?.spec?.items?.[0];
-      assert(condition?.kind === "ConditionalRenderingGroup", failures, `${fileName}: Grid control tab must use Grafana conditional rendering`);
-      assert(condition?.spec?.visibility === "show" && condition?.spec?.condition === "and", failures, `${fileName}: Grid control tab must only show when audit data is present`);
-      assert(item?.kind === "ConditionalRenderingVariable", failures, `${fileName}: Grid control tab conditional must be variable-based`);
-      assert(item?.spec?.variable === "hasGridControlData" && item?.spec?.operator === "matches" && item?.spec?.value === ".+", failures, `${fileName}: Grid control tab must match non-empty audit data helper values`);
+      assert(!gridControlTab.spec?.conditionalRendering, failures, `${fileName}: Grid control tab must stay visible; hidden helper variables are too brittle for optional audit data`);
       for (const text of ["Manual", "Manuelle", "Simulator", "MQTT", "eebus"]) {
         assert(!rawJson.includes(text), failures, `${fileName}: Grid control support must not include simulator control text ${text}`);
       }
@@ -905,20 +900,45 @@ function validateDashboard(fileName, dashboard) {
         assert(rawJson.includes(metric), failures, `${fileName}: Grid control support must query ${metric}`);
       }
       assert(rawJson.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: Grid control support must use the optional audit datasource placeholder`);
+      const eventPanel = panels.find((item) => item.title === "EVCC control events");
+      assert(Boolean(eventPanel), failures, `${fileName}: Grid control tab must include the EVCC control events table`);
+      const eventTarget = eventPanel?.targets?.find((target) => target?.refId === "events");
+      const eventExpr = eventTarget?.expr || "";
+      const eventDatasourceExpr = eventTarget?.raw?.spec?.query?.spec?.expr || "";
+      for (const [label, expr] of [["query wrapper", eventExpr], ["datasource query", eventDatasourceExpr]]) {
+        assert(expr.includes("max_over_time(evcc_audit_gridsession_event_start_timestamp_seconds"), failures, `${fileName}: EVCC control events ${label} must replay the 7-day event history`);
+        assert(expr.includes("unless on(start, type, limit_w, grid_power_start_w, intervention_source)"), failures, `${fileName}: EVCC control events ${label} must suppress stale active rows once a matching finished event exists`);
+      }
+
       assert(rawJson.includes('evcc_audit_control_group_power_w'), failures, `${fileName}: Controllable groups panel must query explicit collector control groups`);
       assert(!rawJson.includes('evcc_audit_control_group_power_w{kind!=\\"loadpoints\\"}'), failures, `${fileName}: Controllable groups panel must not hide configured loadpoint groups`);
       assert(!rawJson.includes('evcc_audit_loadpoint_charge_power_w{name!~\\"$heatPumpLoadpointRegex\\"}'), failures, `${fileName}: Controllable groups panel must not infer controllable loadpoints from names`);
       assert(!rawJson.includes('evcc_audit_loadpoint_charge_power_w{name=~\\"$heatPumpLoadpointRegex\\"}'), failures, `${fileName}: Controllable groups panel must not infer controllable heat pumps from names`);
+
+      const calculatedLegendSeries = [
+        {
+          panelTitle: "Grid operator limits vs. grid power (15 min)",
+          seriesName: "Calculated minimum",
+        },
+        {
+          panelTitle: "Compliance reserve",
+          seriesName: "Calculated reserve avg 15 min",
+        },
+      ];
+      for (const { panelTitle, seriesName } of calculatedLegendSeries) {
+        const panel = panels.find((item) => item.title === panelTitle);
+        assert(Boolean(panel), failures, `${fileName}: missing grid-control panel '${panelTitle}'`);
+        const override = panel?.fieldConfig?.overrides?.find((item) => item?.matcher?.id === "byName" && item?.matcher?.options === seriesName);
+        const hideFrom = override?.properties?.find((item) => item?.id === "custom.hideFrom")?.value;
+        assert(
+          hideFrom?.legend === false && hideFrom?.tooltip === false && hideFrom?.viz === true,
+          failures,
+          `${fileName}: calculated grid-control series '${seriesName}' must stay visible in legend/tooltip and hidden from the plot by default`,
+        );
+      }
     }
     const gridControlVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlData");
-    assert(Boolean(gridControlVariable), failures, `${fileName}: Grid control tab must be backed by hidden hasGridControlData variable`);
-    if (gridControlVariable) {
-      const gridControlVariableRaw = JSON.stringify(gridControlVariable);
-      assert(gridControlVariableRaw.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: hasGridControlData must query the optional audit datasource placeholder`);
-      assert(gridControlVariableRaw.includes("evcc_audit_hems_effective_max_consumption_power_w") && gridControlVariableRaw.includes("evcc_audit_hems_effective_max_production_power_w"), failures, `${fileName}: hasGridControlData must detect active external consumption/feed-in limits`);
-      assert(gridControlVariableRaw.includes("evcc_audit_gridsession_event_start_timestamp_seconds"), failures, `${fileName}: hasGridControlData must detect EVCC control events`);
-    }
-
+    assert(!gridControlVariable, failures, `${fileName}: Grid control tab must not depend on the removed hidden hasGridControlData variable`);
 
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];

@@ -21,7 +21,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.21.4"
+SCRIPT_VERSION = "2026.06.21.10"
 SCRIPT_LAST_MODIFIED = "2026-06-21"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
@@ -120,6 +120,18 @@ def format_event_minute(value: Any) -> str:
     except ValueError:
         return value.strip().replace("T", " ")[:16]
     return parsed.strftime("%Y-%m-%d %H:%M")
+
+
+def recent_event_history(events: list[dict[str, Any]], now_seconds: float, lookback_days: float) -> list[dict[str, Any]]:
+    if lookback_days <= 0:
+        return []
+    cutoff_seconds = now_seconds - (lookback_days * 86400)
+    recent: list[dict[str, Any]] = []
+    for event in events:
+        start_seconds = parse_iso_timestamp_seconds(event.get("start_time_utc"))
+        if start_seconds is not None and cutoff_seconds <= start_seconds <= now_seconds:
+            recent.append(event)
+    return recent
 
 
 @dataclass(frozen=True)
@@ -255,7 +267,38 @@ def event_id(session: dict[str, Any]) -> str:
     )
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
 
-def detect_intervention_source(session: dict[str, Any]) -> str:
+def normalize_intervention_source(value: str) -> str:
+    lowered = value.strip().lower()
+    if not lowered:
+        return ""
+    if "eebus" in lowered:
+        return "EEBUS"
+    if "relay" in lowered or "relais" in lowered:
+        return "Relay"
+    if "hems" in lowered:
+        return "HEMS"
+    if "fnn" in lowered:
+        return "FNN"
+    return ""
+
+def detect_state_intervention_source(state: dict[str, Any]) -> str:
+    hems = state.get("hems") if isinstance(state, dict) else None
+    if not isinstance(hems, dict):
+        return ""
+    return normalize_intervention_source(
+        first_non_empty_string(
+            nested_string(hems, "config", "type"),
+            nested_string(hems, "config", "source"),
+            nested_string(hems, "config", "provider"),
+            nested_string(hems, "status", "source"),
+            nested_string(hems, "status", "provider"),
+            hems.get("type"),
+            hems.get("source"),
+            hems.get("provider"),
+        )
+    )
+
+def detect_intervention_source(session: dict[str, Any], fallback_source: str = "") -> str:
     candidate = first_non_empty_string(
         session.get("source"),
         session.get("origin"),
@@ -269,14 +312,7 @@ def detect_intervention_source(session: dict[str, Any]) -> str:
         nested_string(session, "origin", "type"),
         nested_string(session, "origin", "name"),
     )
-    lowered = candidate.lower()
-    if "eebus" in lowered:
-        return "EEBUS"
-    if "relay" in lowered or "relais" in lowered:
-        return "Relay"
-    if "hems" in lowered:
-        return "HEMS"
-    return ""
+    return normalize_intervention_source(candidate) or normalize_intervention_source(fallback_source)
 
 def detect_source_ski(session: dict[str, Any]) -> str:
     return first_non_empty_string(
@@ -294,7 +330,7 @@ def detect_source_ski(session: dict[str, Any]) -> str:
         nested_string(session, "origin", "ski"),
     )
 
-def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = None) -> list[dict[str, Any]]:
+def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = None, fallback_source: str = "") -> list[dict[str, Any]]:
     if not isinstance(sessions, list):
         return []
     seen_at = seen_at_utc or iso_now()
@@ -315,7 +351,7 @@ def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = No
                 "type": session_value(session, "type", "Type") or "",
                 "limit_w": session_value(session, "limit", "limitPower", "LimitPower") or "",
                 "grid_power_start_w": session_value(session, "grid", "gridPower", "GridPower") or "",
-                "intervention_source": detect_intervention_source(session),
+                "intervention_source": detect_intervention_source(session, fallback_source),
                 "source_ski": detect_source_ski(session),
                 "source": "evcc_gridsessions",
                 "first_seen_utc": seen_at,
@@ -482,47 +518,103 @@ def build_state_metrics(
 
     return lines
 
+def event_history_signature(event: dict[str, Any]) -> tuple[str, ...]:
+    return tuple(
+        str(event.get(field, "")).strip()
+        for field in ["site_id", "start_time_utc", "type", "limit_w", "grid_power_start_w"]
+    )
+
+def merge_event_history_row(existing: dict[str, str], candidate: dict[str, str]) -> dict[str, str]:
+    merged = dict(existing)
+    previous_end_time = str(merged.get("end_time_utc", "")).strip()
+    for field in CSV_EVENT_FIELDS:
+        current_value = str(merged.get(field, "")).strip()
+        candidate_value = str(candidate.get(field, "")).strip()
+        if not current_value and candidate_value:
+            merged[field] = candidate_value
+    current_status = str(merged.get("status", "")).strip()
+    candidate_status = str(candidate.get("status", "")).strip()
+    candidate_end_time = str(candidate.get("end_time_utc", "")).strip()
+    end_time_changed = bool(candidate_end_time and candidate_end_time > previous_end_time)
+    if end_time_changed:
+        merged["end_time_utc"] = candidate_end_time
+    if candidate_status == "finished" or end_time_changed:
+        merged["status"] = "finished"
+    elif candidate_status and current_status != "finished":
+        merged["status"] = candidate_status
+    current_last_seen = str(merged.get("last_seen_utc", "")).strip()
+    candidate_last_seen = str(candidate.get("last_seen_utc", "")).strip()
+    if candidate_last_seen and candidate_last_seen > current_last_seen:
+        if candidate_status == "active" or end_time_changed or not current_last_seen:
+            merged["last_seen_utc"] = candidate_last_seen
+    return merged
+
 def read_existing_events(csv_path: Path) -> dict[str, dict[str, str]]:
     if not csv_path.exists():
         return {}
     with csv_path.open("r", encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle)
         events: dict[str, dict[str, str]] = {}
+        signature_to_event_id: dict[tuple[str, ...], str] = {}
         for row in reader:
             event_key = row.get("event_id", "").strip()
-            if event_key:
-                events[event_key] = {field: row.get(field, "") for field in CSV_EVENT_FIELDS}
+            if not event_key:
+                continue
+            event = {field: row.get(field, "") for field in CSV_EVENT_FIELDS}
+            event["intervention_source"] = normalize_intervention_source(event.get("intervention_source", ""))
+            signature = event_history_signature(event)
+            existing_key = signature_to_event_id.get(signature)
+            if existing_key:
+                events[existing_key] = merge_event_history_row(events[existing_key], event)
+                continue
+            events[event_key] = event
+            signature_to_event_id[signature] = event_key
         return events
+def count_event_history_rows(csv_path: Path) -> int:
+    if not csv_path.exists():
+        return 0
+    with csv_path.open("r", encoding="utf-8", newline="") as handle:
+        return sum(1 for _ in csv.DictReader(handle))
 
-def write_events_csv(audit_dir: str, events: list[dict[str, Any]]) -> Path | None:
-    if not events:
-        return None
-    csv_path = Path(audit_dir) / "events" / "evcc-grid-control-events.csv"
+def events_csv_path(audit_dir: str) -> Path:
+    return Path(audit_dir) / "events" / "evcc-grid-control-events.csv"
+
+def write_event_history_csv(csv_path: Path, events: dict[str, dict[str, str]]) -> None:
     csv_path.parent.mkdir(parents=True, exist_ok=True)
+    with csv_path.open("w", encoding="utf-8", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_EVENT_FIELDS)
+        writer.writeheader()
+        for row in sorted(events.values(), key=lambda item: (item.get("start_time_utc", ""), item.get("event_id", ""))):
+            writer.writerow(row)
+
+def write_events_csv(audit_dir: str, events: list[dict[str, Any]]) -> tuple[Path | None, list[dict[str, str]]]:
+    csv_path = events_csv_path(audit_dir)
+    if not events and not csv_path.exists():
+        return None, []
     existing = read_existing_events(csv_path)
+    history_collapsed = csv_path.exists() and count_event_history_rows(csv_path) != len(existing)
+    signature_to_event_id = {event_history_signature(event): event_id for event_id, event in existing.items()}
+    changed_events: list[dict[str, str]] = []
     for event in events:
         event_key = str(event.get("event_id", "")).strip()
         if not event_key:
             continue
-        current = existing.get(event_key, {field: "" for field in CSV_EVENT_FIELDS})
-        first_seen = current.get("first_seen_utc") or str(event.get("first_seen_utc", ""))
-        for field in CSV_EVENT_FIELDS:
-            value = event.get(field, "")
-            if value != "":
-                current[field] = str(value)
-        current["first_seen_utc"] = first_seen
-        current["last_seen_utc"] = str(event.get("last_seen_utc") or current.get("last_seen_utc") or iso_now())
-        existing[event_key] = current
-
-    tmp_path = csv_path.with_suffix(".csv.tmp")
-    with tmp_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CSV_EVENT_FIELDS)
-        writer.writeheader()
-        for event in sorted(existing.values(), key=lambda row: (row.get("start_time_utc", ""), row.get("event_id", ""))):
-            writer.writerow(event)
-    os.replace(tmp_path, csv_path)
-    return csv_path
-
+        row = {field: str(event.get(field, "")) for field in CSV_EVENT_FIELDS}
+        row["intervention_source"] = normalize_intervention_source(row.get("intervention_source", ""))
+        signature = event_history_signature(row)
+        existing_key = signature_to_event_id.get(signature, event_key)
+        current = existing.get(existing_key, {field: "" for field in CSV_EVENT_FIELDS})
+        row["event_id"] = existing_key
+        row["first_seen_utc"] = current.get("first_seen_utc") or row.get("first_seen_utc", "")
+        row["last_seen_utc"] = row.get("last_seen_utc", "") or iso_now()
+        merged = merge_event_history_row(current, row)
+        if merged != current:
+            changed_events.append(merged)
+        existing[existing_key] = merged
+        signature_to_event_id[signature] = existing_key
+    if changed_events or history_collapsed or not csv_path.exists():
+        write_event_history_csv(csv_path, existing)
+    return csv_path, changed_events
 def collect_once(args: argparse.Namespace) -> list[str]:
     state_url = f"{args.evcc_url.rstrip('/')}/api/state"
     sessions_url = f"{args.evcc_url.rstrip('/')}/api/gridsessions"
@@ -543,12 +635,38 @@ def collect_once(args: argparse.Namespace) -> list[str]:
     lines.append(metric("evcc_audit_collector_last_success_timestamp_seconds", int(time.time()), {"site": args.site, "source": "evcc_state"}))
 
     sessions = http_get_json(sessions_url, args.timeout, args.user_agent)
-    events = normalize_sessions(sessions, args.site)
+    fallback_source = detect_state_intervention_source(state) or args.intervention_source
+    events = normalize_sessions(sessions, args.site, fallback_source=fallback_source)
+    event_metric_events: list[dict[str, Any]] = events
     if args.local_csv and not args.dry_run:
-        write_events_csv(args.audit_dir, events)
-    lines.extend(build_event_metrics(events, args.site))
+        csv_path, changed_events = write_events_csv(args.audit_dir, events)
+        changed_by_id = {event.get("event_id", ""): event for event in changed_events if event.get("event_id")}
+        if csv_path and csv_path.exists():
+            history_events = read_existing_events(csv_path)
+            fallback_source = normalize_intervention_source(fallback_source)
+            history_changed = False
+            if fallback_source:
+                for event_id, event in history_events.items():
+                    if not event.get("intervention_source"):
+                        event["intervention_source"] = fallback_source
+                        changed_by_id[event_id] = event
+                        history_changed = True
+            if history_changed:
+                write_event_history_csv(csv_path, history_events)
+            if args.replay_events:
+                event_metric_events = list(history_events.values())
+            else:
+                recent_by_id = {
+                    event.get("event_id", ""): event
+                    for event in recent_event_history(list(history_events.values()), time.time(), args.event_replay_lookback_days)
+                    if event.get("event_id")
+                }
+                recent_by_id.update(changed_by_id)
+                event_metric_events = list(recent_by_id.values())
+        else:
+            event_metric_events = list(changed_by_id.values())
+    lines.extend(build_event_metrics(event_metric_events, args.site))
     return lines
-
 def write_failure_metric(args: argparse.Namespace, message: str) -> None:
     labels = {"site": args.site, "error": message[:120]}
     try:
@@ -574,6 +692,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--poll-seconds", type=int, default=int(env("EVCC_API_POLL_SECONDS", "10")), help="poll interval in service mode")
     parser.add_argument("--timeout", type=float, default=float(env("HTTP_TIMEOUT_SECONDS", "10")), help="HTTP timeout in seconds")
     parser.add_argument("--control-groups", default=env("EVCC_14A_CONTROL_GROUPS"), help="optional control groups: id|name|kind|members;...")
+    parser.add_argument("--intervention-source", default=env("EVCC_14A_INTERVENTION_SOURCE", env("EVCC_14A_CONTROL_SOURCE")), help="manual fallback source for EVCC gridsession events when EVCC /api/state does not expose hems.config.type: EEBUS, Relay, HEMS, or FNN")
     parser.add_argument("--control-units", type=parse_optional_int, default=parse_optional_int(env("EVCC_14A_CONTROL_UNITS")), help="override number of controllable units for minimum power calculation")
     parser.add_argument("--minimum-base-w", type=float, default=float(env("EVCC_14A_MIN_POWER_BASE_W", "4200")), help="minimum allowed power for one unit")
     parser.add_argument("--minimum-mode", choices=["ems", "direct", "linear"], default=env("EVCC_14A_MIN_POWER_MODE", "ems"), help="minimum power formula: ems uses the GZF table, direct uses one base value per unit, linear keeps the custom factor formula")
@@ -582,6 +701,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--user-agent", default=env("HTTP_USER_AGENT", DEFAULT_USER_AGENT), help="HTTP User-Agent")
     parser.add_argument("--audit-dir", default=env("AUDIT_DATA_DIR", "/var/lib/evcc-grid-control-audit"), help="local directory for the cumulative intervention CSV")
     parser.add_argument("--no-local-csv", dest="local_csv", action="store_false", default=env("LOCAL_EVENT_CSV", "true").lower() not in {"0", "false", "no", "off"}, help="disable the local cumulative intervention CSV")
+    parser.add_argument("--event-replay-lookback-days", type=float, default=float(env("EVENT_REPLAY_LOOKBACK_DAYS", "8")), help="recent local CSV event-history window replayed to VictoriaMetrics on each cycle")
+    parser.add_argument("--replay-events", action="store_true", default=env("REPLAY_EVENTS", "false").lower() in {"1", "true", "yes", "on"}, help="replay all events from the local CSV to VictoriaMetrics instead of sending only new or changed events")
     parser.add_argument("--once", action="store_true", default=env("RUN_ONCE", "false").lower() in {"1", "true", "yes", "on"}, help="run one collector cycle and exit")
     parser.add_argument("--dry-run", action="store_true", help="print Prometheus metrics instead of writing to VictoriaMetrics or local CSV")
     parser.add_argument("--version", action="store_true", help="print version and exit")
@@ -616,4 +737,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

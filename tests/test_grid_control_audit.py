@@ -73,6 +73,20 @@ class GridControlAuditTests(unittest.TestCase):
         args = parser.parse_args(["--minimum-override-w", "6300", "--minimum-mode", "direct"])
         self.assertEqual(args.minimum_override_w, 6300.0)
         self.assertEqual(args.minimum_mode, "direct")
+
+    def test_build_parser_accepts_intervention_source_fallback(self):
+        parser = MODULE.build_parser()
+        args = parser.parse_args(["--intervention-source", "FNN"])
+        self.assertEqual(args.intervention_source, "FNN")
+
+    def test_detect_state_intervention_source_uses_hems_config_type(self):
+        state = {"hems": {"config": {"type": "eebus"}, "status": {"curtailed": True}}}
+        self.assertEqual(MODULE.detect_state_intervention_source(state), "EEBUS")
+
+    def test_detect_state_intervention_source_supports_fnn_and_relay(self):
+        self.assertEqual(MODULE.detect_state_intervention_source({"hems": {"config": {"type": "fnn"}}}), "FNN")
+        self.assertEqual(MODULE.detect_state_intervention_source({"hems": {"config": {"type": "relays"}}}), "Relay")
+
     def test_control_group_legacy_loadpoints_alias_still_works(self):
         groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2")
         state = {"loadpoints": [{"title": "A", "chargePower": 1000}, {"title": "B", "chargePower": 2000}]}
@@ -153,6 +167,50 @@ class GridControlAuditTests(unittest.TestCase):
         )
         self.assertEqual(unknown_events[0]["intervention_source"], "")
 
+    def test_gridsession_event_uses_configured_source_fallback(self):
+        events = MODULE.normalize_sessions(
+            [
+                {
+                    "created": "2026-06-20T08:00:00Z",
+                    "type": "production",
+                    "limit": -3000,
+                }
+            ],
+            "home",
+            fallback_source="eebus",
+        )
+        self.assertEqual(events[0]["intervention_source"], "EEBUS")
+
+    def test_gridsession_event_source_from_evcc_wins_over_fallback(self):
+        events = MODULE.normalize_sessions(
+            [
+                {
+                    "created": "2026-06-20T08:00:00Z",
+                    "type": "consumption",
+                    "limit": 7000,
+                    "source": "relay",
+                }
+            ],
+            "home",
+            fallback_source="eebus",
+        )
+        self.assertEqual(events[0]["intervention_source"], "Relay")
+
+    def test_gridsession_event_supports_fnn_fallback(self):
+        events = MODULE.normalize_sessions(
+            [
+                {
+                    "created": "2026-06-20T08:00:00Z",
+                    "type": "production",
+                    "limit": -1000,
+                    "source": "external-controller",
+                }
+            ],
+            "home",
+            fallback_source="fnn",
+        )
+        self.assertEqual(events[0]["intervention_source"], "FNN")
+
     def test_gridsession_event_ids_use_evcc_id_when_available(self):
         sessions = [
             {"id": 1, "created": "2026-06-20T08:00:00Z", "type": "consumption", "limit": 7000},
@@ -183,10 +241,14 @@ class GridControlAuditTests(unittest.TestCase):
             ]
             updated = [dict(initial[0], end_time_utc="2026-06-20T08:15:00Z", status="finished", last_seen_utc="2026-06-20T08:16:00Z")]
 
-            csv_path = MODULE.write_events_csv(tmpdir, initial)
-            MODULE.write_events_csv(tmpdir, updated)
+            csv_path, changed_initial = MODULE.write_events_csv(tmpdir, initial)
+            _, changed_updated = MODULE.write_events_csv(tmpdir, updated)
 
             self.assertIsNotNone(csv_path)
+            self.assertEqual([event["event_id"] for event in changed_initial], ["abc"])
+            self.assertEqual([event["event_id"] for event in changed_updated], ["abc"])
+            _, unchanged = MODULE.write_events_csv(tmpdir, updated)
+            self.assertEqual(unchanged, [])
             with csv_path.open("r", encoding="utf-8", newline="") as handle:
                 rows = list(csv.DictReader(handle))
             self.assertEqual(len(rows), 1)
@@ -196,6 +258,210 @@ class GridControlAuditTests(unittest.TestCase):
             self.assertEqual(rows[0]["intervention_source"], "EEBUS")
             self.assertEqual(rows[0]["source_ski"], "001122334455")
 
+    def test_write_events_csv_merges_active_and_finished_with_different_evcc_ids(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            active = {
+                "event_id": "active-id",
+                "site_id": "home",
+                "start_time_utc": "2026-06-21T04:55:56Z",
+                "end_time_utc": "",
+                "type": "production",
+                "status": "active",
+                "limit_w": "-10000",
+                "grid_power_start_w": "199",
+                "intervention_source": "EEBUS",
+                "source_ski": "",
+                "source": "evcc_gridsessions",
+                "first_seen_utc": "2026-06-21T04:55:58Z",
+                "last_seen_utc": "2026-06-21T05:53:03Z",
+            }
+            finished = dict(
+                active,
+                event_id="finished-id",
+                end_time_utc="2026-06-21T05:56:06Z",
+                status="finished",
+                last_seen_utc="2026-06-21T10:54:47Z",
+            )
+
+            csv_path, _ = MODULE.write_events_csv(tmpdir, [active])
+            _, changed = MODULE.write_events_csv(tmpdir, [finished])
+
+            self.assertEqual([event["status"] for event in changed], ["finished"])
+            with csv_path.open("r", encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["event_id"], "active-id")
+            self.assertEqual(rows[0]["status"], "finished")
+            self.assertEqual(rows[0]["end_time_utc"], "2026-06-21T05:56:06Z")
+            self.assertEqual(rows[0]["last_seen_utc"], "2026-06-21T10:54:47Z")
+
+    def test_write_events_csv_collapses_existing_active_finished_duplicate_rows(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = MODULE.events_csv_path(tmpdir)
+            csv_path.parent.mkdir(parents=True, exist_ok=True)
+            rows = [
+                {
+                    "event_id": "finished-id",
+                    "site_id": "home",
+                    "start_time_utc": "2026-06-21T04:55:56Z",
+                    "end_time_utc": "2026-06-21T05:56:06Z",
+                    "type": "production",
+                    "status": "finished",
+                    "limit_w": "-10000",
+                    "grid_power_start_w": "199",
+                    "intervention_source": "EEBUS",
+                    "source_ski": "",
+                    "source": "evcc_gridsessions",
+                    "first_seen_utc": "2026-06-21T05:53:04Z",
+                    "last_seen_utc": "2026-06-21T10:54:47Z",
+                },
+                {
+                    "event_id": "active-id",
+                    "site_id": "home",
+                    "start_time_utc": "2026-06-21T04:55:56Z",
+                    "end_time_utc": "",
+                    "type": "production",
+                    "status": "active",
+                    "limit_w": "-10000",
+                    "grid_power_start_w": "199",
+                    "intervention_source": "EEBUS",
+                    "source_ski": "",
+                    "source": "evcc_gridsessions",
+                    "first_seen_utc": "2026-06-21T04:55:58Z",
+                    "last_seen_utc": "2026-06-21T05:53:03Z",
+                },
+            ]
+            with csv_path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=MODULE.CSV_EVENT_FIELDS)
+                writer.writeheader()
+                writer.writerows(rows)
+
+            _, changed = MODULE.write_events_csv(tmpdir, [])
+
+            self.assertEqual(changed, [])
+            with csv_path.open("r", encoding="utf-8", newline="") as handle:
+                collapsed = list(csv.DictReader(handle))
+            self.assertEqual(len(collapsed), 1)
+            self.assertEqual(collapsed[0]["event_id"], "finished-id")
+            self.assertEqual(collapsed[0]["status"], "finished")
+            self.assertEqual(collapsed[0]["end_time_utc"], "2026-06-21T05:56:06Z")
+
+    def test_collect_once_replays_event_metrics_from_local_csv_when_requested(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            MODULE.write_events_csv(
+                tmpdir,
+                [
+                    {
+                        "event_id": "historic",
+                        "site_id": "home",
+                        "start_time_utc": "2026-06-20T08:00:00Z",
+                        "end_time_utc": "2026-06-20T08:15:00Z",
+                        "type": "production",
+                        "status": "finished",
+                        "limit_w": "-3600",
+                        "grid_power_start_w": "199",
+                        "intervention_source": "EEBUS",
+                        "source_ski": "001122334455",
+                        "source": "evcc_gridsessions",
+                        "first_seen_utc": "2026-06-20T08:01:00Z",
+                        "last_seen_utc": "2026-06-20T08:16:00Z",
+                    }
+                ],
+            )
+            parser = MODULE.build_parser()
+            args = parser.parse_args(
+                [
+                    "--evcc-url",
+                    "http://evcc.local",
+                    "--audit-dir",
+                    tmpdir,
+                    "--once",
+                    "--replay-events",
+                ]
+            )
+
+            original_http_get_json = MODULE.http_get_json
+            try:
+                def fake_http_get_json(url, timeout, user_agent):
+                    if url.endswith("/api/state"):
+                        return {"site": {"gridPower": 0}, "hems": {"config": {"type": "eebus"}}}
+                    if url.endswith("/api/gridsessions"):
+                        return []
+                    raise AssertionError(url)
+
+                MODULE.http_get_json = fake_http_get_json
+                metrics = MODULE.collect_once(args)
+            finally:
+                MODULE.http_get_json = original_http_get_json
+
+            text = "\n".join(metrics)
+            self.assertIn('event_id="historic"', text)
+            self.assertIn('intervention_source="EEBUS"', text)
+            self.assertIn('source_ski="001122334455"', text)
+
+    def test_recent_event_history_filters_to_lookback_window(self):
+        events = [
+            {"event_id": "old", "start_time_utc": "2026-06-01T00:00:00Z"},
+            {"event_id": "recent", "start_time_utc": "2026-06-20T00:00:00Z"},
+            {"event_id": "invalid", "start_time_utc": "not-a-date"},
+        ]
+        now_seconds = MODULE.datetime(2026, 6, 21, tzinfo=MODULE.timezone.utc).timestamp()
+
+        recent = MODULE.recent_event_history(events, now_seconds, 8)
+
+        self.assertEqual([event["event_id"] for event in recent], ["recent"])
+
+    def test_collect_once_replays_recent_csv_events_by_default(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            MODULE.write_events_csv(
+                tmpdir,
+                [
+                    {
+                        "event_id": "historic",
+                        "site_id": "home",
+                        "start_time_utc": "2026-06-20T08:00:00Z",
+                        "end_time_utc": "2026-06-20T08:15:00Z",
+                        "type": "production",
+                        "status": "finished",
+                        "limit_w": "-3600",
+                        "grid_power_start_w": "199",
+                        "intervention_source": "EEBUS",
+                        "source_ski": "001122334455",
+                        "source": "evcc_gridsessions",
+                        "first_seen_utc": "2026-06-20T08:01:00Z",
+                        "last_seen_utc": "2026-06-20T08:16:00Z",
+                    }
+                ],
+            )
+            parser = MODULE.build_parser()
+            args = parser.parse_args(
+                [
+                    "--evcc-url",
+                    "http://evcc.local",
+                    "--audit-dir",
+                    tmpdir,
+                    "--once",
+                    "--event-replay-lookback-days",
+                    "99999",
+                ]
+            )
+
+            original_http_get_json = MODULE.http_get_json
+            try:
+                def fake_http_get_json(url, timeout, user_agent):
+                    if url.endswith("/api/state"):
+                        return {"site": {"gridPower": 0}, "hems": {"config": {"type": "eebus"}}}
+                    if url.endswith("/api/gridsessions"):
+                        return []
+                    raise AssertionError(url)
+
+                MODULE.http_get_json = fake_http_get_json
+                metrics = MODULE.collect_once(args)
+            finally:
+                MODULE.http_get_json = original_http_get_json
+
+            text = "\n".join(metrics)
+            self.assertIn('event_id="historic"', text)
+
 if __name__ == "__main__":
     unittest.main()
-

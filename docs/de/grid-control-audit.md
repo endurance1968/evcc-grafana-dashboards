@@ -25,6 +25,8 @@ Daraus entstehen unter anderem diese Metriken:
 
 Zusaetzlich schreibt der Collector eine lokale CSV nach `AUDIT_DATA_DIR/events/evcc-grid-control-events.csv`. Diese Datei enthaelt je Eingriff unter anderem Start, Ende, Typ, Status, Limit, Netzleistung zum Start, Quelle des Eingriffs und bei EEBUS die SKI, falls EVCC diese Information liefert.
 
+Die Grafana-Tabelle liest nicht direkt aus EVCC und nicht direkt aus der CSV. Der Pfad ist bewusst: EVCC-API -> Collector -> lokale CSV + VictoriaMetrics -> Grafana. Bei aktivierter lokaler CSV fuehrt der Collector die Datei als lokale Historie weiter und schreibt im normalen Betrieb neue oder geaenderte EVCC-Events sowie ein kurzes Rueckspielfenster aus der lokalen CSV als `evcc_audit_gridsession_event_*`-Metriken nach VictoriaMetrics. Das Standardfenster ist `EVENT_REPLAY_LOOKBACK_DAYS=8` und haelt die 7-Tage-Tabelle auch nach einem VictoriaMetrics-Neustart gefuellt, ohne bei jedem Poll die komplette Historie erneut zu importieren. Wenn VictoriaMetrics neu aufgebaut wurde oder Event-Metriken fehlen, kann die komplette CSV bewusst mit `REPLAY_EVENTS=true` beziehungsweise `--replay-events` erneut nach VictoriaMetrics gespielt werden.
+
 Normale EVCC-Daten zeigen, was am Netz passiert ist. Diese Audit-Metriken zeigen zusaetzlich, ob EVCC eine externe Begrenzung oder ein Steuerevent kennt.
 
 ## Installation auf dem VictoriaMetrics-Host
@@ -70,9 +72,25 @@ EVCC_API_POLL_SECONDS=10
 HTTP_TIMEOUT_SECONDS=10
 AUDIT_DATA_DIR=/var/lib/evcc-grid-control-audit
 LOCAL_EVENT_CSV=true
+REPLAY_EVENTS=false
 ```
 
 Wenn der Collector direkt auf dem VictoriaMetrics-Host laeuft, ist `VM_WRITE_URL=http://127.0.0.1:8428/api/v1/import/prometheus` normalerweise richtig. Die lokale CSV liegt dann standardmaessig unter `/var/lib/evcc-grid-control-audit/events/evcc-grid-control-events.csv`.
+
+## Quelle der Steuerevents
+
+Die Tabelle `EVCC-Steuerevents` zeigt die Quelle in dieser Reihenfolge:
+
+1. Quelle aus dem EVCC-Event selbst, falls `/api/gridsessions` sie liefert
+2. EVCC-HEMS-Konfiguration aus `/api/state`, zum Beispiel `hems.config.type=eebus`
+3. optionaler Fallback aus `EVCC_14A_INTERVENTION_SOURCE`
+
+Das Event-Label `type` aus EVCC bleibt dabei unveraendert und beschreibt weiterhin `production` oder `consumption`. Es ist nicht die technische Quelle. Wenn deine EVCC-Version die HEMS-Konfiguration nicht ueber `/api/state` liefert, setze den Fallback explizit:
+
+```env
+EVCC_14A_INTERVENTION_SOURCE=EEBUS
+# Alternativen: Relay, HEMS, FNN
+```
 
 ## Optional: steuerbare Gruppen benennen
 

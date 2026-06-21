@@ -25,6 +25,8 @@ It writes metrics such as:
 
 Additionally, the collector writes `AUDIT_DATA_DIR/events/evcc-grid-control-events.csv`. This local CSV contains one row per intervention with start, end, type, status, limit, grid power at start, intervention source, and the EEBUS SKI when EVCC provides it.
 
+The Grafana table does not read directly from EVCC and does not read the CSV directly. The intended path is: EVCC API -> collector -> local CSV + VictoriaMetrics -> Grafana. When the local CSV is enabled, the collector keeps that file as the local event history and normally writes new or changed EVCC events plus a short replay window from the local CSV as `evcc_audit_gridsession_event_*` metrics to VictoriaMetrics. The default window is `EVENT_REPLAY_LOOKBACK_DAYS=8`, keeping the 7-day Grafana table populated after a VictoriaMetrics restart without re-importing the full history on every poll. If VictoriaMetrics was rebuilt or event metrics are missing, intentionally replay the full CSV with `REPLAY_EVENTS=true` or `--replay-events`.
+
 Normal EVCC metrics show what happened at the grid connection. These audit metrics additionally show whether EVCC knows about an external limit or control event.
 
 ## Install On The VictoriaMetrics Host
@@ -70,9 +72,25 @@ EVCC_API_POLL_SECONDS=10
 HTTP_TIMEOUT_SECONDS=10
 AUDIT_DATA_DIR=/var/lib/evcc-grid-control-audit
 LOCAL_EVENT_CSV=true
+REPLAY_EVENTS=false
 ```
 
 When the collector runs directly on the VictoriaMetrics host, `VM_WRITE_URL=http://127.0.0.1:8428/api/v1/import/prometheus` is usually correct. The local CSV is written to `/var/lib/evcc-grid-control-audit/events/evcc-grid-control-events.csv` by default.
+
+## Control Event Source
+
+The `EVCC control events` table uses the source in this order:
+
+1. source from the EVCC event itself, if `/api/gridsessions` exposes it
+2. EVCC HEMS configuration from `/api/state`, for example `hems.config.type=eebus`
+3. optional fallback from `EVCC_14A_INTERVENTION_SOURCE`
+
+The EVCC event label `type` stays unchanged and still describes `production` or `consumption`. It is not the technical source. If your EVCC version does not expose the HEMS configuration via `/api/state`, set the fallback explicitly:
+
+```env
+EVCC_14A_INTERVENTION_SOURCE=EEBUS
+# Alternatives: Relay, HEMS, FNN
+```
 
 ## Optional: Name Controllable Groups
 
