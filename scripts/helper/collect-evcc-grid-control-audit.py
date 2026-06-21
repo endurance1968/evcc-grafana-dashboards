@@ -21,22 +21,18 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.20.6"
-SCRIPT_LAST_MODIFIED = "2026-06-20"
+SCRIPT_VERSION = "2026.06.21.4"
+SCRIPT_LAST_MODIFIED = "2026-06-21"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
-
 
 def env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
 
-
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
 
-
 def iso_now() -> str:
     return utc_now().isoformat(timespec="seconds").replace("+00:00", "Z")
-
 
 def number(value: Any) -> float | None:
     if value is None or isinstance(value, bool):
@@ -45,7 +41,6 @@ def number(value: Any) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
-
 
 def bool_to_number(value: Any) -> int | None:
     if isinstance(value, bool):
@@ -60,19 +55,16 @@ def bool_to_number(value: Any) -> int | None:
             return 0
     return None
 
-
 def first_present(*values: Any) -> Any:
     for value in values:
         if value is not None:
             return value
     return None
 
-
 def non_empty_string(value: Any) -> str:
     if isinstance(value, str) and value.strip():
         return value.strip()
     return ""
-
 
 def first_non_empty_string(*values: Any) -> str:
     for value in values:
@@ -80,7 +72,6 @@ def first_non_empty_string(*values: Any) -> str:
         if parsed:
             return parsed
     return ""
-
 
 def nested_string(data: dict[str, Any], *parts: str) -> str:
     current: Any = data
@@ -90,7 +81,6 @@ def nested_string(data: dict[str, Any], *parts: str) -> str:
         current = current.get(part)
     return non_empty_string(current)
 
-
 def get_path(data: dict[str, Any], *parts: str) -> Any:
     current: Any = data
     for part in parts:
@@ -99,17 +89,14 @@ def get_path(data: dict[str, Any], *parts: str) -> Any:
         current = current[part]
     return current
 
-
 def label_value(value: str) -> str:
     return value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")
-
 
 def metric(name: str, value: float | int, labels: dict[str, str] | None = None) -> str:
     if labels:
         label_text = ",".join(f'{key}="{label_value(str(val))}"' for key, val in sorted(labels.items()))
         return f"{name}{{{label_text}}} {value}"
     return f"{name} {value}"
-
 
 def parse_iso_timestamp_seconds(value: Any) -> float | None:
     if not isinstance(value, str) or not value.strip():
@@ -121,7 +108,6 @@ def parse_iso_timestamp_seconds(value: Any) -> float | None:
         return datetime.fromisoformat(raw).timestamp()
     except ValueError:
         return None
-
 
 def format_event_minute(value: Any) -> str:
     if not isinstance(value, str) or not value.strip():
@@ -143,9 +129,7 @@ class ControlGroup:
     kind: str
     loadpoints: tuple[str, ...] = ()
 
-
 LOADPOINT_CONTROL_GROUP_KINDS = {"loadpoint", "loadpoints", "heat_pump", "heat_pumps"}
-
 
 def normalize_control_group_kind(kind: str) -> str:
     normalized = kind.strip().lower().replace("-", "_")
@@ -154,7 +138,6 @@ def normalize_control_group_kind(kind: str) -> str:
         "heatpumps": "heat_pump",
     }
     return aliases.get(normalized, normalized)
-
 
 def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
     """Parse env syntax: id|name|kind|members;id2|name2|kind2|members2."""
@@ -179,7 +162,6 @@ def parse_control_groups(value: str) -> tuple[ControlGroup, ...]:
         groups.append(ControlGroup(group_id=group_id, name=name, kind=normalized_kind, loadpoints=loadpoints))
     return tuple(groups)
 
-
 def simultaneity_factor(unit_count: int) -> float:
     if unit_count <= 1:
         return 0.0
@@ -198,7 +180,6 @@ def simultaneity_factor(unit_count: int) -> float:
     if unit_count == 8:
         return 0.5
     return 0.45
-
 
 def minimum_allowed_power_w(
     unit_count: int,
@@ -220,12 +201,10 @@ def minimum_allowed_power_w(
         raise ValueError(f"Unsupported minimum power mode: {mode!r}")
     return base_w + max(unit_count - 1, 0) * simultaneity_factor(unit_count) * base_w
 
-
 def http_get_json(url: str, timeout: float, user_agent: str) -> Any:
     req = Request(url, headers={"User-Agent": user_agent})
     with urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
-
 
 def post_prometheus_metrics(write_url: str, lines: list[str], timeout: float, dry_run: bool = False) -> None:
     if not lines:
@@ -239,7 +218,6 @@ def post_prometheus_metrics(write_url: str, lines: list[str], timeout: float, dr
     req.add_header("User-Agent", DEFAULT_USER_AGENT)
     with urlopen(req, timeout=timeout) as response:
         response.read()
-
 
 CSV_EVENT_FIELDS = [
     "event_id",
@@ -257,21 +235,25 @@ CSV_EVENT_FIELDS = [
     "last_seen_utc",
 ]
 
+def session_value(session: dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in session:
+            return session[key]
+    return None
 
 def event_id(session: dict[str, Any]) -> str:
     raw = "|".join(
-        str(
-            first_present(
-                session.get(key),
-                session.get(key.lower()),
-                session.get(key.replace("_", "")),
-            )
-            or ""
-        )
-        for key in ["created", "type", "limit", "source", "ski"]
+        str(value or "")
+        for value in [
+            session_value(session, "id", "Id", "ID"),
+            session_value(session, "created", "Created"),
+            session_value(session, "type", "Type"),
+            session_value(session, "limit", "limitPower", "LimitPower"),
+            session_value(session, "grid", "gridPower", "GridPower"),
+            detect_source_ski(session),
+        ]
     )
     return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:16]
-
 
 def detect_intervention_source(session: dict[str, Any]) -> str:
     candidate = first_non_empty_string(
@@ -283,18 +265,18 @@ def detect_intervention_source(session: dict[str, Any]) -> str:
         session.get("controlSource"),
         session.get("control_source"),
         nested_string(session, "source", "type"),
+        nested_string(session, "source", "name"),
         nested_string(session, "origin", "type"),
-        session.get("type"),
+        nested_string(session, "origin", "name"),
     )
     lowered = candidate.lower()
     if "eebus" in lowered:
         return "EEBUS"
     if "relay" in lowered or "relais" in lowered:
         return "Relay"
-    if candidate:
-        return candidate
-    return "EVCC"
-
+    if "hems" in lowered:
+        return "HEMS"
+    return ""
 
 def detect_source_ski(session: dict[str, Any]) -> str:
     return first_non_empty_string(
@@ -312,7 +294,6 @@ def detect_source_ski(session: dict[str, Any]) -> str:
         nested_string(session, "origin", "ski"),
     )
 
-
 def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = None) -> list[dict[str, Any]]:
     if not isinstance(sessions, list):
         return []
@@ -321,19 +302,19 @@ def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = No
     for session in sessions:
         if not isinstance(session, dict):
             continue
-        start = session.get("created")
+        start = session_value(session, "created", "Created")
         if not start:
             continue
-        end = session.get("finished") or ""
+        end = session_value(session, "finished", "Finished") or ""
         normalized.append(
             {
                 "event_id": event_id(session),
                 "site_id": site_id,
                 "start_time_utc": start,
                 "end_time_utc": end,
-                "type": session.get("type", ""),
-                "limit_w": session.get("limit", ""),
-                "grid_power_start_w": session.get("grid", ""),
+                "type": session_value(session, "type", "Type") or "",
+                "limit_w": session_value(session, "limit", "limitPower", "LimitPower") or "",
+                "grid_power_start_w": session_value(session, "grid", "gridPower", "GridPower") or "",
                 "intervention_source": detect_intervention_source(session),
                 "source_ski": detect_source_ski(session),
                 "source": "evcc_gridsessions",
@@ -343,7 +324,6 @@ def normalize_sessions(sessions: Any, site_id: str, seen_at_utc: str | None = No
             }
         )
     return normalized
-
 
 def build_event_metrics(events: list[dict[str, Any]], site_id: str) -> list[str]:
     lines: list[str] = []
@@ -366,7 +346,6 @@ def build_event_metrics(events: list[dict[str, Any]], site_id: str) -> list[str]
         }
         lines.append(metric("evcc_audit_gridsession_event_start_timestamp_seconds", start_timestamp, event_labels))
     return lines
-
 
 def build_state_metrics(
     state: dict[str, Any],
@@ -446,6 +425,7 @@ def build_state_metrics(
     lines.append(metric("evcc_audit_vnb_signal_active", 1 if consumption_limit_active or production_limit_active else 0, labels))
     lines.append(metric("evcc_audit_hems_effective_max_consumption_power_w", effective_max_consumption_power, labels))
     lines.append(metric("evcc_audit_hems_effective_max_production_power_w", effective_max_production_power, labels))
+
     if grid_import_power is not None:
         lines.append(metric("evcc_audit_vnb_consumption_margin_w", effective_max_consumption_power - grid_import_power, labels))
     if grid_export_power is not None:
@@ -502,7 +482,6 @@ def build_state_metrics(
 
     return lines
 
-
 def read_existing_events(csv_path: Path) -> dict[str, dict[str, str]]:
     if not csv_path.exists():
         return {}
@@ -514,7 +493,6 @@ def read_existing_events(csv_path: Path) -> dict[str, dict[str, str]]:
             if event_key:
                 events[event_key] = {field: row.get(field, "") for field in CSV_EVENT_FIELDS}
         return events
-
 
 def write_events_csv(audit_dir: str, events: list[dict[str, Any]]) -> Path | None:
     if not events:
@@ -545,7 +523,6 @@ def write_events_csv(audit_dir: str, events: list[dict[str, Any]]) -> Path | Non
     os.replace(tmp_path, csv_path)
     return csv_path
 
-
 def collect_once(args: argparse.Namespace) -> list[str]:
     state_url = f"{args.evcc_url.rstrip('/')}/api/state"
     sessions_url = f"{args.evcc_url.rstrip('/')}/api/gridsessions"
@@ -572,7 +549,6 @@ def collect_once(args: argparse.Namespace) -> list[str]:
     lines.extend(build_event_metrics(events, args.site))
     return lines
 
-
 def write_failure_metric(args: argparse.Namespace, message: str) -> None:
     labels = {"site": args.site, "error": message[:120]}
     try:
@@ -580,18 +556,15 @@ def write_failure_metric(args: argparse.Namespace, message: str) -> None:
     except Exception:
         pass
 
-
 def parse_optional_int(value: str) -> int | None:
     if not value:
         return None
     return int(value)
 
-
 def parse_optional_float(value: str) -> float | None:
     if not value:
         return None
     return float(value)
-
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Collect EVCC grid-control audit metrics for VictoriaMetrics.")
@@ -613,7 +586,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true", help="print Prometheus metrics instead of writing to VictoriaMetrics or local CSV")
     parser.add_argument("--version", action="store_true", help="print version and exit")
     return parser
-
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
@@ -642,6 +614,6 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         time.sleep(args.poll_seconds)
 
-
 if __name__ == "__main__":
     raise SystemExit(main())
+

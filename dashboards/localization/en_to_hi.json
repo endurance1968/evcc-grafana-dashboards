@@ -414,7 +414,10 @@
     "Heat pump phases": "हीट पंप फेज",
     "Heat pump active phases": "हीट पंप सक्रिय फेज",
     "Heat pump power": "हीट पंप पावर",
-    "Heat pump loadpoint data": "हीट पंप लोडपॉइंट डेटा"
+    "Heat pump loadpoint data": "हीट पंप लोडपॉइंट डेटा",
+    "Source": "स्रोत",
+    "Source SKI": "स्रोत SKI",
+    "Grid start W": "ग्रिड शुरुआत W"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

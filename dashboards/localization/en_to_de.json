@@ -414,7 +414,10 @@
     "Heat pump phases": "Wärmepumpe Phasen",
     "Heat pump active phases": "Wärmepumpe aktive Phasen",
     "Heat pump power": "Wärmepumpe Leistung",
-    "Heat pump loadpoint data": "Wärmepumpen-Ladepunktdaten"
+    "Heat pump loadpoint data": "Wärmepumpen-Ladepunktdaten",
+    "Source": "Quelle",
+    "Source SKI": "Quell-SKI",
+    "Grid start W": "Netz Start W"
   },
   "Heat pump source mix": "Wärmepumpe Energiequellen",
   "Heat pump title match": "Wärmepumpen-Titelabgleich",

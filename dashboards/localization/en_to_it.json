@@ -414,7 +414,10 @@
     "Heat pump phases": "Fasi pompa di calore",
     "Heat pump active phases": "Fasi attive pompa di calore",
     "Heat pump power": "Potenza pompa di calore",
-    "Heat pump loadpoint data": "Dati punto di carico pompa di calore"
+    "Heat pump loadpoint data": "Dati punto di carico pompa di calore",
+    "Source": "Sorgente",
+    "Source SKI": "SKI sorgente",
+    "Grid start W": "Rete avvio W"
   },
   "Heat pump source mix": "Ripartizione fonti pompa di calore",
   "Heat pump title match": "Corrispondenza titolo pompa di calore",

@@ -5073,7 +5073,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "yellow"
+                          "fixedColor": "#E02F44"
                         }
                       }
                     ]
@@ -5088,7 +5088,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "green"
+                          "fixedColor": "#56A64B"
                         }
                       }
                     ]
@@ -5103,7 +5103,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "red"
+                          "fixedColor": "#C4162A"
                         }
                       },
                       {
@@ -5128,7 +5128,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "orange"
+                          "fixedColor": "#1F9D55"
                         }
                       },
                       {
@@ -5153,7 +5153,7 @@
                         "id": "color",
                         "value": {
                           "mode": "fixed",
-                          "fixedColor": "blue"
+                          "fixedColor": "#3274D9"
                         }
                       },
                       {
@@ -5164,6 +5164,14 @@
                             4,
                             6
                           ]
+                        }
+                      },
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": false,
+                          "tooltip": false,
+                          "viz": true
                         }
                       }
                     ]
@@ -5530,7 +5538,61 @@
                   },
                   "unit": "watt"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Reserva de consumo media 15 min"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#5794F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Calculated reserve avg 15 min"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      },
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": false,
+                          "tooltip": false,
+                          "viz": true
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Reserva de inyeccion media 15 min"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#8AB8FF"
+                        }
+                      }
+                    ]
+                  }
+                ]
               }
             }
           },
@@ -5556,7 +5618,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_desc(((max by (event_id, start, end, type, status, limit_w, grid_power_start_w) (evcc_audit_gridsession_event_start_timestamp_seconds) >= ${__from:date:seconds}) <= ${__to:date:seconds}))",
+                        "expr": "sort_desc(\n  (\n    (\n      max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\"})\n      or\n      (\n        max by (event_id, start, end, type, status, limit_w, grid_power_start_w, intervention_source, source_ski) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source=\"\"})\n        unless on(event_id)\n        max by (event_id) (evcc_audit_gridsession_event_start_timestamp_seconds{source=\"evcc_gridsessions\", intervention_source!=\"\"})\n      )\n    ) >= (time() - 604800)\n  ) <= time()\n)",
                         "format": "table",
                         "legendFormat": "{{type}} {{limit_w}} W",
                         "range": false,
@@ -5612,15 +5674,19 @@
                         "type": 2,
                         "status": 3,
                         "limit_w": 4,
-                        "grid_power_start_w": 5
+                        "grid_power_start_w": 5,
+                        "intervention_source": 6,
+                        "source_ski": 7
                       },
                       "renameByName": {
-                        "start": "Start",
-                        "end": "End",
-                        "type": "Type",
-                        "status": "Status",
-                        "limit_w": "Limit W",
-                        "grid_power_start_w": "Grid power start W"
+                        "start": "Inicio",
+                        "end": "Fin",
+                        "type": "Tipo",
+                        "status": "Estado",
+                        "limit_w": "Limite W",
+                        "grid_power_start_w": "Red inicio W",
+                        "intervention_source": "Fuente",
+                        "source_ski": "SKI de origen"
                       }
                     }
                   }
@@ -5658,7 +5724,7 @@
                       "reducers": []
                     },
                     "inspect": false,
-                    "minWidth": 100
+                    "minWidth": 70
                   },
                   "mappings": [],
                   "thresholds": {
@@ -5680,7 +5746,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 150
+                        "value": 120
                       }
                     ]
                   },
@@ -5692,7 +5758,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 150
+                        "value": 120
                       }
                     ]
                   },
@@ -5704,7 +5770,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 110
+                        "value": 95
                       }
                     ]
                   },
@@ -5716,7 +5782,7 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 90
+                        "value": 80
                       }
                     ]
                   },
@@ -5728,19 +5794,43 @@
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 85
+                        "value": 80
                       }
                     ]
                   },
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Potencia de red inicial W"
+                      "options": "Red inicio W"
                     },
                     "properties": [
                       {
                         "id": "custom.width",
-                        "value": 150
+                        "value": 95
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Fuente"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "SKI de origen"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 120
                       }
                     ]
                   }
@@ -6487,8 +6577,8 @@
       "EVCC"
     ],
     "timeSettings": {
-      "from": "now/d",
-      "to": "now/d",
+      "from": "now-24h",
+      "to": "now",
       "autoRefresh": "10s",
       "autoRefreshIntervals": [
         "5s",
@@ -7276,7 +7366,7 @@
                         "x": 16,
                         "y": 4,
                         "width": 8,
-                        "height": 12,
+                        "height": 20,
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-48"
@@ -7301,7 +7391,7 @@
                       "spec": {
                         "x": 0,
                         "y": 16,
-                        "width": 24,
+                        "width": 16,
                         "height": 8,
                         "element": {
                           "kind": "ElementReference",

@@ -414,7 +414,10 @@
     "Heat pump phases": "热泵相位",
     "Heat pump active phases": "热泵活动相位",
     "Heat pump power": "热泵功率",
-    "Heat pump loadpoint data": "热泵充电点数据"
+    "Heat pump loadpoint data": "热泵充电点数据",
+    "Source": "来源",
+    "Source SKI": "来源 SKI",
+    "Grid start W": "电网起始 W"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",

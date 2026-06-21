@@ -414,7 +414,10 @@
     "Heat pump phases": "Warmtepomp fasen",
     "Heat pump active phases": "Warmtepomp actieve fasen",
     "Heat pump power": "Warmtepomp vermogen",
-    "Heat pump loadpoint data": "Warmtepomp-laadpuntgegevens"
+    "Heat pump loadpoint data": "Warmtepomp-laadpuntgegevens",
+    "Source": "Bron",
+    "Source SKI": "Bron-SKI",
+    "Grid start W": "Net start W"
   },
   "Heat pump source mix": "Verdeling energiebronnen warmtepomp",
   "Heat pump title match": "Warmtepomp titelmatch",

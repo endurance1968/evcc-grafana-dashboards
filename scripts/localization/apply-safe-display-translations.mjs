@@ -1,8 +1,8 @@
 /**
  * Script: apply-safe-display-translations.mjs
  * Purpose: Applies safe display-only translations to the already generated localized dashboards.
- * Version: 2026.06.20.1
- * Last modified: 2026-06-20
+ * Version: 2026.06.21.2
+ * Last modified: 2026-06-21
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -49,7 +49,6 @@ function translateMatcherOptions(node, mapping) {
 
   return node;
 }
-
 
 function translateOverrides(overrides, mapping) {
   return overrides.map((override) => translateSafeNode(override, mapping));
@@ -228,6 +227,37 @@ function pathIncludes(pathParts, key) {
   return pathParts.includes(key);
 }
 
+const transformationInternalFieldNames = new Set(["source", "year", "value"]);
+
+function translateTransformationDisplayNode(node, mapping) {
+  if (Array.isArray(node)) {
+    return node.map((item) => translateTransformationDisplayNode(item, mapping));
+  }
+
+  if (!node || typeof node !== "object") {
+    return node;
+  }
+
+  const result = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (key === "renameByName" && value && typeof value === "object" && !Array.isArray(value)) {
+      result[key] = Object.fromEntries(
+        Object.entries(value).map(([sourceName, displayName]) => [
+          sourceName,
+          typeof displayName === "string" && !transformationInternalFieldNames.has(displayName)
+            ? translateString(displayName, mapping)
+            : displayName,
+        ]),
+      );
+      continue;
+    }
+
+    result[key] = translateTransformationDisplayNode(value, mapping);
+  }
+
+  return result;
+}
+
 function translateSafeNode(node, mapping, pathParts = []) {
   if (Array.isArray(node)) {
     return node.map((item, index) => translateSafeNode(item, mapping, [...pathParts, index]));
@@ -238,7 +268,7 @@ function translateSafeNode(node, mapping, pathParts = []) {
   }
 
   if (pathIncludes(pathParts, "transformations")) {
-    return node;
+    return translateTransformationDisplayNode(node, mapping);
   }
 
   const result = {};
@@ -340,3 +370,4 @@ function main() {
 }
 
 main();
+

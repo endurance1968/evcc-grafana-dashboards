@@ -52,8 +52,8 @@ const expectedTimes = {
     "to": "now/M"
   },
   "VM_EVCC_Today-Details.json": {
-    "from": "now/d",
-    "to": "now/d"
+    "from": "now-24h",
+    "to": "now"
   },
   "VM_EVCC_Today-Mobile.json": {
     "from": "now/d",

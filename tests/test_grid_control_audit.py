@@ -14,7 +14,6 @@ sys.modules[SPEC.name] = MODULE
 assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
-
 class GridControlAuditTests(unittest.TestCase):
     def test_build_state_metrics_detects_consumption_limit_and_grid_split(self):
         state = {
@@ -85,11 +84,11 @@ class GridControlAuditTests(unittest.TestCase):
     def test_gridsession_event_metric_contains_table_labels(self):
         sessions = [
             {
-                "created": "2026-06-20T08:00:00Z",
-                "finished": "2026-06-20T08:15:00Z",
-                "type": "limit",
-                "limit": 4200,
-                "grid": 3900,
+                "Created": "2026-06-20T08:00:00Z",
+                "Finished": "2026-06-20T08:15:00Z",
+                "Type": "production",
+                "LimitPower": -3600,
+                "GridPower": 199,
             }
         ]
         events = MODULE.normalize_sessions(sessions, "home")
@@ -98,19 +97,23 @@ class GridControlAuditTests(unittest.TestCase):
 
         self.assertIn('evcc_audit_gridsession_event_start_timestamp_seconds{', text)
         self.assertIn('site="home"', text)
+        self.assertIn('source="evcc_gridsessions"', text)
         self.assertIn('start="2026-06-20 08:00"', text)
         self.assertIn('end="2026-06-20 08:15"', text)
-        self.assertIn('limit_w="4200"', text)
-        self.assertIn('grid_power_start_w="3900"', text)
+        self.assertIn('type="production"', text)
+        self.assertIn('limit_w="-3600"', text)
+        self.assertIn('grid_power_start_w="199"', text)
+        self.assertIn('intervention_source=""', text)
 
     def test_gridsession_event_keeps_intervention_source_and_ski(self):
         sessions = [
             {
                 "created": "2026-06-20T08:00:00Z",
                 "finished": "2026-06-20T08:15:00Z",
-                "type": "eebus-limit",
-                "limit": 4200,
+                "type": "production",
+                "limit": -1000,
                 "grid": 3900,
+                "source": "eebus",
                 "sourceSki": "001122334455",
             }
         ]
@@ -122,6 +125,42 @@ class GridControlAuditTests(unittest.TestCase):
         text = "\n".join(metrics)
         self.assertIn('intervention_source="EEBUS"', text)
         self.assertIn('source_ski="001122334455"', text)
+
+    def test_gridsession_event_maps_explicit_hems_source_only(self):
+        hems_events = MODULE.normalize_sessions(
+            [
+                {
+                    "created": "2026-06-20T08:00:00Z",
+                    "type": "consumption",
+                    "limit": 7000,
+                    "source": "external-hems",
+                }
+            ],
+            "home",
+        )
+        self.assertEqual(hems_events[0]["intervention_source"], "HEMS")
+
+        unknown_events = MODULE.normalize_sessions(
+            [
+                {
+                    "created": "2026-06-20T08:00:00Z",
+                    "type": "consumption",
+                    "limit": 7000,
+                    "source": "external-controller",
+                }
+            ],
+            "home",
+        )
+        self.assertEqual(unknown_events[0]["intervention_source"], "")
+
+    def test_gridsession_event_ids_use_evcc_id_when_available(self):
+        sessions = [
+            {"id": 1, "created": "2026-06-20T08:00:00Z", "type": "consumption", "limit": 7000},
+            {"id": 2, "created": "2026-06-20T08:00:00Z", "type": "consumption", "limit": 7000},
+        ]
+        events = MODULE.normalize_sessions(sessions, "home")
+
+        self.assertNotEqual(events[0]["event_id"], events[1]["event_id"])
 
     def test_write_events_csv_merges_existing_event_by_id(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -157,6 +196,6 @@ class GridControlAuditTests(unittest.TestCase):
             self.assertEqual(rows[0]["intervention_source"], "EEBUS")
             self.assertEqual(rows[0]["source_ski"], "001122334455")
 
-
 if __name__ == "__main__":
     unittest.main()
+
