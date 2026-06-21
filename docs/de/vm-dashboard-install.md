@@ -104,7 +104,7 @@ GRAFANA_DS_VM_EVCC_AUDIT_UID=
 
 Wenn deine Datasource-UID nicht `vm-evcc` ist, setze `GRAFANA_DS_VM_EVCC_UID` vor dem Deployment.
 
-Der Daily-Details-Tab fuer externe Netz-/14a-Steuerung nutzt optionale `evcc_audit_*`-Metriken aus dem [Netzsteuerungs-Audit-Collector](./grid-control-audit.md). Standardmaessig sucht der Deployer diese Metriken in derselben Datasource wie EVCC. Wenn der Audit-Collector in eine separate VictoriaMetrics schreibt, setze `GRAFANA_DS_VM_EVCC_AUDIT_UID` auf die entsprechende Grafana-Datasource-UID. Der Tab wird nur angezeigt, wenn im gewaehlten Zeitraum Audit-Metriken eine aktive externe Begrenzung oder ein EVCC-Steuerevent liefern. Die Tabelle wird aus `evcc_audit_gridsession_event_start_timestamp_seconds` gefuellt; Felder wie Start, Ende, Art, Status und Limit stammen aus den Labels dieser Metrik.
+Der Daily-Details-Tab fuer externe Netz-/14a-Steuerung nutzt optionale `evcc_audit_*`-Metriken aus dem [Netzsteuerungs-Audit-Collector](./grid-control-audit.md). Standardmaessig sucht der Deployer diese Metriken in derselben Datasource wie EVCC. Wenn der Audit-Collector in eine separate VictoriaMetrics schreibt, setze `GRAFANA_DS_VM_EVCC_AUDIT_UID` auf die entsprechende Grafana-Datasource-UID. Der Tab bleibt sichtbar; ohne Audit-Metriken zeigen die Panels keine Daten. Die Tabelle wird aus `evcc_audit_gridsession_event_start_timestamp_seconds` gefuellt; Felder wie Start, Ende, Art, Status und Limit stammen aus den Labels dieser Metrik.
 
 ### Grafana-Theme optional setzen
 

@@ -5262,7 +5262,7 @@
                       }
                     }
                   ],
-                  "noValue": "No active limit",
+                  "noValue": "कोई सक्रिय सीमा नहीं",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -5364,7 +5364,7 @@
                       }
                     }
                   ],
-                  "noValue": "No active limit",
+                  "noValue": "कोई सक्रिय सीमा नहीं",
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [

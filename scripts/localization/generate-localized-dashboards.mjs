@@ -1,8 +1,8 @@
 /**
  * Script: generate-localized-dashboards.mjs
  * Purpose: Renders localized dashboard JSON files from dashboards/original by using the language mappings.
- * Version: 2026.06.20.1
- * Last modified: 2026-06-20
+ * Version: 2026.06.21.3
+ * Last modified: 2026-06-21
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -28,6 +28,7 @@ const translatableKeys = new Set([
   "displayName",
   "legendFormat",
   "emptyMessage",
+  "noValue",
 ]);
 
 function collectJsonFiles(dirPath) {
@@ -112,10 +113,19 @@ function translateJsonNode(node, mapping, pathParts = []) {
         key === "value" && typeof node.id === "string" && translatableKeys.has(node.id);
       const isByNameMatcherOption =
         key === "options" && typeof value === "string" && node.id === "byName";
+      const isTransformationRenameValue =
+        pathIncludes(pathParts, "renameByName") &&
+        typeof value === "string" &&
+        /[A-Z\s-]/.test(value);
 
       if (
         typeof value === "string" &&
-        ((!isInsideTransformation && ((translatableKeys.has(key) && isSafeName) || isPropertyValueForTranslatableId)) || isByNameMatcherOption)
+        (
+          (!isInsideTransformation &&
+            ((translatableKeys.has(key) && isSafeName) || isPropertyValueForTranslatableId)) ||
+          isByNameMatcherOption ||
+          isTransformationRenameValue
+        )
       ) {
         result[key] = translateString(value, mapping);
       } else if (key === "expr" && typeof value === "string") {

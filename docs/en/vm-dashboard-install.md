@@ -102,7 +102,7 @@ GRAFANA_DS_VM_EVCC_AUDIT_UID=
 
 If your datasource UID is not `vm-evcc`, set `GRAFANA_DS_VM_EVCC_UID` before deployment.
 
-The Daily Details tab for external grid/14a control uses optional `evcc_audit_*` metrics from the [grid-control audit collector](./grid-control-audit.md). By default the deployer looks for these metrics in the same datasource as EVCC. If the audit collector writes to a separate VictoriaMetrics instance, set `GRAFANA_DS_VM_EVCC_AUDIT_UID` to that Grafana datasource UID. The tab is shown only when audit metrics report an active external limit or an EVCC control event in the selected time range. The table is filled from `evcc_audit_gridsession_event_start_timestamp_seconds`; fields such as start, end, type, status, and limit come from that metric's labels.
+The Daily Details tab for external grid/14a control uses optional `evcc_audit_*` metrics from the [grid-control audit collector](./grid-control-audit.md). By default the deployer looks for these metrics in the same datasource as EVCC. If the audit collector writes to a separate VictoriaMetrics instance, set `GRAFANA_DS_VM_EVCC_AUDIT_UID` to that Grafana datasource UID. The tab stays visible; without audit metrics the panels show no data. The table is filled from `evcc_audit_gridsession_event_start_timestamp_seconds`; fields such as start, end, type, status, and limit come from that metric's labels.
 
 ### Optionally Set The Grafana Theme
 
