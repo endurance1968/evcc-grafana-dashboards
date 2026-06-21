@@ -112,7 +112,7 @@ EVCC_14A_CONTROL_GROUPS=wallboxes|Loadpoints|loadpoints|Carport Corner+Carport S
 EVCC_14A_CONTROL_UNITS=2
 ```
 
-The minimum-power value is a dashboard estimate, not legally binding evidence. The default is `EVCC_14A_MIN_POWER_MODE=ems`. The collector then uses the GZF table for EMS control: one unit 4.2 kW, two units 7.56 kW, three units 10.5 kW. For direct per-unit control, set `direct`; the collector then uses 4.2 kW per unit. If the grid operator or installer provides a concrete value, set it directly:
+The minimum-power value is calculated from your configuration and is not legally binding evidence. The default is `EVCC_14A_MIN_POWER_MODE=ems`. The collector then uses the GZF table for EMS control: one unit 4.2 kW, two units 7.56 kW, three units 10.5 kW. For direct per-unit control, set `direct`; the collector then uses 4.2 kW per unit. If the grid operator or installer provides a concrete value, set it directly:
 
 ```env
 EVCC_14A_MIN_POWER_MODE=ems

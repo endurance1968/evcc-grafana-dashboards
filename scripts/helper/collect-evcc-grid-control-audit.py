@@ -21,7 +21,7 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.20.5"
+SCRIPT_VERSION = "2026.06.20.6"
 SCRIPT_LAST_MODIFIED = "2026-06-20"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
@@ -585,6 +585,12 @@ def parse_optional_int(value: str) -> int | None:
     if not value:
         return None
     return int(value)
+
+
+def parse_optional_float(value: str) -> float | None:
+    if not value:
+        return None
+    return float(value)
 
 
 def build_parser() -> argparse.ArgumentParser:

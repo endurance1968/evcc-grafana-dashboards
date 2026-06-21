@@ -69,6 +69,11 @@ class GridControlAuditTests(unittest.TestCase):
         self.assertEqual(MODULE.minimum_allowed_power_w(4, mode="linear", additional_factor=0.4), 9240.0)
         self.assertEqual(MODULE.minimum_allowed_power_w(99, override_w=6300), 6300.0)
 
+    def test_build_parser_accepts_minimum_override(self):
+        parser = MODULE.build_parser()
+        args = parser.parse_args(["--minimum-override-w", "6300", "--minimum-mode", "direct"])
+        self.assertEqual(args.minimum_override_w, 6300.0)
+        self.assertEqual(args.minimum_mode, "direct")
     def test_control_group_legacy_loadpoints_alias_still_works(self):
         groups = MODULE.parse_control_groups("lp|Loadpoints|loadpoints|1+2")
         state = {"loadpoints": [{"title": "A", "chargePower": 1000}, {"title": "B", "chargePower": 2000}]}

@@ -112,7 +112,7 @@ EVCC_14A_CONTROL_GROUPS=wallboxes|Ladepunkte|loadpoints|Carport Ecke+Carport Tre
 EVCC_14A_CONTROL_UNITS=2
 ```
 
-Der Mindestleistungswert ist eine Schaetzung fuer das Dashboard, kein rechtsverbindlicher Nachweis. Standard ist `EVCC_14A_MIN_POWER_MODE=ems`. Dabei nutzt der Collector die GZF-Tabelle fuer EMS-Steuerung: eine Einheit 4,2 kW, zwei Einheiten 7,56 kW, drei Einheiten 10,5 kW. Fuer direkte Einzelsteuerung kannst du `direct` setzen; dann rechnet der Collector 4,2 kW je Einheit. Wenn der Netzbetreiber oder Installateur einen konkreten Wert vorgibt, setze diesen direkt:
+Der Mindestleistungswert wird aus deiner Konfiguration berechnet und ist kein rechtsverbindlicher Nachweis. Standard ist `EVCC_14A_MIN_POWER_MODE=ems`. Dabei nutzt der Collector die GZF-Tabelle fuer EMS-Steuerung: eine Einheit 4,2 kW, zwei Einheiten 7,56 kW, drei Einheiten 10,5 kW. Fuer direkte Einzelsteuerung kannst du `direct` setzen; dann rechnet der Collector 4,2 kW je Einheit. Wenn der Netzbetreiber oder Installateur einen konkreten Wert vorgibt, setze diesen direkt:
 
 ```env
 EVCC_14A_MIN_POWER_MODE=ems
