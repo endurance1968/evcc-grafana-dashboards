@@ -4886,7 +4886,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (avg_over_time(evcc_audit_site_grid_import_power_w[15m]))",
+                        "expr": "max(avg_over_time(clamp_min(gridPower_value, 0)[15m]))",
                         "format": "time_series",
                         "legendFormat": "Prelievo rete medio 15 min",
                         "range": true
@@ -4908,7 +4908,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (avg_over_time(evcc_audit_site_grid_export_power_w[15m]))",
+                        "expr": "max(avg_over_time(clamp_min(-gridPower_value, 0)[15m]))",
                         "format": "time_series",
                         "legendFormat": "Immissione media 15 min",
                         "range": true
@@ -5406,7 +5406,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (evcc_audit_hems_effective_max_consumption_power_w) - max by (site) (avg_over_time(evcc_audit_site_grid_import_power_w[15m]))",
+                        "expr": "max(evcc_audit_hems_effective_max_consumption_power_w) - max(avg_over_time(clamp_min(gridPower_value, 0)[15m]))",
                         "format": "time_series",
                         "legendFormat": "Riserva consumo media 15 min",
                         "range": true
@@ -5428,7 +5428,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (evcc_audit_minimum_allowed_power_w) - max by (site) (avg_over_time(evcc_audit_site_grid_import_power_w[15m]))",
+                        "expr": "max(evcc_audit_minimum_allowed_power_w) - max(avg_over_time(clamp_min(gridPower_value, 0)[15m]))",
                         "format": "time_series",
                         "legendFormat": "Calculated reserve avg 15 min",
                         "range": true
@@ -5450,7 +5450,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (evcc_audit_hems_effective_max_production_power_w) - max by (site) (avg_over_time(evcc_audit_site_grid_export_power_w[15m]))",
+                        "expr": "max by (site) (evcc_audit_hems_effective_max_production_power_w) - max(avg_over_time(clamp_min(-gridPower_value, 0)[15m]))",
                         "format": "time_series",
                         "legendFormat": "Riserva immissione media 15 min",
                         "range": true

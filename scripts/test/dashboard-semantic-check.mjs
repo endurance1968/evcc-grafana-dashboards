@@ -891,13 +891,18 @@ function validateDashboard(fileName, dashboard) {
         assert(!rawJson.includes(text), failures, `${fileName}: Grid control support must not include simulator control text ${text}`);
       }
       for (const metric of [
-        "evcc_audit_site_grid_import_power_w",
-        "evcc_audit_site_grid_export_power_w",
+        "gridPower_value",
         "evcc_audit_hems_effective_max_consumption_power_w",
         "evcc_audit_hems_effective_max_production_power_w",
         "evcc_audit_gridsession_event_start_timestamp_seconds",
       ]) {
         assert(rawJson.includes(metric), failures, `${fileName}: Grid control support must query ${metric}`);
+      }
+      for (const metric of [
+        "evcc_audit_site_grid_import_power_w",
+        "evcc_audit_site_grid_export_power_w",
+      ]) {
+        assert(!rawJson.includes(metric), failures, `${fileName}: Grid control panels must use normal EVCC grid metrics instead of duplicate audit metric ${metric}`);
       }
       assert(rawJson.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: Grid control support must use the optional audit datasource placeholder`);
       const eventPanel = panels.find((item) => item.title === "EVCC control events");
@@ -1301,4 +1306,3 @@ try {
   console.error(error.message || error);
   process.exit(1);
 }
-

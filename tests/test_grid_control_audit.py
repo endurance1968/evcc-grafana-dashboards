@@ -15,7 +15,7 @@ assert SPEC.loader is not None
 SPEC.loader.exec_module(MODULE)
 
 class GridControlAuditTests(unittest.TestCase):
-    def test_build_state_metrics_detects_consumption_limit_and_grid_split(self):
+    def test_build_state_metrics_detects_consumption_limit_without_raw_copies_by_default(self):
         state = {
             "site": {"gridPower": 3500, "homePower": 2800},
             "hems": {"status": {"dimmed": True, "maxConsumptionPower": 4200, "maxProductionPower": 0}},
@@ -24,13 +24,13 @@ class GridControlAuditTests(unittest.TestCase):
         metrics = MODULE.build_state_metrics(state, "home")
         text = "\n".join(metrics)
 
-        self.assertIn('evcc_audit_site_grid_import_power_w{site="home"} 3500.0', text)
-        self.assertIn('evcc_audit_site_grid_export_power_w{site="home"} 0.0', text)
         self.assertIn('evcc_audit_hems_effective_max_consumption_power_w{site="home"} 4200.0', text)
-        self.assertIn('evcc_audit_vnb_signal_active{site="home"} 1', text)
-        self.assertIn('evcc_audit_loadpoint_charge_power_w{loadpoint="1",name="Garage",site="home"} 1800.0', text)
+        self.assertNotIn('evcc_audit_site_grid_import_power_w', text)
+        self.assertNotIn('evcc_audit_site_grid_export_power_w', text)
+        self.assertNotIn('evcc_audit_vnb_signal_active', text)
+        self.assertNotIn('evcc_audit_loadpoint_charge_power_w', text)
 
-    def test_build_state_metrics_detects_feed_in_limit_and_export_split(self):
+    def test_build_state_metrics_detects_feed_in_limit_without_raw_copies_by_default(self):
         state = {
             "site": {"gridPower": -1200},
             "hems": {"status": {"curtailed": True, "maxProductionPower": -800}},
@@ -38,9 +38,9 @@ class GridControlAuditTests(unittest.TestCase):
         metrics = MODULE.build_state_metrics(state, "home")
         text = "\n".join(metrics)
 
-        self.assertIn('evcc_audit_site_grid_import_power_w{site="home"} 0.0', text)
-        self.assertIn('evcc_audit_site_grid_export_power_w{site="home"} 1200.0', text)
         self.assertIn('evcc_audit_hems_effective_max_production_power_w{site="home"} 800.0', text)
+        self.assertNotIn('evcc_audit_site_grid_import_power_w', text)
+        self.assertNotIn('evcc_audit_site_grid_export_power_w', text)
 
     def test_control_group_and_minimum_power_metrics(self):
         groups = MODULE.parse_control_groups("wallboxes|Loadpoints|loadpoints|Garage+Carport;wp1|Heat pump|heat_pump|Heat pump;battery|Battery|battery_grid_charge|")
@@ -257,6 +257,44 @@ class GridControlAuditTests(unittest.TestCase):
             self.assertEqual(rows[0]["status"], "finished")
             self.assertEqual(rows[0]["intervention_source"], "EEBUS")
             self.assertEqual(rows[0]["source_ski"], "001122334455")
+
+    def test_write_events_csv_updates_active_session_when_limit_changes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            initial = {
+                "event_id": "limit-3000",
+                "site_id": "home",
+                "start_time_utc": "2026-06-21T18:45:00Z",
+                "end_time_utc": "",
+                "type": "consumption",
+                "status": "active",
+                "limit_w": "3000",
+                "grid_power_start_w": "",
+                "intervention_source": "EEBUS",
+                "source_ski": "",
+                "source": "evcc_gridsessions",
+                "first_seen_utc": "2026-06-21T18:45:10Z",
+                "last_seen_utc": "2026-06-21T18:45:10Z",
+            }
+            updated = dict(
+                initial,
+                event_id="limit-1000",
+                limit_w="1000",
+                last_seen_utc="2026-06-21T18:50:10Z",
+            )
+
+            csv_path, changed_initial = MODULE.write_events_csv(tmpdir, [initial])
+            _, changed_updated = MODULE.write_events_csv(tmpdir, [updated])
+
+            self.assertIsNotNone(csv_path)
+            self.assertEqual([event["event_id"] for event in changed_initial], ["limit-3000"])
+            self.assertEqual([event["event_id"] for event in changed_updated], ["limit-3000"])
+            with csv_path.open("r", encoding="utf-8", newline="") as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["event_id"], "limit-3000")
+            self.assertEqual(rows[0]["status"], "active")
+            self.assertEqual(rows[0]["limit_w"], "1000")
+            self.assertEqual(rows[0]["last_seen_utc"], "2026-06-21T18:50:10Z")
 
     def test_write_events_csv_merges_active_and_finished_with_different_evcc_ids(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -13,15 +13,19 @@ Der Collector fragt regelmaessig diese EVCC-Endpunkte ab:
 - `/api/state`
 - `/api/gridsessions`
 
-Daraus entstehen unter anderem diese Metriken:
+Daraus entstehen im Normalbetrieb nur die zusaetzlichen Audit- und Event-Metriken, die nicht schon durch den normalen EVCC/Telegraf-Ingest abgedeckt sind:
 
 - `evcc_audit_hems_effective_max_consumption_power_w`
 - `evcc_audit_hems_effective_max_production_power_w`
-- `evcc_audit_site_grid_import_power_w`
-- `evcc_audit_site_grid_export_power_w`
 - `evcc_audit_gridsession_event_start_timestamp_seconds`
 - `evcc_audit_minimum_allowed_power_w`
 - `evcc_audit_control_group_power_w`
+- `evcc_audit_control_units`
+- `evcc_audit_collector_up`
+- `evcc_audit_collector_last_success_timestamp_seconds`
+
+Netzleistung, Hausverbrauch, Speicherwerte und Ladepunkt-Rohwerte werden nicht nochmals dauerhaft als `evcc_audit_*`-Kopie geschrieben. Die Dashboards verwenden dafuer die normalen EVCC-Metriken wie `gridPower_value`; der Collector nutzt diese Werte nur intern fuer Berechnungen.
+
 
 Zusaetzlich schreibt der Collector eine lokale CSV nach `AUDIT_DATA_DIR/events/evcc-grid-control-events.csv`. Diese Datei enthaelt je Eingriff unter anderem Start, Ende, Typ, Status, Limit, Netzleistung zum Start, Quelle des Eingriffs und bei EEBUS die SKI, falls EVCC diese Information liefert.
 

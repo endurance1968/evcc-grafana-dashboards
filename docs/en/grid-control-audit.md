@@ -13,15 +13,19 @@ The collector polls these EVCC endpoints:
 - `/api/state`
 - `/api/gridsessions`
 
-It writes metrics such as:
+In normal operation it writes only additional audit and event metrics that are not already covered by the normal EVCC/Telegraf ingest:
 
 - `evcc_audit_hems_effective_max_consumption_power_w`
 - `evcc_audit_hems_effective_max_production_power_w`
-- `evcc_audit_site_grid_import_power_w`
-- `evcc_audit_site_grid_export_power_w`
 - `evcc_audit_gridsession_event_start_timestamp_seconds`
 - `evcc_audit_minimum_allowed_power_w`
 - `evcc_audit_control_group_power_w`
+- `evcc_audit_control_units`
+- `evcc_audit_collector_up`
+- `evcc_audit_collector_last_success_timestamp_seconds`
+
+Grid power, home consumption, battery values, and raw loadpoint values are not stored again as long-term `evcc_audit_*` copies. The dashboards use the regular EVCC metrics such as `gridPower_value` for those values; the collector only uses them internally for calculations.
+
 
 Additionally, the collector writes `AUDIT_DATA_DIR/events/evcc-grid-control-events.csv`. This local CSV contains one row per intervention with start, end, type, status, limit, grid power at start, intervention source, and the EEBUS SKI when EVCC provides it.
 

@@ -361,13 +361,13 @@
                         "format": "table",
                         "instant": true,
                         "range": false,
-                        "expr": "label_set((sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"PV\") or label_set((sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) /1000, \"series\", \"Import réseau\") or label_set(((sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) * -1) /1000, \"series\", \"Maison\") or label_copy(((sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint)) * -1) /1000, \"loadpoint\", \"series\") or label_set(((sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)) * -1) /1000, \"series\", \"Injection\")"
+                        "expr": "WITH (\n  pv = label_set(\n    sum(sum_over_time((last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000,\n    \"series\",\n    \"PV\"\n  ),\n  gridImport = label_set(\n    sum(sum_over_time((last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) / 1000,\n    \"series\",\n    \"Import réseau\"\n  ),\n  home = label_set(\n    sum(sum_over_time((last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) * -1 / 1000,\n    \"series\",\n    \"Maison\"\n  ),\n  loadpoints = label_copy(\n    sum(sum_over_time((last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",loadpoint!~\"$loadpointBlocklist\"}[1d]))[$__range:1d])) by (local_month, loadpoint) * -1 / 1000,\n    \"loadpoint\",\n    \"series\"\n  ),\n  gridExport = label_set(\n    sum(sum_over_time((last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month) * -1 / 1000,\n    \"series\",\n    \"Injection\"\n  )\n)\npv or gridImport or home or loadpoints or gridExport"
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "A",
+                    "refId": "monthlyEnergy",
                     "hidden": false
                   }
                 }

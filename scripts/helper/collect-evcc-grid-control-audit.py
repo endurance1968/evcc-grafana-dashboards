@@ -21,12 +21,13 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.21.10"
+SCRIPT_VERSION = "2026.06.21.13"
 SCRIPT_LAST_MODIFIED = "2026-06-21"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
 def env(name: str, default: str = "") -> str:
     return os.environ.get(name, default).strip()
+
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
@@ -397,56 +398,17 @@ def build_state_metrics(
     lines: list[str] = [metric("evcc_audit_collector_up", 1, labels)]
 
     site = state.get("site") if isinstance(state.get("site"), dict) else {}
-    grid_power = first_present(
-        get_path(site, "grid", "power"),
-        site.get("gridPower"),
-        get_path(state, "grid", "power"),
-        state.get("gridPower"),
-    )
-    home_power = first_present(site.get("homePower"), state.get("homePower"))
-    grid_import_power: float | None = None
-    grid_export_power: float | None = None
-
-    grid_power_parsed = number(grid_power)
-    if grid_power_parsed is not None:
-        grid_import_power = max(grid_power_parsed, 0.0)
-        grid_export_power = max(-grid_power_parsed, 0.0)
-        lines.append(metric("evcc_audit_site_grid_power_w", grid_power_parsed, labels))
-        lines.append(metric("evcc_audit_site_grid_import_power_w", grid_import_power, labels))
-        lines.append(metric("evcc_audit_site_grid_export_power_w", grid_export_power, labels))
-
-    home_power_parsed = number(home_power)
-    if home_power_parsed is not None:
-        lines.append(metric("evcc_audit_site_home_power_w", home_power_parsed, labels))
 
     battery_grid_charge = first_present(site.get("batteryGridChargeActive"), state.get("batteryGridChargeActive"))
     battery_grid_charge_active = bool_to_number(battery_grid_charge)
-    battery_power_value: float | None = None
-    if battery_grid_charge_active is not None:
-        lines.append(metric("evcc_audit_battery_grid_charge_active", battery_grid_charge_active, labels))
-
     battery = state.get("battery") if isinstance(state.get("battery"), dict) else {}
     battery_power_value = number(first_present(battery.get("power"), state.get("batteryPower")))
-    if battery_power_value is not None:
-        lines.append(metric("evcc_audit_battery_power_w", battery_power_value, labels))
-    battery_soc_value = number(first_present(battery.get("soc"), state.get("batterySoc")))
-    if battery_soc_value is not None:
-        lines.append(metric("evcc_audit_battery_soc_percent", battery_soc_value, labels))
 
     hems_status = get_path(state, "hems", "status") or {}
     hems_dimmed = bool_to_number(hems_status.get("dimmed"))
     hems_curtailed = bool_to_number(hems_status.get("curtailed"))
-    if hems_dimmed is not None:
-        lines.append(metric("evcc_audit_hems_dimmed", hems_dimmed, labels))
-    if hems_curtailed is not None:
-        lines.append(metric("evcc_audit_hems_curtailed", hems_curtailed, labels))
-
     max_consumption_power = number(hems_status.get("maxConsumptionPower"))
     max_production_power = number(hems_status.get("maxProductionPower"))
-    if max_consumption_power is not None:
-        lines.append(metric("evcc_audit_hems_max_consumption_power_w", max_consumption_power, labels))
-    if max_production_power is not None:
-        lines.append(metric("evcc_audit_hems_max_production_power_w", max_production_power, labels))
 
     has_explicit_hems_state = hems_dimmed is not None or hems_curtailed is not None
     consumption_limit_active = hems_dimmed == 1 or (
@@ -458,14 +420,8 @@ def build_state_metrics(
     )
     effective_max_consumption_power = max_consumption_power if consumption_limit_active and max_consumption_power is not None else 0.0
     effective_max_production_power = abs(max_production_power) if production_limit_active and max_production_power is not None else 0.0
-    lines.append(metric("evcc_audit_vnb_signal_active", 1 if consumption_limit_active or production_limit_active else 0, labels))
     lines.append(metric("evcc_audit_hems_effective_max_consumption_power_w", effective_max_consumption_power, labels))
     lines.append(metric("evcc_audit_hems_effective_max_production_power_w", effective_max_production_power, labels))
-
-    if grid_import_power is not None:
-        lines.append(metric("evcc_audit_vnb_consumption_margin_w", effective_max_consumption_power - grid_import_power, labels))
-    if grid_export_power is not None:
-        lines.append(metric("evcc_audit_vnb_production_margin_w", effective_max_production_power - grid_export_power, labels))
 
     loadpoint_powers: dict[str, float] = {}
     loadpoints = state.get("loadpoints") if isinstance(state.get("loadpoints"), list) else []
@@ -477,24 +433,6 @@ def build_state_metrics(
         if charge_power is not None:
             loadpoint_powers[str(index)] = charge_power
             loadpoint_powers[lp_name] = charge_power
-        lp_labels = {"site": site_id, "loadpoint": str(index), "name": lp_name}
-        for field, name in [
-            ("chargePower", "evcc_audit_loadpoint_charge_power_w"),
-            ("offeredCurrent", "evcc_audit_loadpoint_offered_current_a"),
-            ("effectiveMaxCurrent", "evcc_audit_loadpoint_effective_max_current_a"),
-            ("phasesActive", "evcc_audit_loadpoint_phases_active"),
-        ]:
-            parsed = number(loadpoint.get(field))
-            if parsed is not None:
-                lines.append(metric(name, parsed, lp_labels))
-        for field, name in [
-            ("enabled", "evcc_audit_loadpoint_enabled"),
-            ("charging", "evcc_audit_loadpoint_charging"),
-            ("connected", "evcc_audit_loadpoint_connected"),
-        ]:
-            parsed = bool_to_number(loadpoint.get(field))
-            if parsed is not None:
-                lines.append(metric(name, parsed, lp_labels))
 
     for group in control_groups:
         group_labels = {"site": site_id, "group": group.group_id, "name": group.name, "kind": group.kind}
@@ -513,20 +451,22 @@ def build_state_metrics(
         minimum_power = minimum_allowed_power_w(effective_unit_count, minimum_base_w, minimum_mode, minimum_override_w, additional_unit_factor)
         lines.append(metric("evcc_audit_control_units", effective_unit_count, labels))
         lines.append(metric("evcc_audit_minimum_allowed_power_w", minimum_power, labels))
-        if grid_import_power is not None:
-            lines.append(metric("evcc_audit_calculated_minimum_margin_w", minimum_power - grid_import_power, labels))
 
     return lines
 
 def event_history_signature(event: dict[str, Any]) -> tuple[str, ...]:
     return tuple(
         str(event.get(field, "")).strip()
-        for field in ["site_id", "start_time_utc", "type", "limit_w", "grid_power_start_w"]
+        for field in ["site_id", "start_time_utc", "type", "grid_power_start_w"]
     )
+
 
 def merge_event_history_row(existing: dict[str, str], candidate: dict[str, str]) -> dict[str, str]:
     merged = dict(existing)
     previous_end_time = str(merged.get("end_time_utc", "")).strip()
+    current_last_seen = str(merged.get("last_seen_utc", "")).strip()
+    candidate_last_seen = str(candidate.get("last_seen_utc", "")).strip()
+    candidate_is_newer = bool(candidate_last_seen and candidate_last_seen >= current_last_seen)
     for field in CSV_EVENT_FIELDS:
         current_value = str(merged.get(field, "")).strip()
         candidate_value = str(candidate.get(field, "")).strip()
@@ -536,14 +476,15 @@ def merge_event_history_row(existing: dict[str, str], candidate: dict[str, str])
     candidate_status = str(candidate.get("status", "")).strip()
     candidate_end_time = str(candidate.get("end_time_utc", "")).strip()
     end_time_changed = bool(candidate_end_time and candidate_end_time > previous_end_time)
+    candidate_limit = str(candidate.get("limit_w", "")).strip()
+    if candidate_is_newer and candidate_limit:
+        merged["limit_w"] = candidate_limit
     if end_time_changed:
         merged["end_time_utc"] = candidate_end_time
     if candidate_status == "finished" or end_time_changed:
         merged["status"] = "finished"
     elif candidate_status and current_status != "finished":
         merged["status"] = candidate_status
-    current_last_seen = str(merged.get("last_seen_utc", "")).strip()
-    candidate_last_seen = str(candidate.get("last_seen_utc", "")).strip()
     if candidate_last_seen and candidate_last_seen > current_last_seen:
         if candidate_status == "active" or end_time_changed or not current_last_seen:
             merged["last_seen_utc"] = candidate_last_seen
