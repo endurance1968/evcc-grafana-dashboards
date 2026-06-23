@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.19.1"
+SCRIPT_VERSION="2026.06.23.3"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-19"
+SCRIPT_LAST_MODIFIED="2026-06-23"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -67,7 +67,7 @@ done
 printf '%s v%s (build %s, last modified %s, run %s)\n' "$SCRIPT_NAME" "$SCRIPT_VERSION" "$SCRIPT_BUILD_DATE" "$SCRIPT_LAST_MODIFIED" "$(date '+%Y-%m-%dT%H:%M:%S%z')"
 
 PYTHONIOENCODING="${PYTHONIOENCODING:-utf-8}"
-export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_THEME CLI_YES SCRIPT_DIR PYTHONIOENCODING
+export CLI_URL CLI_TOKEN CLI_PURGE CLI_PURGE_ONLY CLI_THEME CLI_YES SCRIPT_DIR SCRIPT_VERSION PYTHONIOENCODING
 
 python3 - "$CONFIG_PATH" <<'PY'
 import json
@@ -76,9 +76,9 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime
 from pathlib import Path
 
+SCRIPT_VERSION = os.environ.get("SCRIPT_VERSION", "unknown")
 config_path = Path(sys.argv[1])
 
 settings = {
@@ -356,6 +356,13 @@ def replace_ds(node):
         return [replace_ds(item) for item in node]
     if isinstance(node, dict):
         out = {k: replace_ds(v) for k, v in node.items()}
+        if out.get("group") == "victoriametrics-metrics-datasource" and isinstance(out.get("datasource"), dict):
+            datasource = dict(out["datasource"])
+            target = settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"] if datasource.get("name") == settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"] or datasource.get("uid") == settings["GRAFANA_DS_VM_EVCC_AUDIT_UID"] else settings["GRAFANA_DS_VM_EVCC_UID"]
+            datasource["type"] = "victoriametrics-metrics-datasource"
+            datasource["uid"] = target
+            datasource["name"] = target
+            out["datasource"] = datasource
         if out.get("type") == "victoriametrics-metrics-datasource" and "uid" in out:
             out["uid"] = settings["GRAFANA_DS_VM_EVCC_UID"]
         return out
@@ -415,15 +422,13 @@ def build_inputs(raw):
     return out
 
 def build_dashboard_marker(settings):
-    timestamp = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
     if settings["DASHBOARD_SOURCE_MODE"] == "localdir":
         source = f"localdir:{settings['DASHBOARD_LOCAL_DIR']}"
-        return f"deployed {timestamp} | {source}"
-    if settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
+    elif settings["DASHBOARD_SOURCE_MODE"] == "rawurl":
         source = f"rawurl:{settings['DASHBOARD_RAW_BASE_URL'].rstrip('/')}"
     else:
         source = f"github:{settings['GITHUB_REPO']}@{settings['GITHUB_REF']}"
-    return f"deployed {timestamp} | {effective_dashboard_language()}/{settings['DASHBOARD_VARIANT']} | {source}"
+    return f"build {SCRIPT_VERSION} | {effective_dashboard_language()}/{settings['DASHBOARD_VARIANT']} | {source}"
 
 
 

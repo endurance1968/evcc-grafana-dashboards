@@ -32,9 +32,9 @@ param(
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$ScriptVersion = '2026.06.19.1'
+$ScriptVersion = '2026.06.23.2'
 $ScriptBuildDate = '2026-05-31'
-$ScriptLastModified = '2026-06-19'
+$ScriptLastModified = '2026-06-23'
 Write-Host "$((Split-Path -Leaf $PSCommandPath)) v$ScriptVersion (build $ScriptBuildDate, last modified $ScriptLastModified, run $((Get-Date).ToString('yyyy-MM-ddTHH:mm:sszzz')))"
 
 function Load-DotEnv([string]$Path) {
@@ -296,6 +296,16 @@ function Parse-JsonDocument([string]$Json) {
   return Convert-JsonNode ($serializer.DeserializeObject($Json))
 }
 
+function Convert-ObjectToHashtable($Node) {
+  $out = @{}
+  if ($Node -is [hashtable]) {
+    foreach ($key in $Node.Keys) { $out[[string]$key] = $Node[$key] }
+  } elseif ($Node -is [pscustomobject]) {
+    foreach ($prop in $Node.PSObject.Properties) { $out[$prop.Name] = $prop.Value }
+  }
+  return $out
+}
+
 function Replace-DatasourcePlaceholders($Node) {
   if ($null -eq $Node) { return $Node }
   if ($Node -is [string]) {
@@ -310,15 +320,14 @@ function Replace-DatasourcePlaceholders($Node) {
   }
   if ($Node -is [hashtable] -or $Node -is [pscustomobject]) {
     $out = @{}
-    foreach ($prop in $Node.PSObject.Properties) { $out[$prop.Name] = Replace-DatasourcePlaceholders $prop.Value }
+    $inputMap = Convert-ObjectToHashtable $Node
+    foreach ($key in $inputMap.Keys) { $out[$key] = Replace-DatasourcePlaceholders $inputMap[$key] }
     if ($out.ContainsKey('group') -and [string]$out['group'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('datasource') -and ($out['datasource'] -is [hashtable] -or $out['datasource'] -is [pscustomobject])) {
-      $datasource = @{}
-      foreach ($prop in $out['datasource'].PSObject.Properties) { $datasource[$prop.Name] = $prop.Value }
-      $targetDatasource = if ([string]$datasource['name'] -eq [string]$settings.GRAFANA_DS_VM_EVCC_AUDIT_UID) { $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID } else { $settings.GRAFANA_DS_VM_EVCC_UID }
+      $datasource = Convert-ObjectToHashtable $out['datasource']
+      $targetDatasource = if ([string]$datasource['name'] -eq [string]$settings.GRAFANA_DS_VM_EVCC_AUDIT_UID -or [string]$datasource['uid'] -eq [string]$settings.GRAFANA_DS_VM_EVCC_AUDIT_UID) { $settings.GRAFANA_DS_VM_EVCC_AUDIT_UID } else { $settings.GRAFANA_DS_VM_EVCC_UID }
+      $datasource['type'] = 'victoriametrics-metrics-datasource'
+      $datasource['uid'] = $targetDatasource
       $datasource['name'] = $targetDatasource
-      if ($datasource.ContainsKey('uid')) {
-        $datasource['uid'] = $targetDatasource
-      }
       $out['datasource'] = [pscustomobject]$datasource
     }
     if ($out.ContainsKey('type') -and [string]$out['type'] -eq 'victoriametrics-metrics-datasource' -and $out.ContainsKey('uid')) {
@@ -328,7 +337,6 @@ function Replace-DatasourcePlaceholders($Node) {
   }
   return $Node
 }
-
 function Is-V2Dashboard($Raw) {
   return ($null -ne $Raw -and $null -ne $Raw.PSObject.Properties['kind'] -and [string]$Raw.kind -eq 'Dashboard' -and $null -ne $Raw.PSObject.Properties['apiVersion'] -and [string]$Raw.apiVersion -like 'dashboard.grafana.app/v2*')
 }
@@ -390,17 +398,14 @@ function Build-Inputs($Raw) {
 }
 
 function Get-DashboardBuildMarker() {
-  $timestamp = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss zzz")
   if ($settings.DASHBOARD_SOURCE_MODE -eq 'localdir') {
     $source = "localdir:$($settings.DASHBOARD_LOCAL_DIR)"
-    return "deployed $timestamp | $source"
-  }
-  if ($settings.DASHBOARD_SOURCE_MODE -eq 'rawurl') {
+  } elseif ($settings.DASHBOARD_SOURCE_MODE -eq 'rawurl') {
     $source = "rawurl:$(([string]$settings.DASHBOARD_RAW_BASE_URL).TrimEnd('/'))"
   } else {
     $source = "github:$($settings.GITHUB_REPO)@$($settings.GITHUB_REF)"
   }
-  return "deployed $timestamp | $(Get-EffectiveDashboardLanguage)/$($settings.DASHBOARD_VARIANT) | $source"
+  return "build $ScriptVersion | $(Get-EffectiveDashboardLanguage)/$($settings.DASHBOARD_VARIANT) | $source"
 }
 
 function Get-DashboardOverrides() {

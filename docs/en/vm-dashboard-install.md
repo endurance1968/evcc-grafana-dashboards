@@ -176,7 +176,7 @@ Backward-compatible aliases are still accepted:
 - `DASHBOARD_FUEL_PRICE_PER_L` for `DASHBOARD_FUEL_COST_PER_L`
 - `DASHBOARD_BATTERY_CAPACITY_WH` for `DASHBOARD_STORAGE_CAPACITY_WH`
 
-Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see deployment timestamp, selected language/variant, and source ref.
+Every deployed dashboard includes a small visible `Build` variable in the header. Hover over it to see the deployer build number, selected language/variant, and source ref. The installation timestamp is intentionally not used as the dashboard version.
 
 ## Runtime Arguments
 

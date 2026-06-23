@@ -3,9 +3,9 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.19.1"
+SCRIPT_VERSION="2026.06.23.2"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-19"
+SCRIPT_LAST_MODIFIED="2026-06-23"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -525,15 +525,12 @@ dashboard_build_marker() {
   local source
   if [[ "$DASHBOARD_SOURCE_MODE" == "localdir" ]]; then
     source="localdir:$DASHBOARD_LOCAL_DIR"
-    printf 'deployed %s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$source"
-    return
-  fi
-  if [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
+  elif [[ "$DASHBOARD_SOURCE_MODE" == "rawurl" ]]; then
     source="rawurl:${DASHBOARD_RAW_BASE_URL%/}"
   else
     source="github:$GITHUB_REPO@$GITHUB_REF"
   fi
-  printf 'deployed %s | %s/%s | %s' "$(date '+%Y-%m-%d %H:%M:%S %z')" "$(effective_dashboard_language)" "$DASHBOARD_VARIANT" "$source"
+  printf 'build %s | %s/%s | %s' "$SCRIPT_VERSION" "$(effective_dashboard_language)" "$DASHBOARD_VARIANT" "$source"
 }
 
 apply_dashboard_build_description() {
@@ -593,7 +590,7 @@ print_dashboard_overrides() {
   done
 }
 
-replace_ds_filter='def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk(if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "string" and . == "${DS_VM-EVCC-AUDIT}" then $auditDs elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end)'
+replace_ds_filter='def normalize_vm_query_ds: if type == "object" and .group == "victoriametrics-metrics-datasource" and (.datasource | type == "object") then .datasource as $old | (if (($old.name // "") == $auditDs or ($old.uid // "") == $auditDs) then $auditDs else $ds end) as $target | .datasource = ($old + {name: $target, uid: $target, type: "victoriametrics-metrics-datasource"}) elif type == "object" and .type == "victoriametrics-metrics-datasource" and has("uid") then .uid = $ds else . end; def walk(f): . as $in | if type == "object" then reduce keys[] as $key ({}; .[$key] = ($in[$key] | walk(f))) | f elif type == "array" then map(walk(f)) | f else f end; walk((if type == "string" and . == "${DS_VM-EVCC}" then $ds elif type == "string" and . == "${DS_VM-EVCC-AUDIT}" then $auditDs else . end) | normalize_vm_query_ds)'
 
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT

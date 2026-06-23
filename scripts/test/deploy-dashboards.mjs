@@ -19,8 +19,8 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.06.03.1";
-const SCRIPT_LAST_MODIFIED = "2026-06-03";
+const SCRIPT_VERSION = "2026.06.23.1";
+const SCRIPT_LAST_MODIFIED = "2026-06-23";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -396,7 +396,7 @@ function applyOverridesToDashboard(raw, overrides) {
 }
 
 function buildDashboardBuildMarker(sourceLabel) {
-  return `deployed ${new Date().toISOString()} | ${language}/${variant} | ${tag} | ${sourceLabel}`;
+  return `build ${SCRIPT_VERSION} | ${language}/${variant} | ${tag} | ${sourceLabel}`;
 }
 
 function applyDashboardBuildDescription(raw, marker) {

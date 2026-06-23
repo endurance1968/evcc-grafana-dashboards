@@ -1,8 +1,8 @@
 /**
  * Script: powershell-deployer-compat.mjs
  * Purpose: Validate deploy.ps1 JSON handling and localdir dashboard loading under Windows PowerShell 5.1 so copied deployers behave like the repo version.
- * Version: 2026.06.16.1
- * Last modified: 2026-06-16
+ * Version: 2026.06.23.1
+ * Last modified: 2026-06-23
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -12,8 +12,8 @@ import { readDeployManifest, resolveDashboardFiles } from "../helper/deploy-mani
 
 const repoRoot = process.cwd();
 const scriptName = "powershell-deployer-compat.mjs";
-const version = "2026.06.16.1";
-const lastModified = "2026-06-16";
+const version = "2026.06.23.1";
+const lastModified = "2026-06-23";
 const deployerPath = path.join(repoRoot, "scripts", "deploy.ps1");
 const manifest = readDeployManifest(repoRoot);
 const defaultDashboardFiles = resolveDashboardFiles(manifest);
@@ -124,11 +124,14 @@ function buildHarness(functionSources) {
     "",
     `$repoRoot = '${repoRoot.replace(/'/g, "''")}'`,
     `$dashboardPath = '${dashboardPath.replace(/'/g, "''")}'`,
+    `$detailsDashboardPath = Join-Path $repoRoot 'dashboards/original/en/VM_EVCC_Today-Details.json'`,
     `$localDashboardDir = '${localDashboardDir.replace(/'/g, "''")}'`,
-    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; DASHBOARD_SOURCE_MODE = 'localdir'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
+    "$settings = @{ GRAFANA_DS_VM_EVCC_UID = 'vm-evcc'; GRAFANA_DS_VM_EVCC_AUDIT_UID = 'vm-audit'; DASHBOARD_SOURCE_MODE = 'localdir'; DASHBOARD_LOCAL_DIR = $localDashboardDir }",
     "$FixedDashboardFiles = @('VM_EVCC_All-time.json','VM_EVCC_Year.json','VM_EVCC_Month.json','VM_EVCC_Today-Details.json','VM_EVCC_Today.json','VM_EVCC_Today-Mobile.json')",
     "$raw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $dashboardPath)",
     "$rewritten = Replace-DatasourcePlaceholders $raw",
+    "$detailsRaw = Parse-JsonDocument (Get-Content -Raw -LiteralPath $detailsDashboardPath)",
+    "$detailsRewritten = Replace-DatasourcePlaceholders $detailsRaw",
     "$dashboardFiles = @(Get-DashboardFilesFromManifest)",
     "$sourceText = Get-SourceFileContent 'VM_EVCC_Today.json'",
     "",
@@ -183,6 +186,13 @@ function buildHarness(functionSources) {
     "Assert-Array $metric.options.reduceOptions.calcs 'metric.options.reduceOptions.calcs' 1",
     "if ($metric.targets[0].datasource.uid -ne 'vm-evcc') { throw \"metric.targets[0].datasource.uid is $($metric.targets[0].datasource.uid), expected vm-evcc\" }",
     "",
+    "$gridPanel = $detailsRewritten.spec.elements.'panel-44'",
+    "if ($null -eq $gridPanel) { throw 'Grid-control v2 panel panel-44 not found' }",
+    "$gridQuery = @($gridPanel.spec.data.spec.queries)[0].spec.query",
+    "if ($gridQuery.datasource.uid -ne 'vm-audit') { throw \"gridQuery.datasource.uid is $($gridQuery.datasource.uid), expected vm-audit\" }",
+    "if ($gridQuery.datasource.name -ne 'vm-audit') { throw \"gridQuery.datasource.name is $($gridQuery.datasource.name), expected vm-audit\" }",
+    "if ($gridQuery.datasource.type -ne 'victoriametrics-metrics-datasource') { throw \"gridQuery.datasource.type is $($gridQuery.datasource.type), expected victoriametrics-metrics-datasource\" }",
+    "",
     "if ($dashboardFiles.Count -ne 6) { throw \"Get-DashboardFilesFromManifest returned $($dashboardFiles.Count), expected 6\" }",
     "if (-not $sourceText.Contains('\"title\"')) { throw 'Get-SourceFileContent returned unexpected dashboard content' }",
     "",
@@ -202,6 +212,7 @@ function main() {
   const functionSources = [
     extractFunctionSource(deployerText, "Convert-JsonNode"),
     extractFunctionSource(deployerText, "Parse-JsonDocument"),
+    extractFunctionSource(deployerText, "Convert-ObjectToHashtable"),
     extractFunctionSource(deployerText, "Replace-DatasourcePlaceholders"),
     extractFunctionSource(deployerText, "Get-SourceFileContent"),
     extractFunctionSource(deployerText, "Get-DashboardFilesFromManifest"),

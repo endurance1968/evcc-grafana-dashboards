@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.21.1
- * Last modified: 2026-06-21
+ * Version: 2026.06.23.1
+ * Last modified: 2026-06-23
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -866,6 +866,18 @@ function validateDashboard(fileName, dashboard) {
     validateSemanticColors(fileName, panel, failures);
     for (const override of panel.fieldConfig?.overrides || []) {
       assert(!(override?.matcher?.id === "byName" && forbiddenUserSpecificMatchers.has(override?.matcher?.options)), failures, `${fileName}: panel '${panel.title}' must not contain user-specific byName matcher '${override?.matcher?.options}'`);
+    }
+  }
+
+  for (const panel of panels) {
+    for (const target of panel.targets || []) {
+      const querySpec = target?.raw?.spec?.query?.spec || {};
+      const queryDatasource = target?.raw?.spec?.query?.datasource || target?.datasource || {};
+      const datasourceName = String(queryDatasource?.name || queryDatasource?.uid || "");
+      const datasourceType = String(queryDatasource?.type || "");
+      const queryType = String(target?.queryType || target?.scenarioId || querySpec?.queryType || querySpec?.scenarioId || "");
+      assert(datasourceName !== "-- Grafana --" && datasourceType !== "grafana", failures, `${fileName}: panel '${panel.title || panel.id}' target '${target.refId || "?"}' must not use Grafana's test datasource`);
+      assert(!/random\s*walk|random_walk/i.test(queryType), failures, `${fileName}: panel '${panel.title || panel.id}' target '${target.refId || "?"}' must not use Random Walk test data`);
     }
   }
 

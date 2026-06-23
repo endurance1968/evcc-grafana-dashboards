@@ -178,7 +178,7 @@ Rueckwaertskompatible Aliase werden weiterhin akzeptiert:
 - `DASHBOARD_FUEL_PRICE_PER_L` fuer `DASHBOARD_FUEL_COST_PER_L`
 - `DASHBOARD_BATTERY_CAPACITY_WH` fuer `DASHBOARD_STORAGE_CAPACITY_WH`
 
-Jedes deployte Dashboard enthaelt eine kleine sichtbare `Build`-Variable im Header. Beim Hover zeigt sie Deployment-Zeitpunkt, Sprache/Variante und Source Ref.
+Jedes deployte Dashboard enthaelt eine kleine sichtbare `Build`-Variable im Header. Beim Hover zeigt sie die Deployer-Buildnummer, Sprache/Variante und Source Ref. Der Installationszeitpunkt wird bewusst nicht als Dashboard-Version verwendet.
 
 ## Laufzeitargumente
 
