@@ -1,8 +1,8 @@
 /**
  * Script: import-dashboards-raw.mjs
  * Purpose: Import raw dashboard JSON files into Grafana and emit an import manifest.
- * Version: 2026.06.04.1
- * Last modified: 2026-06-04
+ * Version: 2026.06.23.1
+ * Last modified: 2026-06-23
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -199,7 +199,7 @@ function prepareV2Dashboard(raw, filePath) {
   };
   dashboard.spec ||= {};
   dashboard.spec.title = titleWithPrefix(dashboardTitle(dashboard) || path.basename(filePath, ".json"));
-  return dashboard;
+  return deepReplaceDataSourcePlaceholders(dashboard, dsMap);
 }
 
 function prepareDashboard(raw, filePath) {
@@ -363,4 +363,3 @@ main().catch((err) => {
   console.error(err.message || err);
   process.exit(1);
 });
-

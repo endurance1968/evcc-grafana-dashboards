@@ -898,7 +898,13 @@ function validateDashboard(fileName, dashboard) {
     const gridControlTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Grid control");
     assert(Boolean(gridControlTab), failures, `${fileName}: Today Details must include the optional Grid control tab`);
     if (gridControlTab) {
-      assert(!gridControlTab.spec?.conditionalRendering, failures, `${fileName}: Grid control tab must stay visible; hidden helper variables are too brittle for optional audit data`);
+      const gridControlConditional = gridControlTab.spec?.conditionalRendering;
+      assert(gridControlConditional?.kind === "ConditionalRenderingGroup", failures, `${fileName}: Grid control tab must be conditionally shown only when audit metrics exist`);
+      const gridControlConditionalItems = gridControlConditional?.spec?.items || [];
+      const gridControlConditionalVariable = gridControlConditionalItems.find((item) => item.kind === "ConditionalRenderingVariable");
+      assert(gridControlConditionalVariable?.spec?.variable === "hasGridControlAuditData", failures, `${fileName}: Grid control tab must depend on hasGridControlAuditData`);
+      assert(gridControlConditionalVariable?.spec?.operator === "matches", failures, `${fileName}: Grid control tab visibility must use a matches condition`);
+      assert(gridControlConditionalVariable?.spec?.value === ".+", failures, `${fileName}: Grid control tab visibility must require at least one audit metric`);
       for (const text of ["Manual", "Manuelle", "Simulator", "MQTT", "eebus"]) {
         assert(!rawJson.includes(text), failures, `${fileName}: Grid control support must not include simulator control text ${text}`);
       }
@@ -917,6 +923,20 @@ function validateDashboard(fileName, dashboard) {
         assert(!rawJson.includes(metric), failures, `${fileName}: Grid control panels must use normal EVCC grid metrics instead of duplicate audit metric ${metric}`);
       }
       assert(rawJson.includes("${DS_VM-EVCC-AUDIT}"), failures, `${fileName}: Grid control support must use the optional audit datasource placeholder`);
+
+      const gridLimitsPanel = panels.find((item) => item.title === "Grid operator limits vs. grid power (15 min)");
+      assert(Boolean(gridLimitsPanel), failures, `${fileName}: missing grid-control limits panel`);
+      const gridLimitsExprByRef = new Map(
+        (gridLimitsPanel?.targets || []).map((target) => [
+          target.refId,
+          String(target?.expr || target?.raw?.spec?.query?.spec?.expr || ""),
+        ]),
+      );
+      assert(/clamp_min\(gridPower_value, 0\)/.test(gridLimitsExprByRef.get("gridImport15m") || ""), failures, `${fileName}: Grid import must stay positive`);
+      assert(/clamp_min\(-gridPower_value, 0\).*\* -1/.test(gridLimitsExprByRef.get("gridFeedIn15m") || ""), failures, `${fileName}: Feed-in must be rendered as negative grid power`);
+      assert(!String(gridLimitsExprByRef.get("consumptionLimit") || "").includes("* -1"), failures, `${fileName}: Consumption limit must stay positive`);
+      assert(String(gridLimitsExprByRef.get("productionLimit") || "").includes("* -1"), failures, `${fileName}: Feed-in limit must be rendered negative like feed-in power`);
+
       const eventPanel = panels.find((item) => item.title === "EVCC control events");
       assert(Boolean(eventPanel), failures, `${fileName}: Grid control tab must include the EVCC control events table`);
       const eventTarget = eventPanel?.targets?.find((target) => target?.refId === "events");
@@ -954,8 +974,13 @@ function validateDashboard(fileName, dashboard) {
         );
       }
     }
-    const gridControlVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlData");
-    assert(!gridControlVariable, failures, `${fileName}: Grid control tab must not depend on the removed hidden hasGridControlData variable`);
+    const removedGridControlVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlData");
+    assert(!removedGridControlVariable, failures, `${fileName}: Grid control tab must not depend on the removed hidden hasGridControlData variable`);
+    const gridControlAuditVariable = dashboardVariables(dashboard).find((variable) => dashboardVariableName(variable) === "hasGridControlAuditData");
+    assert(Boolean(gridControlAuditVariable), failures, `${fileName}: Grid control tab must define the hidden hasGridControlAuditData variable`);
+    const gridControlAuditVariableJson = JSON.stringify(gridControlAuditVariable || {});
+    assert(gridControlAuditVariableJson.includes("evcc_audit_"), failures, `${fileName}: hasGridControlAuditData must detect audit metrics`);
+    assert(!gridControlAuditVariableJson.includes("gridPower_value"), failures, `${fileName}: hasGridControlAuditData must not treat normal grid power data as grid-control data`);
 
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
     const loadpointRows = loadpointTab?.spec?.layout?.spec?.rows || [];

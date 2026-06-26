@@ -4,7 +4,7 @@ Englische Version: [grid-control-audit.md](../en/grid-control-audit.md).
 
 Diese optionale Anleitung richtet den Zusatz-Collector fuer den Daily-Details-Tab `Netzsteuerung` ein. Der normale EVCC/Telegraf-Live-Ingest bleibt unveraendert und liefert weiterhin die normalen EVCC-Metriken. Der Audit-Collector liest EVCC nur lesend aus, schreibt zusaetzliche `evcc_audit_*`-Metriken nach VictoriaMetrics und fuehrt lokal eine kumulative CSV-Datei der erkannten Eingriffe.
 
-Der Tab bleibt sichtbar, damit die Netzsteuerungsdaten gezielt geprueft werden koennen. Ohne Audit-Metriken zeigen die Panels keine Daten; sobald der Collector Werte oder GridSession-Ereignisse liefert, werden Limits, Reserven, steuerbare Gruppen und die Event-Tabelle gefuellt.
+Der Tab wird automatisch nur angezeigt, wenn in der konfigurierten Audit-Datasource `evcc_audit_*`-Metriken vorhanden sind. Normale EVCC-Netzmetriken reichen dafuer nicht aus. Ohne Collector/Audit-Metriken bleibt der Tab verborgen; sobald der Collector Werte oder GridSession-Ereignisse liefert, werden Limits, Reserven, steuerbare Gruppen und die Event-Tabelle gefuellt.
 
 ## Was der Collector schreibt
 

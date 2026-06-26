@@ -4,7 +4,7 @@ German version: [grid-control-audit.md](../de/grid-control-audit.md).
 
 This optional guide installs the helper collector used by the Daily Details `Grid control` tab. The normal EVCC/Telegraf live ingest remains unchanged and continues to provide the regular EVCC metrics. The audit collector reads EVCC through read-only API calls, writes additional `evcc_audit_*` metrics to VictoriaMetrics, and keeps a local cumulative CSV file for detected interventions.
 
-The tab stays visible so grid-control data can be checked explicitly. Without audit metrics the panels show no data; once the collector writes values or GridSession events, limits, reserves, controllable groups, and the event table are populated.
+The tab is shown automatically only when the configured audit datasource contains `evcc_audit_*` metrics. Regular EVCC grid metrics are not enough. Without collector/audit metrics the tab remains hidden; once the collector writes values or GridSession events, limits, reserves, controllable groups, and the event table are populated.
 
 ## What The Collector Writes
 

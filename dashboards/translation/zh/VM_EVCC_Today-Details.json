@@ -4908,7 +4908,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max(avg_over_time(clamp_min(-gridPower_value, 0)[15m]))",
+                        "expr": "max(avg_over_time(clamp_min(-gridPower_value, 0)[15m])) * -1",
                         "format": "time_series",
                         "legendFormat": "上网馈电 15 分钟平均",
                         "range": true
@@ -4952,7 +4952,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (evcc_audit_hems_effective_max_production_power_w)",
+                        "expr": "max by (site) (evcc_audit_hems_effective_max_production_power_w) * -1",
                         "format": "time_series",
                         "legendFormat": "馈电限制",
                         "range": true
@@ -6918,6 +6918,46 @@
             }
           ]
         }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "name": "hasGridControlAuditData",
+          "label": "Grid-control audit data",
+          "description": "Internal helper variable. Shows the grid-control tab only when EVCC audit/network-limit metrics exist in the selected datasource.",
+          "hide": "hideVariable",
+          "skipUrlSync": true,
+          "refresh": "onTimeRangeChanged",
+          "query": {
+            "kind": "DataQuery",
+            "group": "victoriametrics-metrics-datasource",
+            "version": "v0",
+            "datasource": {
+              "name": "${DS_VM-EVCC-AUDIT}"
+            },
+            "spec": {
+              "editorMode": "code",
+              "query": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
+              "expr": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
+              "qryType": 1,
+              "refId": "VariableQueryEditor-VariableQuery"
+            }
+          },
+          "definition": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
+          "regex": "",
+          "regexApplyTo": "value",
+          "sort": "disabled",
+          "current": {
+            "selected": false,
+            "text": "",
+            "value": ""
+          },
+          "options": [],
+          "multi": false,
+          "includeAll": false,
+          "allowCustomValue": false
+        },
+        "group": "query"
       }
     ],
     "layout": {
@@ -7359,6 +7399,23 @@
                           "kind": "ElementReference",
                           "name": "panel-49"
                         }
+                      }
+                    }
+                  ]
+                }
+              },
+              "conditionalRendering": {
+                "kind": "ConditionalRenderingGroup",
+                "spec": {
+                  "visibility": "show",
+                  "condition": "and",
+                  "items": [
+                    {
+                      "kind": "ConditionalRenderingVariable",
+                      "spec": {
+                        "variable": "hasGridControlAuditData",
+                        "operator": "matches",
+                        "value": ".+"
                       }
                     }
                   ]
