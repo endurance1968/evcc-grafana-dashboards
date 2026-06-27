@@ -6937,13 +6937,13 @@
             },
             "spec": {
               "editorMode": "code",
-              "query": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
-              "expr": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
+              "query": "label_values({__name__=~\"evcc_audit_.+\"}, site)",
+              "expr": "label_values({__name__=~\"evcc_audit_.+\"}, site)",
               "qryType": 1,
               "refId": "VariableQueryEditor-VariableQuery"
             }
           },
-          "definition": "label_values(evcc_audit_hems_effective_max_consumption_power_w, site)",
+          "definition": "label_values({__name__=~\"evcc_audit_.+\"}, site)",
           "regex": "",
           "regexApplyTo": "value",
           "sort": "disabled",

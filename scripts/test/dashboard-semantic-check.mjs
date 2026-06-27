@@ -980,6 +980,7 @@ function validateDashboard(fileName, dashboard) {
     assert(Boolean(gridControlAuditVariable), failures, `${fileName}: Grid control tab must define the hidden hasGridControlAuditData variable`);
     const gridControlAuditVariableJson = JSON.stringify(gridControlAuditVariable || {});
     assert(gridControlAuditVariableJson.includes("evcc_audit_"), failures, `${fileName}: hasGridControlAuditData must detect audit metrics`);
+    assert(gridControlAuditVariableJson.includes("__name__=~"), failures, `${fileName}: hasGridControlAuditData must detect the audit metric family, not one single audit series`);
     assert(!gridControlAuditVariableJson.includes("gridPower_value"), failures, `${fileName}: hasGridControlAuditData must not treat normal grid power data as grid-control data`);
 
     const loadpointTab = dashboard.spec?.layout?.spec?.tabs?.find((tab) => tab.spec?.title === "Loadpoints");
