@@ -5450,7 +5450,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "max by (site) (evcc_audit_hems_effective_max_production_power_w) - max(avg_over_time(clamp_min(-gridPower_value, 0)[15m]))",
+                        "expr": "(-1 * (max by (site) (evcc_audit_hems_effective_max_production_power_w) - max(avg_over_time(clamp_min(-gridPower_value, 0)[15m])))) and (max by (site) (evcc_audit_hems_effective_max_production_power_w) > 0)",
                         "format": "time_series",
                         "legendFormat": "Reserva de inyeccion media 15 min",
                         "range": true
