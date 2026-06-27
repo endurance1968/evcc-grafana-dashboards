@@ -150,8 +150,8 @@ Installation aus einem vorhandenen Repo-Checkout:
 
 ```bash
 sudo apt install -y python3-openpyxl
-sudo mkdir -p /opt/evcc-vm-migration
-sudo install -m 0755 scripts/helper/import-investment-costs.py /opt/evcc-vm-migration/import-investment-costs.py
+sudo mkdir -p /opt/evcc-vm-tools
+sudo install -m 0755 scripts/helper/import-investment-costs.py /opt/evcc-vm-tools/import-investment-costs.py
 sudo install -m 0755 scripts/helper/evcc-vm-investment-weekly.sh /usr/local/bin/evcc-vm-investment-weekly.sh
 sudo install -m 0640 scripts/helper/evcc-vm-investment-weekly.conf.example /etc/evcc-vm-investment-costs.conf
 sudo nano /etc/evcc-vm-investment-costs.conf
@@ -165,11 +165,11 @@ BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/ma
 # BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
 
 sudo apt install -y python3-openpyxl
-sudo mkdir -p /opt/evcc-vm-migration
+sudo mkdir -p /opt/evcc-vm-tools
 curl -fsSLo /tmp/import-investment-costs.py "$BASE/scripts/helper/import-investment-costs.py"
 curl -fsSLo /tmp/evcc-vm-investment-weekly.sh "$BASE/scripts/helper/evcc-vm-investment-weekly.sh"
 curl -fsSLo /tmp/evcc-vm-investment-weekly.conf.example "$BASE/scripts/helper/evcc-vm-investment-weekly.conf.example"
-sudo install -m 0755 /tmp/import-investment-costs.py /opt/evcc-vm-migration/import-investment-costs.py
+sudo install -m 0755 /tmp/import-investment-costs.py /opt/evcc-vm-tools/import-investment-costs.py
 sudo install -m 0755 /tmp/evcc-vm-investment-weekly.sh /usr/local/bin/evcc-vm-investment-weekly.sh
 sudo install -m 0640 /tmp/evcc-vm-investment-weekly.conf.example /etc/evcc-vm-investment-costs.conf
 sudo nano /etc/evcc-vm-investment-costs.conf

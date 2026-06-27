@@ -45,8 +45,8 @@ This avoids two common problems: a long data gap between import and live operati
 Create a working directory:
 
 ```bash
-mkdir -p /opt/evcc-vm-migration
-cd /opt/evcc-vm-migration
+mkdir -p /opt/evcc-vm-tools
+cd /opt/evcc-vm-tools
 ```
 
 Download the scripts:
@@ -293,7 +293,7 @@ Create `/usr/local/bin/evcc-vm-rollup-daily.sh`:
 #!/usr/bin/env bash
 set -euo pipefail
 
-/usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py \
+/usr/bin/python3 /opt/evcc-vm-tools/evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
   backfill \
   --start-day "$(date -d 'yesterday' +%Y-%m-01)" \

@@ -152,7 +152,7 @@ For Raspberry Pi-class deployments, run the rollup job on at least a Raspberry P
 Example cron:
 
 ```cron
-5 5 * * * /usr/bin/python3 /opt/evcc-grafana-dashboards/scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%Y-\%m-01) --end-day $(date -d 'yesterday' +\%F) --replace-range --write >> /var/log/evcc-vm-rollup.log 2>&1
+5 5 * * * /usr/bin/python3 /opt/evcc-vm-tools/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backfill --start-day $(date -d 'yesterday' +\%Y-\%m-01) --end-day $(date -d 'yesterday' +\%F) --replace-range --write >> /var/log/evcc-vm-rollup.log 2>&1
 ```
 
 Manual delete dry-run for a monthly rollup scope:

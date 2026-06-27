@@ -50,12 +50,12 @@ BASE="http://<server:port>/<owner>/<repo>/raw/branch/main"
 Script und Beispiele installieren:
 
 ```bash
-sudo mkdir -p /opt/evcc-vm-migration
+sudo mkdir -p /opt/evcc-vm-tools
 curl -fsSLo /tmp/collect-evcc-grid-control-audit.py "$BASE/scripts/helper/collect-evcc-grid-control-audit.py"
 curl -fsSLo /tmp/evcc-grid-control-audit.env.example "$BASE/scripts/helper/evcc-grid-control-audit.env.example"
 curl -fsSLo /tmp/evcc-grid-control-audit.service.example "$BASE/scripts/helper/evcc-grid-control-audit.service.example"
 
-sudo install -m 0755 /tmp/collect-evcc-grid-control-audit.py /opt/evcc-vm-migration/collect-evcc-grid-control-audit.py
+sudo install -m 0755 /tmp/collect-evcc-grid-control-audit.py /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py
 sudo install -m 0640 /tmp/evcc-grid-control-audit.env.example /etc/evcc-grid-control-audit.env
 sudo install -m 0644 /tmp/evcc-grid-control-audit.service.example /etc/systemd/system/evcc-grid-control-audit.service
 ```
@@ -147,7 +147,7 @@ EVCC_14A_MIN_POWER_MODE=ems
 Vor dem Service-Start kannst du einen Lauf ausfuehren:
 
 ```bash
-sudo /usr/bin/python3 /opt/evcc-vm-migration/collect-evcc-grid-control-audit.py \
+sudo /usr/bin/python3 /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py \
   --evcc-url http://192.168.1.197:7070 \
   --vm-write-url http://127.0.0.1:8428/api/v1/import/prometheus \
   --site home \
@@ -157,7 +157,7 @@ sudo /usr/bin/python3 /opt/evcc-vm-migration/collect-evcc-grid-control-audit.py 
 Nur anzeigen, ohne nach VictoriaMetrics oder in die lokale CSV zu schreiben:
 
 ```bash
-sudo /usr/bin/python3 /opt/evcc-vm-migration/collect-evcc-grid-control-audit.py \
+sudo /usr/bin/python3 /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py \
   --evcc-url http://192.168.1.197:7070 \
   --site home \
   --once \

@@ -47,8 +47,8 @@ So vermeidest du zwei typische Probleme: eine lange Datenluecke zwischen Import 
 Arbeitsverzeichnis anlegen:
 
 ```bash
-mkdir -p /opt/evcc-vm-migration
-cd /opt/evcc-vm-migration
+mkdir -p /opt/evcc-vm-tools
+cd /opt/evcc-vm-tools
 ```
 
 Skripte herunterladen:
@@ -295,7 +295,7 @@ Erwartetes Ergebnis: Rohdaten-Checks und Rollup-Checks sind beide OK.
 #!/usr/bin/env bash
 set -euo pipefail
 
-/usr/bin/python3 /opt/evcc-vm-migration/evcc-vm-rollup.py \
+/usr/bin/python3 /opt/evcc-vm-tools/evcc-vm-rollup.py \
   --config /etc/evcc-vm-rollup.conf \
   backfill \
   --start-day "$(date -d 'yesterday' +%Y-%m-01)" \

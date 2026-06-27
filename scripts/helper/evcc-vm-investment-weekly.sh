@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Script: evcc-vm-investment-weekly.sh
 # Purpose: Cron-safe weekly PV investment/generation-cost rollup for production VictoriaMetrics.
-# Version: 2026.06.11.1
-# Last modified: 2026-06-11
+# Version: 2026.06.27.1
+# Last modified: 2026-06-27
 set -euo pipefail
 
-SCRIPT_VERSION="2026.06.11.1"
-SCRIPT_LAST_MODIFIED="2026-06-11"
+SCRIPT_VERSION="2026.06.27.1"
+SCRIPT_LAST_MODIFIED="2026-06-27"
 CONFIG_FILE="${EVCC_VM_INVESTMENT_CONFIG:-/etc/evcc-vm-investment-costs.conf}"
 
 if [[ -f "$CONFIG_FILE" ]]; then
@@ -15,7 +15,7 @@ if [[ -f "$CONFIG_FILE" ]]; then
 fi
 
 : "${PYTHON_BIN:=/usr/bin/python3}"
-: "${HELPER_SCRIPT:=/opt/evcc-vm-migration/import-investment-costs.py}"
+: "${HELPER_SCRIPT:=/opt/evcc-vm-tools/import-investment-costs.py}"
 : "${VM_BASE_URL:=http://127.0.0.1:8428}"
 : "${INVESTMENT_FILE:=/etc/evcc-investments.xlsx}"
 : "${TIMEZONE:=Europe/Berlin}"

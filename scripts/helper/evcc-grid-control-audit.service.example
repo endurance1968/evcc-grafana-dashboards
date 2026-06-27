@@ -6,7 +6,7 @@ Wants=network-online.target
 [Service]
 Type=simple
 EnvironmentFile=/etc/evcc-grid-control-audit.env
-ExecStart=/usr/bin/python3 /opt/evcc-vm-migration/collect-evcc-grid-control-audit.py
+ExecStart=/usr/bin/python3 /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py
 Restart=always
 RestartSec=10
 User=root

@@ -4,7 +4,7 @@
 
 # Runtime
 PYTHON_BIN=/usr/bin/python3
-HELPER_SCRIPT=/opt/evcc-vm-migration/import-investment-costs.py
+HELPER_SCRIPT=/opt/evcc-vm-tools/import-investment-costs.py
 VM_BASE_URL=http://127.0.0.1:8428
 INVESTMENT_FILE=/etc/evcc-investments.xlsx
 TIMEZONE=Europe/Berlin
