@@ -57,6 +57,28 @@ class GridControlAuditTests(unittest.TestCase):
         self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 900.0', text)
         self.assertIn('evcc_audit_minimum_allowed_power_w{site="home"} 10500.0', text)
 
+    def test_battery_grid_charge_ignores_discharge_even_when_active(self):
+        groups = MODULE.parse_control_groups("battery|Battery|battery_grid_charge|")
+        state = {
+            "site": {"batteryGridChargeActive": True},
+            "battery": {"power": 900},
+        }
+        metrics = MODULE.build_state_metrics(state, "home", groups, control_unit_count=None)
+        text = "\n".join(metrics)
+
+        self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 0', text)
+
+    def test_battery_grid_charge_is_zero_when_inactive(self):
+        groups = MODULE.parse_control_groups("battery|Battery|battery_grid_charge|")
+        state = {
+            "site": {"batteryGridChargeActive": False},
+            "battery": {"power": -900},
+        }
+        metrics = MODULE.build_state_metrics(state, "home", groups, control_unit_count=None)
+        text = "\n".join(metrics)
+
+        self.assertIn('evcc_audit_control_group_power_w{group="battery",kind="battery_grid_charge",name="Battery",site="home"} 0', text)
+
     def test_minimum_allowed_power_uses_gzf_table_for_ems_mode(self):
         self.assertEqual(MODULE.minimum_allowed_power_w(1), 4200.0)
         self.assertEqual(MODULE.minimum_allowed_power_w(2), 7560.0)

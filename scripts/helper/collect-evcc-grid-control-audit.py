@@ -21,8 +21,8 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-SCRIPT_VERSION = "2026.06.21.13"
-SCRIPT_LAST_MODIFIED = "2026-06-21"
+SCRIPT_VERSION = "2026.06.28.1"
+SCRIPT_LAST_MODIFIED = "2026-06-28"
 DEFAULT_USER_AGENT = f"evcc-vm-grid-control-audit/{SCRIPT_VERSION}"
 
 def env(name: str, default: str = "") -> str:
@@ -442,7 +442,7 @@ def build_state_metrics(
                 lines.append(metric("evcc_audit_control_group_power_w", sum(values), group_labels))
         elif group.kind == "battery_grid_charge":
             if battery_grid_charge_active == 1 and battery_power_value is not None:
-                lines.append(metric("evcc_audit_control_group_power_w", abs(battery_power_value), group_labels))
+                lines.append(metric("evcc_audit_control_group_power_w", max(-battery_power_value, 0), group_labels))
             else:
                 lines.append(metric("evcc_audit_control_group_power_w", 0, group_labels))
 
