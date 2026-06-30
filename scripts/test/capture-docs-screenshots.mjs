@@ -1,7 +1,7 @@
 /**
  * Script: capture-docs-screenshots.mjs
  * Purpose: Capture curated German dashboard screenshots for docs/screenshots.
- * Version: 2026.06.30.2
+ * Version: 2026.06.30.3
  * Last modified: 2026-06-30
  */
 import fs from "node:fs";
@@ -16,7 +16,7 @@ import {
   requireEnv,
 } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.30.2";
+const SCRIPT_VERSION = "2026.06.30.3";
 const SCRIPT_LAST_MODIFIED = "2026-06-30";
 
 loadEnvFile(parseArg("env", ".env.local"));
@@ -35,6 +35,7 @@ const timeFrom = optionalEnv("GRAFANA_TIME_FROM", "").trim();
 const timeTo = optionalEnv("GRAFANA_TIME_TO", "").trim();
 
 const desktop = { name: "desktop", width: 2240, height: 1300 };
+const desktopWide = { name: "desktop-wide", width: 2800, height: 1300 };
 const desktopTall = { name: "desktop-tall", width: 2240, height: 1700 };
 const mobile = { name: "mobile", width: 586, height: 1108 };
 
@@ -71,6 +72,7 @@ const capturePlan = [
     captures: [
       { file: "today-pv.png", tab: "PV", viewport: desktop },
       { file: "today-grid.png", tab: "Netz", viewport: desktop },
+      { file: "today-grid-control.png", tab: "Netzsteuerung", viewport: desktopWide },
       { file: "today-consumption.png", tab: "Haus", viewport: desktop },
       { file: "today-tariffs.png", tab: "Tarife", viewport: desktop },
       { file: "today-loadpoints.png", tab: "Ladepunkte", viewport: desktop },

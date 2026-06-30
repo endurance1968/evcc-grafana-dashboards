@@ -124,6 +124,14 @@ PV-Tab mit PV-Energie, PV-Leistung, Batterie und Forecast.
 
 Netz-Tab mit Grid-/Netzsicht und Einspeise-/Bezugsverlauf.
 
+### Today Details Netzsteuerung
+
+<a href="./today-grid-control.png" target="_blank" rel="noopener">
+  <img src="./today-grid-control.png" alt="Today Details Netzsteuerung Tab" width="720">
+</a>
+
+Netzsteuerungs-Tab mit VNB-Grenzen, Einhaltungsreserven, steuerbaren Gruppen und EVCC-Steuerevents.
+
 ### Today Details Haus
 
 <a href="./today-consumption.png" target="_blank" rel="noopener">

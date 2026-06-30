@@ -124,6 +124,14 @@ PV tab with PV energy, PV power, battery, and forecast.
 
 Grid tab with import/feed-in visibility and grid history.
 
+### Today Details Grid Control
+
+<a href="./today-grid-control.png" target="_blank" rel="noopener">
+  <img src="./today-grid-control.png" alt="Today Details Grid Control Tab" width="720">
+</a>
+
+Grid-control tab with grid operator limits, compliance reserves, controllable groups, and EVCC control events.
+
 ### Today Details Home
 
 <a href="./today-consumption.png" target="_blank" rel="noopener">
