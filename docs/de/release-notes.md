@@ -12,15 +12,15 @@ Noch keine Eintraege.
 
 ### Neue Funktionen
 
-- EVCC-Gruenanteil ist als eigener KPI in `Today`, `Month`, `Year` und `All-time` sichtbar. Der Wert folgt EVCCs `greenShareHome_value` und beschreibt EVCCs Haus-Gruenanteil als Trend-KPI.
-- Optionaler Netzsteuerungs-/14a-Auditpfad: ein Collector kann EVCC-Begrenzungen und Steuerereignisse nach VictoriaMetrics schreiben und lokal als CSV-Historie sichern. `Today - Details` zeigt dafuer den Tab `Netzsteuerung` mit VNB-Grenzen, Einhaltungsreserven, aktuellen Limits, steuerbaren Gruppen und Ereignistabelle.
-- Der Collector unterstuetzt explizit konfigurierte steuerbare Gruppen, z. B. zusammengefasste Ladepunkte, Waermepumpe und Batterie-Netzladung.
+- EVCC-Gruenanteil ist als eigener KPI in `Today`, `Month`, `Year` und `All-time` sichtbar. Der Wert folgt EVCCs `greenShareHome_value` und beschreibt EVCCs Haus-Gruenanteil als Trend-KPI. Relevante Commits: `5c6e84c`, `d339f10`.
+- Optionaler Netzsteuerungs-/14a-Auditpfad: ein Collector kann EVCC-Begrenzungen und Steuerereignisse nach VictoriaMetrics schreiben und lokal als CSV-Historie sichern. `Today - Details` zeigt dafuer den Tab `Netzsteuerung` mit VNB-Grenzen, Einhaltungsreserven, aktuellen Limits, steuerbaren Gruppen und Ereignistabelle. Relevante Commits: `a2b2201`, `4086d95`, `0c5fe56`, `8645fa1`.
+- Der Collector unterstuetzt explizit konfigurierte steuerbare Gruppen, z. B. zusammengefasste Ladepunkte, Waermepumpe und Batterie-Netzladung. Relevante Commits: `ace544d`, `a271eb1`, `25f3390`.
 
 ### Verbesserungen
 
-- `Year` und `Month` ordnen Haus-/Verbraucher-/Finanzbereiche klarer: Versorgungsmix-Panels liegen unter `Haus`, Kosten- und Preis-Panels unter `Finanzen`.
-- Netzsteuerungs-Panels verwenden konsistente Vorzeichen und Farben: Bezug/Verbrauch rot, Einspeisung gruen und berechnete Werte blau; Einspeisung wird negativ dargestellt.
-- Der Deployer schreibt eine aussagekraeftigere Dashboard-Build-Info mit Build/Source statt nur dem Deployment-Zeitpunkt.
+- `Year` und `Month` ordnen Haus-/Verbraucher-/Finanzbereiche klarer: Versorgungsmix-Panels liegen unter `Haus`, Kosten- und Preis-Panels unter `Finanzen`. Relevanter Commit: `afb8248`.
+- Netzsteuerungs-Panels verwenden konsistente Vorzeichen und Farben: Bezug/Verbrauch rot, Einspeisung gruen und berechnete Werte blau; Einspeisung wird negativ dargestellt. Relevante Commits: `d3c32c0`, `8645fa1`.
+- Der Deployer schreibt eine aussagekraeftigere Dashboard-Build-Info mit Build/Source statt nur dem Deployment-Zeitpunkt. Relevanter Commit: `bec38c9`.
 
 ### Hinweise fuer Nutzer
 

@@ -10,15 +10,15 @@ No entries yet.
 
 ### New Features
 
-- EVCC green share is visible as a KPI in `Today`, `Month`, `Year`, and `All-time`. The value follows EVCC's `greenShareHome_value` and represents EVCC's home green share as a trend KPI.
-- Optional grid-control/14a audit path: a collector can write EVCC limits and control events to VictoriaMetrics and keep a local CSV history. `Today - Details` shows these values in the `Grid control` tab with grid limits, compliance reserves, current limits, controllable groups, and an event table.
-- The collector supports explicitly configured controllable groups, for example combined loadpoints, heat pump, and battery grid charge.
+- EVCC green share is visible as a KPI in `Today`, `Month`, `Year`, and `All-time`. The value follows EVCC's `greenShareHome_value` and represents EVCC's home green share as a trend KPI. Relevant commits: `5c6e84c`, `d339f10`.
+- Optional grid-control/14a audit path: a collector can write EVCC limits and control events to VictoriaMetrics and keep a local CSV history. `Today - Details` shows these values in the `Grid control` tab with grid limits, compliance reserves, current limits, controllable groups, and an event table. Relevant commits: `a2b2201`, `4086d95`, `0c5fe56`, `8645fa1`.
+- The collector supports explicitly configured controllable groups, for example combined loadpoints, heat pump, and battery grid charge. Relevant commits: `ace544d`, `a271eb1`, `25f3390`.
 
 ### Improvements
 
-- `Year` and `Month` group home, consumer, and finance areas more clearly: supply-mix panels live under `Home`, while cost and price panels live under `Finances`.
-- Grid-control panels use consistent signs and colors: import/consumption in red, feed-in in green, and calculated values in blue; feed-in is shown as negative.
-- The deployer writes a more useful dashboard build marker with build/source instead of only the deployment timestamp.
+- `Year` and `Month` group home, consumer, and finance areas more clearly: supply-mix panels live under `Home`, while cost and price panels live under `Finances`. Relevant commit: `afb8248`.
+- Grid-control panels use consistent signs and colors: import/consumption in red, feed-in in green, and calculated values in blue; feed-in is shown as negative. Relevant commits: `d3c32c0`, `8645fa1`.
+- The deployer writes a more useful dashboard build marker with build/source instead of only the deployment timestamp. Relevant commit: `bec38c9`.
 
 ### User Notes
 
