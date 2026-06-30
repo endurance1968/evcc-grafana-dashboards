@@ -56,13 +56,13 @@ Jahresansicht fuer Haus, Netz und Autarkie.
 
 Jahresansicht fuer Batterie- und Speicherkennzahlen.
 
-### Year Verbraucher
+### Year Finanzen
 
-<a href="./year-consumers.png" target="_blank" rel="noopener">
-  <img src="./year-consumers.png" alt="Year Verbraucher Tab" width="720">
+<a href="./year-finances.png" target="_blank" rel="noopener">
+  <img src="./year-finances.png" alt="Year Finanzen Tab" width="720">
 </a>
 
-Jahresansicht fuer Verbraucher.
+Jahresansicht fuer Finanzen, Stromkosten und PV-Gestehungskosten.
 
 ### Year Fahrzeuge
 
@@ -98,13 +98,13 @@ Monatsansicht fuer Haus, Netzbezug und Eigenverbrauch.
 
 Monatsansicht fuer Batterie, SOC und Speicherfluesse.
 
-### Month Verbraucher
+### Month Finanzen
 
-<a href="./month-consumers.png" target="_blank" rel="noopener">
-  <img src="./month-consumers.png" alt="Month Verbraucher Tab" width="720">
+<a href="./month-finances.png" target="_blank" rel="noopener">
+  <img src="./month-finances.png" alt="Month Finanzen Tab" width="720">
 </a>
 
-Monatsansicht fuer Verbraucher und Lastverteilung.
+Monatsansicht fuer Finanzen, Strompreise und Stromkosten.
 
 ## Today - Details
 

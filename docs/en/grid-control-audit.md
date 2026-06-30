@@ -69,7 +69,7 @@ sudo nano /etc/evcc-grid-control-audit.env
 Minimal example:
 
 ```env
-EVCC_BASE_URL=http://192.168.1.197:7070
+EVCC_BASE_URL=http://evcc.local:7070
 VM_WRITE_URL=http://127.0.0.1:8428/api/v1/import/prometheus
 SITE_ID=home
 EVCC_API_POLL_SECONDS=10
@@ -148,7 +148,7 @@ Before enabling the service, run one collector cycle:
 
 ```bash
 sudo /usr/bin/python3 /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py \
-  --evcc-url http://192.168.1.197:7070 \
+  --evcc-url http://evcc.local:7070 \
   --vm-write-url http://127.0.0.1:8428/api/v1/import/prometheus \
   --site home \
   --once
@@ -158,7 +158,7 @@ Print metrics without writing to VictoriaMetrics or the local CSV:
 
 ```bash
 sudo /usr/bin/python3 /opt/evcc-vm-tools/collect-evcc-grid-control-audit.py \
-  --evcc-url http://192.168.1.197:7070 \
+  --evcc-url http://evcc.local:7070 \
   --site home \
   --once \
   --dry-run

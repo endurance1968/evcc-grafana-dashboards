@@ -1,8 +1,8 @@
 /**
  * Script: capture-docs-screenshots.mjs
  * Purpose: Capture curated German dashboard screenshots for docs/screenshots.
- * Version: 2026.06.14.6
- * Last modified: 2026-06-14
+ * Version: 2026.06.30.2
+ * Last modified: 2026-06-30
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,8 +16,8 @@ import {
   requireEnv,
 } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.14.6";
-const SCRIPT_LAST_MODIFIED = "2026-06-14";
+const SCRIPT_VERSION = "2026.06.30.2";
+const SCRIPT_LAST_MODIFIED = "2026-06-30";
 
 loadEnvFile(parseArg("env", ".env.local"));
 
@@ -53,7 +53,7 @@ const capturePlan = [
       { file: "year-pv.png", tab: "PV", viewport: desktopTall },
       { file: "year-home.png", tab: "Haus", viewport: desktop },
       { file: "year-battery.png", tab: "Speicher", viewport: desktop },
-      { file: "year-consumers.png", tab: "Verbraucher", viewport: desktop },
+      { file: "year-finances.png", tab: "Finanzen", viewport: desktop },
       { file: "year-vehicles.png", tab: "Fahrzeuge", viewport: desktop },
     ],
   },
@@ -63,7 +63,7 @@ const capturePlan = [
       { file: "month-pv.png", tab: "PV", viewport: desktop },
       { file: "month-home.png", tab: "Haus", viewport: desktop },
       { file: "month-battery.png", tab: "Speicher", viewport: desktop },
-      { file: "month-consumers.png", tab: "Verbraucher", viewport: desktop },
+      { file: "month-finances.png", tab: "Finanzen", viewport: desktop },
     ],
   },
   {
@@ -200,7 +200,7 @@ async function login(page) {
   await page.fill('input[name="password"]', password);
   await page.click('button[type="submit"]');
   await page.waitForLoadState("networkidle");
-  await page.keyboard.press("Escape").catch(() => {});
+  await dismissTransientOverlays(page);
   const closeMenu = page.getByLabel("Close menu");
   if ((await closeMenu.count()) > 0 && await closeMenu.first().isVisible()) {
     await closeMenu.first().click({ force: true }).catch(async () => {
@@ -208,6 +208,24 @@ async function login(page) {
     });
     await page.waitForTimeout(500);
   }
+}
+
+async function dismissTransientOverlays(page) {
+  for (let i = 0; i < 3; i += 1) {
+    await page.keyboard.press("Escape").catch(() => {});
+    await page.waitForTimeout(150);
+  }
+  await page.evaluate(() => {
+    const portal = document.querySelector("#grafana-portal-container");
+    if (!portal) {
+      return;
+    }
+    for (const el of portal.children) {
+      if (el instanceof HTMLElement) {
+        el.style.display = "none";
+      }
+    }
+  }).catch(() => {});
 }
 
 async function setToolbarVisibility(page, visible) {
@@ -353,6 +371,7 @@ async function selectTab(page, tabName) {
   if (!tabName) {
     return;
   }
+  await dismissTransientOverlays(page);
   const exact = new RegExp(`^\\s*${escapeRegex(tabName)}\\s*$`);
   const candidates = [
     page.getByRole("tab", { name: exact }),
@@ -364,8 +383,13 @@ async function selectTab(page, tabName) {
     for (let index = 0; index < count; index += 1) {
       const item = locator.nth(index);
       if (await item.isVisible()) {
-        await item.click();
+        const selected = await item.getAttribute("aria-selected").catch(() => "");
+        if (selected === "true") {
+          return;
+        }
+        await item.click({ force: true });
         await page.waitForTimeout(waitMs);
+        await dismissTransientOverlays(page);
         return;
       }
     }
@@ -432,6 +456,7 @@ async function main() {
     await page.setViewportSize({ width: capture.viewport.width, height: capture.viewport.height });
     await page.goto(dashboardUrl(capture.dashboard), { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(waitMs);
+    await dismissTransientOverlays(page);
     await selectTab(page, capture.tab);
     const target = path.join(outDir, capture.file);
     await captureComposed(page, capture.viewport, target);

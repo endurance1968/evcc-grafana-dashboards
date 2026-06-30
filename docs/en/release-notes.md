@@ -1,16 +1,29 @@
 # Release Notes
 
-These notes summarize the first public VictoriaMetrics-based EVCC dashboard release.
+These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 
 ## Unreleased
 
+No entries yet.
+
+## V2026-06-30
+
 ### New Features
 
-- EVCC green share is documented as a first-class KPI and treated in KPI sections as EVCC's home green share. The value is based on EVCC's `greenShareHome_value` and treats PV plus battery discharge as green available power.
+- EVCC green share is visible as a KPI in `Today`, `Month`, `Year`, and `All-time`. The value follows EVCC's `greenShareHome_value` and represents EVCC's home green share as a trend KPI.
+- Optional grid-control/14a audit path: a collector can write EVCC limits and control events to VictoriaMetrics and keep a local CSV history. `Today - Details` shows these values in the `Grid control` tab with grid limits, compliance reserves, current limits, controllable groups, and an event table.
+- The collector supports explicitly configured controllable groups, for example combined loadpoints, heat pump, and battery grid charge.
+
+### Improvements
+
+- `Year` and `Month` group home, consumer, and finance areas more clearly: supply-mix panels live under `Home`, while cost and price panels live under `Finances`.
+- Grid-control panels use consistent signs and colors: import/consumption in red, feed-in in green, and calculated values in blue; feed-in is shown as negative.
+- The deployer writes a more useful dashboard build marker with build/source instead of only the deployment timestamp.
 
 ### User Notes
 
 - Long-range green-share panels in month, year, and all-time dashboards require the regular EVCC VM rollup for the affected date ranges. The current long-range values are trend KPIs based on daily EVCC ratios, not an external renewable-tariff or CO2 assessment.
+- The grid-control tab is shown only when `evcc_audit_*` metrics exist. This optional view requires the collector to be installed and running; the documentation uses `/opt/evcc-vm-tools` for that setup.
 
 ## V2026-06-14
 
@@ -126,6 +139,3 @@ Release validation covered:
 - German tab-navigation dashboard screenshots for every active tab
 - Grafana localization spot-checks for `de`, `fr`, and `zh`
 - local static/unit/dashboard checks via `npm test`
-
-
-

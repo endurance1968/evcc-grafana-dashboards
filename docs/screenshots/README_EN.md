@@ -56,13 +56,13 @@ Yearly home, grid, and autarky view.
 
 Yearly battery and storage metrics.
 
-### Year Consumers
+### Year Finances
 
-<a href="./year-consumers.png" target="_blank" rel="noopener">
-  <img src="./year-consumers.png" alt="Year Consumers Tab" width="720">
+<a href="./year-finances.png" target="_blank" rel="noopener">
+  <img src="./year-finances.png" alt="Year Finances Tab" width="720">
 </a>
 
-Yearly consumer view.
+Yearly finance view with electricity costs and PV generation costs.
 
 ### Year Vehicles
 
@@ -98,13 +98,13 @@ Monthly home, grid import, and self-consumption view.
 
 Monthly battery, SOC, and storage flow view.
 
-### Month Consumers
+### Month Finances
 
-<a href="./month-consumers.png" target="_blank" rel="noopener">
-  <img src="./month-consumers.png" alt="Month Consumers Tab" width="720">
+<a href="./month-finances.png" target="_blank" rel="noopener">
+  <img src="./month-finances.png" alt="Month Finances Tab" width="720">
 </a>
 
-Monthly consumers and load distribution.
+Monthly finance view with electricity prices and costs.
 
 ## Today - Details
 

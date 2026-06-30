@@ -2,17 +2,30 @@
 
 Englische Version: [release-notes.md](../en/release-notes.md).
 
-Diese Hinweise fassen das erste oeffentliche EVCC-Dashboard-Release auf VictoriaMetrics-Basis zusammen.
+Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetrics-Basis zusammen.
 
 ## Unreleased
 
+Noch keine Eintraege.
+
+## V2026-06-30
+
 ### Neue Funktionen
 
-- EVCC-Gruenanteil wird als eigener KPI dokumentiert und in den Kennzahlenbereichen als EVCC-Haus-Gruenanteil verstanden. Der Wert basiert auf EVCCs `greenShareHome_value` und zaehlt PV plus Batterieentladung als gruen verfuegbare Leistung.
+- EVCC-Gruenanteil ist als eigener KPI in `Today`, `Month`, `Year` und `All-time` sichtbar. Der Wert folgt EVCCs `greenShareHome_value` und beschreibt EVCCs Haus-Gruenanteil als Trend-KPI.
+- Optionaler Netzsteuerungs-/14a-Auditpfad: ein Collector kann EVCC-Begrenzungen und Steuerereignisse nach VictoriaMetrics schreiben und lokal als CSV-Historie sichern. `Today - Details` zeigt dafuer den Tab `Netzsteuerung` mit VNB-Grenzen, Einhaltungsreserven, aktuellen Limits, steuerbaren Gruppen und Ereignistabelle.
+- Der Collector unterstuetzt explizit konfigurierte steuerbare Gruppen, z. B. zusammengefasste Ladepunkte, Waermepumpe und Batterie-Netzladung.
+
+### Verbesserungen
+
+- `Year` und `Month` ordnen Haus-/Verbraucher-/Finanzbereiche klarer: Versorgungsmix-Panels liegen unter `Haus`, Kosten- und Preis-Panels unter `Finanzen`.
+- Netzsteuerungs-Panels verwenden konsistente Vorzeichen und Farben: Bezug/Verbrauch rot, Einspeisung gruen und berechnete Werte blau; Einspeisung wird negativ dargestellt.
+- Der Deployer schreibt eine aussagekraeftigere Dashboard-Build-Info mit Build/Source statt nur dem Deployment-Zeitpunkt.
 
 ### Hinweise fuer Nutzer
 
 - Fuer Langzeit-Gruenanteil in Monats-, Jahres- und Gesamtzeitraum-Dashboards muss der normale EVCC-VM-Rollup fuer die gewuenschten Zeitraeume gelaufen sein. Die aktuellen Langzeitwerte sind Trend-KPIs aus taeglichen EVCC-Ratios, keine externe Oekostrom- oder CO2-Bewertung.
+- Der Netzsteuerungs-Tab erscheint nur, wenn `evcc_audit_*`-Metriken vorhanden sind. Fuer diese optionale Ansicht muss der Collector installiert und betrieben werden; die Doku verwendet dafuer `/opt/evcc-vm-tools`.
 
 ## V2026-06-14
 
@@ -128,6 +141,3 @@ Die Release-Validierung deckte ab:
 - deutsche Screenshots der Dashboards mit Tab-Navigation fuer jeden aktiven Tab
 - Grafana-Lokalisierungs-Spot-Checks fuer `de`, `fr` und `zh`
 - lokale statische/unit/dashboard Checks via `npm test`
-
-
-

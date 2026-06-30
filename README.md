@@ -6,8 +6,8 @@ English: This repository contains VictoriaMetrics-based Grafana dashboards for E
 
 Die Arbeit baut auf den frueheren InfluxDB-basierten EVCC-Dashboards von Carsten auf:
 [ha-puzzles/evcc-grafana-dashboards](https://github.com/ha-puzzles/evcc-grafana-dashboards).
-Vielen Dank an Carsten fuer die starke Vorarbeit. Dieses Repository liefert den VictoriaMetrics-Pfad mit Migration, Tages-Rollups, lokalisierten Dashboard-Varianten und Deploy-Skripten fuer Grafana.
-Ich werde versuchen, den Stand mit dem von Carsten synchron zu halten - von daher kann es immer mal zu breaking changes kommen. evtl. lasst Ihr als via Telegraf weiterhin auch Eure Influx befüllen. Quasi als Fallback falls neu migriert werden muss.
+Vielen Dank an Carsten fuer die starke Vorarbeit. Dieses Repository liefert den VictoriaMetrics-Pfad mit Migration, Tages-Rollups, lokalisierten Dashboard-Varianten, optionalen Zusatz-Auswertungen und Deploy-Skripten fuer Grafana.
+Ich versuche, den Stand mit Carstens Projekt synchron zu halten. Gerade bei neuen Funktionen kann es deshalb gelegentlich zu Breaking Changes kommen. Wenn du frisch migrierst, ist es sinnvoll, InfluxDB ueber Telegraf zunaechst weiter parallel zu befuellen, bis die VictoriaMetrics-Installation vollstaendig validiert ist.
 
 Beispiel-Dashboard, automatisch aus der aktuellen Screenshot-Galerie:
 
@@ -24,6 +24,10 @@ Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/s
 - Grafana-13-TAB-Dashboards als unterstuetztes Navigationsmodell
 - Deploy-Skripte fuer Erstimport und Updates
 - ein Rollup-Skript fuer taegliche Langzeit-Metriken
+- optionale PV-Gestehungskosten/LCOE-Auswertung mit Investment-Datei und Wochen-Helper
+- PV-Anlagenvergleiche fuer Jahresertrag und spezifischen Ertrag (`kWh/kWp`)
+- EVCC-Gruenanteil als KPI in Tages- und Langzeitansichten
+- optionale historische Energieimporte, z. B. SMA-PV-Ertraege und SMA-Energiebilanzen als EVCC-kompatible Tageswerte
 - einen optionalen [Netzsteuerungs-Audit-Collector](./docs/de/grid-control-audit.md) fuer den Daily-Details-Tab
 - Dokumentation fuer die Migration von InfluxDB nach VictoriaMetrics
 - Installations- und Betriebsanleitungen fuer VictoriaMetrics, EVCC/Telegraf-Live-Ingest, Grafana, Migration und Dashboard-Deployment
@@ -33,10 +37,10 @@ Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/s
 
 Die Dashboards enthalten Tages-, Monats-, Jahres- und All-Time-Ansichten.
 
-- `Today` zeigt den aktuellen Tag: PV, Netz, Hausverbrauch, Speicher, Ladepunkte, Energiefluss, Forecast, Autarkie, Eigenverbrauch und Kosten.
-- `Today - Details` zeigt zusaetzlich Phasen, Lade-Metriken, Rohhistorien und Preisdetails.
+- `Today` zeigt den aktuellen Tag: PV, Netz, Hausverbrauch, Speicher, Ladepunkte, Energiefluss, Forecast, Autarkie, Eigenverbrauch, Gruenanteil und Kosten.
+- `Today - Details` zeigt zusaetzlich Phasen, Lade-Metriken, Rohhistorien, Preisdetails und optional Netzsteuerungs-/14a-Auditdaten.
 - `Today - Mobile` ist eine kompakte Ansicht fuer kleinere Bildschirme.
-- `Month`, `Year` und `All-time` zeigen laengere Zeitraeume auf Basis der taeglichen `evcc_*` Rollups.
+- `Month`, `Year` und `All-time` zeigen laengere Zeitraeume auf Basis der taeglichen `evcc_*` Rollups, inklusive Finanz-, PV-Anlagen- und Anlagenvergleichsansichten, wenn die optionalen Daten vorhanden sind.
 
 Typische Anwendungsfaelle:
 
@@ -45,11 +49,15 @@ Typische Anwendungsfaelle:
 - Fahrzeuge und Ladepunkte nach Energie, Kosten und Nutzung auswerten
 - Speicherladung, Entladung und SOC-Verhalten analysieren
 - Preisentwicklung, Importkosten und Lastverteilung visualisieren
+- PV-Anlagen ueber Jahresertrag, spezifischen Ertrag und optional Gestehungskosten vergleichen
+- Gruenanteil, Autarkie und Eigenverbrauch als getrennte KPIs beobachten
+- optionale Netzsteuerungs-/14a-Eingriffe auditieren, wenn EVCC und der Collector entsprechende Daten liefern
 - historische EVCC-Daten von InfluxDB nach VictoriaMetrics migrieren und dort weiterbetreiben
+- fehlende historische EVCC-Jahre optional mit kompatiblen Tagesimporten aus externen Quellen ergaenzen
 
 ## Einstieg
 
 Der zentrale Einstieg fuer Installation, Migration, Live-Ingest und Dashboard-Deployment ist:
 
-- [docs/de/README.md](./docs/README.md)
+- [docs/README.md](./docs/README.md)
 - [Release Notes](./docs/de/release-notes.md)
