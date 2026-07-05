@@ -11,3 +11,7 @@ price_bucket_minutes = 15
 start = 2026-02-20T00:00:00Z
 end = 2026-03-22T00:00:00Z
 step = 1d
+
+[scheduler]
+# Optional override. If empty, write operations use <config>.lock.
+lock_file =

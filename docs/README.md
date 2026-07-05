@@ -77,6 +77,7 @@ Diese Dokumente sind vor allem fuer Fehleranalyse und Betrieb relevant:
 - Investitionskosten fuer effektiven Strompreis: [investment-costs.md](./de/investment-costs.md)
 - SMA-PV-Daten pro Anlage optional importieren: [sma-pv-import.md](./de/sma-pv-import.md)
 - SMA-Energiebilanz als historische EVCC-Rollups importieren: [sma-energy-balance-import.md](./de/sma-energy-balance-import.md)
+- Optionaler VRM-Batteriefluss-Import: [vrm-energy-import.md](./de/vrm-energy-import.md)
 - Entscheidung Setup-/Filter-Statuspanel: [design/setup-filter-status-panel-decision.md](./de/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots

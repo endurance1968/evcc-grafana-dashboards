@@ -149,6 +149,12 @@ python3 scripts/rollup/evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf backf
 
 Rollups sind Tageswerte. Den Refresh einmal pro Tag planen, nachdem `yesterday` abgeschlossen ist. Fuer Produktion `--replace-range` bevorzugen: den monatlichen Rollup-Bereich loeschen, der `yesterday` enthaelt, und danach diesen Monat bis `yesterday` neu aufbauen. Das macht den Refresh idempotent und vermeidet doppelte Samples mit denselben Serienlabels und Timestamps in VictoriaMetrics.
 
+Schreibende `backfill`- und `delete`-Laeufe nehmen automatisch einen Lock. Ohne weitere Konfiguration liegt er bei `<config>.lock`; alternativ kann `[scheduler] lock_file = /var/lock/evcc-vm-rollup.lock` gesetzt oder `--lock-file ...` uebergeben werden. `--no-lock` ist nur fuer manuelle Wiederherstellung gedacht, wenn sicher kein anderer Rollup-Prozess laeuft.
+
+Die Backfill-Zusammenfassung meldet die langsamsten Rollup-Familien, eine Optimierungsempfehlung und Datenqualitaetszaehler fuer ignorierte Counter-Resets, gefilterte Power-Spikes und fehlende Energie-Buckets. Der Scheduler-Pfad bleibt `--replace-range --write`; die Zaehlwerte gehoeren in das Rollup-Log und sollten nach Aenderungen oder auffaelligen Datenluecken geprueft werden.
+
+Der Replace-Matcher schliesst optionale `evcc_vrm_*`-Hilfsmetriken aus. VRM-Energieflussimporte werden separat ueber ihren eigenen `--replace-range` gepflegt und nicht durch den Rollup-Scheduler geloescht.
+
 Fuer Raspberry-Pi-aehnliche Deployments den Rollup-Job mindestens auf Raspberry Pi 4 mit 4 GB RAM oder vergleichbarer Hardware ausfuehren. Raspberry Pi 3 und 1-2-GB-Systeme werden fuer den monatlichen Replace-Pfad nicht empfohlen.
 
 Cron-Beispiel:

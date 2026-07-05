@@ -377,6 +377,8 @@ Aktuelles Full-Rebuild-Profil ueber `2025-01-01 .. 2026-03-27`:
 - VM-Schreibzeit vernachlaessigbar
 - Hauptkostenstelle ist weiterhin VM-Lese-/Query-Zeit
 
+Aktuelle Backfill-Laeufe geben zusaetzlich `profile_families` und `profile_analysis` aus. Die Auswertung nennt die langsamste Rollup-Familie und markiert Optimierung nur dann als pruefenswert, wenn eine Familie messbar dominiert. Damit sind gemeinsame Rohdaten-Caches, Parallelisierung oder Batch-Tuning erst nach wiederholten Livecopy-Messungen sinnvoll, nicht als blinde Standardoptimierung.
+
 Mindestempfehlung fuer den Rollup-Job auf Raspberry-Pi-aehnlichen Systemen ist Raspberry Pi 4 mit 4 GB RAM oder vergleichbare Hardware. Raspberry Pi 3 und 1-2-GB-Systeme werden fuer den monatlichen `--replace-range`-Rollup-Pfad nicht empfohlen, weil der aktuelle Python-Prozess etwa 1,25 GB erreichen kann, bevor Betriebssystem, VictoriaMetrics und weitere Dienste beruecksichtigt sind.
 
 ### Namespace-Status

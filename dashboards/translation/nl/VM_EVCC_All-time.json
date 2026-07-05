@@ -986,6 +986,70 @@
                       "kind": "DataQuery",
                       "group": "victoriametrics-metrics-datasource",
                       "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_charge_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range])))",
+                        "instant": true,
+                        "legendFormat": "vrmBatteryChargeTotal",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryChargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_discharge_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range])))",
+                        "instant": true,
+                        "legendFormat": "vrmBatteryDischargeTotal",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryDischargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "__expr__",
+                      "version": "v0",
+                      "spec": {
+                        "expression": "$vrmBatteryDischargeTotal / $vrmBatteryChargeTotal",
+                        "type": "math",
+                        "expr": ""
+                      },
+                      "datasource": {
+                        "name": "__expr__"
+                      }
+                    },
+                    "refId": "vrmBatteryEfficiency",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
                       "datasource": {
                         "name": "vm-evcc"
                       },
@@ -1151,6 +1215,87 @@
                       {
                         "id": "unit",
                         "value": "percentunit"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryChargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM accu laden"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "watth"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryDischargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM accu ontladen"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "watth"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryEfficiency"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM accu-efficiëntie"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
                       }
                     ]
                   },

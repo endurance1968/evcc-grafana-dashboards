@@ -75,6 +75,7 @@ Use these when the normal migration path reports a problem or when you need oper
 - Investment costs for effective electricity price: [investment-costs.md](./en/investment-costs.md)
 - Optional per-source SMA PV data import: [sma-pv-import.md](./en/sma-pv-import.md)
 - Import SMA energy balance as historic EVCC rollups: [sma-energy-balance-import.md](./en/sma-energy-balance-import.md)
+- Optional VRM battery flow import: [vrm-energy-import.md](./en/vrm-energy-import.md)
 - Setup/filter status panel decision: [design/setup-filter-status-panel-decision.md](./en/design/setup-filter-status-panel-decision.md)
 
 ## Screenshots

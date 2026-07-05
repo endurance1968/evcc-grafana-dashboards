@@ -3435,10 +3435,12 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "format": "table",
-                        "instant": true,
-                        "range": false,
-                        "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"खरीदा गया\")"
+                        "format": "time_series",
+                        "instant": false,
+                        "range": true,
+                        "expr": "sum without(local_year,local_month)(evcc_grid_import_cost_daily_eur{local_year=\"${__from:date:YYYY}\"})",
+                        "interval": "1d",
+                        "legendFormat": "खरीदा गया"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -3457,10 +3459,12 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "format": "table",
-                        "instant": true,
-                        "range": false,
-                        "expr": "label_set((sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) by (local_month)), \"series\", \"बेचा गया\") and on() (sum(sum_over_time((last_over_time(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"}[1d]))[$__range:1d])) > 0)"
+                        "format": "time_series",
+                        "instant": false,
+                        "range": true,
+                        "expr": "sum without(local_year,local_month)(evcc_grid_export_credit_daily_eur{local_year=\"${__from:date:YYYY}\"})",
+                        "interval": "1d",
+                        "legendFormat": "बेचा गया"
                       },
                       "datasource": {
                         "name": "vm-evcc"
@@ -3471,97 +3475,27 @@
                   }
                 }
               ],
-              "transformations": [
-                {
-                  "kind": "Transformation",
-                  "group": "sortBy",
-                  "spec": {
-                    "options": {
-                      "fields": {},
-                      "sort": [
-                        {
-                          "field": "local_month"
-                        }
-                      ]
-                    }
-                  }
-                },
-                {
-                  "kind": "Transformation",
-                  "group": "organize",
-                  "spec": {
-                    "options": {
-                      "excludeByName": {},
-                      "indexByName": {
-                        "local_month": 0,
-                        "series": 1,
-                        "Value": 2
-                      },
-                      "renameByName": {
-                        "local_month": "month",
-                        "series": "series",
-                        "Value": "value"
-                      }
-                    }
-                  }
-                },
-                {
-                  "kind": "Transformation",
-                  "group": "filterFieldsByName",
-                  "spec": {
-                    "options": {
-                      "include": {
-                        "names": [
-                          "month",
-                          "series",
-                          "value"
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  "kind": "Transformation",
-                  "group": "groupingToMatrix",
-                  "spec": {
-                    "options": {
-                      "columnField": "series",
-                      "rowField": "month",
-                      "valueField": "value"
-                    }
-                  }
-                }
-              ],
+              "transformations": [],
               "queryOptions": {}
             }
           },
           "vizConfig": {
             "kind": "VizConfig",
-            "group": "barchart",
+            "group": "timeseries",
             "version": "12.3.3",
             "spec": {
               "options": {
-                "barRadius": 0.2,
-                "barWidth": 0.9,
-                "fullHighlight": false,
-                "groupWidth": 0.7,
                 "legend": {
                   "calcs": [],
                   "displayMode": "list",
                   "placement": "bottom",
                   "showLegend": true
                 },
-                "orientation": "auto",
-                "showValue": "auto",
-                "stacking": "none",
                 "tooltip": {
                   "hideZeros": false,
                   "mode": "multi",
                   "sort": "desc"
-                },
-                "xField": "month",
-                "xTickLabelRotation": 0,
-                "xTickLabelSpacing": 0
+                }
               },
               "fieldConfig": {
                 "defaults": {
@@ -3576,6 +3510,9 @@
                     "axisColorMode": "text",
                     "axisLabel": "",
                     "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
                     "fillOpacity": 80,
                     "gradientMode": "none",
                     "hideFrom": {
@@ -3583,9 +3520,19 @@
                       "tooltip": false,
                       "viz": false
                     },
-                    "lineWidth": 1,
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 0,
+                    "pointSize": 5,
                     "scaleDistribution": {
                       "type": "linear"
+                    },
+                    "showPoints": "never",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
                     },
                     "thresholdsStyle": {
                       "mode": "off"
@@ -3607,22 +3554,6 @@
                   }
                 },
                 "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "month"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "string"
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "माह"
-                      }
-                    ]
-                  },
                   {
                     "matcher": {
                       "id": "byName",
@@ -3663,7 +3594,7 @@
         "kind": "Panel",
         "spec": {
           "id": 37,
-          "title": "बैटरी सारांश",
+          "title": "बैटरी",
           "description": "",
           "links": [],
           "data": {
@@ -4089,7 +4020,7 @@
         "kind": "Panel",
         "spec": {
           "id": 50,
-          "title": "बैटरी चार्ज",
+          "title": "EVCC बैटरी चार्ज",
           "description": "",
           "links": [],
           "data": {
@@ -4515,7 +4446,7 @@
         "kind": "Panel",
         "spec": {
           "id": 49,
-          "title": "बैटरी दक्षता",
+          "title": "EVCC बैटरी दक्षता",
           "description": "",
           "links": [],
           "data": {
@@ -6884,6 +6815,797 @@
             }
           }
         }
+      },
+      "panel-83": {
+        "kind": "Panel",
+        "spec": {
+          "id": 83,
+          "title": "VRM बैटरी",
+          "description": "Optional Victron VRM battery-flow based charge, discharge, and efficiency for the selected year.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_charge_daily_wh{source=\"vrm\",local_date=~\".+\",local_year=\"${__from:date:YYYY}\"}[$__range])))",
+                        "legendFormat": "vrmBatteryChargeTotal",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryChargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_discharge_daily_wh{source=\"vrm\",local_date=~\".+\",local_year=\"${__from:date:YYYY}\"}[$__range])))",
+                        "legendFormat": "vrmBatteryDischargeTotal",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryDischargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "__expr__",
+                      "version": "v0",
+                      "spec": {
+                        "expression": "$vrmBatteryDischargeTotal / $vrmBatteryChargeTotal",
+                        "type": "math",
+                        "expr": ""
+                      },
+                      "datasource": {
+                        "name": "__expr__"
+                      }
+                    },
+                    "refId": "vrmBatteryEfficiency",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "text": {
+                  "titleSize": 16,
+                  "valueSize": 29
+                },
+                "textMode": "value_and_name",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#3274D9"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "none",
+                  "decimals": 1
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryChargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM चार्ज"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "watth"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryDischargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM डिस्चार्ज"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "watth"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 2
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryEfficiency"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "VRM दक्षता"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-84": {
+        "kind": "Panel",
+        "spec": {
+          "id": 84,
+          "title": "VRM बैटरी चार्ज",
+          "description": "Optional Victron VRM monthly battery charge and discharge for the selected year.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "format": "table",
+                        "expr": "WITH (\n  charge = label_set(sum(max by (site, local_month, local_date) (last_over_time(evcc_vrm_battery_charge_daily_wh{source=\"vrm\",local_date=~\".+\",local_year=\"${__from:date:YYYY}\"}[$__range]))) by (local_month) / 1000, \"series\", \"चार्ज\"),\n  discharge = label_set(sum(max by (site, local_month, local_date) (last_over_time(evcc_vrm_battery_discharge_daily_wh{source=\"vrm\",local_date=~\".+\",local_year=\"${__from:date:YYYY}\"}[$__range]))) by (local_month) / 1000, \"series\", \"डिस्चार्ज\")\n)\ncharge or discharge",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "A",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "sortBy",
+                  "spec": {
+                    "options": {
+                      "fields": {},
+                      "sort": [
+                        {
+                          "field": "local_month"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "indexByName": {
+                        "local_month": 0,
+                        "series": 1,
+                        "Value": 2
+                      },
+                      "renameByName": {
+                        "local_month": "month",
+                        "series": "series",
+                        "Value": "value"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "filterFieldsByName",
+                  "spec": {
+                    "options": {
+                      "include": {
+                        "names": [
+                          "month",
+                          "series",
+                          "value"
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "groupingToMatrix",
+                  "spec": {
+                    "options": {
+                      "columnField": "series",
+                      "rowField": "month",
+                      "valueField": "value"
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "barchart",
+            "version": "12.2.1",
+            "spec": {
+              "options": {
+                "barRadius": 0.2,
+                "barWidth": 0.9,
+                "groupWidth": 0.7,
+                "showValue": "auto",
+                "stacking": "none",
+                "legend": {
+                  "showLegend": true,
+                  "displayMode": "list",
+                  "placement": "bottom"
+                },
+                "tooltip": {
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "month"
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed",
+                    "fixedColor": "#3274D9"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisSoftMax": 1,
+                    "axisSoftMin": 0,
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 80,
+                    "gradientMode": "opacity",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kWh"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "month"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "none"
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "type": "value",
+                            "options": {
+                              "1": {
+                                "text": "01"
+                              },
+                              "2": {
+                                "text": "02"
+                              },
+                              "3": {
+                                "text": "03"
+                              },
+                              "4": {
+                                "text": "04"
+                              },
+                              "5": {
+                                "text": "05"
+                              },
+                              "6": {
+                                "text": "06"
+                              },
+                              "7": {
+                                "text": "07"
+                              },
+                              "8": {
+                                "text": "08"
+                              },
+                              "9": {
+                                "text": "09"
+                              },
+                              "10": {
+                                "text": "10"
+                              },
+                              "11": {
+                                "text": "11"
+                              },
+                              "12": {
+                                "text": "12"
+                              },
+                              "01": {
+                                "text": "01"
+                              },
+                              "02": {
+                                "text": "02"
+                              },
+                              "03": {
+                                "text": "03"
+                              },
+                              "04": {
+                                "text": "04"
+                              },
+                              "05": {
+                                "text": "05"
+                              },
+                              "06": {
+                                "text": "06"
+                              },
+                              "07": {
+                                "text": "07"
+                              },
+                              "08": {
+                                "text": "08"
+                              },
+                              "09": {
+                                "text": "09"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "चार्ज"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#6AA9FF",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "चार्ज"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "डिस्चार्ज"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#1F4B99",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "डिस्चार्ज"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-85": {
+        "kind": "Panel",
+        "spec": {
+          "id": 85,
+          "title": "VRM बैटरी प्रवाह",
+          "description": "Optional Victron VRM battery energy-flow components for the selected year.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_pv_to_battery_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "PV से बैटरी",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmPvToBattery",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_grid_to_battery_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "ग्रिड से बैटरी",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmGridToBattery",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_to_consumers_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "बैटरी से उपभोक्ता",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryToConsumers",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_to_grid_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "बैटरी से ग्रिड",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryToGrid",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "bargauge",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayMode": "gradient",
+                "orientation": "vertical",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "auto",
+                "text": {
+                  "titleSize": 10,
+                  "valueSize": 12
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 1,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "kWh",
+                  "min": 0,
+                  "custom": {
+                    "barRadius": 0.18
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "PV से बैटरी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "PV से बैटरी"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ग्रिड से बैटरी"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "ग्रिड से बैटरी"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E0B400"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "बैटरी से उपभोक्ता"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी से उपभोक्ता"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "बैटरी से ग्रिड"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "बैटरी से ग्रिड"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "id": null,
@@ -7594,6 +8316,45 @@
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-49"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 18,
+                        "width": 5,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-83"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 5,
+                        "y": 18,
+                        "width": 7,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-85"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 12,
+                        "y": 18,
+                        "width": 12,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-84"
                         }
                       }
                     }

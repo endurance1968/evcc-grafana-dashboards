@@ -3,6 +3,7 @@ import importlib.util
 import io
 import pathlib
 import sys
+import tempfile
 import unittest
 from datetime import date
 from types import SimpleNamespace
@@ -29,6 +30,7 @@ class VmRollupTests(unittest.TestCase):
             benchmark_start="2026-02-20T00:00:00Z",
             benchmark_end="2026-03-22T00:00:00Z",
             benchmark_step="1d",
+            scheduler_lock_file="",
         )
 
     def test_record_name_uses_prefix(self):
@@ -69,6 +71,30 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(rows[0]["label"], "Grid price and cost rollups")
         self.assertEqual(rows[0]["seconds"], 5.0)
         self.assertEqual(rows[0]["percent"], 25.0)
+
+    def test_rollup_profile_analysis_identifies_slowest_family(self):
+        analysis = MODULE.rollup_profile_analysis(
+            {
+                "total_s": 20.0,
+                "positive_energy_s": 3.0,
+                "price_rollups_s": 7.0,
+            }
+        )
+
+        self.assertEqual(analysis["slowest_family"]["key"], "price_rollups_s")
+        self.assertTrue(analysis["optimization_worth_reviewing"])
+        self.assertIn("Grid price and cost rollups", analysis["recommendation"])
+
+    def test_rollup_lock_rejects_parallel_write_run(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            lock_path = pathlib.Path(tmp_dir) / "rollup.lock"
+            with MODULE.RollupLock(lock_path, "backfill"):
+                self.assertTrue(lock_path.exists())
+                with self.assertRaises(SystemExit):
+                    with MODULE.RollupLock(lock_path, "backfill"):
+                        pass
+
+            self.assertFalse(lock_path.exists())
 
     def test_vehicle_distance_rollup_collapses_to_vehicle_dimension(self):
         item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "vehicle_daily_distance")
@@ -391,7 +417,10 @@ class VmRollupTests(unittest.TestCase):
 
     def test_rollup_month_matcher_uses_configured_prefix_and_month_labels(self):
         matcher = MODULE.rollup_month_matcher(self.settings, "2026", "04")
-        self.assertEqual(matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="04"}')
+        self.assertEqual(
+            matcher,
+            '{__name__=~"evcc_.*",__name__!~"evcc_vrm_.*",local_year="2026",local_month="04"}',
+        )
 
     def test_build_month_scopes_groups_windows_by_local_month(self):
         windows = MODULE.build_day_windows(
@@ -401,8 +430,8 @@ class VmRollupTests(unittest.TestCase):
         )
         scopes = MODULE.build_month_scopes(self.settings, windows)
         self.assertEqual([(item.local_year, item.local_month) for item in scopes], [("2026", "01"), ("2026", "02")])
-        self.assertEqual(scopes[0].matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="01"}')
-        self.assertEqual(scopes[1].matcher, '{__name__=~"evcc_.*",local_year="2026",local_month="02"}')
+        self.assertEqual(scopes[0].matcher, '{__name__=~"evcc_.*",__name__!~"evcc_vrm_.*",local_year="2026",local_month="01"}')
+        self.assertEqual(scopes[1].matcher, '{__name__=~"evcc_.*",__name__!~"evcc_vrm_.*",local_year="2026",local_month="02"}')
 
     def test_validate_month_replace_range_rejects_non_month_start(self):
         with self.assertRaises(SystemExit) as raised:
@@ -699,6 +728,53 @@ class VmRollupTests(unittest.TestCase):
         )
 
         self.assertIsNone(value)
+
+    def test_quality_counter_tracks_counter_resets(self):
+        original_profile = MODULE.ACTIVE_PROFILE
+        MODULE.ACTIVE_PROFILE = {"quality_counter_resets": 0.0}
+        try:
+            value = MODULE.summarize_counter_spread_samples(
+                [
+                    (0, 100.0),
+                    (10, 101.0),
+                    (20, 1.0),
+                    (30, 2.5),
+                ]
+            )
+            counters = MODULE.quality_counter_summary(MODULE.ACTIVE_PROFILE)
+        finally:
+            MODULE.ACTIVE_PROFILE = original_profile
+
+        self.assertAlmostEqual(value, 2500.0, places=6)
+        self.assertEqual(counters, [{"key": "quality_counter_resets", "label": "Counter resets ignored", "count": 1}])
+
+    def test_quality_counter_tracks_power_spikes_and_missing_buckets(self):
+        original_profile = MODULE.ACTIVE_PROFILE
+        MODULE.ACTIVE_PROFILE = {"quality_power_spikes": 0.0, "quality_missing_buckets": 0.0}
+        try:
+            value = MODULE.summarize_legacy_bucket_energy_samples(
+                samples=[
+                    (0, 100.0),
+                    (60, 50000.0),
+                    (180, 300.0),
+                ],
+                start_ts=0,
+                end_ts=240,
+                bucket_seconds=60,
+                reducer="mean",
+            )
+            counters = MODULE.quality_counter_summary(MODULE.ACTIVE_PROFILE)
+        finally:
+            MODULE.ACTIVE_PROFILE = original_profile
+
+        self.assertAlmostEqual(value, (100.0 + 300.0) / 60.0, places=6)
+        self.assertEqual(
+            counters,
+            [
+                {"key": "quality_power_spikes", "label": "Power spike samples ignored", "count": 1},
+                {"key": "quality_missing_buckets", "label": "Missing energy buckets", "count": 2},
+            ],
+        )
 
     def test_fetch_grid_energy_rollups_prefers_counter_spread_for_import(self):
         def fake_fetch_single_series_range(settings, query, start_iso, end_iso, step):

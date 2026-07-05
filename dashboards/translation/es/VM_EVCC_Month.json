@@ -1238,7 +1238,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH ( homeEnergy = last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]), loadpointEnergy = sum(last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (homeEnergy * 0), gridImport = sum(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (homeEnergy * 0) ) 1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001)",
+                        "expr": "WITH ( homeEnergy = sum(last_over_time(evcc_home_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])), loadpointEnergy = sum(last_over_time(evcc_loadpoint_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (homeEnergy * 0), gridImport = sum(last_over_time(evcc_grid_import_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (homeEnergy * 0) ) 1 - gridImport / clamp_min(homeEnergy + loadpointEnergy, 0.001)",
                         "format": "time_series",
                         "legendFormat": "Autosuficiencia",
                         "range": true,
@@ -1261,7 +1261,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH ( pvEnergy = last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d]), gridExport = sum(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (pvEnergy * 0) ) (pvEnergy - gridExport) / clamp_min(pvEnergy, 0.001)",
+                        "expr": "WITH ( pvEnergy = sum(last_over_time(evcc_pv_energy_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])), gridExport = sum(last_over_time(evcc_grid_export_daily_wh{local_year=\"${__from:date:YYYY}\",local_month=\"${__from:date:MM}\"}[1d])) or (pvEnergy * 0) ) (pvEnergy - gridExport) / clamp_min(pvEnergy, 0.001)",
                         "format": "time_series",
                         "legendFormat": "Autoconsumo",
                         "range": true,
@@ -1404,10 +1404,6 @@
                           "mode": "fixed",
                           "fixedColor": "#73BF69"
                         }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autosuficiencia"
                       }
                     ]
                   },
@@ -1423,10 +1419,6 @@
                           "mode": "fixed",
                           "fixedColor": "#A44C9C"
                         }
-                      },
-                      {
-                        "id": "displayName",
-                        "value": "Autoconsumo"
                       }
                     ]
                   },
@@ -2104,7 +2096,7 @@
                   {
                     "matcher": {
                       "id": "byRegexp",
-                      "options": "^(Battery|Speicher|Batterie|Batería|Batteria|Accu|电池|बैटरी)$"
+                      "options": "^(Battery|Speicher|Batería|Batteria|Accu|电池|बैटरी)$"
                     },
                     "properties": [
                       {
@@ -3711,7 +3703,7 @@
         "kind": "Panel",
         "spec": {
           "id": 11,
-          "title": "Niveles de batería casa",
+          "title": "Niveles de batería EVCC",
           "description": "",
           "links": [],
           "data": {
@@ -4705,6 +4697,486 @@
             }
           }
         }
+      },
+      "panel-43": {
+        "kind": "Panel",
+        "spec": {
+          "id": 43,
+          "title": "Eficiencia de batería VRM",
+          "description": "Carga, descarga y eficiencia opcionales basadas en flujos de batería de Victron VRM para el mes seleccionado.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_charge_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "Carga de batería VRM",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryChargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_discharge_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "Descarga de batería VRM",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryDischargeTotal",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "__expr__",
+                      "version": "v0",
+                      "spec": {
+                        "expression": "$vrmBatteryDischargeTotal / $vrmBatteryChargeTotal",
+                        "type": "math"
+                      },
+                      "datasource": {
+                        "name": "__expr__"
+                      }
+                    },
+                    "refId": "vrmBatteryEfficiency",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "stat",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "text": {
+                  "titleSize": 16,
+                  "valueSize": 29
+                },
+                "textMode": "value_and_name",
+                "wideLayout": true
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "none",
+                  "decimals": 1
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryChargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Carga de batería VRM"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 0
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryDischargeTotal"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Descarga de batería VRM"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 0
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "vrmBatteryEfficiency"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Eficiencia de batería VRM"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-44": {
+        "kind": "Panel",
+        "spec": {
+          "id": 44,
+          "title": "Flujos de batería VRM",
+          "description": "Componentes opcionales del flujo de energía de la batería Victron VRM para el mes seleccionado.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_pv_to_battery_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "FV a batería",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmPvToBattery",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_grid_to_battery_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "Red a batería",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmGridToBattery",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_to_consumers_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "Batería a consumidores",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryToConsumers",
+                    "hidden": false
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum(max by (site, local_date) (last_over_time(evcc_vrm_battery_to_grid_daily_wh{source=\"vrm\",local_date=~\".+\"}[$__range]))) / 1000",
+                        "format": "time_series",
+                        "instant": true,
+                        "legendFormat": "Batería a red",
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "vrmBatteryToGrid",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "bargauge",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayMode": "gradient",
+                "orientation": "vertical",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "auto",
+                "text": {
+                  "titleSize": 10,
+                  "valueSize": 12
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "decimals": 1,
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "kWh",
+                  "min": 0,
+                  "custom": {
+                    "barRadius": 0.18
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "FV a batería"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "FV a batería"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#56A64B"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Red a batería"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Red a batería"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E0B400"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Batería a consumidores"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Batería a consumidores"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#73A7F2"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Batería a red"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Batería a red"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kWh"
+                      },
+                      {
+                        "id": "decimals",
+                        "value": 1
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#3274D9"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "id": null,
@@ -5217,6 +5689,32 @@
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-11"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 7,
+                        "width": 5,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-43"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 5,
+                        "y": 7,
+                        "width": 19,
+                        "height": 7,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-44"
                         }
                       }
                     }

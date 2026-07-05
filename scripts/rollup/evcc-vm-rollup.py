@@ -8,6 +8,7 @@ import bisect
 import configparser
 import json
 import math
+import os
 import re
 import sys
 import time
@@ -16,12 +17,13 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 from datetime import date, datetime, time as dt_time, timedelta, timezone
+from pathlib import Path
 from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.06.15.1"
-SCRIPT_LAST_MODIFIED = "2026-06-15"
+SCRIPT_VERSION = "2026.07.05.1"
+SCRIPT_LAST_MODIFIED = "2026-07-05"
 
 PROFILE_FAMILY_LABELS = (
     ("positive_energy_s", "Positive energy rollups"),
@@ -36,6 +38,12 @@ PROFILE_FAMILY_LABELS = (
     ("generic_rollup_s", "Generic direct rollups"),
     ("health_rollup_s", "PV health rollups"),
     ("import_s", "VictoriaMetrics import"),
+)
+
+QUALITY_COUNTER_LABELS = (
+    ("quality_counter_resets", "Counter resets ignored"),
+    ("quality_power_spikes", "Power spike samples ignored"),
+    ("quality_missing_buckets", "Missing energy buckets"),
 )
 
 
@@ -79,6 +87,7 @@ class Settings:
     benchmark_start: str
     benchmark_end: str
     benchmark_step: str
+    scheduler_lock_file: str
 
 
 @dataclass(frozen=True)
@@ -202,6 +211,10 @@ def bump_profile_value(name: str, value: float = 1.0) -> None:
     ACTIVE_PROFILE[name] = ACTIVE_PROFILE.get(name, 0) + value
 
 
+def bump_quality_counter(name: str, value: int = 1) -> None:
+    bump_profile_value(name, float(value))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Plan, benchmark and backfill VictoriaMetrics rollups for EVCC safely."
@@ -261,6 +274,19 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Emit machine-readable JSON for detect/plan/benchmark/backfill output.",
     )
+    parser.add_argument(
+        "--lock-file",
+        default="",
+        help=(
+            "Lock file for write operations. Defaults to the [scheduler] lock_file setting "
+            "or to <config>.lock."
+        ),
+    )
+    parser.add_argument(
+        "--no-lock",
+        action="store_true",
+        help="Disable the write-operation lock guard. Intended only for manual recovery.",
+    )
     return parser.parse_args()
 
 
@@ -307,6 +333,7 @@ def load_settings(path: str) -> Settings:
         benchmark_start=benchmark_start,
         benchmark_end=benchmark_end,
         benchmark_step=benchmark_step,
+        scheduler_lock_file=parser.get("scheduler", "lock_file", fallback="") if parser.has_section("scheduler") else "",
     )
 
 
@@ -911,9 +938,11 @@ def promql_string(value: str) -> str:
 
 def rollup_month_matcher(settings: Settings, local_year: str, local_month: str) -> str:
     name_regex = re.escape(f"{settings.metric_prefix}_") + ".*"
+    excluded_helper_regex = re.escape(f"{settings.metric_prefix}_vrm_") + ".*"
     return (
         "{"
         f'__name__=~"{promql_string(name_regex)}",'
+        f'__name__!~"{promql_string(excluded_helper_regex)}",'
         f'local_year="{promql_string(local_year)}",'
         f'local_month="{promql_string(local_month)}"'
         "}"
@@ -1510,11 +1539,16 @@ def summarize_polarity_bucket_energy_samples(
     negative_counts: dict[int, int] = {}
 
     for timestamp, value in samples:
+        if not math.isfinite(value):
+            continue
+        if abs(value) >= peak_power_limit:
+            bump_quality_counter("quality_power_spikes")
+            continue
         bucket_start = (timestamp // bucket_seconds) * bucket_seconds
-        if 0 <= value < peak_power_limit:
+        if value >= 0:
             positive_sums[bucket_start] = positive_sums.get(bucket_start, 0.0) + value
             positive_counts[bucket_start] = positive_counts.get(bucket_start, 0) + 1
-        if value <= 0 and value < peak_power_limit:
+        if value <= 0:
             negative_sums[bucket_start] = negative_sums.get(bucket_start, 0.0) + value
             negative_counts[bucket_start] = negative_counts.get(bucket_start, 0) + 1
 
@@ -1565,6 +1599,8 @@ def summarize_counter_spread_samples(
         delta = value - previous
         if delta >= 0:
             total_delta += delta
+        else:
+            bump_quality_counter("quality_counter_resets")
         previous = value
 
     if total_delta <= 0:
@@ -1605,7 +1641,10 @@ def summarize_positive_bucket_energy_samples(
 ) -> float:
     buckets: dict[int, list[float]] = {}
     for timestamp, value in samples:
-        if not math.isfinite(value) or value <= 0 or value >= peak_power_limit:
+        if not math.isfinite(value) or value <= 0:
+            continue
+        if value >= peak_power_limit:
+            bump_quality_counter("quality_power_spikes")
             continue
         bucket_start = (timestamp // bucket_seconds) * bucket_seconds
         buckets.setdefault(bucket_start, []).append(value)
@@ -1635,16 +1674,24 @@ def summarize_legacy_bucket_energy_samples(
     for timestamp, value in samples:
         if timestamp < start_ts or timestamp >= end_ts:
             continue
-        if not math.isfinite(value) or value < 0 or value >= peak_power_limit:
+        if not math.isfinite(value) or value < 0:
+            continue
+        if value >= peak_power_limit:
+            bump_quality_counter("quality_power_spikes")
             continue
         bucket_start = start_ts + (((timestamp - start_ts) // bucket_seconds) * bucket_seconds)
         bucket_map.setdefault(bucket_start, []).append(value)
     total_wh = 0.0
+    expected_buckets = 0
     for bucket_start in range(start_ts, end_ts, bucket_seconds):
+        expected_buckets += 1
         values = bucket_map.get(bucket_start)
         if not values:
             continue
         total_wh += reduce_bucket_values(values, reducer) * bucket_seconds / 3600.0
+    missing_buckets = expected_buckets - len(bucket_map)
+    if missing_buckets > 0:
+        bump_quality_counter("quality_missing_buckets", missing_buckets)
     return total_wh
 
 
@@ -2979,6 +3026,96 @@ def rollup_family_profile(profile: dict[str, float | int]) -> list[dict[str, flo
     return sorted(rows, key=lambda item: float(item["seconds"]), reverse=True)
 
 
+def rollup_profile_analysis(profile: dict[str, float | int]) -> dict[str, object]:
+    rows = rollup_family_profile(profile)
+    if not rows:
+        return {
+            "slowest_family": None,
+            "optimization_worth_reviewing": False,
+            "recommendation": "No measured rollup family runtime was recorded.",
+        }
+
+    slowest = rows[0]
+    percent = float(slowest["percent"])
+    seconds = float(slowest["seconds"])
+    worth_reviewing = seconds >= 1.0 and percent >= 25.0
+    if worth_reviewing:
+        recommendation = (
+            f"Profile {slowest['label']} first; optimize caching, batching, or parallelism only if "
+            "this family remains dominant in repeated livecopy runs."
+        )
+    else:
+        recommendation = (
+            "No single rollup family dominates this run; broad optimization is unlikely to pay off "
+            "before another measured bottleneck appears."
+        )
+    return {
+        "slowest_family": slowest,
+        "optimization_worth_reviewing": worth_reviewing,
+        "recommendation": recommendation,
+    }
+
+
+def quality_counter_summary(profile: dict[str, float | int]) -> list[dict[str, int | str]]:
+    rows: list[dict[str, int | str]] = []
+    for key, label in QUALITY_COUNTER_LABELS:
+        count = int(round(float(profile.get(key, 0.0) or 0.0)))
+        if count <= 0:
+            continue
+        rows.append({"key": key, "label": label, "count": count})
+    return rows
+
+
+class RollupLock:
+    def __init__(self, path: Path, command: str) -> None:
+        self.path = path
+        self.command = command
+        self.fd: int | None = None
+
+    def __enter__(self) -> "RollupLock":
+        if self.path.parent and str(self.path.parent) not in {"", "."}:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "script": SCRIPT_NAME,
+            "version": SCRIPT_VERSION,
+            "command": self.command,
+            "pid": os.getpid(),
+            "started_at": format_local_timestamp(current_local_timestamp()),
+        }
+        try:
+            self.fd = os.open(str(self.path), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.write(self.fd, json.dumps(payload, separators=(",", ":"), ensure_ascii=True).encode("utf-8"))
+            os.write(self.fd, b"\n")
+        except FileExistsError as exc:
+            try:
+                existing = self.path.read_text(encoding="utf-8").strip()
+            except OSError:
+                existing = ""
+            detail = f" Existing lock: {existing}" if existing else ""
+            raise SystemExit(f"Another evcc-vm-rollup write run appears active: {self.path}.{detail}") from exc
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        if self.fd is not None:
+            os.close(self.fd)
+            self.fd = None
+        try:
+            self.path.unlink()
+        except FileNotFoundError:
+            pass
+
+
+def write_operation_needs_lock(args: argparse.Namespace) -> bool:
+    return bool(args.write and args.command in {"backfill", "delete"} and not getattr(args, "no_lock", False))
+
+
+def resolve_lock_file(settings: Settings, args: argparse.Namespace) -> Path:
+    configured = (getattr(args, "lock_file", "") or settings.scheduler_lock_file).strip()
+    if configured:
+        return Path(configured).expanduser()
+    return Path(f"{args.config}.lock").expanduser()
+
+
 def mean_of_top(values: list[float], limit: int) -> float | None:
     finite = [value for value in values if math.isfinite(value)]
     if not finite:
@@ -3173,6 +3310,9 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "generic_rollup_s": 0.0,
         "import_s": 0.0,
         "health_rollup_s": 0.0,
+        "quality_counter_resets": 0.0,
+        "quality_power_spikes": 0.0,
+        "quality_missing_buckets": 0.0,
     }
     update_peak_memory()
     started_at = time.perf_counter()
@@ -3665,6 +3805,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "write_safety": write_safety,
         "replace_range": bool(getattr(args, "replace_range", False)),
         "replace_delete_results": replace_summary,
+        "lock_file": str(resolve_lock_file(settings, args)) if write_operation_needs_lock(args) else None,
         "metrics": [item.record for item in catalog] + [
             record_name(settings, "pv_top30_mean_yearly_wh"),
             record_name(settings, "pv_top5_mean_monthly_wh"),
@@ -3680,6 +3821,8 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "import_results": import_results,
         "profile": rounded_profile,
         "profile_families": rollup_family_profile(rounded_profile),
+        "profile_analysis": rollup_profile_analysis(rounded_profile),
+        "quality_counters": quality_counter_summary(rounded_profile),
     }
     if args.json:
         print(json.dumps(summary, indent=2, ensure_ascii=True))
@@ -3803,6 +3946,8 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
     print(f"Batch size:   {summary['batch_size']}")
     if summary.get("replace_range"):
         print("Replace mode: enabled")
+    if summary.get("lock_file"):
+        print(f"Lock file:    {summary['lock_file']}")
 
     print("\nSummary")
     print("-------")
@@ -3858,11 +4003,31 @@ def print_backfill_summary(summary: dict, args: argparse.Namespace) -> None:
         for item in profile_families[:8]:
             print(f"- {item['label']}: {item['seconds']} s ({item['percent']}%)")
 
+    profile_analysis = summary.get("profile_analysis", {})
+    if profile_analysis:
+        print("\nProfile analysis")
+        print("----------------")
+        slowest = profile_analysis.get("slowest_family")
+        if slowest:
+            print(f"- Slowest family: {slowest['label']} ({slowest['seconds']} s, {slowest['percent']}%)")
+        print(f"- Optimization worth reviewing: {'yes' if profile_analysis.get('optimization_worth_reviewing') else 'no'}")
+        print(f"- Recommendation: {profile_analysis.get('recommendation')}")
+
+    quality_counters = summary.get("quality_counters", [])
+    print("\nData quality counters")
+    print("---------------------")
+    if quality_counters:
+        for item in quality_counters:
+            print(f"- {item['label']}: {item['count']}")
+    else:
+        print("- No counter resets, power spikes, or missing energy buckets were observed.")
+
     print("\nInterpretation")
     print("--------------")
     print("- 'Skipped items' are grouped below so you can see whether they mostly come from missing source data, invalid values, or missing labels.")
     if profile_families:
         print("- 'Rollup family timings' show where runtime is spent; use them before changing batch sizes, caching, or parallelism.")
+    print("- 'Data quality counters' report ignored counter resets, filtered power spikes, and missing legacy energy buckets.")
     if args.write:
         print("- Write mode calculated the rollups and imported the resulting evcc_* metrics into VictoriaMetrics.")
         if summary.get("replace_range"):
@@ -3896,6 +4061,13 @@ def main() -> int:
     args = parse_args()
     settings = load_settings(args.config)
 
+    if write_operation_needs_lock(args):
+        with RollupLock(resolve_lock_file(settings, args), args.command):
+            return dispatch_command(settings, args)
+    return dispatch_command(settings, args)
+
+
+def dispatch_command(settings: Settings, args: argparse.Namespace) -> int:
     if args.command == "detect":
         return print_detect(settings, as_json=args.json)
     if args.command == "plan":

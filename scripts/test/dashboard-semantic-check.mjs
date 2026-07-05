@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.06.23.1
- * Last modified: 2026-06-23
+ * Version: 2026.07.05.2
+ * Last modified: 2026-07-05
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -52,8 +52,8 @@ const expectedTimes = {
     "to": "now/M"
   },
   "VM_EVCC_Today-Details.json": {
-    "from": "now-24h",
-    "to": "now"
+    "from": "now/d",
+    "to": "now/d"
   },
   "VM_EVCC_Today-Mobile.json": {
     "from": "now/d",

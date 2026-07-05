@@ -1851,7 +1851,10 @@
                 }
               ],
               "transformations": [],
-              "queryOptions": {}
+              "queryOptions": {
+                "interval": "1h",
+                "maxDataPoints": 24
+              }
             }
           },
           "vizConfig": {
@@ -2217,7 +2220,10 @@
                 }
               ],
               "transformations": [],
-              "queryOptions": {}
+              "queryOptions": {
+                "interval": "1h",
+                "maxDataPoints": 24
+              }
             }
           },
           "vizConfig": {
@@ -6578,8 +6584,8 @@
       "EVCC"
     ],
     "timeSettings": {
-      "from": "now-24h",
-      "to": "now",
+      "from": "now/d",
+      "to": "now/d",
       "autoRefresh": "10s",
       "autoRefreshIntervals": [
         "5s",

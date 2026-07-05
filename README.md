@@ -28,6 +28,7 @@ Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/s
 - PV-Anlagenvergleiche fuer Jahresertrag und spezifischen Ertrag (`kWh/kWp`)
 - EVCC-Gruenanteil als KPI in Tages- und Langzeitansichten
 - optionale historische Energieimporte, z. B. SMA-PV-Ertraege und SMA-Energiebilanzen als EVCC-kompatible Tageswerte
+- optionaler VRM-Batteriefluss-Import fuer zusaetzliche Speicherwirkungsgrad-Auswertungen
 - einen optionalen [Netzsteuerungs-Audit-Collector](./docs/de/grid-control-audit.md) fuer den Daily-Details-Tab
 - Dokumentation fuer die Migration von InfluxDB nach VictoriaMetrics
 - Installations- und Betriebsanleitungen fuer VictoriaMetrics, EVCC/Telegraf-Live-Ingest, Grafana, Migration und Dashboard-Deployment

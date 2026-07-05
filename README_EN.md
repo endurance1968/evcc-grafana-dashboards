@@ -25,6 +25,7 @@ More dashboard examples are available in the [screenshot gallery](./docs/screens
 - PV source comparisons for yearly energy and specific yield (`kWh/kWp`)
 - EVCC green share as a KPI in daily and long-range views
 - optional historic energy imports, for example SMA PV yield and SMA energy balance files as EVCC-compatible daily values
+- optional VRM battery-flow import for additional battery efficiency analytics
 - an optional [grid-control audit collector](./docs/en/grid-control-audit.md) for the Daily Details tab
 - documentation for InfluxDB to VictoriaMetrics migration
 - end-user guides for VictoriaMetrics, EVCC/Telegraf live ingest, Grafana, migration, and dashboard deployment
