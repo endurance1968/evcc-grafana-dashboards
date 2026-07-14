@@ -16,46 +16,52 @@ More dashboard examples are available in the [screenshot gallery](./docs/screens
 
 ## What this repository adds
 
-- a complete VictoriaMetrics-based EVCC dashboard collection
-- generated dashboard translations based on the English source dashboards
+Baseline scope for a plain EVCC/VM setup:
+
+- Complete VictoriaMetrics-based EVCC dashboard collection
+- Generated dashboard translations based on the English source dashboards
 - Grafana 13 TAB dashboards as the supported navigation model
-- deploy scripts for first-time imports and later updates
-- a rollup script for daily long-range dashboard metrics
-- optional PV generation cost/LCOE analytics based on an investment file and a weekly helper
-- PV source comparisons for yearly energy and specific yield (`kWh/kWp`)
+- Deploy scripts for first-time imports and later updates
+- Rollup script for daily long-range metrics from EVCC raw data in VictoriaMetrics
+- PV source comparisons for yearly energy and specific yield (`kWh/kWp`) when EVCC or imported PV daily values provide the data
 - EVCC green share as a KPI in daily and long-range views
-- optional historic energy imports, for example SMA PV yield and SMA energy balance files as EVCC-compatible daily values
-- optional VRM battery-flow import for additional battery efficiency analytics
-- an optional [grid-control audit collector](./docs/en/grid-control-audit.md) for the Daily Details tab
-- documentation for InfluxDB to VictoriaMetrics migration
-- end-user guides for VictoriaMetrics, EVCC/Telegraf live ingest, Grafana, migration, and dashboard deployment
-- curated release notes and screenshots for the recommended Grafana 13 TAB dashboards
+- Documentation for InfluxDB to VictoriaMetrics migration
+- End-user guides for VictoriaMetrics, EVCC/Telegraf live ingest, Grafana, migration, and dashboard deployment
+- Curated release notes and screenshots for the recommended Grafana 13 TAB dashboards
+
+Optional add-on features with their own collectors, importers, or helper scripts:
+
+- PV generation cost/LCOE analytics require an investment file and the investment/PV cost helper
+- Historic SMA PV yield and SMA energy balance data require separate import runs that write EVCC-compatible daily values to VictoriaMetrics
+- VRM battery efficiency requires the optional VRM battery-flow import and writes additional `evcc_vrm_*` metrics
+- Grid-control/14a audit data requires the optional [grid-control audit collector](./docs/en/grid-control-audit.md) and then appears in the Daily Details tab
+- Missing historic EVCC years can optionally be filled with compatible daily imports from external sources
 
 ## What the dashboards cover
 
 The dashboards include day, month, year, and all-time views.
 
-- `Today` focuses on the current day: PV, grid, home, battery, charging points, energy flow, forecast, autarky, self-consumption, green share, and costs.
-- `Today - Details` goes deeper into phases, charging metrics, raw histories, pricing details, and optional grid-control/14a audit data.
-- `Today - Mobile` is a compact layout for smaller screens.
-- `Month`, `Year`, and `All-time` provide longer-range energy, cost, battery, vehicle, finance, and PV-source analysis based on daily rollups when the optional data is available.
+- Dashboard `Today` focuses on the current day: PV, grid, home, battery, charging points, energy flow, forecast, autarky, self-consumption, green share, and costs.
+- Dashboard `Today - Details` goes deeper into phases, charging metrics, raw histories, pricing details, and optional grid-control/14a audit data.
+- Dashboard `Today - Mobile` is a compact layout for smaller screens.
+- Dashboards `Month`, `Year`, and `All-time` provide longer-range energy, cost, battery, vehicle, finance, and PV-source analysis based on daily rollups when the optional data is available.
 
 Typical use cases:
 
-- track PV production, self-consumption, and autarky
-- compare grid import and feed-in over time
-- analyze vehicles and charging points by energy, cost, and usage
-- inspect battery charge, discharge, and SOC behavior
-- visualize pricing trends, import cost, and load distribution
-- compare PV sources by yearly energy, specific yield, and optional generation cost
-- track green share, autarky, and self-consumption as separate KPIs
-- audit optional grid-control/14a events when EVCC and the collector provide the required data
-- migrate historic EVCC data from InfluxDB to VictoriaMetrics and continue operating there
-- optionally fill historic years without EVCC data from compatible external daily imports
+- Track PV production, self-consumption, and autarky
+- Compare grid import and feed-in over time
+- Analyze vehicles and charging points by energy, cost, and usage
+- Inspect battery charge, discharge, and SOC behavior
+- Visualize pricing trends, import cost, and load distribution
+- Compare PV sources by yearly energy, specific yield, and optional generation cost
+- Track green share, autarky, and self-consumption as separate KPIs
+- Audit optional grid-control/14a events when EVCC and the collector provide the required data
+- Migrate historic EVCC data from InfluxDB to VictoriaMetrics and continue operating there
+- Optionally fill historic years without EVCC data from compatible external daily imports
 
 ## Getting started
 
 For installation, migration, live ingest, and dashboard deployment, continue here:
 
 - [docs/en/README.md](./docs/README_EN.md)
-- [release notes](./docs/en/release-notes.md)
+- [Release notes](./docs/en/release-notes.md)

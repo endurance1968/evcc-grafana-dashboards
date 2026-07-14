@@ -19,29 +19,35 @@ Weitere Beispiele der Dashboards findest du in der [Screenshot-Galerie](./docs/s
 
 ## Was dieses Repository liefert
 
-- eine vollstaendige EVCC-Dashboard-Sammlung fuer VictoriaMetrics
-- generierte Dashboard-Uebersetzungen auf Basis der englischen Quelldashboards
+Basisumfang fuer ein nacktes EVCC/VM-Setup:
+
+- Vollstaendige EVCC-Dashboard-Sammlung fuer VictoriaMetrics
+- Generierte Dashboard-Uebersetzungen auf Basis der englischen Quelldashboards
 - Grafana-13-TAB-Dashboards als unterstuetztes Navigationsmodell
 - Deploy-Skripte fuer Erstimport und Updates
-- ein Rollup-Skript fuer taegliche Langzeit-Metriken
-- optionale PV-Gestehungskosten/LCOE-Auswertung mit Investment-Datei und Wochen-Helper
-- PV-Anlagenvergleiche fuer Jahresertrag und spezifischen Ertrag (`kWh/kWp`)
+- Rollup-Skript fuer taegliche Langzeit-Metriken aus den EVCC-Rohdaten in VictoriaMetrics
+- PV-Anlagenvergleiche fuer Jahresertrag und spezifischen Ertrag (`kWh/kWp`), soweit EVCC oder importierte PV-Tageswerte die Daten liefern
 - EVCC-Gruenanteil als KPI in Tages- und Langzeitansichten
-- optionale historische Energieimporte, z. B. SMA-PV-Ertraege und SMA-Energiebilanzen als EVCC-kompatible Tageswerte
-- optionaler VRM-Batteriefluss-Import fuer zusaetzliche Speicherwirkungsgrad-Auswertungen
-- einen optionalen [Netzsteuerungs-Audit-Collector](./docs/de/grid-control-audit.md) fuer den Daily-Details-Tab
 - Dokumentation fuer die Migration von InfluxDB nach VictoriaMetrics
 - Installations- und Betriebsanleitungen fuer VictoriaMetrics, EVCC/Telegraf-Live-Ingest, Grafana, Migration und Dashboard-Deployment
 - Release Notes und Screenshots fuer die empfohlenen Grafana-13-TAB-Dashboards
+
+Optionale Zusatzfeatures mit eigenen Sammlern, Importern oder Helper-Skripten:
+
+- PV-Gestehungskosten/LCOE-Auswertung benoetigt eine Investment-Datei und den Investment-/PV-Kosten-Helper
+- Historische SMA-PV-Ertraege und SMA-Energiebilanzen benoetigen separate Importlaeufe, die EVCC-kompatible Tageswerte nach VictoriaMetrics schreiben
+- VRM-Speicherwirkungsgrad benoetigt den optionalen VRM-Batteriefluss-Import und schreibt zusaetzliche `evcc_vrm_*` Metriken
+- Netzsteuerungs-/14a-Auditdaten benoetigen den optionalen [Netzsteuerungs-Audit-Collector](./docs/de/grid-control-audit.md) und erscheinen dann im Daily-Details-Tab
+- Fehlende historische EVCC-Jahre koennen optional mit kompatiblen Tagesimporten aus externen Quellen ergaenzt werden
 
 ## Was die Dashboards abdecken
 
 Die Dashboards enthalten Tages-, Monats-, Jahres- und All-Time-Ansichten.
 
-- `Today` zeigt den aktuellen Tag: PV, Netz, Hausverbrauch, Speicher, Ladepunkte, Energiefluss, Forecast, Autarkie, Eigenverbrauch, Gruenanteil und Kosten.
-- `Today - Details` zeigt zusaetzlich Phasen, Lade-Metriken, Rohhistorien, Preisdetails und optional Netzsteuerungs-/14a-Auditdaten.
-- `Today - Mobile` ist eine kompakte Ansicht fuer kleinere Bildschirme.
-- `Month`, `Year` und `All-time` zeigen laengere Zeitraeume auf Basis der taeglichen `evcc_*` Rollups, inklusive Finanz-, PV-Anlagen- und Anlagenvergleichsansichten, wenn die optionalen Daten vorhanden sind.
+- Dashboard `Today` zeigt den aktuellen Tag: PV, Netz, Hausverbrauch, Speicher, Ladepunkte, Energiefluss, Forecast, Autarkie, Eigenverbrauch, Gruenanteil und Kosten.
+- Dashboard `Today - Details` zeigt zusaetzlich Phasen, Lade-Metriken, Rohhistorien, Preisdetails und optional Netzsteuerungs-/14a-Auditdaten.
+- Dashboard `Today - Mobile` ist eine kompakte Ansicht fuer kleinere Bildschirme.
+- Dashboards `Month`, `Year` und `All-time` zeigen laengere Zeitraeume auf Basis der taeglichen `evcc_*` Rollups, inklusive Finanz-, PV-Anlagen- und Anlagenvergleichsansichten, wenn die optionalen Daten vorhanden sind.
 
 Typische Anwendungsfaelle:
 
@@ -50,11 +56,11 @@ Typische Anwendungsfaelle:
 - Fahrzeuge und Ladepunkte nach Energie, Kosten und Nutzung auswerten
 - Speicherladung, Entladung und SOC-Verhalten analysieren
 - Preisentwicklung, Importkosten und Lastverteilung visualisieren
-- PV-Anlagen ueber Jahresertrag, spezifischen Ertrag und optional Gestehungskosten vergleichen
+- PV-Anlagen ueber Jahresertrag, spezifischen Ertrag und optionale Gestehungskosten vergleichen
 - Gruenanteil, Autarkie und Eigenverbrauch als getrennte KPIs beobachten
-- optionale Netzsteuerungs-/14a-Eingriffe auditieren, wenn EVCC und der Collector entsprechende Daten liefern
-- historische EVCC-Daten von InfluxDB nach VictoriaMetrics migrieren und dort weiterbetreiben
-- fehlende historische EVCC-Jahre optional mit kompatiblen Tagesimporten aus externen Quellen ergaenzen
+- Optionale Netzsteuerungs-/14a-Eingriffe auditieren, wenn EVCC und der Collector entsprechende Daten liefern
+- Historische EVCC-Daten von InfluxDB nach VictoriaMetrics migrieren und dort weiterbetreiben
+- Fehlende historische EVCC-Jahre optional mit kompatiblen Tagesimporten aus externen Quellen ergaenzen
 
 ## Einstieg
 
