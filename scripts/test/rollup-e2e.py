@@ -24,8 +24,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.06.04.1"
-SCRIPT_LAST_MODIFIED = "2026-06-04"
+SCRIPT_VERSION = "2026.07.26.1"
+SCRIPT_LAST_MODIFIED = "2026-07-26"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -333,7 +333,8 @@ def fixture_probe_time(args: argparse.Namespace) -> str:
 
 def first_rollup_sample_time(args: argparse.Namespace) -> str:
     local_start = datetime.fromisoformat(args.start_day).replace(tzinfo=ZoneInfo(args.timezone))
-    return local_start.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    local_noon = local_start.replace(hour=12)
+    return local_noon.astimezone(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def serialize_series(series: list[Series]) -> bytes:

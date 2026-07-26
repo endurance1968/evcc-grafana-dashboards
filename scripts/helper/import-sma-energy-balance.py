@@ -2,8 +2,8 @@
 """
 Script: import-sma-energy-balance.py
 Purpose: Import SMA energy-balance daily exports as EVCC-compatible daily VictoriaMetrics rollups.
-Version: 2026.06.07.1
-Last modified: 2026-06-07
+Version: 2026.07.26.1
+Last modified: 2026-07-26
 """
 from __future__ import annotations
 
@@ -22,8 +22,8 @@ from pathlib import Path
 from typing import Any, Iterable
 from zoneinfo import ZoneInfo
 
-SCRIPT_VERSION = "2026.06.07.1"
-SCRIPT_LAST_MODIFIED = "2026-06-07"
+SCRIPT_VERSION = "2026.07.26.1"
+SCRIPT_LAST_MODIFIED = "2026-07-26"
 SOURCE_LABEL = "sma_energy_balance"
 
 TARGET_METRICS = {
@@ -198,8 +198,8 @@ def parse_date(value: str, field: str) -> dt.date:
 
 
 def timestamp_for_day(day: dt.date, tz: ZoneInfo) -> int:
-    local = dt.datetime.combine(day, dt.time.min, tzinfo=tz)
-    return int(local.timestamp() * 1000)
+    local_noon = dt.datetime.combine(day, dt.time(hour=12), tzinfo=tz)
+    return int(local_noon.astimezone(dt.timezone.utc).timestamp() * 1000)
 
 
 def escape_label(value: str) -> str:

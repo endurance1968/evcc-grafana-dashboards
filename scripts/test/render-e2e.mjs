@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.06.15.1
- * Last modified: 2026-06-15
+ * Version: 2026.07.26.1
+ * Last modified: 2026-07-26
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -231,6 +231,32 @@ function toMs(date) {
   return date.getTime();
 }
 
+function localNoonMs(day) {
+  const desired = Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), day.getUTCDate(), 12, 0, 0);
+  let candidate = new Date(desired);
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  });
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const parts = formatter.formatToParts(candidate);
+    const value = (type) => Number(parts.find((part) => part.type === type)?.value || 0);
+    const actual = Date.UTC(value("year"), value("month") - 1, value("day"), value("hour"), value("minute"), value("second"));
+    const correction = desired - actual;
+    if (correction === 0) {
+      return candidate.getTime();
+    }
+    candidate = new Date(candidate.getTime() + correction);
+  }
+  return candidate.getTime();
+}
+
 function pad2(value) {
   return String(value).padStart(2, "0");
 }
@@ -276,7 +302,7 @@ function addDailyRollupSeries(series, metric, labels, days, valueForDay) {
       groups.set(key, { labels: groupLabels, values: [] });
     }
     groups.get(key).values.push({
-      timestamp: toMs(day),
+      timestamp: localNoonMs(day),
       value: valueForDay(day, index),
     });
   }
@@ -581,8 +607,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.06.15.1");
-    console.log("Last modified: 2026-06-15");
+    console.log("Version:       2026.07.26.1");
+    console.log("Last modified: 2026-07-26");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");

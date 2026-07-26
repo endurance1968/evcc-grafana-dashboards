@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-query-readback.mjs
  * Purpose: Execute original VM dashboard MetricsQL targets against VictoriaMetrics after Grafana macro substitution.
- * Version: 2026.04.29.1
- * Last modified: 2026-04-29
+ * Version: 2026.07.26.1
+ * Last modified: 2026-07-26
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -101,16 +101,18 @@ function isVmTarget(target) {
   return String(target?.group || "") === "victoriametrics-metrics-datasource" && targetExpr(target).trim() !== "";
 }
 
-function datePartsInBerlin(date) {
+const dashboardTimeZone = "Europe/Berlin";
+
+function datePartsInTimeZone(date, timeZone = dashboardTimeZone) {
   const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Berlin",
+    timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
-    hour12: false,
+    hourCycle: "h23",
   }).formatToParts(date);
   const value = (type) => parts.find((part) => part.type === type)?.value || "00";
   return {
@@ -121,6 +123,28 @@ function datePartsInBerlin(date) {
     mm: value("minute"),
     ss: value("second"),
   };
+}
+
+function zonedDateFromParts(parts, timeZone = dashboardTimeZone) {
+  const desiredWallTime = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  let candidate = new Date(desiredWallTime);
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const actual = datePartsInTimeZone(candidate, timeZone);
+    const actualWallTime = Date.UTC(
+      Number(actual.YYYY),
+      Number(actual.MM) - 1,
+      Number(actual.DD),
+      Number(actual.HH),
+      Number(actual.mm),
+      Number(actual.ss),
+    );
+    const correction = desiredWallTime - actualWallTime;
+    if (correction === 0) {
+      return candidate;
+    }
+    candidate = new Date(candidate.getTime() + correction);
+  }
+  return candidate;
 }
 
 function parseDurationSeconds(value) {
@@ -158,39 +182,65 @@ function durationString(seconds) {
   return `${Math.max(1, seconds)}s`;
 }
 
-function floorUtc(date, unit) {
-  const out = new Date(date.getTime());
+function floorZoned(date, unit) {
+  const current = datePartsInTimeZone(date);
+  const parts = {
+    year: Number(current.YYYY),
+    month: Number(current.MM),
+    day: Number(current.DD),
+    hour: Number(current.HH),
+    minute: Number(current.mm),
+    second: Number(current.ss),
+  };
   if (unit === "y") {
-    out.setUTCMonth(0, 1);
+    parts.month = 1;
+    parts.day = 1;
   } else if (unit === "M") {
-    out.setUTCDate(1);
+    parts.day = 1;
   }
   if (["y", "M", "d"].includes(unit)) {
-    out.setUTCHours(0, 0, 0, 0);
+    parts.hour = 0;
+    parts.minute = 0;
+    parts.second = 0;
   } else if (unit === "h") {
-    out.setUTCMinutes(0, 0, 0);
+    parts.minute = 0;
+    parts.second = 0;
   } else if (unit === "m") {
-    out.setUTCSeconds(0, 0);
+    parts.second = 0;
   }
-  return out;
+  return zonedDateFromParts(parts);
 }
 
-function addUtc(date, amount, unit) {
-  const out = new Date(date.getTime());
-  if (unit === "y") {
-    out.setUTCFullYear(out.getUTCFullYear() + amount);
-  } else if (unit === "M") {
-    out.setUTCMonth(out.getUTCMonth() + amount);
-  } else if (unit === "w") {
-    out.setUTCDate(out.getUTCDate() + amount * 7);
-  } else if (unit === "d") {
-    out.setUTCDate(out.getUTCDate() + amount);
-  } else if (unit === "h") {
-    out.setUTCHours(out.getUTCHours() + amount);
-  } else if (unit === "m") {
-    out.setUTCMinutes(out.getUTCMinutes() + amount);
+function addZoned(date, amount, unit) {
+  if (["h", "m"].includes(unit)) {
+    return new Date(date.getTime() + amount * (unit === "h" ? 3600000 : 60000));
   }
-  return out;
+  const current = datePartsInTimeZone(date);
+  const wallTime = new Date(Date.UTC(
+    Number(current.YYYY),
+    Number(current.MM) - 1,
+    Number(current.DD),
+    Number(current.HH),
+    Number(current.mm),
+    Number(current.ss),
+  ));
+  if (unit === "y") {
+    wallTime.setUTCFullYear(wallTime.getUTCFullYear() + amount);
+  } else if (unit === "M") {
+    wallTime.setUTCMonth(wallTime.getUTCMonth() + amount);
+  } else if (unit === "w") {
+    wallTime.setUTCDate(wallTime.getUTCDate() + amount * 7);
+  } else if (unit === "d") {
+    wallTime.setUTCDate(wallTime.getUTCDate() + amount);
+  }
+  return zonedDateFromParts({
+    year: wallTime.getUTCFullYear(),
+    month: wallTime.getUTCMonth() + 1,
+    day: wallTime.getUTCDate(),
+    hour: wallTime.getUTCHours(),
+    minute: wallTime.getUTCMinutes(),
+    second: wallTime.getUTCSeconds(),
+  });
 }
 
 function resolveRelativeTime(expr, now) {
@@ -208,10 +258,10 @@ function resolveRelativeTime(expr, now) {
   const groups = match.groups || {};
   let out = new Date(now.getTime());
   if (groups.sign && groups.amount && groups.offsetUnit) {
-    out = addUtc(out, Number(groups.amount) * (groups.sign === "-" ? -1 : 1), groups.offsetUnit);
+    out = addZoned(out, Number(groups.amount) * (groups.sign === "-" ? -1 : 1), groups.offsetUnit);
   }
   if (groups.floorUnit) {
-    out = floorUtc(out, groups.floorUnit);
+    out = floorZoned(out, groups.floorUnit);
   }
   return out;
 }
@@ -298,7 +348,7 @@ function resolvedDashboardVariables(dashboard) {
 }
 
 function replaceDateMacro(match, source, format, range) {
-  const parts = datePartsInBerlin(source === "__to" ? range.toDate : range.fromDate);
+  const parts = datePartsInTimeZone(source === "__to" ? range.toDate : range.fromDate);
   return String(format)
     .replaceAll("YYYY", parts.YYYY)
     .replaceAll("MM", parts.MM)
@@ -457,6 +507,13 @@ async function checkTargets(baseUrl, targets, now) {
 }
 
 async function main() {
+  const springNow = new Date("2026-03-30T10:00:00Z");
+  const fallNow = new Date("2026-10-26T12:00:00Z");
+  const springSeconds = (resolveRelativeTime("now/d", springNow) - resolveRelativeTime("now-1d/d", springNow)) / 1000;
+  const fallSeconds = (resolveRelativeTime("now/d", fallNow) - resolveRelativeTime("now-1d/d", fallNow)) / 1000;
+  if (springSeconds !== 82800 || fallSeconds !== 90000) {
+    throw new Error(`Local-time regression: expected 23h/25h DST days, got ${springSeconds}s/${fallSeconds}s.`);
+  }
   const sourceDir = path.resolve(parseArg("source-dir", defaultSourceDir));
   const docker = hasFlag("docker");
   const dockerImage = parseArg("docker-image", defaultDockerImage);
@@ -488,8 +545,8 @@ async function main() {
     console.log("Dashboard query readback");
     console.log("========================");
     console.log("Script:        dashboard-query-readback.mjs");
-    console.log("Version:       2026.04.29.1");
-    console.log("Last modified: 2026-04-29");
+    console.log("Version:       2026.07.26.1");
+    console.log("Last modified: 2026-07-26");
     console.log(`VM base URL:   ${baseUrl}`);
     console.log(`Source dir:    ${sourceDir}`);
     console.log(`Query time:    ${now.toISOString().replace(".000Z", "Z")}`);

@@ -22,8 +22,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.07.05.1"
-SCRIPT_LAST_MODIFIED = "2026-07-05"
+SCRIPT_VERSION = "2026.07.26.1"
+SCRIPT_LAST_MODIFIED = "2026-07-26"
 
 PROFILE_FAMILY_LABELS = (
     ("positive_energy_s", "Positive energy rollups"),
@@ -849,7 +849,9 @@ def build_day_windows(settings: Settings, start_day: date, end_day: date) -> lis
                 day=day_text,
                 start_iso=to_iso_z(start_utc),
                 end_iso=to_iso_z(end_utc),
-                sample_timestamp_ms=int(start_utc.timestamp() * 1000),
+                sample_timestamp_ms=int(
+                    datetime.combine(current, dt_time(hour=12), tzinfo=tz).astimezone(timezone.utc).timestamp() * 1000
+                ),
                 local_year=day_text[0:4],
                 local_month=day_text[5:7],
                 local_day=day_text[8:10],

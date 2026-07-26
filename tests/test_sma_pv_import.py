@@ -15,6 +15,17 @@ SMA_SPEC.loader.exec_module(SMA_MODULE)
 
 
 class SmaPvImportTests(unittest.TestCase):
+    def test_timestamp_for_day_uses_local_noon_across_dst(self):
+        timezone = SMA_MODULE.ZoneInfo("Europe/Berlin")
+        self.assertEqual(
+            SMA_MODULE.timestamp_for_day(SMA_MODULE.dt.date(2026, 3, 29), timezone),
+            1774778400000,
+        )
+        self.assertEqual(
+            SMA_MODULE.timestamp_for_day(SMA_MODULE.dt.date(2026, 10, 25), timezone),
+            1792926000000,
+        )
+
     def test_default_metric_is_evcc_compatible_daily_metric(self):
         self.assertEqual(SMA_MODULE.DEFAULT_METRIC, "evcc_pv_energy_by_title_daily_wh")
 

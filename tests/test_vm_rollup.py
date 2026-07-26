@@ -178,7 +178,7 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(calls[0][1]["start"], "2026-03-01T23:00:00Z")
         self.assertEqual(calls[0][1]["end"], "2026-03-02T23:00:00Z")
 
-    def test_build_day_windows_uses_local_midnight_even_across_dst(self):
+    def test_build_day_windows_uses_local_noon_sample_across_spring_dst(self):
         windows = MODULE.build_day_windows(
             self.settings,
             MODULE.parse_local_day("2026-03-29", "--start-day"),
@@ -187,10 +187,23 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(len(windows), 1)
         self.assertEqual(windows[0].start_iso, "2026-03-28T23:00:00Z")
         self.assertEqual(windows[0].end_iso, "2026-03-29T22:00:00Z")
+        self.assertEqual(windows[0].sample_timestamp_ms, 1774778400000)
         self.assertEqual(windows[0].local_year, "2026")
         self.assertEqual(windows[0].local_month, "03")
         self.assertEqual(windows[0].local_day, "29")
         self.assertEqual(windows[0].local_date, "2026-03-29")
+
+    def test_build_day_windows_keeps_local_noon_across_fall_dst_and_boundaries(self):
+        windows = MODULE.build_day_windows(
+            self.settings,
+            MODULE.parse_local_day("2024-02-29", "--start-day"),
+            MODULE.parse_local_day("2026-10-25", "--end-day"),
+        )
+        by_day = {window.day: window for window in windows}
+        self.assertEqual(by_day["2024-02-29"].sample_timestamp_ms, 1709204400000)
+        self.assertEqual(by_day["2025-12-31"].local_year, "2025")
+        self.assertEqual(by_day["2026-01-01"].local_month, "01")
+        self.assertEqual(by_day["2026-10-25"].sample_timestamp_ms, 1792926000000)
 
     def test_backfill_write_window_allows_latest_completed_day(self):
         args = SimpleNamespace(write=True, allow_incomplete_current_day=False)

@@ -60,6 +60,9 @@ jobs:
       - name: Dashboard query readback
         run: npm run test:query-readback
 
+      - name: Daily rollup DST regression
+        run: npm run test:dst-rollups
+
       - name: Dedup series disposable E2E
         run: npm run test:dedup-e2e
 

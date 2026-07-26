@@ -16,6 +16,21 @@ INVESTMENT_SPEC.loader.exec_module(INVESTMENT_MODULE)
 
 
 class InvestmentCostImportTests(unittest.TestCase):
+    def test_period_timestamps_follow_local_calendar_noon(self):
+        timezone = INVESTMENT_MODULE.ZoneInfo("Europe/Berlin")
+        self.assertEqual(
+            INVESTMENT_MODULE.timestamp_for_day(INVESTMENT_MODULE.dt.date(2024, 2, 29), timezone),
+            1709204400000,
+        )
+        self.assertEqual(
+            INVESTMENT_MODULE.timestamp_for_month(2026, 3, timezone),
+            1773572400000,
+        )
+        self.assertEqual(
+            INVESTMENT_MODULE.timestamp_for_year(2026, timezone),
+            1767265200000,
+        )
+
     def test_parse_float_accepts_fraction_allocation(self):
         self.assertAlmostEqual(
             INVESTMENT_MODULE.parse_float("1/3", "allocation_percent", "shared row"),

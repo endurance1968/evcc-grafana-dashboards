@@ -23,6 +23,10 @@ def epoch_seconds(day: str) -> int:
 
 
 class VrmEnergyFlowImportTests(unittest.TestCase):
+    def test_output_timestamp_uses_local_noon_across_dst(self):
+        self.assertEqual(module.local_noon_timestamp_ms(dt.date(2026, 3, 29), "Europe/Berlin"), 1774778400000)
+        self.assertEqual(module.local_noon_timestamp_ms(dt.date(2026, 10, 25), "Europe/Berlin"), 1792926000000)
+
     def test_normalize_api_records_uses_vrm_timestamps_for_sparse_daily_arrays(self):
         rows = module.normalize_api_records(
             {

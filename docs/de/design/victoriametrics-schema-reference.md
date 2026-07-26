@@ -291,7 +291,20 @@ Aktuelle Regel:
 
 - Lokale Tagesfenster werden in der konfigurierten Zeitzone gebildet.
 - Aktueller Zeitzonen-Default ist `Europe/Berlin`.
-- Ein taegliches Sample wird am UTC-Start des zugehoerigen lokalen Tages geschrieben.
+- Jedes taegliche Sample wird um `12:00` Uhr lokaler Zeit des fachlich zugehoerigen Kalendertags geschrieben.
+- Der lokale Mittag liegt auch an 23- und 25-Stunden-Tagen eindeutig innerhalb des Tages und vermeidet Grenzfallverluste an Mitternacht.
+- Monats-Helper verwenden einen festen lokalen Mittagsanker am 15. des Monats; Jahres-Helper verwenden den lokalen Mittag am 1. Januar.
+- Laufend neu berechnete Monats- und Jahreszustandsmetriken duerfen stattdessen den lokalen Mittag des letzten enthaltenen Tages tragen. `local_year` und `local_month` bleiben die fachliche Periodenzuordnung.
+
+### Dashboard-Aggregation und Altbestand
+
+- Summen, Zaehler und Mittelwerte fuer `Month`, `Year` und `All-time` werden direkt ueber die gespeicherten Tages-Samples im lokalen Dashboardzeitraum gebildet.
+- Ein Rueckblickspuffer von drei Stunden schliesst historische Mitternachtssamples am linken Periodenrand ein, ohne das Mittagssample des Folgetags einzubeziehen.
+- Tageskurven bevorzugen den kanonischen Mittagsanker und verwenden fuer vorhandene Altserien einen Mitternachts-Fallback.
+- Feste `[$__range:1d]`-Subqueries sind fuer Tagesrollups verboten, weil ein lokaler Tag in `Europe/Berlin` 23 oder 25 Stunden haben kann.
+- Bestehende Mitternachtsdaten muessen nicht migriert werden. Ein Rollup-Backfill mit Replace-Modus normalisiert die betroffenen Monatsscopes sicher.
+- SMA-Bilanzdaten muessen bei einer historischen Neuberechnung mit `--replace` geschrieben werden, damit nicht dieselben fachlichen Tage gleichzeitig an Mitternacht und Mittag vorhanden sind.
+- VRM-Importe ersetzen die betroffenen `local_date`-Serien vor dem Schreiben und bleiben dadurch idempotent.
 
 ### Energie-Rollups
 

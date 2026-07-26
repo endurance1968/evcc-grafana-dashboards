@@ -1,14 +1,14 @@
 /**
  * Script: rollup-path-check.mjs
  * Purpose: Run the complete deterministic rollup validation path as one reproducible check.
- * Version: 2026.06.02.1
- * Last modified: 2026-06-02
+ * Version: 2026.07.26.1
+ * Last modified: 2026-07-26
  */
 import { spawnSync } from "node:child_process";
 
 const scriptName = "rollup-path-check.mjs";
-const version = "2026.06.02.1";
-const lastModified = "2026-06-02";
+const version = "2026.07.26.1";
+const lastModified = "2026-07-26";
 
 function parseArg(name, fallback = "") {
   const prefix = `--${name}=`;
@@ -89,6 +89,7 @@ function main() {
 
   results.push(["Static/unit/dashboard checks", runNodeScript("scripts/test/local-checks.mjs", "Static/unit/dashboard checks")]);
   results.push(["External energy validation", runNodeScript("scripts/test/energy-validation.mjs", "External energy validation", energyValidationArgs())]);
+  results.push(["Daily rollup DST check", runNodeScript("scripts/test/daily-rollup-dst-check.mjs", "Daily rollup DST check")]);
   results.push(["Dashboard query readback", runNodeScript("scripts/test/dashboard-query-readback.mjs", "Dashboard query readback", ["--docker"])]);
   if (skipRender) {
     results.push(["Grafana render smoke E2E", "SKIP (--skip-render)"]);

@@ -14,6 +14,17 @@ BALANCE_SPEC.loader.exec_module(BALANCE_MODULE)
 
 
 class SmaEnergyBalanceTests(unittest.TestCase):
+    def test_timestamp_for_day_uses_local_noon_across_dst(self):
+        timezone = BALANCE_MODULE.ZoneInfo("Europe/Berlin")
+        self.assertEqual(
+            BALANCE_MODULE.timestamp_for_day(BALANCE_MODULE.dt.date(2026, 3, 29), timezone),
+            1774778400000,
+        )
+        self.assertEqual(
+            BALANCE_MODULE.timestamp_for_day(BALANCE_MODULE.dt.date(2026, 10, 25), timezone),
+            1792926000000,
+        )
+
     def write_month(self, directory: Path, name: str, body: str) -> Path:
         path = directory / name
         path.write_text(body, encoding="utf-8")

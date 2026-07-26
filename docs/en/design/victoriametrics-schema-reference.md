@@ -289,7 +289,20 @@ Current rule:
 
 - Local day windows are built in the configured timezone.
 - Current timezone default is `Europe/Berlin`.
-- A daily sample timestamp is written at the UTC start of the corresponding local day.
+- Every daily sample is written at `12:00` local time on its corresponding business calendar day.
+- Local noon remains unambiguous and inside the day on both 23-hour and 25-hour days, avoiding midnight boundary losses.
+- Monthly helpers use a fixed local-noon anchor on the 15th; yearly helpers use local noon on January 1.
+- Continuously recalculated monthly and yearly state metrics may instead use local noon of their latest included day. `local_year` and `local_month` remain the business period assignment.
+
+### Dashboard aggregation and existing data
+
+- Sums, counts, and averages in `Month`, `Year`, and `All-time` operate directly on stored daily samples over the local dashboard range.
+- A three-hour lookback buffer includes historical midnight samples at the left period boundary without including the following day's noon sample.
+- Daily curves prefer the canonical noon anchor and retain a midnight fallback for existing series.
+- Fixed `[$__range:1d]` subqueries are forbidden for daily rollups because a local `Europe/Berlin` day may contain 23 or 25 hours.
+- Existing midnight data does not require migration. A rollup backfill in replace mode safely normalizes the affected month scopes.
+- Historical SMA energy-balance rewrites must use `--replace` so the same business day cannot remain at both midnight and noon.
+- VRM imports delete the affected `local_date` series before writing and therefore remain idempotent.
 
 ### Energy rollups
 
