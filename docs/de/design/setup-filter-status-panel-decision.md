@@ -9,7 +9,7 @@ Es wird kein dauerhaft sichtbares Setup- oder Filter-Statuspanel in die Standard
 Die wichtigsten Deploy- und Filterwerte bleiben ueber diese Wege nachvollziehbar:
 
 - `Build`-Variable im Dashboard-Header: zeigt Deployment-Zeitpunkt, Sprache/Variante und Source Ref im Tooltip.
-- Dashboard-Variablen in Grafana: zeigen die wirksamen Werte wie `peakPowerLimit`, `energySampleInterval`, `tariffPriceInterval`, `loadpointBlocklist`, `extBlocklist`, `auxBlocklist`, `vehicleBlocklist` und `heatPumpLoadpointRegex`.
+- Dashboard-Variablen in Grafana: zeigen die wirksamen Werte wie `peakPowerLimit`, `energySampleInterval`, `tariffPriceInterval`, `loadpointBlocklist`, `consumerBlocklist`, `extBlocklist`, `auxBlocklist`, `vehicleBlocklist` und `heatPumpLoadpointRegex`.
 - `vm-dashboard-install.env`: bleibt die fuehrende Konfigurationsquelle fuer Deploy-Overrides.
 - Troubleshooting-Doku: beschreibt, wie EVCC-Labels und Blocklists geprueft werden.
 

@@ -77,3 +77,42 @@ npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:8428
 ```
 
 Without private caches, public/default validation intentionally treats missing external comparison files as non-blocking skips.
+
+## 2026-07-26 Read-Only Live-Source Validation For Consumers
+
+The Consumer release candidate was validated against the production VictoriaMetrics source in strict read-only mode in addition to deterministic fixtures. Grafana ran only as a disposable test instance.
+
+Results:
+
+- `check_data.py --phase full` reported overall `OK`, no `host` or `db` labels, and available core raw data and rollups.
+- All 385 MetricsQL targets from the six source dashboards executed successfully against the live VM.
+- All six dashboards with 58 critical panels rendered against the live VM without panel errors.
+- The live source did not yet contain `consumersPower_value` or `evcc_consumer_*` series. The new Consumer feature is therefore not functionally live-validated yet and remains deterministic-fixture-tested only.
+- Existing real consumers were still represented by 16 EXT series. The production EXT blocklist removed carport and main distribution meters, but remaining parent/child combinations such as the ground-floor distribution meter, UPS, and downstream meters could temporarily consume or exceed total home consumption. The dashboard correctly clamped `Other` to zero, but the underlying meter topology remains semantically ambiguous without explicit hierarchy.
+
+Release conclusion:
+
+- Fixture E2E remains mandatory for reproducible expected values and failure scenarios.
+- A read-only live render with actual deploy overrides is an additional mandatory release gate.
+- Consumer must not be called live-validated until EVCC provides real Consumer metrics.
+- Before release, the EXT-to-Consumer migration or blocklist must prevent parent and child meters from being summed twice.
+
+## 2026-07-27 Live Copy And Complete Consumer Rollup
+
+The previous day's validation was repeated after real Consumer metrics became available. Production Grafana and production VictoriaMetrics remained strictly read-only; import, cleanup, and rollup ran only in a newly created disposable VM.
+
+Results:
+
+- The live source provided six Consumer titles: `KWL`, `Rack Kühler`, `Rack Lüfter`, `Spüle`, `Waschmaschine`, and `Waschmaschine II`.
+- The rollup processed 572 days from 2025-01-01 through 2026-07-26 and wrote 41 metrics, 288 series, and 7,840 samples.
+- The 2025 rollups contained 356 PV and home daily values plus 365 daily grid-import and feed-in values. Totals were about 14.42 MWh PV, 22.43 MWh home consumption, 14.06 MWh grid import, and 0.83 MWh feed-in.
+- All six titles continued as Consumers were absent from `evcc_ext_energy*_daily_wh` afterward. Ten actual diagnostic or distribution meters remained as EXT.
+- Production Grafana settings were copied into the disposable instance. `Today` remained the range for Today dashboards, and the `.*Car.*|.*Haupt.*` blocklist filtered the known sum meters.
+- End-user visual checks confirmed separate Consumer and additional-meter views in Today Details, Month, Year, and All-time. Year 2025 showed all twelve months, All-time showed 2025 and 2026, and annual matrices used an actual year axis.
+- The Today finance view showed purchase cost as negative, feed-in credit as positive, and balance as the sum of both values.
+
+Safety finding:
+
+- `--replace-range` deletes existing rollups in the target range before rebuilding them. A full-range run is safe only when complete raw history exists for every affected family.
+- A full additive backfill over imported rollups is unsafe as well: different daily timestamps produce multiple samples per local day and double monthly totals. The corrected live copy transformed only the six mapped EXT rollup series, preferred Consumer per day during overlap, and imported only those Consumer series.
+- `check_data.py --phase full` now checks every `evcc_*_daily_*` series for at most one sample per label set and local day. The corrected copy reported 0 duplicate days; July PV, home, grid-import, and feed-in totals matched the read-only live VM exactly.

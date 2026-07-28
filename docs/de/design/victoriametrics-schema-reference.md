@@ -155,6 +155,7 @@ Diese Rohmetriken speisen die Langzeit-Rollups:
 | `pvPower_value` | PV-Leistung | taegliche PV-Energie |
 | `homePower_value` | Hausleistung | taegliche Hausenergie, No-PV-Baseline |
 | `chargePower_value` | Ladeleistung | Loadpoint-Energie, Fahrzeugenergie, Fahrzeugkosten |
+| `consumersPower_value` | Leistung regulaerer EVCC-Verbraucher | Verbrauchsaufschluesselung ab EVCC 0.309.2 |
 | `extPower_value` | externer Zaehler Leistung | zaehlerseitige Hausaufschluesselung |
 | `auxPower_value` | Auxiliary-Zaehler Leistung | Auxiliary-Zaehleraufschluesselung |
 | `gridPower_value` | Netzleistung | Netzeinspeiseenergie, dynamische Preisgewichtung |
@@ -176,6 +177,8 @@ Diese Rohmetriken sind ebenfalls aktiv genutzt:
 | `greenShareHome_value` | EVCC-Gruenanteil fuer Hausverbrauch als Ratio `0..1` | KPI-Gauges/Verlauf in `Today*`, taegliches Rollup fuer Langzeit-KPI-Panels |
 
 Hinweis: `tariffSolar_value` ist optional und entsteht nur, wenn EVCC selbst einen Solar-Forecast konfiguriert hat. `greenShareHome_value` ist optional und entsteht nur, wenn EVCC die Gruenanteil-KPI schreibt. Die Dashboards rufen Forecast.Solar, Solcast, Open-Meteo oder externe Gruenanteil-Dienste nicht direkt ab; sie zeigen nur die von EVCC geschriebenen Samples an.
+
+EVCC trennt ab Version 0.309.2 regulaere Verbraucher (`consumer`), selbstregelnde Verbraucher (`aux`) und zusaetzliche Zaehler (`ext`). Der EVCC-Influx-Writer erzeugt fuer regulaere Verbraucher das Measurement `consumersPower`; nach dem Import nach VictoriaMetrics lautet die Rohmetrik `consumersPower_value`. Bei einer spaeteren Umstellung kann `consumer_legacy_ext_regex` alte EXT-Leistung unter demselben `title` in den Consumer-Rollup uebernehmen. Consumer hat bei Ueberlappung Vorrang; der Titel wird aus den EXT-Rollups ausgeschlossen.
 
 ### EVCC-Gruenanteil
 
@@ -202,6 +205,7 @@ Der Produktionspraefix ist aktuell `evcc`.
 | `evcc_loadpoint_energy_daily_wh` | `local_year`, `local_month`, `loadpoint` | taegliche Ladeenergie pro Loadpoint |
 | `evcc_vehicle_energy_daily_wh` | `local_year`, `local_month`, `vehicle` | taegliche Ladeenergie pro Fahrzeug |
 | `evcc_vehicle_distance_daily_km` | `local_year`, `local_month`, `vehicle` | taeglich gefahrene Distanz pro Fahrzeug |
+| `evcc_consumer_energy_daily_wh` | `local_year`, `local_month`, `title` | taegliche Energie pro regulaerem EVCC-Verbraucher |
 | `evcc_ext_energy_daily_wh` | `local_year`, `local_month`, `title` | taegliche Energie pro externem Zaehler-Titel |
 | `evcc_aux_energy_daily_wh` | `local_year`, `local_month`, `title` | taegliche Energie pro Auxiliary-Zaehler-Titel |
 | `evcc_battery_soc_daily_min_pct` | `local_year`, `local_month` | minimaler taeglicher Batterie-SOC |
@@ -211,6 +215,8 @@ Der Produktionspraefix ist aktuell `evcc`.
 | `evcc_battery_charge_daily_wh` | `local_year`, `local_month` | taegliche Batterieladeenergie |
 | `evcc_battery_discharge_daily_wh` | `local_year`, `local_month` | taegliche Batterieentladeenergie |
 | `evcc_green_share_home_daily_ratio` | `local_year`, `local_month` | taeglicher Mittelwert des EVCC-Gruenanteils fuer Hausverbrauch, Ratio `0..1` |
+
+Optional erzeugt die Quellzuordnung zusaetzlich `evcc_consumer_energy_from_pv_daily_wh`, `evcc_consumer_energy_from_battery_daily_wh` und `evcc_consumer_energy_from_grid_daily_wh`, jeweils mit dem Label `title`.
 
 ### Taegliche Finanz- und Preis-Baselines
 
@@ -360,6 +366,7 @@ ab, um Queries lesbar zu halten und wiederholte Inline-Timezone-Guards zu vermei
 Das Schema selbst traegt Fachdimensionen, und die Dashboards wenden darauf Blocklists an:
 
 - `loadpointBlocklist`
+- `consumerBlocklist`
 - `extBlocklist`
 - `auxBlocklist`
 - `vehicleBlocklist`

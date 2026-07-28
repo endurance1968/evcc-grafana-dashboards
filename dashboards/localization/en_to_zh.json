@@ -436,7 +436,8 @@
     "VRM battery": "VRM 电池",
     "VRM charge": "VRM 充电",
     "VRM discharge": "VRM 放电",
-    "VRM efficiency": "VRM 效率"
+    "VRM efficiency": "VRM 效率",
+    "Meter overlap": "电表重叠"
   },
   "Heat pump source mix": "热泵能源来源占比",
   "Heat pump title match": "热泵标题匹配",

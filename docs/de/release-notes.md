@@ -6,7 +6,31 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 
 ## Unreleased
 
-Noch keine Eintraege.
+### Neue Funktionen
+
+- Reguläre EVCC-Consumer werden in `Today - Details`, `Month`, `Year` und `All-time` getrennt von AUX und EXT ausgewertet.
+- Historische EXT-Verbraucher können über `consumer_legacy_ext_regex` lückenlos unter demselben Consumer-Titel fortgeführt werden; Überlappungen werden zugunsten der Consumer-Reihe dedupliziert.
+- Umbenannte Consumer-Titel können über `consumer_title_aliases_json` vor der Tagesintegration kanonisiert werden.
+- Der optionale VRM-Energieflussimport besitzt einen taggenauen Quell-/VM-Validator für alle sechs Hilfsmetriken.
+
+### Verbesserungen
+
+- EXT-Zähler besitzen eigene Ansichten als zusätzliche Zähler und beeinflussen `Sonstiges` oder die Hausverbraucherbilanz nicht mehr.
+- Today-Finanzwerte verwenden dieselbe Vorzeichenkonvention wie die Langzeit-Rollups: Bezugskosten negativ, Einspeisegutschrift positiv und Bilanz als Summe beider Werte.
+- Englische Quelldashboards werden statisch auf bekannte deutsche Endusertexte und veraltete Repository-Links geprüft.
+- Die Datenprüfung erkennt mehrere Rollup-Samples desselben Labelsatzes am selben lokalen Tag als kritischen Fehler.
+- Der Rollup-Scheduler schützt Schreibläufe mit einer Lock-Datei, verarbeitet standardmäßig nur abgeschlossene Tage und meldet Resets, Leistungsspitzen sowie fehlende Energie-Buckets.
+- Der vollständige Livecopy-Backfill wurde profiliert; die Titelkanonisierung läuft speicherschonend in MetricsQL und der normale Monats-Ersatzpfad bleibt kurz.
+
+### Fehlerbehebungen
+
+- Consumer-Titelaliase werden jetzt vor der Tagesintegration angewendet; alte und aktuelle Schreibweisen erscheinen nicht mehr als doppelte Langzeitreihen.
+- Der strikte Energievergleich behandelt EVCC- und VRM-Speicherwerte als getrennte Messgrenzen und prüft stattdessen die VRM-Importparität gegen denselben Quellsnapshot.
+
+### Hinweise Für Nutzer
+
+- Nach einem EXT-zu-Consumer-Rollenwechsel muss der komplette betroffene Zeitraum neu berechnet werden. `--replace-range --write` ist nur bei vollstaendiger Rohdatenhistorie sicher, weil vorhandene Rollups vor der Neuberechnung geloescht werden.
+- `consumer_legacy_ext_regex` darf nur echte frühere Endverbraucher enthalten, keine Verteiler- oder Summenzähler.
 
 ## V2026-06-30
 

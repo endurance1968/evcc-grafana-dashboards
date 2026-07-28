@@ -22,8 +22,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "evcc-vm-rollup.py"
-SCRIPT_VERSION = "2026.07.26.1"
-SCRIPT_LAST_MODIFIED = "2026-07-26"
+SCRIPT_VERSION = "2026.07.28.1"
+SCRIPT_LAST_MODIFIED = "2026-07-28"
 
 PROFILE_FAMILY_LABELS = (
     ("positive_energy_s", "Positive energy rollups"),
@@ -44,6 +44,22 @@ QUALITY_COUNTER_LABELS = (
     ("quality_counter_resets", "Counter resets ignored"),
     ("quality_power_spikes", "Power spike samples ignored"),
     ("quality_missing_buckets", "Missing energy buckets"),
+)
+MATRIX_POSITIVE_ENERGY_METRIC_KEYS = frozenset(
+    {
+        "pv_daily_energy",
+        "home_daily_energy",
+    }
+)
+
+DIRECT_POSITIVE_ENERGY_METRIC_KEYS = frozenset(
+    {
+        "loadpoint_daily_energy",
+        "vehicle_daily_energy",
+        "ext_daily_energy",
+        "aux_daily_energy",
+        "consumer_daily_energy",
+    }
 )
 
 
@@ -88,6 +104,8 @@ class Settings:
     benchmark_end: str
     benchmark_step: str
     scheduler_lock_file: str
+    consumer_legacy_ext_regex: str = "^$"
+    consumer_title_aliases: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -290,6 +308,38 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def parse_consumer_title_aliases(raw_value: str) -> tuple[tuple[str, str], ...]:
+    value = raw_value.strip()
+    if not value or value == "{}":
+        return ()
+    try:
+        payload = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"consumer_title_aliases_json must be a JSON object: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise SystemExit("consumer_title_aliases_json must be a JSON object")
+
+    aliases: dict[str, str] = {}
+    for raw_source, raw_target in payload.items():
+        source = str(raw_source).strip()
+        target = str(raw_target).strip()
+        if not source or not target:
+            raise SystemExit("consumer_title_aliases_json keys and values must not be empty")
+        if source == target:
+            raise SystemExit(f"consumer_title_aliases_json maps {source!r} to itself")
+        aliases[source] = target
+
+    for source in aliases:
+        seen = {source}
+        target = aliases[source]
+        while target in aliases:
+            if target in seen:
+                raise SystemExit(f"consumer_title_aliases_json contains a cycle at {target!r}")
+            seen.add(target)
+            target = aliases[target]
+    return tuple(sorted(aliases.items()))
+
+
 def load_settings(path: str) -> Settings:
     parser = configparser.ConfigParser()
     try:
@@ -321,6 +371,19 @@ def load_settings(path: str) -> Settings:
         benchmark_end = benchmark_defaults["end"]
         benchmark_step = benchmark_defaults["step"]
 
+    consumer_legacy_ext_regex = parser.get(
+        "victoriametrics",
+        "consumer_legacy_ext_regex",
+        fallback="^$",
+    ).strip() or "^$"
+    try:
+        re.compile(consumer_legacy_ext_regex)
+    except re.error as exc:
+        raise SystemExit(f"consumer_legacy_ext_regex is not a valid regular expression: {exc}") from exc
+    consumer_title_aliases = parse_consumer_title_aliases(
+        parser.get("victoriametrics", "consumer_title_aliases_json", fallback="{}")
+    )
+
     return Settings(
         base_url=parser.get("victoriametrics", "base_url").rstrip("/"),
         host_label=parser.get("victoriametrics", "host_label", fallback=""),
@@ -334,6 +397,8 @@ def load_settings(path: str) -> Settings:
         benchmark_end=benchmark_end,
         benchmark_step=benchmark_step,
         scheduler_lock_file=parser.get("scheduler", "lock_file", fallback="") if parser.has_section("scheduler") else "",
+        consumer_legacy_ext_regex=consumer_legacy_ext_regex,
+        consumer_title_aliases=consumer_title_aliases,
     )
 
 
@@ -454,6 +519,79 @@ def collect_label_values(series: list[dict], label_name: str) -> list[str]:
     return values
 
 
+def metricql_string(value: str) -> str:
+    return json.dumps(value, ensure_ascii=True)
+
+
+def legacy_consumer_ext_matcher(settings: Settings) -> str:
+    return f"title=~{metricql_string(settings.consumer_legacy_ext_regex)}"
+
+
+def non_legacy_ext_matcher(settings: Settings) -> str:
+    return f"title!~{metricql_string(settings.consumer_legacy_ext_regex)}"
+
+
+def merged_consumer_power_query(settings: Settings) -> str:
+    root = base_matchers(settings)
+    title_present = 'title!=""'
+    alias_sources = [source for source, _ in settings.consumer_title_aliases]
+    unaliased_matchers = [title_present]
+    if alias_sources:
+        alias_regex = "^(" + "|".join(re.escape(source) for source in alias_sources) + ")$"
+        unaliased_matchers.append(f"title!~{metricql_string(alias_regex)}")
+
+    consumer = f"avg by (title) ({selector('consumersPower_value', root, *unaliased_matchers)})"
+    legacy_ext = f"avg by (title) ({selector('extPower_value', root, *unaliased_matchers, legacy_consumer_ext_matcher(settings))})"
+    branches = [f"({consumer}) or ({legacy_ext})"]
+
+    for source, target in settings.consumer_title_aliases:
+        source_matcher = f"title={metricql_string(source)}"
+        alias_consumer = f"avg by (title) ({selector('consumersPower_value', root, source_matcher)})"
+        alias_legacy_ext = f"avg by (title) ({selector('extPower_value', root, source_matcher, legacy_consumer_ext_matcher(settings))})"
+        branches.append(
+            f'label_set((({alias_consumer}) or ({alias_legacy_ext})), "title", {metricql_string(target)})'
+        )
+    return " or ".join(f"({branch})" for branch in branches)
+
+
+def canonical_consumer_title(settings: Settings, title: str) -> str:
+    aliases = dict(settings.consumer_title_aliases)
+    canonical = title
+    while canonical in aliases:
+        canonical = aliases[canonical]
+    return canonical
+
+
+def canonicalize_consumer_title_matrix(settings: Settings, matrix: list[dict]) -> list[dict]:
+    if not settings.consumer_title_aliases:
+        return matrix
+
+    samples_by_title: dict[str, dict[int, tuple[int, float]]] = {}
+    metric_by_title: dict[str, dict[str, str]] = {}
+    for result_item in matrix:
+        metric = dict(result_item.get("metric", {}))
+        source_title = str(metric.get("title", "")).strip()
+        if not source_title:
+            continue
+        canonical_title = canonical_consumer_title(settings, source_title)
+        metric["title"] = canonical_title
+        metric_by_title[canonical_title] = metric
+        priority = 1 if source_title == canonical_title else 0
+        target_samples = samples_by_title.setdefault(canonical_title, {})
+        for timestamp, value in result_item.get("samples", []):
+            existing = target_samples.get(timestamp)
+            if existing is None or priority >= existing[0]:
+                target_samples[timestamp] = (priority, value)
+
+    return [
+        {
+            "metric": metric_by_title[title],
+            "samples": [(timestamp, value) for timestamp, (_, value) in sorted(samples.items())],
+        }
+        for title, samples in sorted(samples_by_title.items())
+    ]
+
+
 def detect_dimensions(settings: Settings) -> dict[str, list[str]]:
     time_window = {
         "start": settings.benchmark_start,
@@ -483,12 +621,26 @@ def detect_dimensions(settings: Settings) -> dict[str, list[str]]:
             **time_window,
         },
     ).get("data", [])
+    consumer_series = http_get_json(
+        settings,
+        "/api/v1/series",
+        {
+            "match[]": [series_match(settings, "consumersPower_value")],
+            **time_window,
+        },
+    ).get("data", [])
 
+    ext_titles = collect_label_values(ext_series, "title")
+    legacy_ext_pattern = re.compile(settings.consumer_legacy_ext_regex)
     return {
         "loadpoints": collect_label_values(charge_series, "loadpoint"),
         "vehicles": collect_label_values(charge_series, "vehicle"),
-        "ext_titles": collect_label_values(ext_series, "title"),
+        "ext_titles": ext_titles,
         "aux_titles": collect_label_values(aux_series, "title"),
+        "consumer_titles": sorted(
+            {canonical_consumer_title(settings, title) for title in collect_label_values(consumer_series, "title")}
+        ),
+        "legacy_consumer_ext_titles": [title for title in ext_titles if legacy_ext_pattern.search(title)],
     }
 
 
@@ -604,8 +756,8 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
         RollupMetric(
             key="ext_daily_energy",
             record=record_name(settings, "ext_energy_daily_wh"),
-            expr=f"integrate((avg by (title) ({selector('extPower_value', root, title_present)}))[1d]) / 3600",
-            description="Per-ext-title daily energy.",
+            expr=f"integrate((avg by (title) ({selector('extPower_value', root, title_present, non_legacy_ext_matcher(settings))}))[1d]) / 3600",
+            description="Per-EXT-title daily energy excluding titles migrated to Consumer.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -615,6 +767,15 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             record=record_name(settings, "aux_energy_daily_wh"),
             expr=f"integrate((avg by (title) ({selector('auxPower_value', root, title_present)}))[1d]) / 3600",
             description="Per-aux-title daily energy.",
+            phase="phase-1",
+            implemented=True,
+            group_labels=("title",),
+        ),
+        RollupMetric(
+            key="consumer_daily_energy",
+            record=record_name(settings, "consumer_energy_daily_wh"),
+            expr=f"integrate(({merged_consumer_power_query(settings)})[1d]) / 3600",
+            description="Per-Consumer-title daily energy with optional legacy EXT history and Consumer precedence.",
             phase="phase-1",
             implemented=True,
             group_labels=("title",),
@@ -696,6 +857,33 @@ def build_catalog(settings: Settings) -> list[RollupMetric]:
             record=record_name(settings, "aux_energy_from_grid_daily_wh"),
             expr="python: per-aux-title daily energy attributed to grid supply",
             description="Per-aux-title daily energy attributed to grid supply on 60-second buckets.",
+            phase="phase-3",
+            implemented=True,
+            group_labels=("title",),
+        ),
+        RollupMetric(
+            key="consumer_daily_energy_from_pv",
+            record=record_name(settings, "consumer_energy_from_pv_daily_wh"),
+            expr="python: per-consumer-title daily energy attributed to PV supply",
+            description="Per-consumer-title daily energy attributed to PV supply on 60-second buckets.",
+            phase="phase-3",
+            implemented=True,
+            group_labels=("title",),
+        ),
+        RollupMetric(
+            key="consumer_daily_energy_from_battery",
+            record=record_name(settings, "consumer_energy_from_battery_daily_wh"),
+            expr="python: per-consumer-title daily energy attributed to battery discharge",
+            description="Per-consumer-title daily energy attributed to battery discharge on 60-second buckets.",
+            phase="phase-3",
+            implemented=True,
+            group_labels=("title",),
+        ),
+        RollupMetric(
+            key="consumer_daily_energy_from_grid",
+            record=record_name(settings, "consumer_energy_from_grid_daily_wh"),
+            expr="python: per-consumer-title daily energy attributed to grid supply",
+            description="Per-consumer-title daily energy attributed to grid supply on 60-second buckets.",
             phase="phase-3",
             implemented=True,
             group_labels=("title",),
@@ -1752,9 +1940,11 @@ def positive_energy_query(settings: Settings, item: RollupMetric) -> str:
     if item.key == "vehicle_daily_energy":
         return f'avg by (vehicle) ({selector("chargePower_value", root, vehicle_present)})'
     if item.key == "ext_daily_energy":
-        return f'avg by (title) ({selector("extPower_value", root, title_present)})'
+        return f'avg by (title) ({selector("extPower_value", root, title_present, non_legacy_ext_matcher(settings))})'
     if item.key == "aux_daily_energy":
         return f'avg by (title) ({selector("auxPower_value", root, title_present)})'
+    if item.key == "consumer_daily_energy":
+        return merged_consumer_power_query(settings)
     raise ValueError(f"Unsupported positive energy key: {item.key}")
 
 
@@ -1770,6 +1960,8 @@ def fetch_chunk_positive_energy_matrix(
         chunk.end_iso,
         settings.raw_sample_step,
     )
+    if item.key == "consumer_daily_energy":
+        result = canonicalize_consumer_title_matrix(settings, result)
     update_peak_memory()
     return result
 
@@ -1969,6 +2161,13 @@ def summarize_consumer_source_attribution_rollups(
         bucket_seconds,
         "title",
     )
+    consumer_maps = build_consumer_bucket_average_maps(
+        context["consumer_title_matrix"],
+        start_ts,
+        end_ts,
+        bucket_seconds,
+        "title",
+    )
     metric_name_by_key = {
         "loadpoint_daily_energy_from_pv": "loadpoint_energy_from_pv_daily_wh",
         "loadpoint_daily_energy_from_battery": "loadpoint_energy_from_battery_daily_wh",
@@ -1979,6 +2178,9 @@ def summarize_consumer_source_attribution_rollups(
         "aux_daily_energy_from_pv": "aux_energy_from_pv_daily_wh",
         "aux_daily_energy_from_battery": "aux_energy_from_battery_daily_wh",
         "aux_daily_energy_from_grid": "aux_energy_from_grid_daily_wh",
+        "consumer_daily_energy_from_pv": "consumer_energy_from_pv_daily_wh",
+        "consumer_daily_energy_from_battery": "consumer_energy_from_battery_daily_wh",
+        "consumer_daily_energy_from_grid": "consumer_energy_from_grid_daily_wh",
     }
     out = {metric_key: [] for metric_key in metric_name_by_key}
     for consumer, totals in attribute_consumer_bucket_maps(loadpoint_maps, pv_bucket_map, battery_bucket_map, bucket_seconds).items():
@@ -1993,6 +2195,11 @@ def summarize_consumer_source_attribution_rollups(
             out[metric_key].append((labels, totals[source_name]))
     for consumer, totals in attribute_consumer_bucket_maps(aux_maps, pv_bucket_map, battery_bucket_map, bucket_seconds).items():
         for source_name, metric_key in (("pv", "aux_daily_energy_from_pv"), ("battery", "aux_daily_energy_from_battery"), ("grid", "aux_daily_energy_from_grid")):
+            labels = base_daily_labels(settings, record_name(settings, metric_name_by_key[metric_key]), window)
+            labels["title"] = consumer
+            out[metric_key].append((labels, totals[source_name]))
+    for consumer, totals in attribute_consumer_bucket_maps(consumer_maps, pv_bucket_map, battery_bucket_map, bucket_seconds).items():
+        for source_name, metric_key in (("pv", "consumer_daily_energy_from_pv"), ("battery", "consumer_daily_energy_from_battery"), ("grid", "consumer_daily_energy_from_grid")):
             labels = base_daily_labels(settings, record_name(settings, metric_name_by_key[metric_key]), window)
             labels["title"] = consumer
             out[metric_key].append((labels, totals[source_name]))
@@ -2042,6 +2249,13 @@ def summarize_consumer_source_attribution_rollups_for_windows(
         bucket_seconds,
         "title",
     )
+    consumer_maps = build_consumer_bucket_average_maps(
+        context["consumer_title_matrix"],
+        start_ts,
+        end_ts,
+        bucket_seconds,
+        "title",
+    )
     metric_name_by_key = {
         "loadpoint_daily_energy_from_pv": "loadpoint_energy_from_pv_daily_wh",
         "loadpoint_daily_energy_from_battery": "loadpoint_energy_from_battery_daily_wh",
@@ -2052,6 +2266,9 @@ def summarize_consumer_source_attribution_rollups_for_windows(
         "aux_daily_energy_from_pv": "aux_energy_from_pv_daily_wh",
         "aux_daily_energy_from_battery": "aux_energy_from_battery_daily_wh",
         "aux_daily_energy_from_grid": "aux_energy_from_grid_daily_wh",
+        "consumer_daily_energy_from_pv": "consumer_energy_from_pv_daily_wh",
+        "consumer_daily_energy_from_battery": "consumer_energy_from_battery_daily_wh",
+        "consumer_daily_energy_from_grid": "consumer_energy_from_grid_daily_wh",
     }
     out = {
         window.day: {metric_key: [] for metric_key in metric_name_by_key}
@@ -2062,6 +2279,7 @@ def summarize_consumer_source_attribution_rollups_for_windows(
         (loadpoint_maps, "loadpoint", "loadpoint_daily_energy_from"),
         (ext_maps, "title", "ext_daily_energy_from"),
         (aux_maps, "title", "aux_daily_energy_from"),
+        (consumer_maps, "title", "consumer_daily_energy_from"),
     ]
     for consumer_maps, output_label, metric_prefix in group_specs:
         totals_by_day = attribute_consumer_bucket_maps_by_window(consumer_maps, pv_bucket_map, battery_bucket_map, bucket_seconds, windows)
@@ -2104,7 +2322,7 @@ def fetch_chunk_consumer_attribution_context(settings: Settings, chunk: ChunkWin
         ),
         "ext_title_matrix": fetch_series_range(
             settings,
-            f"avg by (title) ({selector('extPower_value', root, title_present)})",
+            f"avg by (title) ({selector('extPower_value', root, title_present, non_legacy_ext_matcher(settings))})",
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
@@ -2115,6 +2333,16 @@ def fetch_chunk_consumer_attribution_context(settings: Settings, chunk: ChunkWin
             chunk.start_iso,
             chunk.end_iso,
             settings.raw_sample_step,
+        ),
+        "consumer_title_matrix": canonicalize_consumer_title_matrix(
+            settings,
+            fetch_series_range(
+                settings,
+                merged_consumer_power_query(settings),
+                chunk.start_iso,
+                chunk.end_iso,
+                settings.raw_sample_step,
+            ),
         ),
     }
     update_peak_memory()
@@ -3346,16 +3574,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
     processed_days = 0
     pv_daily_values_by_year: dict[str, dict[str, object]] = {}
     pv_daily_values_by_year_month: dict[tuple[str, str], dict[str, object]] = {}
-    legacy_positive_energy_metric_keys = {
-        "pv_daily_energy",
-        "home_daily_energy",
-    }
-    direct_positive_energy_metric_keys = {
-        "loadpoint_daily_energy",
-        "vehicle_daily_energy",
-        "ext_daily_energy",
-        "aux_daily_energy",
-    }
+
     price_metric_keys = {
         "grid_import_cost_daily",
         "grid_import_price_avg_daily",
@@ -3392,6 +3611,9 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
         "aux_daily_energy_from_pv",
         "aux_daily_energy_from_battery",
         "aux_daily_energy_from_grid",
+        "consumer_daily_energy_from_pv",
+        "consumer_daily_energy_from_battery",
+        "consumer_daily_energy_from_grid",
     }
 
     for chunk_index, (chunk_name, chunk_windows) in enumerate(chunks, start=1):
@@ -3488,7 +3710,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                     emitted_samples += 1
                     add_duration(ACTIVE_PROFILE, "battery_soc_s", started_at)
                     continue
-                if item.key in legacy_positive_energy_metric_keys:
+                if item.key in MATRIX_POSITIVE_ENERGY_METRIC_KEYS:
                     started_at = time.perf_counter()
                     matrix_cache_key = (fetch_block.name, item.key)
                     matrix = positive_energy_contexts.get(matrix_cache_key)
@@ -3527,7 +3749,7 @@ def backfill(settings: Settings, args: argparse.Namespace) -> int:
                         emitted_samples += 1
                     add_duration(ACTIVE_PROFILE, "positive_energy_s", started_at)
                     continue
-                if item.key in direct_positive_energy_metric_keys:
+                if item.key in DIRECT_POSITIVE_ENERGY_METRIC_KEYS:
                     started_at = time.perf_counter()
                     result_items = fetch_rollup_vector(settings, item, window)
                     if not result_items:

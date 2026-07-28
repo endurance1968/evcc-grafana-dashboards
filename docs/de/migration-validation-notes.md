@@ -79,3 +79,42 @@ npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:8428
 ```
 
 Ohne private Caches behandelt die public/default-Validierung fehlende externe Vergleichsdateien bewusst als nicht blockierende Skips.
+
+## 2026-07-26 Read-only Live-Quellenpruefung fuer Consumer
+
+Der Consumer-Releasekandidat wurde zusaetzlich zu den deterministischen Fixtures gegen die produktive, strikt read-only verwendete VictoriaMetrics-Quelle geprueft. Grafana lief dabei ausschliesslich in einer Wegwerf-Testinstanz.
+
+Ergebnis:
+
+- `check_data.py --phase full` meldete insgesamt `OK`, keine `host`- oder `db`-Labels und vorhandene Kern-Rohdaten sowie Rollups.
+- Alle 385 MetricsQL-Ziele der sechs Quelldashboards wurden gegen die Live-VM erfolgreich ausgefuehrt.
+- Alle sechs Dashboards mit 58 kritischen Panels renderten gegen die Live-VM ohne Panel-Fehler.
+- Die Live-Quelle enthielt noch keine `consumersPower_value`- oder `evcc_consumer_*`-Reihen. Die neue Consumer-Funktion ist deshalb live noch nicht funktional verifiziert, sondern nur deterministisch per Fixture getestet.
+- Die vorhandenen realen Verbraucher lagen weiterhin als 16 EXT-Reihen vor. Die produktive EXT-Blocklist filterte Carport- und Hauptverteiler, aber verbleibende Eltern-/Kind-Kombinationen wie EG-Verteiler, USV und Unterzaehler konnten die Summe zeitweise bis an oder ueber den Hausverbrauch treiben. Das Dashboard begrenzte `Sonstiges` korrekt auf null, aber die zugrunde liegende Zaehlertopologie bleibt ohne explizite Hierarchie fachlich mehrdeutig.
+
+Releasefolgerung:
+
+- Fixture-E2E bleibt fuer reproduzierbare Sollwerte und Fehlerszenarien Pflicht.
+- Ein read-only Live-Render mit echten Deploy-Overrides ist ein zusaetzliches, verbindliches Release-Gate.
+- Consumer darf erst als live-validiert gelten, wenn EVCC echte Consumer-Metriken liefert.
+- Vor einer Freigabe muss die EXT-zu-Consumer-Migration beziehungsweise Blocklist so festgelegt sein, dass Eltern- und Kindzaehler nicht doppelt summiert werden.
+
+## 2026-07-27 Live-Kopie Und Vollstaendiger Consumer-Rollup
+
+Die Validierung vom Vortag wurde mit den inzwischen vorhandenen echten Consumer-Metriken wiederholt. Produktions-Grafana und Produktions-VictoriaMetrics blieben strikt read-only; Import, Bereinigung und Rollup liefen ausschliesslich in einer neu erstellten Wegwerf-VM.
+
+Ergebnis:
+
+- Die Live-Quelle lieferte sechs Consumer-Titel: `KWL`, `Rack Kühler`, `Rack Lüfter`, `Spüle`, `Waschmaschine` und `Waschmaschine II`.
+- Der Rollup verarbeitete 572 Tage vom 2025-01-01 bis 2026-07-26 und schrieb 41 Metriken, 288 Serien und 7.840 Samples.
+- Die 2025-Rollups enthielten 356 PV- und Haus-Tageswerte sowie 365 Tageswerte fuer Netzbezug und Einspeisung. Die Summen betrugen rund 14,42 MWh PV, 22,43 MWh Hausverbrauch, 14,06 MWh Netzbezug und 0,83 MWh Einspeisung.
+- Die sechs als Consumer fortgefuehrten Titel waren anschliessend vollstaendig aus `evcc_ext_energy*_daily_wh` entfernt. Zehn echte Diagnose-/Verteilerzaehler blieben als EXT erhalten.
+- Die produktiven Grafana-Einstellungen wurden in die Wegwerf-Instanz uebernommen. `Today` blieb der Zeitraum der Today-Dashboards; die Blocklist `.*Car.*|.*Haupt.*` filterte die bekannten Summenzaehler.
+- Die grafische Endnutzerpruefung bestaetigte getrennte Consumer- und Zusätzliche-Zähler-Ansichten in Today Details, Month, Year und All-time. Year 2025 zeigte alle zwölf Monate, All-time zeigte 2025 und 2026, und die Jahresmatrizen verwendeten eine echte Jahresachse.
+- Die Today-Finanzansicht zeigte Bezugskosten negativ, Einspeisegutschrift positiv und die Bilanz als Summe beider Werte.
+
+Sicherheitsbefund:
+
+- `--replace-range` loescht vorhandene Rollups im Zielzeitraum vor der Neuberechnung. Das ist fuer einen Gesamtzeitraum nur sicher, wenn die komplette Rohdatenhistorie aller betroffenen Familien vorliegt.
+- Ein additiver Voll-Backfill ueber bereits importierte Rollups ist ebenfalls unsicher: Unterschiedliche Tageszeitstempel erzeugen mehrere Samples pro lokalem Tag und verdoppeln Monatswerte. Die korrigierte Live-Kopie transformierte nur die sechs gemappten EXT-Rollup-Reihen, bevorzugte Consumer tagweise bei Ueberlappung und importierte ausschliesslich diese Consumer-Reihen.
+- `check_data.py --phase full` prueft nun alle `evcc_*_daily_*`-Reihen auf hoechstens ein Sample je Labelsatz und lokalem Tag. Die korrigierte Kopie meldete 0 doppelte Tage; Juli stimmte fuer PV, Haus, Netzbezug und Einspeisung exakt mit der read-only Live-VM ueberein.

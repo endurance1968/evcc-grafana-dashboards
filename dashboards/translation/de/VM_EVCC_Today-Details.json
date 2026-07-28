@@ -1098,7 +1098,7 @@
         "spec": {
           "id": 31,
           "title": "Haus: Aktuelle Leistung",
-          "description": "",
+          "description": "Consumer- und AUX-Zähler fließen in die Hausaufteilung ein. EXT-Zähler werden getrennt unter Zusätzliche Zähler angezeigt. Eltern- oder Summenzähler mit den rollenspezifischen Blocklisten ausschließen.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -1113,17 +1113,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(delta, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Sonstiges",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherPowersAux",
+                    "refId": "otherPowerCurrent",
                     "hidden": false
                   }
                 },
@@ -1136,17 +1137,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(-delta, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Zählerüberlappung",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherPowersExt",
+                    "refId": "meterOverlapCurrent",
                     "hidden": false
                   }
                 },
@@ -1159,63 +1161,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherPowersExtAux",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux\n)\nsort_by_label(tracked, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
-                        "range": true
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "extPowers",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}), \"title\")",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "{{title}}",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "auxPowers",
+                    "refId": "trackedPowersCurrent",
                     "hidden": false
                   }
                 }
@@ -1251,7 +1208,7 @@
                 },
                 "sort": "none",
                 "tooltip": {
-                  "hideZeros": false,
+                  "hideZeros": true,
                   "mode": "single",
                   "sort": "none"
                 }
@@ -1277,13 +1234,29 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Sonstige"
+                      "options": "Sonstiges"
                     },
                     "properties": [
                       {
                         "id": "color",
                         "value": {
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zählerüberlappung"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
                         }
                       }
                     ]
@@ -1314,17 +1287,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\navg(homePower_value) - (sum(tracked) or on() vector(0))",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Sonstiges",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherPowersExt",
+                    "refId": "otherPower",
                     "hidden": false
                   }
                 },
@@ -1337,86 +1311,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherPowersAux",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "avg(homePower_value) - sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})) - sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherPowersExtAux",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\nsort_by_label(tracked, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
-                        "range": true
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "extPowers",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}), \"title\")",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "{{title}}",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "auxPowers",
+                    "refId": "trackedPowers",
                     "hidden": false
                   }
                 }
@@ -1485,7 +1391,6 @@
                     }
                   },
                   "mappings": [],
-                  "min": 0,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -1505,13 +1410,14 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Sonstige"
+                      "options": "Sonstiges"
                     },
                     "properties": [
                       {
                         "id": "color",
                         "value": {
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
                         }
                       }
                     ]
@@ -1542,17 +1448,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 - range_sum(integrate(sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(delta_energy, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Sonstiges",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherPowersExtAux",
+                    "refId": "otherEnergy",
                     "hidden": false
                   }
                 },
@@ -1565,17 +1472,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))))/3600 ",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(-delta_energy, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Zählerüberlappung",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherPowersExt",
+                    "refId": "meterOverlapEnergy",
                     "hidden": false
                   }
                 },
@@ -1588,63 +1496,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(integrate(avg(homePower_value)))/3600 - range_sum(integrate(sum(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}))))/3600 ",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherPowersAux",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(range_sum(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"})))/3600, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\nsort_by_label(range_sum(integrate(tracked)) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
-                        "range": true
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "extEnergys",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(range_sum(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"})))/3600, \"title\")",
-                        "format": "time_series",
-                        "interval": "$energySampleInterval",
-                        "legendFormat": "{{title}}",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "auxEnergys",
+                    "refId": "trackedEnergy",
                     "hidden": false
                   }
                 }
@@ -1680,7 +1543,7 @@
                 },
                 "sort": "none",
                 "tooltip": {
-                  "hideZeros": false,
+                  "hideZeros": true,
                   "mode": "single",
                   "sort": "none"
                 }
@@ -1706,13 +1569,29 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Sonstige"
+                      "options": "Sonstiges"
                     },
                     "properties": [
                       {
                         "id": "color",
                         "value": {
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zählerüberlappung"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
                         }
                       }
                     ]
@@ -1743,17 +1622,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or aux\n)\nsum(integrate(avg(homePower_value) offset -1h)) / 3600 - (sum(integrate(tracked)) / 3600 or on() vector(0))",
                         "format": "time_series",
                         "interval": "1h",
-                        "legendFormat": "Sonstige",
-                        "range": true
+                        "legendFormat": "Sonstiges",
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "otherEnergyExtAux",
+                    "refId": "otherEnergy",
                     "hidden": false
                   }
                 },
@@ -1766,86 +1646,18 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h))/3600",
-                        "format": "time_series",
-                        "interval": "1h",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherEnergyExt",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(integrate(avg(homePower_value) offset -1h))/3600 - sum(integrate(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h))/3600",
-                        "format": "time_series",
-                        "interval": "1h",
-                        "legendFormat": "Sonstige",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "otherEnergyAux",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}) offset -1h)/3600, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or aux\n)\nsort_by_label(integrate(tracked) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "1h",
                         "legendFormat": "{{title}}",
-                        "range": true
+                        "range": true,
+                        "instant": false
                       },
                       "datasource": {
                         "name": "vm-evcc"
                       }
                     },
-                    "refId": "extEnergys",
-                    "hidden": false
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "query": {
-                      "kind": "DataQuery",
-                      "group": "victoriametrics-metrics-datasource",
-                      "version": "v0",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sort_by_label(integrate(avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}) offset -1h)/3600, \"title\")",
-                        "format": "time_series",
-                        "interval": "1h",
-                        "legendFormat": "__auto",
-                        "range": true
-                      },
-                      "datasource": {
-                        "name": "vm-evcc"
-                      }
-                    },
-                    "refId": "auxEnergys",
+                    "refId": "trackedEnergy",
                     "hidden": false
                   }
                 }
@@ -1917,7 +1729,6 @@
                     }
                   },
                   "mappings": [],
-                  "min": 0,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -1967,13 +1778,14 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Sonstige"
+                      "options": "Sonstiges"
                     },
                     "properties": [
                       {
                         "id": "color",
                         "value": {
-                          "mode": "fixed"
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
                         }
                       }
                     ]
@@ -1989,7 +1801,7 @@
         "spec": {
           "id": 39,
           "title": "Gesamt: Energieverteilung",
-          "description": "Die Formel für 'Sonstige' muss je nach Verfügbarkeit von AUX und EXT Metern angepasst werden. Siehe https://github.com/ha-puzzles/evcc-grafana-dashboards/tree/main/dashboards#formel-für-sonstige-anpassen für mehr Informationen.",
+          "description": "Die Gesamtenergie kombiniert Hausverbrauch, Ladepunkte und die konfigurierte Wärmepumpen-Ladepunktgruppe. Consumer- und AUX-Details stehen im Tab Haus; EXT-Zähler werden getrennt unter Zusätzliche Zähler angezeigt.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -2712,7 +2524,7 @@
         "spec": {
           "id": 24,
           "title": "Kosten",
-          "description": "",
+          "description": "Strombezug wird als negative Kosten und Einspeisung als positive Gutschrift angezeigt. Bilanz = Einspeisegutschrift minus Bezugskosten. Jeder Leistungsmesswert verwendet den Tarifwert mit demselben Zeitstempel.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -2727,7 +2539,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
+                        "expr": "-range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) / 3600000)",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Einkauf",
@@ -2750,7 +2562,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
+                        "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_min(-avg(gridPower_value), 0)) / 3600000)",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Verkauf",
@@ -2902,7 +2714,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Tagessumme"
+                        "value": "Bilanz"
                       }
                     ]
                   }
@@ -2917,7 +2729,7 @@
         "spec": {
           "id": 23,
           "title": "Kosten",
-          "description": "",
+          "description": "Strombezug wird als negative Kosten und Einspeisung als positive Gutschrift angezeigt. Bilanz = Einspeisegutschrift minus Bezugskosten. Jeder Leistungsmesswert verwendet den Tarifwert mit demselben Zeitstempel.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -2932,7 +2744,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(tariffGrid_value offset -$tariffPriceInterval) * integrate(clamp_min(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
+                        "expr": "avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) / 3600000 * -1",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Einkauf",
@@ -2955,7 +2767,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg(tariffFeedIn_value offset -$tariffPriceInterval) * integrate(clamp_max(avg(gridPower_value offset -$tariffPriceInterval), 0)) /3600000",
+                        "expr": "avg(tariffFeedIn_value) * integrate(clamp_min(-avg(gridPower_value), 0)) / 3600000",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Verkauf",
@@ -6511,6 +6323,565 @@
             }
           }
         }
+      },
+      "panel-54": {
+        "kind": "Panel",
+        "spec": {
+          "id": 54,
+          "title": "Zusätzliche Zähler: Aktuelle Leistung",
+          "description": "Aktuelle Leistung der EVCC-EXT-Zähler. Diese Steuerungs- und Verteilerzähler werden getrennt angezeigt und nicht vom Hausverbrauch abgezogen.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sort_by_label(avg by (title)(last_over_time(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}[2m])), \"title\")",
+                        "format": "time_series",
+                        "interval": "$energySampleInterval",
+                        "legendFormat": "{{title}}",
+                        "range": true,
+                        "instant": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "piechart",
+            "version": "12.4.0",
+            "spec": {
+              "options": {
+                "displayLabels": [],
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true,
+                  "sortBy": "Value",
+                  "sortDesc": false,
+                  "values": [
+                    "value"
+                  ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "sort": "none",
+                "tooltip": {
+                  "hideZeros": true,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "text",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  "mappings": [],
+                  "min": 0,
+                  "unit": "watt"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Sonstiges"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zählerüberlappung"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-55": {
+        "kind": "Panel",
+        "spec": {
+          "id": 55,
+          "title": "Zusätzliche Zähler: Leistung",
+          "description": "Leistungsverlauf der EVCC-EXT-Zähler. Eltern- und Summenzähler können mit extBlocklist ausgeschlossen werden.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+                        "format": "time_series",
+                        "interval": "$energySampleInterval",
+                        "legendFormat": "{{title}}",
+                        "range": true,
+                        "instant": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.4.0",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "text",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisWidth": 80,
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "watt"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Sonstiges"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-56": {
+        "kind": "Panel",
+        "spec": {
+          "id": 56,
+          "title": "Zusätzliche Zähler: Energieverteilung",
+          "description": "Von EVCC-EXT-Zählern gemessene Energie. Die Werte dienen der Diagnose und sind nicht Teil der Hausverbraucherbilanz.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sort_by_label(range_sum(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))) / 3600, \"title\")",
+                        "format": "time_series",
+                        "interval": "$energySampleInterval",
+                        "legendFormat": "{{title}}",
+                        "range": true,
+                        "instant": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "piechart",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayLabels": [],
+                "legend": {
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true,
+                  "sortBy": "Value",
+                  "sortDesc": false,
+                  "values": [
+                    "value"
+                  ]
+                },
+                "pieType": "donut",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "sort": "none",
+                "tooltip": {
+                  "hideZeros": true,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "text",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    }
+                  },
+                  "mappings": [],
+                  "min": 0,
+                  "unit": "watth"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Sonstiges"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Zählerüberlappung"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-57": {
+        "kind": "Panel",
+        "spec": {
+          "id": 57,
+          "title": "Zusätzliche Zähler: Energie",
+          "description": "Stündliche Energie der EVCC-EXT-Zähler. Eltern- und Kindzähler können sich überlappen und müssen gezielt gefiltert werden.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sort_by_label(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h)) / 3600, \"title\")",
+                        "format": "time_series",
+                        "interval": "1h",
+                        "legendFormat": "{{title}}",
+                        "range": true,
+                        "instant": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {
+                "interval": "1h",
+                "maxDataPoints": 24
+              }
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "timeseries",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "text",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisWidth": 80,
+                    "barAlignment": 1,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "mappings": [],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "watth"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Gesamt"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "transparent",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.stacking",
+                        "value": {
+                          "group": "A",
+                          "mode": "none"
+                        }
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Sonstiges"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "id": null,
@@ -6690,6 +7061,29 @@
       {
         "kind": "ConstantVariable",
         "spec": {
+          "name": "consumerBlocklist",
+          "query": "^none$",
+          "current": {
+            "selected": true,
+            "text": "^none$",
+            "value": "^none$"
+          },
+          "label": "Consumer-Blockliste",
+          "hide": "hideVariable",
+          "skipUrlSync": true,
+          "description": "Liste der EXT Geräte, die NICHT angezeigt werden sollen. Der Ausdruck ist eine reguläre Expression. Sie darf nicht leer sein. Wenn nichts gefiltert werden soll, verwende eine reguläre Expression, die keinen der Einträge matched.\n\nBeispiele:\nKeine Einträge: /^none$/\nFiltere 'Erdgeschoss' aus: /^Erdgeschoss$/\nFiltere 'Erdgeschoss' und 'Erster Stock' aus: /^Erdgeschoss$|^Erster Stock$/\nFiltere alles, das mit 'Verteiler' beginnt aus: /^Verteiler.*$/",
+          "options": [
+            {
+              "value": "^none$",
+              "text": "^none$",
+              "selected": false
+            }
+          ]
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
           "name": "extBlocklist",
           "query": "^none$",
           "current": {
@@ -6776,7 +7170,7 @@
         "spec": {
           "name": "hasHeatPumpLoadpointData",
           "label": "Wärmepumpen-Ladepunktdaten",
-          "description": "Internal helper variable. Shows the heat-pump loadpoint row only when matching loadpoint data exists in the selected time range.",
+          "description": "Interne Hilfsvariable. Zeigt die Wärmepumpen-Ladepunktzeile nur, wenn passende Ladepunktdaten im gewählten Zeitraum vorhanden sind.",
           "hide": "hideVariable",
           "skipUrlSync": true,
           "refresh": "onTimeRangeChanged",
@@ -6846,7 +7240,7 @@
           "label": "Tarif Preis Interval",
           "hide": "hideVariable",
           "skipUrlSync": true,
-          "description": "Interval in dem der Stromtarif sich ändert. Ändert er sich im Viertel-Stundentakt, kann das auf '15m' geändert werden. Hat man einen konstanten Tarif, dann auf '1d' für einen Tag.",
+          "description": "Aktualisierungsintervall der Preisanzeige. Für Viertelstundentarife 15m und für einen festen Tagestarif 1d verwenden.",
           "options": [
             {
               "value": "15m",
@@ -6929,8 +7323,8 @@
         "kind": "QueryVariable",
         "spec": {
           "name": "hasGridControlAuditData",
-          "label": "Grid-control audit data",
-          "description": "Internal helper variable. Shows the grid-control tab only when EVCC audit/network-limit metrics exist in the selected datasource.",
+          "label": "Netzsteuerungs-Auditdaten",
+          "description": "Interne Hilfsvariable. Zeigt den Netzsteuerungs-Tab nur, wenn EVCC-Audit-/Netzlimit-Metriken in der gewählten Datenquelle vorhanden sind.",
           "hide": "hideVariable",
           "skipUrlSync": true,
           "refresh": "onTimeRangeChanged",
@@ -7587,6 +7981,71 @@
                               }
                             ]
                           }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "title": "Zusätzliche Zähler",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 7,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-54"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 7,
+                        "y": 0,
+                        "width": 17,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-55"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 10,
+                        "width": 7,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-56"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 7,
+                        "y": 10,
+                        "width": 17,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-57"
                         }
                       }
                     }

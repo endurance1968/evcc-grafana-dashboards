@@ -6568,6 +6568,740 @@
             }
           }
         }
+      },
+      "panel-60": {
+        "kind": "Panel",
+        "spec": {
+          "id": 60,
+          "title": "Consumer energy distribution",
+          "description": "All-time regular Consumer and AUX energy. Other is the measured home energy not assigned to those consumer roles; EXT meters are excluded.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "WITH (\n  home = sum(sum_over_time(evcc_home_energy_daily_wh[$__range] offset 3h)),\n  consumer_total = sum(sum_over_time(evcc_consumer_energy_daily_wh{title!=\"\", title !~ \"$consumerBlocklist\"}[$__range] offset 3h)) or vector(0),\n  aux_total = sum(sum_over_time(evcc_aux_energy_daily_wh{title!=\"\", title !~ \"$auxBlocklist\"}[$__range] offset 3h)) or vector(0),\n  other = label_set(clamp_min(home - consumer_total - aux_total, 0) / 1000, \"series\", \"Otros\"),\n  overlap = label_set(clamp_min(consumer_total + aux_total - home, 0) / 1000, \"series\", \"Solapamiento de contadores\"),\n  consumer = label_copy(sum(sum_over_time(evcc_consumer_energy_daily_wh{title!=\"\", title !~ \"$consumerBlocklist\"}[$__range] offset 3h)) by (title) / 1000, \"title\", \"series\"),\n  aux = label_copy(sum(sum_over_time(evcc_aux_energy_daily_wh{title!=\"\", title !~ \"$auxBlocklist\"}[$__range] offset 3h)) by (title) / 1000, \"title\", \"series\"),\n  tracked = sum by (series)(consumer or aux)\n)\nsort_by_label(other or overlap or tracked, \"series\")",
+                        "format": "time_series",
+                        "legendFormat": "{{series}}",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "consumerDistribution",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "piechart",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayLabels": [
+                  "name",
+                  "percent"
+                ],
+                "legend": {
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "pieType": "pie",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "tooltip": {
+                  "mode": "single",
+                  "hideZeros": true
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "kWh",
+                  "color": {
+                    "mode": "palette-classic"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "Other"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Otros"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Casa"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9F7AEA"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Otros"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Solapamiento de contadores"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "MeterOverlap"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Solapamiento de contadores"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-61": {
+        "kind": "Panel",
+        "spec": {
+          "id": 61,
+          "title": "Consumer energy/year",
+          "description": "Yearly regular Consumer and AUX energy with the unassigned home remainder.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "format": "table",
+                        "instant": true,
+                        "range": false,
+                        "expr": "WITH (\n  home = sum(sum_over_time(evcc_home_energy_daily_wh[$__range] offset 3h)) by (local_year),\n  consumer_total = sum(sum_over_time(evcc_consumer_energy_daily_wh{title!=\"\", title !~ \"$consumerBlocklist\"}[$__range] offset 3h)) by (local_year),\n  aux_total = sum(sum_over_time(evcc_aux_energy_daily_wh{title!=\"\", title !~ \"$auxBlocklist\"}[$__range] offset 3h)) by (local_year),\n  zero = home * 0,\n  other = label_set((home - (consumer_total or on(local_year) zero) - (aux_total or on(local_year) zero)) / 1000, \"series\", \"Otros\"),\n  consumer = label_set(label_copy(sum(sum_over_time(evcc_consumer_energy_daily_wh{title!=\"\", title !~ \"$consumerBlocklist\"}[$__range] offset 3h)) by (local_year, title) / 1000, \"title\", \"series\"), \"meter_role\", \"consumer\"),\n  aux = label_set(label_copy(sum(sum_over_time(evcc_aux_energy_daily_wh{title!=\"\", title !~ \"$auxBlocklist\"}[$__range] offset 3h)) by (local_year, title) / 1000, \"title\", \"series\"), \"meter_role\", \"aux\"),\n  tracked = sum by (local_year, series)(consumer or aux)\n)\nother or tracked"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "consumers",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "sortBy",
+                  "spec": {
+                    "options": {
+                      "fields": {},
+                      "sort": [
+                        {
+                          "field": "local_year"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "indexByName": {
+                        "local_year": 0,
+                        "series": 1,
+                        "Value": 2
+                      },
+                      "renameByName": {
+                        "local_year": "year",
+                        "series": "series",
+                        "Value": "value"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "filterFieldsByName",
+                  "spec": {
+                    "options": {
+                      "include": {
+                        "names": [
+                          "year",
+                          "series",
+                          "value"
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "groupingToMatrix",
+                  "spec": {
+                    "options": {
+                      "columnField": "series",
+                      "rowField": "year",
+                      "valueField": "value"
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "barchart",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "barRadius": 0.2,
+                "barWidth": 0.97,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "normal",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "year",
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 0
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "unit": "kWh",
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisWidth": 80,
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "year"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "none"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "^Other.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Otros"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-62": {
+        "kind": "Panel",
+        "spec": {
+          "id": 62,
+          "title": "Additional meter totals",
+          "description": "Absolute all-time energy per EVCC EXT meter. Values are not additive because parent, child and sum meters can overlap.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sort_by_label(sum(sum_over_time(evcc_ext_energy_daily_wh{title!=\"\", title !~ \"$extBlocklist\"}[$__range] offset 3h)) by (title) / 1000, \"title\")",
+                        "format": "time_series",
+                        "legendFormat": "{{title}}",
+                        "instant": true,
+                        "range": false
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "bargauge",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "displayMode": "gradient",
+                "orientation": "horizontal",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showUnfilled": true,
+                "sizing": "auto",
+                "text": {
+                  "valueSize": 14
+                }
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "unit": "kWh",
+                  "color": {
+                    "mode": "palette-classic"
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "Other"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Otros"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Casa"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9F7AEA"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Otros"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Solapamiento de contadores"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byFrameRefID",
+                      "options": "MeterOverlap"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Solapamiento de contadores"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#E02F44"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "panel-63": {
+        "kind": "Panel",
+        "spec": {
+          "id": 63,
+          "title": "Additional meters: Energy/year",
+          "description": "Yearly energy of EVCC EXT meters. Exclude parent or sum meters with extBlocklist when hierarchies overlap.",
+          "links": [],
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "query": {
+                      "kind": "DataQuery",
+                      "group": "victoriametrics-metrics-datasource",
+                      "version": "v0",
+                      "spec": {
+                        "editorMode": "code",
+                        "format": "table",
+                        "instant": true,
+                        "range": false,
+                        "expr": "sort_by_label(label_copy(sum(sum_over_time(evcc_ext_energy_daily_wh{title!=\"\", title !~ \"$extBlocklist\"}[$__range] offset 3h)) by (local_year, title) / 1000, \"title\", \"series\"), \"series\")",
+                        "legendFormat": "{{title}}"
+                      },
+                      "datasource": {
+                        "name": "vm-evcc"
+                      }
+                    },
+                    "refId": "meters",
+                    "hidden": false
+                  }
+                }
+              ],
+              "transformations": [
+                {
+                  "kind": "Transformation",
+                  "group": "sortBy",
+                  "spec": {
+                    "options": {
+                      "fields": {},
+                      "sort": [
+                        {
+                          "field": "local_year"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "organize",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "indexByName": {
+                        "local_year": 0,
+                        "series": 1,
+                        "Value": 2
+                      },
+                      "renameByName": {
+                        "local_year": "year",
+                        "series": "series",
+                        "Value": "value"
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "filterFieldsByName",
+                  "spec": {
+                    "options": {
+                      "include": {
+                        "names": [
+                          "year",
+                          "series",
+                          "value"
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "kind": "Transformation",
+                  "group": "groupingToMatrix",
+                  "spec": {
+                    "options": {
+                      "columnField": "series",
+                      "rowField": "year",
+                      "valueField": "value"
+                    }
+                  }
+                }
+              ],
+              "queryOptions": {}
+            }
+          },
+          "vizConfig": {
+            "kind": "VizConfig",
+            "group": "barchart",
+            "version": "12.3.3",
+            "spec": {
+              "options": {
+                "barRadius": 0.2,
+                "barWidth": 0.97,
+                "fullHighlight": false,
+                "groupWidth": 0.7,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "normal",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                },
+                "xField": "year",
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 0
+              },
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "unit": "kWh",
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisWidth": 80,
+                    "fillOpacity": 80,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "year"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "none"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "^Other.*"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Otros"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "mode": "fixed",
+                          "fixedColor": "#9FA7B3"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "layout": {
@@ -7060,6 +7794,84 @@
                 }
               }
             }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "title": "Consumidores",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 7,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-60"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 7,
+                        "y": 0,
+                        "width": 17,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-61"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "title": "Additional meters",
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 0,
+                        "y": 0,
+                        "width": 7,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-62"
+                        }
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "x": 7,
+                        "y": 0,
+                        "width": 17,
+                        "height": 10,
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-63"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           }
         ]
       }
@@ -7467,6 +8279,71 @@
           "hide": "hideVariable",
           "skipUrlSync": true,
           "description": "URL utilizada para abrir el portal del inversor."
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "name": "consumerBlocklist",
+          "query": "^none$",
+          "current": {
+            "selected": true,
+            "text": "^none$",
+            "value": "^none$"
+          },
+          "label": "Consumer Blocklist",
+          "hide": "hideVariable",
+          "skipUrlSync": false,
+          "options": [
+            {
+              "selected": true,
+              "text": "^none$",
+              "value": "^none$"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "name": "extBlocklist",
+          "query": "^none$",
+          "current": {
+            "selected": true,
+            "text": "^none$",
+            "value": "^none$"
+          },
+          "label": "Lista de bloqueo EXT",
+          "hide": "hideVariable",
+          "skipUrlSync": false,
+          "options": [
+            {
+              "selected": true,
+              "text": "^none$",
+              "value": "^none$"
+            }
+          ]
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "name": "auxBlocklist",
+          "query": "^none$",
+          "current": {
+            "text": "^none$",
+            "value": "^none$"
+          },
+          "label": "Lista de bloqueo AUX",
+          "hide": "hideVariable",
+          "skipUrlSync": false,
+          "options": [
+            {
+              "text": "^none$",
+              "value": "^none$",
+              "selected": true
+            }
+          ]
         }
       }
     ]

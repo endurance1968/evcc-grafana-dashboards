@@ -160,6 +160,7 @@ Personal dashboard variable overrides can be kept in the same env file. The exte
 DASHBOARD_INSTALLED_WATT_PEAK=22
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -168,6 +169,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 # DASHBOARD_PORTAL_TITLE=Portal
 # DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
+
+If sum or parent meters and their child meters exist under Consumer, EXT, or AUX at the same time, use the corresponding blocklist to select one non-overlapping level. The filters affect both the visible series and `Other`; see [Excluding Sum And Parent Meters From Home Attribution](./migration-troubleshooting.md#excluding-sum-and-parent-meters-from-home-attribution) for a concrete distribution, UPS, and laundry example.
 
 If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:
 

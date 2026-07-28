@@ -1,6 +1,6 @@
 # AI Working State
 
-Last updated: 2026-07-04
+Last updated: 2026-07-28
 
 This file is an internal handoff note for Codex continuation work. It is not end-user documentation.
 
@@ -13,46 +13,34 @@ This file is an internal handoff note for Codex continuation work. It is not end
 - Complex Grafana/dashboard changes must be visually verified in the disposable Docker test environment before being reported as ready.
 - For full live-VM test imports, use Docker-network-local month-by-month export/import with `max_rows_per_line=1000`; avoid streaming a complete VM export through the Windows host port.
 - Preferred install/tool path on Linux hosts is `/opt/evcc-vm-tools`, not `/opt/evcc-vm-migration`.
+- Do not mark current release screenshots final before Ole has completed the manual GUI review.
 
 ## Current Repository State
 
 Repository: `D:\AI-Workspaces\evcc-grafana-dashboards`
 
-There are uncommitted local changes related to:
+The July release candidate includes Consumer dashboards and rollups, Consumer/EXT migration mapping, Consumer title aliases, Today finance fixes, VRM energy-flow validation, scheduler/data-quality guards, deployer updates, and generated localizations.
 
-- Optional VRM energy-flow import helper and tests.
-- VRM storage panels/values for month, year, and all-time dashboards.
-- Generated localized dashboard JSON updates.
-- README and documentation updates for the VRM import work.
-- Local check/test script updates.
+Issues #20, #21, and #22 were technically completed on 2026-07-28. Their Forgejo closure comments must reference the final commit and the evidence below.
 
-Do not commit these changes until the Docker test path has been re-run and Ole has reviewed the German Grafana dashboards.
+## Final Technical Evidence
 
-## Forgejo Tracking
+- Fresh isolated Grafana 13.1.0: `http://127.0.0.1:13000`, login `admin` / `admin`.
+- Fresh isolated VictoriaMetrics 1.139.0: `http://127.0.0.1:18440`.
+- Exactly six current German dashboards are deployed with the production filter overrides.
+- Full livecopy rollup: 573 completed days, 36,625 samples, 1,388 series, 210.606 seconds, 1,264 MB peak Python memory.
+- Data quality: overall `OK`, zero duplicate label/day combinations, zero `host` labels, zero `db` labels, two ignored counter resets, zero power spikes, 9,910 missing energy buckets.
+- Consumer titles: 14 canonical long-range titles; `Trocker` is merged into `Trockner` before daily integration.
+- VRM parity: 383 days, 2,298 samples, six metrics, zero missing/extra/duplicate days. June 2026 efficiency 85.260%, reference delta 0.040 percentage points.
+- Mandatory release path: 190 Python tests, 76 dashboard JSON files, 382 live MetricsQL queries, 58 critical rendered panels, repeated replace-range idempotence; result `OK` in 417.0 seconds on the final dashboard sources.
+- The Month battery layout was visually checked at 1280 pixels after deployment; values and daily axis labels no longer overlap.
 
-Existing relevant open issues:
+## Remaining Release Gate
 
-- #19 `Audit-Collector: Batterie-Netzladung nur bei tatsächlicher Ladeleistung zählen`
-- #20 `Optionalen VRM-Energieflussimport fuer Speicherwirkungsgrad ergaenzen`
-- #21 `Rollup: Performance-Timings auswerten und Backfill/Scheduler optimieren`
-- #22 `Rollup: Datenqualitäts- und Scheduler-Schutz verbessern`
-- Roadmap issues #8-#14 for future Grafana 13/visualization ideas.
-
-Issues #19 and #20 contain `Arbeitsstand 2026-07-04` comments with the latest continuation notes.
-
-## Immediate Continuation Plan
-
-1. Cleanly rebuild the disposable Docker VictoriaMetrics/Grafana test environment.
-2. Import live VM data read-only into the Docker test VM using the known month-by-month internal Docker-network path.
-3. Import VRM daily energy-flow data from 2025-01-01 into the Docker test VM only.
-4. Deploy German dashboards to the Docker test Grafana only.
-5. Visually verify month, year, and all-time storage panels:
-   - EVCC and VRM storage values must not be mixed in the same semantic panel unless intentionally labeled.
-   - Units must be scaled correctly (Wh/kWh/MWh), with no raw Wh values shown as MWh.
-   - All-time VRM values should be integrated into the storage panel layout as Ole requested, without leaving excessive height or misalignment.
-   - Month and year VRM storage flow panels must show data where VRM data exists.
-6. Run the smallest relevant checks first, then broader tests if dashboard JSON or helper behavior changed.
-7. Ask Ole for manual German GUI review before commit/push.
+- Ole manually reviews the disposable German Grafana dashboards.
+- Curated screenshots are refreshed only after that approval.
+- Issue #30 remains the overall release gate.
+- Issue #35 remains excluded from this release.
 
 ## Known Endpoints And Constraints
 
@@ -62,11 +50,11 @@ Read-only production references:
 - Production EVCC: `http://192.168.1.197:7070`
 - Production Grafana: `http://192.168.1.189:3000`
 
-Typical disposable test setup, verify before use:
+Disposable test setup currently retained for review:
 
-- Test Grafana often runs at `http://127.0.0.1:13000`
-- Test VictoriaMetrics often uses host port `18440`
-- Typical Grafana test credentials have been `admin` / `admin`, but verify the current container configuration.
+- Test Grafana: `http://127.0.0.1:13000`
+- Test VictoriaMetrics: `http://127.0.0.1:18440`
+- Test Grafana credentials: `admin` / `admin`
 
 ## Release Notes Rules
 

@@ -2,9 +2,9 @@
 # Deploy dashboards to Grafana with the portable POSIX shell flow.
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -eu
-SCRIPT_VERSION="2026.06.23.3"
+SCRIPT_VERSION="2026.07.26.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-23"
+SCRIPT_LAST_MODIFIED="2026-07-26"
 SCRIPT_NAME="${0##*/}"
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
@@ -119,6 +119,7 @@ settings = {
     "DASHBOARD_BATTERY_CAPACITY_WH": "",
     "DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX": "",
     "DASHBOARD_FILTER_LOADPOINT_BLOCKLIST": "",
+    "DASHBOARD_FILTER_CONSUMER_BLOCKLIST": "",
     "DASHBOARD_FILTER_EXT_BLOCKLIST": "",
     "DASHBOARD_FILTER_AUX_BLOCKLIST": "",
     "DASHBOARD_FILTER_VEHICLE_BLOCKLIST": "",
@@ -448,6 +449,7 @@ def build_dashboard_overrides(settings):
         "storageCapacity": settings.get("DASHBOARD_STORAGE_CAPACITY_WH", "") or settings.get("DASHBOARD_BATTERY_CAPACITY_WH", ""),
         "heatPumpLoadpointRegex": settings.get("DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX", ""),
         "loadpointBlocklist": settings.get("DASHBOARD_FILTER_LOADPOINT_BLOCKLIST", ""),
+        "consumerBlocklist": settings.get("DASHBOARD_FILTER_CONSUMER_BLOCKLIST", ""),
         "extBlocklist": settings.get("DASHBOARD_FILTER_EXT_BLOCKLIST", ""),
         "auxBlocklist": settings.get("DASHBOARD_FILTER_AUX_BLOCKLIST", ""),
         "vehicleBlocklist": settings.get("DASHBOARD_FILTER_VEHICLE_BLOCKLIST", ""),

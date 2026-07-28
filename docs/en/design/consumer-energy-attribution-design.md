@@ -150,6 +150,12 @@ That means:
 - `evcc_ext_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
 - `evcc_ext_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
 
+### Regular EVCC consumers
+
+- `evcc_consumer_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_consumer_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_consumer_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
+
 ### Auxiliary meters
 
 - `evcc_aux_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
@@ -172,6 +178,7 @@ They are useful if a later panel should explain how much of the full house load 
 For each bucket, use positive demand only:
 
 - `chargePower_value` per `loadpoint`
+- `consumersPower_value` per `title`
 - `extPower_value` per `title`
 - `auxPower_value` per `title`
 

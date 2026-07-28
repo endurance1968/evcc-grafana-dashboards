@@ -2637,7 +2637,7 @@
         "spec": {
           "id": 73,
           "title": "Costi",
-          "description": "",
+          "description": "Purchased electricity is shown as a negative cost and feed-in as a positive credit. Balance = feed-in credit - purchase cost. Each power sample uses the tariff value at the same timestamp.",
           "links": [],
           "data": {
             "kind": "QueryGroup",
@@ -2652,7 +2652,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) /3600000)",
+                        "expr": "-range_sum(avg(tariffGrid_value) * integrate(clamp_min(avg(gridPower_value), 0)) / 3600000)",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Acquistato",
@@ -2675,7 +2675,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)) /3600000)",
+                        "expr": "range_sum(avg(tariffFeedIn_value) * integrate(clamp_min(-avg(gridPower_value), 0)) / 3600000)",
                         "format": "time_series",
                         "interval": "$tariffPriceInterval",
                         "legendFormat": "Venduto",
@@ -2803,7 +2803,7 @@
                       },
                       {
                         "id": "displayName",
-                        "value": "Totale giornaliero"
+                        "value": "Bilancio"
                       }
                     ]
                   }

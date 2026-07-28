@@ -56,6 +56,40 @@ class CheckDataCliTests(unittest.TestCase):
             CHECK_MODULE.matcher_count = original_matcher_count
 
 
+    def test_daily_rollup_duplicate_days_groups_by_labels_and_local_day(self):
+        original_export_lines = CHECK_MODULE.export_lines
+        lines = [
+            json.dumps(
+                {
+                    "metric": {"__name__": "evcc_pv_energy_daily_wh", "local_year": "2026"},
+                    "timestamps": [1783288800000, 1783332000000],
+                    "values": [100.0, 100.0],
+                }
+            ),
+            json.dumps(
+                {
+                    "metric": {"__name__": "evcc_home_energy_daily_wh", "local_year": "2026"},
+                    "timestamps": [1783288800000],
+                    "values": [80.0],
+                }
+            ),
+        ]
+        try:
+            CHECK_MODULE.export_lines = lambda *args, **kwargs: iter(lines)
+            result = CHECK_MODULE.daily_rollup_duplicate_days(
+                "http://127.0.0.1:8428",
+                "2026-07-05T00:00:00Z",
+                "2026-07-06T23:59:59Z",
+                "Europe/Berlin",
+            )
+        finally:
+            CHECK_MODULE.export_lines = original_export_lines
+
+        self.assertEqual(result["duplicate_series_days"], 1)
+        self.assertEqual(result["duplicate_samples"], 1)
+        self.assertEqual(result["examples"][0]["metric"], "evcc_pv_energy_daily_wh")
+        self.assertEqual(result["examples"][0]["day"], "2026-07-06")
+
 class CompareImportCoverageCliTests(unittest.TestCase):
     def test_main_accepts_deprecated_vm_db_label_argument(self):
         original_argv = sys.argv[:]

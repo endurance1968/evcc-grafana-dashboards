@@ -83,6 +83,7 @@ Examples:
 - `evcc_loadpoint_energy_daily_wh{loadpoint="..."}`
 - `evcc_vehicle_energy_daily_wh{vehicle="..."}`
 - `evcc_vehicle_distance_daily_km{vehicle="..."}`
+- `evcc_consumer_energy_daily_wh{title="..."}`
 - `evcc_ext_energy_daily_wh{title="..."}`
 - `evcc_aux_energy_daily_wh{title="..."}`
 - `evcc_battery_soc_daily_min_pct`
@@ -151,23 +152,27 @@ Why:
 
 The Influx legacy dashboards are kept only as static German reference JSON. VM dashboards should not copy their structure blindly.
 
-## Known open items
+## Performance And Scheduler Validation
 
-These items are intentionally deferred from the first safe rollout:
+The release candidate was validated on 2026-07-28 in an isolated VictoriaMetrics copy with complete read-only live raw data from 2025-01-01 through 2026-07-27:
 
-- optional monthly rollup layer
-- any further measured performance tuning beyond the current chunked fetch path
+- The full backfill processed 573 days, 36,625 samples, and 1,388 series in 210.606 seconds with 1,264 MB peak Python memory.
+- Consumer source attribution was the slowest family at 90.737 seconds or 43.08%; vehicle cost rollups followed at 68.47 seconds.
+- A correct Python matrix canonicalization was rejected because it required 258.392 seconds and 1,751 MB. The final query canonicalization saves about 18% runtime and 28% memory compared with that intermediate implementation.
+- A 27-day July replacement completed in about 13 seconds. This monthly range is substantially closer to the normal scheduler path than the one-time full backfill.
+- Further parallelism or caches are not a release gate: the daily run remains short, while extra concurrency would add unnecessary locking, ordering, and reproducibility risk.
 
-## Future extension: consumer source attribution
+The scheduler remains on `--replace-range --write` and may process completed days only by default. A concurrently started second write run was rejected by the lock file during livecopy testing. The full backfill reported two ignored counter resets, zero power spikes, and 9,910 missing energy buckets. The subsequent data check found no duplicate label/day combinations.
 
-For a later dashboard feature that should show yearly or monthly consumer energy split by:
+## Known Open Items
 
-- `PV`
-- `Battery`
-- `Grid`
+- Add an optional monthly rollup layer only after another measured dashboard bottleneck appears.
+- Start further performance work only from a reproducible profile that represents the normal scheduler range and target hardware.
 
-there is now a dedicated design note:
+## Consumer Source Attribution
+
+Source attribution for Consumers, AUX, EXT, and loadpoints is implemented. It splits modeled daily energy into `PV`, `Battery`, and `Grid` with 60-second buckets. Historical EXT consumers can continue through `consumer_legacy_ext_regex`; `consumer_title_aliases_json` canonicalizes renamed Consumer titles before daily integration.
+
+The domain boundaries and balance rules are documented in:
 
 - [Consumer Energy Attribution Design](./consumer-energy-attribution-design.md)
-
-That extension is intentionally separate from the current baseline rollup scope because it adds modeled source attribution per consumer group.

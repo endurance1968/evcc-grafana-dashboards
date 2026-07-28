@@ -19,8 +19,8 @@ import {
   resolveDashboardFamily,
 } from "../helper/_dashboard-family.mjs";
 
-const SCRIPT_VERSION = "2026.06.23.1";
-const SCRIPT_LAST_MODIFIED = "2026-06-23";
+const SCRIPT_VERSION = "2026.07.26.1";
+const SCRIPT_LAST_MODIFIED = "2026-07-26";
 
 loadEnvFile(parseArg("env", ".env"));
 
@@ -343,6 +343,34 @@ function applyColorOverrides(node, colorMap) {
 }
 
 function applyVariableDefaults(raw, variableMap) {
+  const v2List = raw?.spec?.variables;
+  if (Array.isArray(v2List)) {
+    for (const variable of v2List) {
+      const spec = variable?.spec;
+      const desired = variableMap?.[spec?.name];
+      if (!spec || desired === undefined) continue;
+      if (variable.kind !== "QueryVariable") {
+        spec.query = desired;
+      }
+      spec.current = {
+        ...(spec.current || {}),
+        selected: desired === "$__all",
+        text: desired === "$__all" ? "All" : desired,
+        value: desired,
+      };
+      if (Array.isArray(spec.options)) {
+        if (variable.kind === "ConstantVariable") {
+          spec.options = [{ selected: true, text: spec.current.text, value: desired }];
+          continue;
+        }
+        for (const option of spec.options) {
+          option.selected = option?.value === desired;
+        }
+      }
+    }
+    return;
+  }
+
   const list = raw?.templating?.list;
   if (!Array.isArray(list)) return;
   for (const variable of list) {
@@ -400,6 +428,11 @@ function buildDashboardBuildMarker(sourceLabel) {
 }
 
 function applyDashboardBuildDescription(raw, marker) {
+  for (const variable of raw?.spec?.variables || []) {
+    if (variable?.spec?.name === "dashboardBuild") {
+      variable.spec.description = marker;
+    }
+  }
   for (const variable of raw?.templating?.list || []) {
     if (variable?.name === "dashboardBuild") {
       variable.description = marker;

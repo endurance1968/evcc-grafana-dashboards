@@ -436,7 +436,8 @@
     "VRM battery": "VRM accu",
     "VRM charge": "VRM laden",
     "VRM discharge": "VRM ontladen",
-    "VRM efficiency": "VRM efficiëntie"
+    "VRM efficiency": "VRM efficiëntie",
+    "Meter overlap": "Meteroverlap"
   },
   "Heat pump source mix": "Verdeling energiebronnen warmtepomp",
   "Heat pump title match": "Warmtepomp titelmatch",

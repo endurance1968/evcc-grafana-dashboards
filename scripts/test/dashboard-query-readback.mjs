@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-query-readback.mjs
  * Purpose: Execute original VM dashboard MetricsQL targets against VictoriaMetrics after Grafana macro substitution.
- * Version: 2026.07.26.1
+ * Version: 2026.07.26.2
  * Last modified: 2026-07-26
  */
 import fs from "node:fs";
@@ -30,6 +30,7 @@ const fallbackVariables = {
   VAR_TARIFFPRICEINTERVAL: "15m",
   VAR_VEHICLEBLOCKLIST: "^none$",
   auxBlocklist: "^none$",
+  consumerBlocklist: "^none$",
   dashboardBuild: "query-readback",
   energySampleInterval: "30s",
   extBlocklist: "^none$",
@@ -545,7 +546,7 @@ async function main() {
     console.log("Dashboard query readback");
     console.log("========================");
     console.log("Script:        dashboard-query-readback.mjs");
-    console.log("Version:       2026.07.26.1");
+    console.log("Version:       2026.07.26.2");
     console.log("Last modified: 2026-07-26");
     console.log(`VM base URL:   ${baseUrl}`);
     console.log(`Source dir:    ${sourceDir}`);

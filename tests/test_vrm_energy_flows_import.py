@@ -1,5 +1,7 @@
 import datetime as dt
 import importlib.util
+import json
+import tempfile
 import unittest
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -109,6 +111,19 @@ class VrmEnergyFlowImportTests(unittest.TestCase):
 
         self.assertEqual([row["day"] for row in rows], ["2026-01-02"])
         self.assertEqual(rows[0]["battery_charge_kwh"], 0.0)
+
+    def test_source_snapshot_contains_normalized_rows_and_metadata(self):
+        rows = [{"day": "2026-06-01", "pv_to_battery_kwh": 1.0, "grid_to_battery_kwh": 0.0, "battery_to_consumers_kwh": 0.8, "battery_to_grid_kwh": 0.0, "battery_charge_kwh": 1.0, "battery_discharge_kwh": 0.8}]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "snapshot.json"
+            module.write_source_snapshot(
+                path, rows, "site", "vrm", dt.date(2026, 6, 1), dt.date(2026, 6, 1)
+            )
+            payload = json.loads(path.read_text(encoding="utf-8"))
+
+        self.assertEqual(payload["site_id"], "site")
+        self.assertEqual(payload["summary"]["days"], 1)
+        self.assertEqual(payload["rows"], rows)
 
     def test_chunk_date_ranges_splits_inclusive_ranges(self):
         chunks = list(module.chunk_date_ranges(dt.date(2026, 1, 1), dt.date(2026, 1, 5), 2))

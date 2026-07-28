@@ -222,10 +222,30 @@ metric_prefix = evcc
 raw_sample_step = 10s
 energy_rollup_step = 60s
 price_bucket_minutes = 15
+# Alte EXT-Titel, die unter demselben Titel als Consumer weiterlaufen. Standard `^$`: keine Zuordnung.
+consumer_legacy_ext_regex = ^$
+# Optionale JSON-Aliase fuer umbenannte Consumer-Titel. Standard `{}`: keine Umbenennung.
+consumer_title_aliases_json = {}
 max_fetch_points_per_series = 28000
 ```
 
 Behalte `metric_prefix = evcc`. Die Dashboards erwarten Produktions-Rollups wie `evcc_pv_energy_daily_wh`.
+
+### Historische EXT-Verbraucher Als Consumer Fortfuehren
+
+Wenn ein Endverbraucher frueher als `ext` lief und nun unter demselben EVCC-`title` als `consumer` konfiguriert ist, trage nur diese Titel in `consumer_legacy_ext_regex` ein:
+
+```ini
+consumer_legacy_ext_regex = ^(Spuelmaschine|Waschmaschine)$
+```
+
+Der Rollup fuehrt dann die alte EXT-Leistung und die neue Consumer-Leistung unter `evcc_consumer_energy_daily_wh` fort. Bei zeitlicher Ueberlappung gewinnt der Consumer-Wert pro Messintervall; der zugeordnete Titel wird gleichzeitig aus `evcc_ext_energy_daily_wh` entfernt. Verteiler- und Summenzaehler duerfen nicht in diesen Regex aufgenommen werden.
+
+Wurde ein Consumer-Titel korrigiert oder umbenannt, kann `consumer_title_aliases_json` alte und neue Schreibweisen vor der Tagesintegration zusammenführen. Beispiel: `{"Trocker":"Trockner"}`. Der aktuelle Zieltitel hat bei zeitlicher Überlappung Vorrang. Berechne auch nach einer Titelumbenennung den vollständigen betroffenen Zeitraum neu.
+
+Nach einer Umstellung muss der gesamte betroffene Zeitraum neu berechnet werden. `--replace-range --write` darf dafuer nur verwendet werden, wenn fuer jeden betroffenen Tag die vollstaendige Rohdatenhistorie aller neu zu berechnenden Metrikfamilien in der Ziel-VM vorhanden ist. Der Schalter loescht vorhandene Rollup-Reihen im Zeitraum vor der Neuberechnung; fehlen alte Rohdaten, gehen dadurch nicht rekonstruierbare historische Rollups verloren.
+
+Enthaelt eine Testkopie oder Teilmigration historische Rollups, aber nur aktuelle Rohdaten, darf weder `--replace-range` noch ein additiver Voll-Backfill ueber den Gesamtzeitraum laufen. Ein additiver Voll-Backfill kann fachlich gleiche Tageswerte mit einem zweiten Tageszeitstempel schreiben und Monats- oder Jahressummen dadurch verdoppeln. Erzeuge in diesem Sonderfall ausschliesslich die fehlenden Consumer-Reihen in einer isolierten Wegwerf-VM oder transformiere die konkret zugeordneten alten EXT-Rollup-Reihen mit einem eindeutigen tagweisen Cutover. Importiere danach nur diese Consumer-Reihen in die Zielkopie. Pruefe abschliessend mit `check_data.py --phase full`, dass jeder Labelsatz hoechstens ein Sample pro lokalem Tag besitzt. Ein Lauf nur fuer den Vortag kann die alte EXT-Historie nicht rueckwirkend umordnen.
 
 ## 7. Rollup-Plan pruefen
 
@@ -237,7 +257,7 @@ python3 evcc-vm-rollup.py --config /etc/evcc-vm-rollup.conf benchmark
 
 Erwartetes Ergebnis:
 
-- `detect` findet deine Ladepunkte, Fahrzeuge und optionalen EXT-/AUX-Titel.
+- `detect` findet deine Ladepunkte, Fahrzeuge, Consumer-, EXT- und AUX-Titel sowie die per Regex als historische Consumer zugeordneten EXT-Titel.
 - `plan` listet die zu erzeugenden taeglichen `evcc_*` Rollups.
 - `benchmark` kann repraesentative Rohdaten ohne Timeouts abfragen.
 

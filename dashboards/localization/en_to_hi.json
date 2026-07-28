@@ -436,7 +436,8 @@
     "VRM battery": "VRM बैटरी",
     "VRM charge": "VRM चार्ज",
     "VRM discharge": "VRM डिस्चार्ज",
-    "VRM efficiency": "VRM दक्षता"
+    "VRM efficiency": "VRM दक्षता",
+    "Meter overlap": "मीटर ओवरलैप"
   },
   "Heat pump source mix": "हीट पंप ऊर्जा स्रोत मिश्रण",
   "Heat pump title match": "हीट पंप शीर्षक मिलान",

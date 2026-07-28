@@ -177,8 +177,8 @@ For PV devices, prefer `title` as the stable business key. EVCC can renumber PV 
 
 If Grafana finds raw data but individual detail panels look empty, duplicated, or wrongly grouped, check the EVCC business labels first. Common symptoms are:
 
-- PV, battery, AUX, or EXT details show only `Total` or unexpected names.
-- Home consumption or consumer shares look too high because AUX/EXT meters are not filtered as intended.
+- PV, battery, Consumer, AUX, or EXT details show only `Total` or unexpected names.
+- Home consumption or consumer shares look too high because Consumer, AUX, or EXT meters are not filtered as intended.
 - Loadpoints or vehicles are missing because `loadpoint` or `vehicle` is not present as a label.
 - A heat pump appears as a normal loadpoint or vehicle consumer instead of the expected group.
 
@@ -187,6 +187,11 @@ Check the series directly in VictoriaMetrics:
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=consumersPower_value' \
   --data-urlencode 'start=now-24h' \
   --data-urlencode 'end=now'
 
@@ -208,15 +213,18 @@ curl -fsG 'http://localhost:8428/api/v1/series' \
 
 Important points:
 
-- `title` is the most important display name for PV, battery, AUX, and EXT devices.
+- `title` is the most important display name for PV, battery, Consumer, AUX, and EXT devices.
 - `loadpoint` separates loadpoints.
 - `vehicle` separates vehicles.
-- Missing AUX/EXT series are not an error when EVCC does not write such meters.
+- Missing Consumer, AUX, or EXT series are not an error when EVCC does not write such meters.
 - Fix EVCC first when a name is wrong. New samples will then arrive correctly; historical values can be adjusted with `vm-rewrite-label-value.py` if needed.
+
+Starting with version 0.309.2, EVCC writes dedicated consumers as `consumersPower`. Historical devices that previously ran as additional meters under `extPower` are not renamed automatically. For a role change with an unchanged `title`, set `consumer_legacy_ext_regex` in the rollup configuration and recalculate the complete affected period with `--replace-range --write`. Consumer wins per sampling interval during overlap, and the mapped legacy title is not also written as an EXT rollup.
 
 Dashboard blocklists only filter the dashboard view and do not delete data. Put them into `vm-dashboard-install.env`; the deployer applies them during dashboard import:
 
 ```env
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
@@ -226,6 +234,25 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 `^none$` is the safe value for "filter nothing" because normal EVCC names should not match it. Quote regexes that contain `|`, spaces, or special characters. After changing a blocklist, redeploy the dashboards; no data migration is required for that.
 
+### Excluding Sum And Parent Meters From Home Attribution
+
+The Consumer and AUX blocklists apply to visible consumer series and to `Other`. EXT is intentionally separate: `extBlocklist` filters only the `Additional meters` tab, and EXT values are neither subtracted from home consumption nor summed as end consumers. No blocklist deletes VictoriaMetrics data.
+
+Concrete use case: A sum meter and its child meters must not contribute to home attribution at the same time. Typical overlapping hierarchies include:
+
+- **Distribution hierarchy:** `Main Distribution` > `Ground Floor Distribution` > `Office` and `Cinema`.
+- **UPS hierarchy:** `UPS` > `Rack Cooler` and `Rack Fans`.
+- **Laundry hierarchy:** `Laundry` > `Washing Machine` and `Dryer`.
+
+Choose exactly one non-overlapping level per hierarchy. If, for example, the sum meters are written under EXT and only the child meters should remain visible, the configuration can look like this:
+
+```env
+DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Main.*|^Ground Floor Distribution$|^UPS$|^Laundry$"
+```
+
+Always adapt the regex to the actual EVCC `title` values and the Consumer, EXT, or AUX roles. A filtered Consumer or AUX meter disappears from both the legend and home attribution. A filtered EXT meter disappears only from the separate additional-meter view. Historical merging of an identical EXT/Consumer `title` is handled by the rollup through `consumer_legacy_ext_regex`.
+
+`Other` intentionally remains the difference between `homePower` and all included detail meters. It can therefore contain real conversion and distribution losses as well as loads without a dedicated meter, such as microinverter losses or a load connected to the wallbox feeder rather than to a wallbox itself. If the detail meters remaining after the blocklists exceed home consumption, the dashboard shows the red `Meter overlap` diagnostic; check the hierarchy, sign, and meter assignment in that case.
 
 ## Forecast Panel Is Empty
 

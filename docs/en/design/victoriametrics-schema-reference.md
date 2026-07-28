@@ -153,6 +153,7 @@ These raw metrics feed the long-range rollups:
 | `pvPower_value` | PV power | PV daily energy |
 | `homePower_value` | Home power | Home daily energy, no-PV baseline |
 | `chargePower_value` | Charging power | Loadpoint energy, vehicle energy, vehicle cost |
+| `consumersPower_value` | Regular EVCC consumer power | Consumption breakdown starting with EVCC 0.309.2 |
 | `extPower_value` | External meter power | Meter-side home breakdown |
 | `auxPower_value` | Auxiliary meter power | Auxiliary meter breakdown |
 | `gridPower_value` | Grid power | Grid export energy, dynamic price weighting |
@@ -174,6 +175,8 @@ These raw metrics are also in active use:
 | `greenShareHome_value` | EVCC green share for home consumption as ratio `0..1` | KPI gauges/history in `Today*`, daily rollup for long-range KPI panels |
 
 Note: `tariffSolar_value` is optional and exists only when EVCC itself has a solar forecast configured. `greenShareHome_value` is optional and exists only when EVCC writes the green-share KPI. The dashboards do not call Forecast.Solar, Solcast, Open-Meteo, or external green-share services directly; they only display samples written by EVCC.
+
+Starting with version 0.309.2, EVCC distinguishes regular consumers (`consumer`), self-regulating consumers (`aux`), and additional meters (`ext`). The EVCC Influx writer emits the `consumersPower` measurement for regular consumers; after import into VictoriaMetrics the raw metric is `consumersPower_value`. After a later role change, `consumer_legacy_ext_regex` can include legacy EXT power under the same `title` in Consumer rollups. Consumer wins during overlap, and the mapped title is excluded from EXT rollups.
 
 ### EVCC Green Share
 
@@ -200,6 +203,7 @@ The production prefix is currently `evcc`.
 | `evcc_loadpoint_energy_daily_wh` | `local_year`, `local_month`, `loadpoint` | Daily charging energy per loadpoint |
 | `evcc_vehicle_energy_daily_wh` | `local_year`, `local_month`, `vehicle` | Daily charging energy per vehicle |
 | `evcc_vehicle_distance_daily_km` | `local_year`, `local_month`, `vehicle` | Daily driven distance per vehicle |
+| `evcc_consumer_energy_daily_wh` | `local_year`, `local_month`, `title` | Daily energy per regular EVCC consumer |
 | `evcc_ext_energy_daily_wh` | `local_year`, `local_month`, `title` | Daily energy per external meter title |
 | `evcc_aux_energy_daily_wh` | `local_year`, `local_month`, `title` | Daily energy per auxiliary meter title |
 | `evcc_battery_soc_daily_min_pct` | `local_year`, `local_month` | Minimum daily battery SOC |
@@ -209,6 +213,8 @@ The production prefix is currently `evcc`.
 | `evcc_battery_charge_daily_wh` | `local_year`, `local_month` | Daily battery charge energy |
 | `evcc_battery_discharge_daily_wh` | `local_year`, `local_month` | Daily battery discharge energy |
 | `evcc_green_share_home_daily_ratio` | `local_year`, `local_month` | Daily mean EVCC green share for home consumption, ratio `0..1` |
+
+The optional source-attribution path also writes `evcc_consumer_energy_from_pv_daily_wh`, `evcc_consumer_energy_from_battery_daily_wh`, and `evcc_consumer_energy_from_grid_daily_wh`, each labeled by `title`.
 
 ### Daily finance and price baselines
 
@@ -358,6 +364,7 @@ to keep queries readable and to avoid repeated inline timezone guards.
 The schema itself carries business dimensions, and the dashboards apply blocklists on top:
 
 - `loadpointBlocklist`
+- `consumerBlocklist`
 - `extBlocklist`
 - `auxBlocklist`
 - `vehicleBlocklist`

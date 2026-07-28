@@ -179,8 +179,8 @@ Fuer PV-Geraete ist `title` normalerweise der stabilere Fachschluessel. EVCC kan
 
 Wenn Grafana zwar Rohdaten findet, aber einzelne Detailpanels leer, doppelt oder falsch gruppiert wirken, pruefe zuerst die EVCC-Fachlabels. Typische Symptome sind:
 
-- PV-, Batterie-, AUX- oder EXT-Details zeigen nur `Gesamt` oder unerwartete Namen.
-- Hausverbrauch oder Verbraucheranteile wirken zu hoch, weil AUX-/EXT-Meter nicht passend gefiltert werden.
+- PV-, Batterie-, Consumer-, AUX- oder EXT-Details zeigen nur `Gesamt` oder unerwartete Namen.
+- Hausverbrauch oder Verbraucheranteile wirken zu hoch, weil Consumer-, AUX- oder EXT-Meter nicht passend gefiltert werden.
 - Ladepunkte oder Fahrzeuge fehlen, weil `loadpoint` oder `vehicle` nicht als Label vorhanden ist.
 - Eine Waermepumpe erscheint als normaler Ladepunkt oder Fahrzeugverbrauch statt in der erwarteten Gruppe.
 
@@ -189,6 +189,11 @@ Pruefe die Serien direkt in VictoriaMetrics:
 ```bash
 curl -fsG 'http://localhost:8428/api/v1/series' \
   --data-urlencode 'match[]=pvPower_value' \
+  --data-urlencode 'start=now-24h' \
+  --data-urlencode 'end=now'
+
+curl -fsG 'http://localhost:8428/api/v1/series' \
+  --data-urlencode 'match[]=consumersPower_value' \
   --data-urlencode 'start=now-24h' \
   --data-urlencode 'end=now'
 
@@ -210,15 +215,18 @@ curl -fsG 'http://localhost:8428/api/v1/series' \
 
 Wichtig:
 
-- `title` ist fuer PV-, Batterie-, AUX- und EXT-Geraete der wichtigste Anzeigename.
+- `title` ist fuer PV-, Batterie-, Consumer-, AUX- und EXT-Geraete der wichtigste Anzeigename.
 - `loadpoint` trennt Ladepunkte.
 - `vehicle` trennt Fahrzeuge.
-- Fehlende AUX-/EXT-Serien sind kein Fehler, wenn EVCC keine solchen Meter schreibt.
+- Fehlende Consumer-, AUX- oder EXT-Serien sind kein Fehler, wenn EVCC keine solchen Meter schreibt.
 - Aendere zuerst EVCC, wenn ein Name falsch ist. Danach kommen neue Messwerte korrekt an; historische Werte koennen bei Bedarf mit `vm-rewrite-label-value.py` nachgezogen werden.
+
+EVCC schreibt ab Version 0.309.2 echte Verbraucher als `consumersPower`. Historische Geraete, die vorher als zusaetzliche Zaehler unter `extPower` liefen, werden dadurch nicht automatisch umbenannt. Setze fuer einen Rollenwechsel mit unveraendertem `title` im Rollup `consumer_legacy_ext_regex` und berechne den kompletten betroffenen Zeitraum mit `--replace-range --write` neu. Consumer gewinnt bei Ueberlappung pro Messintervall; der zugeordnete Alt-Titel wird nicht zusaetzlich als EXT-Rollup geschrieben.
 
 Dashboard-Blocklists filtern nur die Anzeige und loeschen keine Daten. Sie gehoeren in `vm-dashboard-install.env` und werden beim Dashboard-Deployment uebernommen:
 
 ```env
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
@@ -228,6 +236,25 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 `^none$` ist der sichere Wert fuer "nichts filtern", weil normale EVCC-Namen dadurch nicht matchen. Wenn du Regexes mit `|`, Leerzeichen oder Sonderzeichen nutzt, setze sie in Anfuehrungszeichen. Nach einer Blocklist-Aenderung reicht ein erneutes Dashboard-Deployment; Daten muessen dafuer nicht migriert werden.
 
+### Summen- und Elternzaehler aus der Hausaufteilung entfernen
+
+Die Consumer- und AUX-Blocklists gelten fuer die sichtbaren Verbrauchsreihen und fuer `Sonstiges`. EXT ist fachlich getrennt: `extBlocklist` filtert nur den Tab `Zusaetzliche Zaehler`, und EXT-Werte werden weder vom Hausverbrauch abgezogen noch als Endverbraucher summiert. Keine Blocklist loescht Daten aus VictoriaMetrics.
+
+Konkreter Anwendungsfall: Ein Summenzaehler und seine Unterzaehler duerfen nicht gleichzeitig in die Hausaufteilung eingehen. Typische ueberlappende Hierarchien sind:
+
+- **Verteilerhierarchie:** `Haupt-Verteiler` > `EG-Verteiler` > `Buero` und `Kino`.
+- **USV-Hierarchie:** `USV` > `Rack Kuehler` und `Rack Luefter`.
+- **Waschraum-Hierarchie:** `Waschraum` > `Waschmaschine` und `Trockner`.
+
+Waehle pro Hierarchie genau eine nicht ueberlappende Ebene. Wenn beispielsweise die Summenzaehler unter EXT geschrieben werden und nur die Unterzaehler sichtbar bleiben sollen, kann die Konfiguration so aussehen:
+
+```env
+DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*|^EG-Verteiler$|^USV$|^Waschraum$"
+```
+
+Passe die Regex immer an die tatsaechlichen EVCC-`title`-Werte und die Rollen Consumer, EXT oder AUX an. Ein gefilterter Consumer- oder AUX-Zaehler verschwindet aus Legende und Hausaufteilung. Ein gefilterter EXT-Zaehler verschwindet nur aus der getrennten Zusatzzaehleransicht. Die historische Zusammenfuehrung eines identischen EXT-/Consumer-`title` erfolgt im Rollup ueber `consumer_legacy_ext_regex`.
+
+`Sonstiges` bleibt bewusst die Differenz zwischen `homePower` und allen einbezogenen Detailzaehlern. Darin koennen deshalb reale Umwandlungs- und Verteilverluste sowie nicht separat gemessene Verbraucher enthalten sein, zum Beispiel MPII-Verluste oder ein Verbraucher am Wallbox-Zuleitungszweig. Uebersteigen die nach den Blocklists verbleibenden Detailzaehler den Hausverbrauch, zeigt das Dashboard die rote Diagnose `Zaehlerueberlappung`; dann sind Hierarchie, Vorzeichen oder Messpunktzuordnung zu pruefen.
 
 ## Forecast-Panel ist leer
 

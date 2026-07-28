@@ -76,6 +76,7 @@ DASHBOARD_FUEL_COST_PER_L=1.75
 DASHBOARD_STORAGE_CAPACITY_WH=9500
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -84,6 +85,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 # DASHBOARD_PORTAL_TITLE=Portal
 # DASHBOARD_PORTAL_URL=https://example.invalid/portal
 ```
+
+Summen- oder Elternzaehler lassen sich mit der Blocklist ihrer Consumer-, EXT- oder AUX-Rolle aus Anzeige und `Sonstiges` entfernen. Verwende je Messhierarchie nur eine Ebene; ein konkretes Beispiel steht unter [Summen- und Elternzaehler aus der Hausaufteilung entfernen](./migration-troubleshooting.md#summen--und-elternzaehler-aus-der-hausaufteilung-entfernen).
 
 Die vollstaendige Liste steht in [vm-dashboard-install.md](./vm-dashboard-install.md) und in `vm-dashboard-install.env.example`. Jeder Env-Key darf nur einmal aktiv gesetzt sein; doppelte Keys werden abgelehnt.
 

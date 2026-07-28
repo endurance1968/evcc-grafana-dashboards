@@ -24,8 +24,8 @@ from zoneinfo import ZoneInfo
 
 
 SCRIPT_NAME = "rollup-e2e.py"
-SCRIPT_VERSION = "2026.07.26.1"
-SCRIPT_LAST_MODIFIED = "2026-07-26"
+SCRIPT_VERSION = "2026.07.27.1"
+SCRIPT_LAST_MODIFIED = "2026-07-27"
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROLLUP_SCRIPT = REPO_ROOT / "scripts" / "rollup" / "evcc-vm-rollup.py"
@@ -314,12 +314,25 @@ def fixture_timestamps(start_day: str, days: int, tz_name: str) -> list[int]:
 def build_fixture_series(args: argparse.Namespace) -> list[Series]:
     timestamps = fixture_timestamps(args.start_day, 2, args.timezone)
     common = {"e2e_fixture": FIXTURE_LABEL}
+    migration_cutover = 12
+    legacy_consumer_timestamps = timestamps[: migration_cutover + 1]
+    current_consumer_timestamps = timestamps[migration_cutover:]
     return [
         Series({"__name__": "pvPower_value", **common}, [1000.0] * len(timestamps), timestamps),
         Series({"__name__": "homePower_value", **common}, [500.0] * len(timestamps), timestamps),
         Series({"__name__": "gridPower_value", **common}, [250.0] * len(timestamps), timestamps),
         Series({"__name__": "chargePower_value", "loadpoint": "LP1", **common}, [100.0] * len(timestamps), timestamps),
         Series({"__name__": "extPower_value", "title": "Lab", **common}, [50.0] * len(timestamps), timestamps),
+        Series(
+            {"__name__": "extPower_value", "title": "Office", **common},
+            [75.0] * len(legacy_consumer_timestamps),
+            legacy_consumer_timestamps,
+        ),
+        Series(
+            {"__name__": "consumersPower_value", "title": "Office", **common},
+            [75.0] * len(current_consumer_timestamps),
+            current_consumer_timestamps,
+        ),
         Series({"__name__": "tariffGrid_value", **common}, [0.30] * len(timestamps), timestamps),
         Series({"__name__": "tariffFeedIn_value", **common}, [0.08] * len(timestamps), timestamps),
     ]
@@ -359,6 +372,7 @@ def write_config(base_url: str, args: argparse.Namespace, directory: Path) -> Pa
         "raw_sample_step": "1h",
         "energy_rollup_step": "1h",
         "price_bucket_minutes": "60",
+        "consumer_legacy_ext_regex": "^Office$",
         "max_fetch_points_per_series": "50000",
     }
     config["benchmark"] = {
@@ -440,12 +454,20 @@ def validate_rollup_values(base_url: str, args: argparse.Namespace) -> dict[str,
         f"{ROLLUP_PREFIX}_grid_import_daily_wh": 6000.0,
         f"{ROLLUP_PREFIX}_loadpoint_energy_daily_wh": 2400.0,
         f"{ROLLUP_PREFIX}_ext_energy_daily_wh": 1200.0,
+        f"{ROLLUP_PREFIX}_consumer_energy_daily_wh": 1800.0,
         f"{ROLLUP_PREFIX}_grid_import_cost_daily_eur": 1.8,
         f"{ROLLUP_PREFIX}_grid_import_price_avg_daily_ct_per_kwh": 30.0,
         f"{ROLLUP_PREFIX}_grid_import_price_effective_daily_ct_per_kwh": 30.0,
         f"{ROLLUP_PREFIX}_grid_import_price_min_daily_ct_per_kwh": 30.0,
         f"{ROLLUP_PREFIX}_grid_import_price_max_daily_ct_per_kwh": 30.0,
     }
+    if any(
+        row.get("metric", {}).get("__name__") == f"{ROLLUP_PREFIX}_ext_energy_daily_wh"
+        and row.get("metric", {}).get("title") == "Office"
+        for row in rows
+    ):
+        raise AssertionError("Migrated EXT title Office must not remain in EXT rollups")
+
     required_values: dict[str, list[tuple[int, float]]] = {}
     for metric, expected in required.items():
         samples = sorted(metric_values.get(metric, []))

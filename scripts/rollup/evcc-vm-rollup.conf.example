@@ -6,6 +6,10 @@ metric_prefix = test_evcc
 raw_sample_step = 10s
 energy_rollup_step = 60s
 price_bucket_minutes = 15
+# Regex for former EXT titles that continue under the same Consumer title. Consumer wins on overlap.
+consumer_legacy_ext_regex = ^$
+# Optional JSON aliases for renamed Consumer titles, for example {"Old title":"Current title"}.
+consumer_title_aliases_json = {}
 
 [benchmark]
 start = 2026-02-20T00:00:00Z

@@ -436,7 +436,8 @@
     "VRM battery": "Batería VRM",
     "VRM charge": "Carga VRM",
     "VRM discharge": "Descarga VRM",
-    "VRM efficiency": "Eficiencia VRM"
+    "VRM efficiency": "Eficiencia VRM",
+    "Meter overlap": "Solapamiento de contadores"
   },
   "Heat pump source mix": "Mezcla de fuentes de la bomba de calor",
   "Heat pump title match": "Coincidencia de título de bomba de calor",

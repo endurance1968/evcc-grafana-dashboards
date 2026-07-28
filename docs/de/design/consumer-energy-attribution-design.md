@@ -152,6 +152,12 @@ Das bedeutet:
 - `evcc_ext_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
 - `evcc_ext_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
 
+### Regulaere EVCC-Verbraucher
+
+- `evcc_consumer_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_consumer_energy_from_battery_daily_wh{local_year="...",local_month="...",title="..."}`
+- `evcc_consumer_energy_from_grid_daily_wh{local_year="...",local_month="...",title="..."}`
+
 ### Auxiliary-Zaehler
 
 - `evcc_aux_energy_from_pv_daily_wh{local_year="...",local_month="...",title="..."}`
@@ -174,6 +180,7 @@ Sie sind nuetzlich, wenn ein spaeteres Panel erklaeren soll, wie viel der gesamt
 Pro Bucket nur positiven Bedarf verwenden:
 
 - `chargePower_value` pro `loadpoint`
+- `consumersPower_value` pro `title`
 - `extPower_value` pro `title`
 - `auxPower_value` pro `title`
 

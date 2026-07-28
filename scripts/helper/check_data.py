@@ -23,12 +23,13 @@ import sys
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from typing import Dict, List, Sequence
+from typing import Dict, Iterator, List, Sequence
+from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "check_data.py"
-SCRIPT_VERSION = "2026.04.09.1"
-SCRIPT_LAST_MODIFIED = "2026-04-09"
+SCRIPT_VERSION = "2026.07.27.2"
+SCRIPT_LAST_MODIFIED = "2026-07-27"
 
 
 def iso_z(value: dt.datetime) -> str:
@@ -119,6 +120,16 @@ FEATURES: Dict[str, Dict[str, object]] = {
             MetricCheck("evcc_aux_energy_from_grid_daily_wh", "warning", "Consumer attribution for AUX uses this."),
         ],
     },
+    "consumer": {
+        "detect": ["consumersPower_value"],
+        "raw": [MetricCheck("consumersPower_value", "warning", "Today detail dashboard can show EVCC consumers.")],
+        "rollups": [
+            MetricCheck("evcc_consumer_energy_daily_wh", "warning", "Month/Year panels use consumer daily energy."),
+            MetricCheck("evcc_consumer_energy_from_pv_daily_wh", "warning", "Consumer attribution uses this PV share."),
+            MetricCheck("evcc_consumer_energy_from_battery_daily_wh", "warning", "Consumer attribution uses this battery share."),
+            MetricCheck("evcc_consumer_energy_from_grid_daily_wh", "warning", "Consumer attribution uses this grid share."),
+        ],
+    },
     "tariffs": {
         "detect": ["tariffGrid_value", "tariffSolar_value", "tariffFeedIn_value", "tariffCo2_value"],
         "raw": [
@@ -160,6 +171,8 @@ CORE_RAW: Sequence[MetricCheck] = (
     MetricCheck("homePower_value", "critical", "Today dashboard needs home power."),
 )
 
+DAILY_ROLLUP_MATCHER = '{__name__=~"evcc_.*_daily_.*"}'
+
 CORE_ROLLUPS: Sequence[MetricCheck] = (
     MetricCheck("evcc_pv_energy_daily_wh", "critical", "Month/Year/All-time need PV daily energy."),
     MetricCheck("evcc_grid_import_daily_wh", "critical", "Month/Year/All-time need grid import daily energy."),
@@ -180,6 +193,62 @@ def build_matcher_url(base_url: str, matcher: str, start: str, end: str) -> str:
     params = urllib.parse.urlencode({"match[]": matcher, "start": start, "end": end})
     return f"{base_url.rstrip('/')}/api/v1/series?{params}"
 
+
+def build_export_url(base_url: str, matcher: str, start: str, end: str) -> str:
+    params = urllib.parse.urlencode({"match[]": matcher, "start": start, "end": end})
+    return f"{base_url.rstrip('/')}/api/v1/export?{params}"
+
+
+def export_lines(base_url: str, matcher: str, start: str, end: str) -> Iterator[str]:
+    request = urllib.request.Request(
+        build_export_url(base_url, matcher, start, end),
+        headers={"Accept": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=60) as response:
+        for raw_line in response:
+            line = raw_line.decode("utf-8").strip()
+            if line:
+                yield line
+
+
+def daily_rollup_duplicate_days(
+    base_url: str,
+    start: str,
+    end: str,
+    timezone_name: str,
+) -> dict:
+    timezone = ZoneInfo(timezone_name)
+    counts: Dict[tuple, int] = {}
+    labels_by_series: Dict[tuple, Dict[str, str]] = {}
+
+    for line in export_lines(base_url, DAILY_ROLLUP_MATCHER, start, end):
+        row = json.loads(line)
+        metric = {str(key): str(value) for key, value in (row.get("metric") or {}).items()}
+        series_key = tuple(sorted(metric.items()))
+        labels_by_series[series_key] = metric
+        for timestamp in row.get("timestamps") or []:
+            local_day = dt.datetime.fromtimestamp(int(timestamp) / 1000, tz=UTC).astimezone(timezone).date().isoformat()
+            key = (series_key, local_day)
+            counts[key] = counts.get(key, 0) + 1
+
+    duplicates = [(series_key, day, count) for (series_key, day), count in counts.items() if count > 1]
+    duplicates.sort(key=lambda item: (dict(item[0]).get("__name__", ""), dict(item[0]).get("title", ""), item[1]))
+    examples = []
+    for series_key, day, count in duplicates[:10]:
+        labels = labels_by_series[series_key]
+        examples.append(
+            {
+                "metric": labels.get("__name__", ""),
+                "title": labels.get("title", ""),
+                "day": day,
+                "samples": count,
+            }
+        )
+    return {
+        "duplicate_series_days": len(duplicates),
+        "duplicate_samples": sum(count - 1 for _series_key, _day, count in duplicates),
+        "examples": examples,
+    }
 
 def build_series_url(base_url: str, metric: str, start: str, end: str) -> str:
     return build_matcher_url(base_url, metric, start, end)
@@ -264,6 +333,7 @@ def main() -> int:
     )
     parser.add_argument("--raw-hours", type=int, default=48, help="recent window for raw metric checks")
     parser.add_argument("--rollup-days", type=int, default=90, help="recent window for daily rollup checks")
+    parser.add_argument("--timezone", default="Europe/Berlin", help="local timezone for daily rollup uniqueness checks")
     parser.add_argument("--feature-lookback-days", type=int, default=3650, help="lookback window to detect optional features")
     parser.add_argument("--end-time", help="override logical end time in RFC3339 (default: now)")
     parser.add_argument(
@@ -352,6 +422,44 @@ def main() -> int:
             "skipped_reason": "rollup phase not active yet" if args.phase == "auto" and not detected_rollup_presence else f"phase={effective_phase}",
         })
 
+    if effective_phase in {"rollup", "full"}:
+        uniqueness = daily_rollup_duplicate_days(args.base_url, rollup_start, end, args.timezone)
+        duplicate_count = int(uniqueness["duplicate_series_days"])
+        examples = uniqueness["examples"]
+        example_text = ""
+        if examples:
+            example_text = " Examples: " + ", ".join(
+                f"{item['metric']}[{item['title'] or '-'}] {item['day']}={item['samples']}"
+                for item in examples[:3]
+            )
+        sections.append(
+            {
+                "title": "Daily rollup uniqueness",
+                "items": [
+                    {
+                        "metric": DAILY_ROLLUP_MATCHER,
+                        "level": "CRITICAL" if duplicate_count else "OK",
+                        "series": duplicate_count,
+                        "duplicate_samples": uniqueness["duplicate_samples"],
+                        "examples": examples,
+                        "reason": (
+                            f"Found {duplicate_count} label/day combinations with multiple samples."
+                            if duplicate_count
+                            else "Every checked daily rollup label set has at most one sample per local day."
+                        )
+                        + example_text,
+                    }
+                ],
+            }
+        )
+    else:
+        sections.append(
+            {
+                "title": "Daily rollup uniqueness",
+                "items": [],
+                "skipped_reason": f"phase={effective_phase}",
+            }
+        )
     cleanup_items = [
         {
             "metric": host_matcher,

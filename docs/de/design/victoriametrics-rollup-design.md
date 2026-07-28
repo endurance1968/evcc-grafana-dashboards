@@ -85,6 +85,7 @@ Beispiele:
 - `evcc_loadpoint_energy_daily_wh{loadpoint="..."}`
 - `evcc_vehicle_energy_daily_wh{vehicle="..."}`
 - `evcc_vehicle_distance_daily_km{vehicle="..."}`
+- `evcc_consumer_energy_daily_wh{title="..."}`
 - `evcc_ext_energy_daily_wh{title="..."}`
 - `evcc_aux_energy_daily_wh{title="..."}`
 - `evcc_battery_soc_daily_min_pct`
@@ -153,23 +154,27 @@ Warum:
 
 Die Influx-Legacy-Dashboards bleiben nur als statische deutsche Referenz-JSON erhalten. VM-Dashboards sollten ihre Struktur nicht blind kopieren.
 
+## Performance- und Scheduler-Validierung
+
+Der Release-Kandidat wurde am 2026-07-28 in einer isolierten VictoriaMetrics-Kopie mit vollstaendigen read-only Live-Rohdaten von 2025-01-01 bis 2026-07-27 geprüft:
+
+- Der Voll-Backfill verarbeitete 573 Tage, 36.625 Samples und 1.388 Serien in 210,606 Sekunden bei 1.264 MB Python-Spitzenspeicher.
+- Die Consumer-Quellenzuordnung war mit 90,737 Sekunden beziehungsweise 43,08% die langsamste Familie; die Fahrzeugkosten folgten mit 68,47 Sekunden.
+- Eine fachlich korrekte Python-Matrix-Kanonisierung wurde verworfen, weil sie 258,392 Sekunden und 1.751 MB benötigte. Die endgültige Query-Kanonisierung spart gegenüber diesem Zwischenstand rund 18% Laufzeit und 28% Speicher.
+- Ein Juli-Ersatzlauf mit 27 Tagen lief in etwa 13 Sekunden. Dieser Monatsbereich entspricht dem normalen Scheduler-Pfad wesentlich besser als der einmalige Voll-Backfill.
+- Weitere Parallelisierung oder zusätzliche Caches sind kein Release-Gate: Der tägliche Lauf bleibt kurz, und zusätzliche Nebenläufigkeit würde Locking, Reihenfolge und Reproduzierbarkeit unnötig riskieren.
+
+Der Scheduler bleibt bei `--replace-range --write` und darf standardmaessig nur abgeschlossene Tage verarbeiten. Ein gleichzeitig gestarteter zweiter Schreiblauf wurde im Livecopy-Test durch die Lock-Datei abgewiesen. Der Voll-Backfill meldete zwei ignorierte Counter-Resets, keine Leistungsspitzen und 9.910 fehlende Energie-Buckets. Die anschliessende Datenpruefung fand keine doppelten Label-/Tageskombinationen.
+
 ## Bekannte offene Punkte
 
-Diese Punkte sind bewusst aus dem ersten sicheren Rollout verschoben:
+- Eine optionale monatliche Rollup-Schicht wird erst nach einem erneut gemessenen Dashboard-Flaschenhals eingefuehrt.
+- Weitere Performance-Arbeit beginnt nur mit einem reproduzierbaren Profil, das den normalen Scheduler-Zeitraum und die Zielhardware abbildet.
 
-- optionale monatliche Rollup-Schicht
-- weitere gemessene Performance-Optimierung ueber den aktuellen chunked fetch path hinaus
+## Verbraucher-Quellenzuordnung
 
-## Zukuenftige Erweiterung: Verbraucher-Quellenzuordnung
+Die Quellenzuordnung fuer Consumer, AUX, EXT und Ladepunkte ist implementiert. Sie teilt die modellierte Tagesenergie in `PV`, `Battery` und `Grid` auf und verwendet 60-Sekunden-Buckets. Historische EXT-Verbraucher koennen per `consumer_legacy_ext_regex` fortgefuehrt werden; `consumer_title_aliases_json` vereinheitlicht umbenannte Consumer-Titel vor der Tagesintegration.
 
-Fuer ein spaeteres Dashboard-Feature, das jaehrliche oder monatliche Verbraucherenergie nach folgenden Quellen aufteilen soll:
-
-- `PV`
-- `Battery`
-- `Grid`
-
-gibt es eine eigene Designnotiz:
+Die fachlichen Grenzen und Bilanzregeln stehen in:
 
 - [Consumer Energy Attribution Design](./consumer-energy-attribution-design.md)
-
-Diese Erweiterung ist absichtlich vom aktuellen Baseline-Rollup-Umfang getrennt, weil sie modellierte Quellenzuordnung pro Verbrauchergruppe hinzufuegt.

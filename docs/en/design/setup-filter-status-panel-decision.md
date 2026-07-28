@@ -9,7 +9,7 @@ No permanently visible setup or filter status panel will be added to the standar
 The important deploy and filter values remain inspectable through these paths:
 
 - `Build` variable in the dashboard header: shows deployment timestamp, language/variant, and source ref in the tooltip.
-- Dashboard variables in Grafana: show effective values such as `peakPowerLimit`, `energySampleInterval`, `tariffPriceInterval`, `loadpointBlocklist`, `extBlocklist`, `auxBlocklist`, `vehicleBlocklist`, and `heatPumpLoadpointRegex`.
+- Dashboard variables in Grafana: show effective values such as `peakPowerLimit`, `energySampleInterval`, `tariffPriceInterval`, `loadpointBlocklist`, `consumerBlocklist`, `extBlocklist`, `auxBlocklist`, `vehicleBlocklist`, and `heatPumpLoadpointRegex`.
 - `vm-dashboard-install.env`: remains the leading configuration source for deploy overrides.
 - Troubleshooting docs: explain how to check EVCC labels and blocklists.
 

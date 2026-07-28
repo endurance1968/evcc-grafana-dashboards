@@ -43,6 +43,7 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] `DASHBOARD_TARIFF_PRICE_INTERVAL`
 - [x] `DASHBOARD_INSTALLED_WATT_PEAK`
 - [x] `DASHBOARD_FILTER_LOADPOINT_BLOCKLIST`
+- [x] `DASHBOARD_FILTER_CONSUMER_BLOCKLIST`
 - [x] `DASHBOARD_FILTER_EXT_BLOCKLIST`
 - [x] `DASHBOARD_FILTER_AUX_BLOCKLIST`
 - [x] `DASHBOARD_FILTER_VEHICLE_BLOCKLIST`
@@ -60,6 +61,9 @@ Use it as a release gate. If one of the items below is still open, the release s
 - [x] Dashboard links between `Today`, `Month`, `Year`, and `All-time` work as intended
 - [x] `Year`, `Previous year`, and `2 years ago` behave consistently with the intended time semantics
 - [x] Units, decimals, background styling, and panel layout are visually consistent
+- [x] The current release candidate was rendered in disposable Grafana against the read-only live VM with the actual deploy overrides and blocklists; fixture data alone is insufficient.
+- [x] Every new optional feature in release scope has matching live metrics and a visible end-user check. If the live metric is absent, the feature is explicitly reported as fixture-tested only and not live-validated.
+- [x] Consumer, AUX, and EXT sums were checked for parent/child overlap. Filtered detail meters must not silently consume or exceed total home consumption.
 
 ## 5. Localization
 
@@ -89,36 +93,30 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] daily rollup refresh tested
 - [x] Windows and Linux deployers tested
 - [x] localization audit at `0`
-- [x] curated release screenshot set under [docs/screenshots](../screenshots/README_EN.md) reflects the final visible dashboard state, including tab navigation state
+- [ ] curated release screenshot set under [docs/screenshots](../screenshots/README_EN.md) reflects the final visible dashboard state, including tab navigation state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
+- [x] Read-only live-source rendering with actual deploy overrides is plausible; new optional features without matching live metrics are not marked as live-validated
 
 ## Current Evidence Notes
 
-Last updated: 2026-05-31.
+Last updated: 2026-07-28.
 
-Checked items above are based on the completed documentation restructuring, the successful `npm run test:rollup-path` run on 2026-05-28, a local Windows Docker migration walkthrough on 2026-05-29 using real read-only EVCC/Influx source data, and the manually refreshed release screenshots from 2026-05-31.
+The current release candidate was tested in a freshly cleaned Docker environment with Grafana 13.1.0 and VictoriaMetrics 1.139.0. Production remained read-only; 19 monthly blocks from 2025-01-01 through 2026-07-29 were copied into the isolated test VM. Before end-user visual testing, all old test dashboards were deleted and exactly six current German dashboards were deployed with the production filters.
 
-Migration evidence with real read-only source data from 2026-05-29:
+Current technical evidence:
 
-- source InfluxDB v1 database `evcc`, read-only access during the test
-- source EVCC API was used only for read-only topology verification
-- disposable target VictoriaMetrics used Docker image `victoriametrics/victoria-metrics:v1.138.0`
-- disposable target Grafana used Docker image `grafana/grafana`, Grafana `13.0.1+security-01`
-- `vmctl influx` imported 643 series, 267,886,076 samples, and 5.3 GB from the real Influx history for `2025-01-01T00:00:00Z` through the live import snapshot on 2026-05-29
-- real labels after import included 3 loadpoints (`Carport_Ecke`, `Carport_Treppe`, `Daikin-WP`), 3 vehicles (`Altherma-3`, `BMW i3`, `Schneeflittchen`), and 16 EXT titles
-- host-label cleanup dry-runs reported `GO FOR IT`; final `check_data.py` confirmed `host` series `0` and `db` series `0`
-- `compare_import_coverage.py` over the completed window `2026-05-22T00:00:00Z` through `2026-05-28T23:59:59Z` reported 0 repo-relevant problems and 0 critical energy problems
-- rollup `detect`, `plan`, and `benchmark` succeeded; full backfill from `2025-01-01` through `2026-05-28` wrote 36 rollup metrics, 1,154 series, and 30,013 samples
-- `deploy.ps1` deployed the German generated tab-navigation dashboards from the local checkout with `PURGE=true`
-- `render-smoke-check.mjs` passed strictly for all 6 dashboards and 49 critical panels against the real-data test VM
-- Manual dashboard safety review from 2026-05-30 completed successfully: navigation between Today, Month, Year, and All-time, year time navigation semantics, units, decimals, background styling, and panel layout were accepted.
-- Clean new-user Docker dry run from 2026-05-30 completed from the published docs path: fresh VictoriaMetrics `v1.139.0`, fresh Grafana `13.0.1`, datasource UID `vm-evcc`, and German generated tab-navigation deployment via `deploy-python.sh`.
-- Release screenshots from 2026-05-31 were manually refreshed and curated directly under `docs/screenshots` as one PNG per relevant dashboard or active dashboard tab.
-- Localization Grafana spot-checks from 2026-05-30 passed for `de`, `fr`, and `zh`; French and Chinese deployments showed localized dashboard and panel titles in Grafana.
-- Release notes were added in `docs/en/release-notes.md`, and root preview wording was removed from `README.md`.
+- The complete rollup processed 573 completed days, 36,625 samples, and 1,388 series in 210.606 seconds with 1,264 MB peak memory.
+- `check_data.py --phase full` reported overall `OK`, no duplicate label/day combinations, and no `host` or `db` labels.
+- The mandatory `npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:18440` run passed in 417.0 seconds: 190 Python tests, 76 dashboard JSON files, 382 real MetricsQL queries, 58 critical panels across six dashboards, and repeated `--replace-range` without duplicates.
+- The VRM import contained 383 days and 2,298 samples. All six VRM metrics matched the normalized source snapshot day by day with `missing=0`, `extra=0`, and `duplicates=0`. June 2026 produced 85.260% efficiency versus the 85.3% reference, a 0.040 percentage-point delta.
+- The scheduler lock rejected a concurrently started second write run. The full backfill reported two ignored counter resets, zero power spikes, and 9,910 missing energy buckets.
+- Consumer long-range series contain 14 canonical titles. The former `Trocker` spelling appears only as `Trockner` after full replacement; mapped former EXT consumers are not also counted as EXT.
+- End-user visual testing confirmed 2025 and 2026 in All-time, plausible July 2026 values, `Today` as the actual Grafana range, and separate EVCC and VRM battery values. For June 2026, Grafana showed 96.5% EVCC and 85.3% VRM efficiency.
+- The Month battery layout was corrected at 1280 pixels: metrics and daily axis labels no longer overlap.
 
-Still open: none for the first public release gate.
+Earlier installation, migration, and localization evidence remains valid. The screenshots under `docs/screenshots` still represent the previous release candidate and must only be refreshed and marked final after Ole's manual visual approval.
 
+Still open for the release gate: Ole's manual visual approval, refreshed curated screenshots, and completion of issue #30. Issue #35 remains explicitly outside this release scope.
 Debian 13 install evidence from 2026-05-29:
 
 - validated in fresh `debian:trixie` Docker containers reporting Debian `13.5` and `x86_64`

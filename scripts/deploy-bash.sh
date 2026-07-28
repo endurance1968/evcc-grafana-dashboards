@@ -3,9 +3,9 @@
 # Reads vm-dashboard-install.env, resolves the dashboard file list and uploads dashboards.
 set -euo pipefail
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_VERSION="2026.06.23.2"
+SCRIPT_VERSION="2026.07.26.1"
 SCRIPT_BUILD_DATE="2026-05-31"
-SCRIPT_LAST_MODIFIED="2026-06-23"
+SCRIPT_LAST_MODIFIED="2026-07-26"
 SCRIPT_NAME="${0##*/}"
 
 CONFIG_PATH="./vm-dashboard-install.env"
@@ -109,6 +109,7 @@ DASHBOARD_RUNNING_COSTS_YEARLY=""
 DASHBOARD_BATTERY_CAPACITY_WH=""
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX=""
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=""
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=""
 DASHBOARD_FILTER_EXT_BLOCKLIST=""
 DASHBOARD_FILTER_AUX_BLOCKLIST=""
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=""
@@ -571,6 +572,7 @@ print_dashboard_overrides() {
     "storageCapacity:${DASHBOARD_STORAGE_CAPACITY_WH:-$DASHBOARD_BATTERY_CAPACITY_WH}" \
     "heatPumpLoadpointRegex:$DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX" \
     "loadpointBlocklist:$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST" \
+    "consumerBlocklist:$DASHBOARD_FILTER_CONSUMER_BLOCKLIST" \
     "extBlocklist:$DASHBOARD_FILTER_EXT_BLOCKLIST" \
     "auxBlocklist:$DASHBOARD_FILTER_AUX_BLOCKLIST" \
     "vehicleBlocklist:$DASHBOARD_FILTER_VEHICLE_BLOCKLIST" \
@@ -623,6 +625,7 @@ for file_name in "${DASHBOARD_FILES[@]}"; do
   apply_dashboard_override "$raw_file" "storageCapacity" "${DASHBOARD_STORAGE_CAPACITY_WH:-$DASHBOARD_BATTERY_CAPACITY_WH}"
   apply_dashboard_override "$raw_file" "heatPumpLoadpointRegex" "$DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX"
   apply_dashboard_override "$raw_file" "loadpointBlocklist" "$DASHBOARD_FILTER_LOADPOINT_BLOCKLIST"
+  apply_dashboard_override "$raw_file" "consumerBlocklist" "$DASHBOARD_FILTER_CONSUMER_BLOCKLIST"
   apply_dashboard_override "$raw_file" "extBlocklist" "$DASHBOARD_FILTER_EXT_BLOCKLIST"
   apply_dashboard_override "$raw_file" "auxBlocklist" "$DASHBOARD_FILTER_AUX_BLOCKLIST"
   apply_dashboard_override "$raw_file" "vehicleBlocklist" "$DASHBOARD_FILTER_VEHICLE_BLOCKLIST"

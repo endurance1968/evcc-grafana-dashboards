@@ -1,8 +1,8 @@
 /**
  * Script: energy-validation.mjs
  * Purpose: Run the external energy comparison validator with a portable Python interpreter lookup.
- * Version: 2026.04.16.1
- * Last modified: 2026-04-16
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -42,7 +42,10 @@ function findPython() {
 
 function main() {
   const python = findPython();
-  const args = ["scripts/helper/validate_energy_comparison.py", ...process.argv.slice(2)];
+  const cliArgs = process.argv.slice(2);
+  const vrmImport = cliArgs.includes("--vrm-import");
+  const script = vrmImport ? "scripts/helper/validate-vrm-import.py" : "scripts/helper/validate_energy_comparison.py";
+  const args = [script, ...cliArgs.filter((arg) => arg !== "--vrm-import")];
   console.log(`$ ${[python, ...args].join(" ")}`);
   const result = spawnSync(python, args, { cwd: repoRoot, stdio: "inherit" });
   if (result.error) {

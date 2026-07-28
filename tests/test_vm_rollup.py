@@ -1,4 +1,5 @@
 import contextlib
+import dataclasses
 import importlib.util
 import io
 import pathlib
@@ -48,6 +49,8 @@ class VmRollupTests(unittest.TestCase):
         self.assertIn("evcc_potential_vehicle_charge_cost_daily_eur", records)
         self.assertIn("evcc_grid_import_cost_daily_eur", records)
         self.assertIn("evcc_grid_import_price_effective_daily_ct_per_kwh", records)
+        self.assertIn("evcc_consumer_energy_daily_wh", records)
+        self.assertIn("evcc_consumer_energy_from_grid_daily_wh", records)
 
     def test_catalog_marks_only_remaining_phase_two_items_as_deferred(self):
         catalog = MODULE.build_catalog(self.settings)
@@ -119,6 +122,73 @@ class VmRollupTests(unittest.TestCase):
         self.assertEqual(item.group_labels, ())
         self.assertIn("greenShareHome_value", item.expr)
         self.assertIn("avg_over_time", item.expr)
+
+    def test_consumer_daily_energy_uses_evcc_consumers_power_metric(self):
+        item = next(metric for metric in MODULE.build_catalog(self.settings) if metric.key == "consumer_daily_energy")
+
+        query = MODULE.positive_energy_query(self.settings, item)
+
+        self.assertEqual(item.record, "evcc_consumer_energy_daily_wh")
+        self.assertEqual(item.group_labels, ("title",))
+        self.assertIn("consumersPower_value", query)
+        self.assertIn("avg by (title)", query)
+        self.assertNotIn("consumer_daily_energy", MODULE.MATRIX_POSITIVE_ENERGY_METRIC_KEYS)
+        self.assertIn("consumer_daily_energy", MODULE.DIRECT_POSITIVE_ENERGY_METRIC_KEYS)
+
+    def test_consumer_legacy_ext_mapping_merges_history_with_consumer_precedence(self):
+        settings = dataclasses.replace(self.settings, consumer_legacy_ext_regex="^(Office|Kitchen)$")
+        catalog = MODULE.build_catalog(settings)
+        consumer = next(metric for metric in catalog if metric.key == "consumer_daily_energy")
+        ext = next(metric for metric in catalog if metric.key == "ext_daily_energy")
+
+        consumer_query = MODULE.positive_energy_query(settings, consumer)
+        ext_query = MODULE.positive_energy_query(settings, ext)
+
+        self.assertIn("consumersPower_value", consumer_query)
+        self.assertIn("extPower_value", consumer_query)
+        self.assertIn('title=~"^(Office|Kitchen)$"', consumer_query)
+        self.assertIn(") or (", consumer_query)
+        self.assertIn('title!~"^(Office|Kitchen)$"', ext_query)
+
+    def test_default_consumer_legacy_ext_mapping_matches_no_nonempty_title(self):
+        catalog = MODULE.build_catalog(self.settings)
+        consumer = next(metric for metric in catalog if metric.key == "consumer_daily_energy")
+        ext = next(metric for metric in catalog if metric.key == "ext_daily_energy")
+
+        self.assertIn('title=~"^$"', consumer.expr)
+        self.assertIn('title!~"^$"', ext.expr)
+
+    def test_consumer_title_alias_is_applied_before_daily_integration(self):
+        settings = dataclasses.replace(
+            self.settings,
+            consumer_title_aliases=(("Trocker", "Trockner"),),
+        )
+
+        query = MODULE.merged_consumer_power_query(settings)
+
+        self.assertIn('title!~"^(Trocker)$"', query)
+        self.assertIn('title="Trocker"', query)
+        self.assertIn('label_set(', query)
+        self.assertIn('"title", "Trockner"', query)
+    def test_consumer_title_alias_parser_rejects_cycles(self):
+        with self.assertRaises(SystemExit):
+            MODULE.parse_consumer_title_aliases('{"Old":"New","New":"Old"}')
+
+    def test_consumer_title_alias_prefers_canonical_samples_on_overlap(self):
+        settings = dataclasses.replace(
+            self.settings,
+            consumer_title_aliases=(("Trocker", "Trockner"),),
+        )
+        matrix = [
+            {"metric": {"title": "Trocker"}, "samples": [(100, 500.0), (110, 600.0)]},
+            {"metric": {"title": "Trockner"}, "samples": [(110, 700.0), (120, 800.0)]},
+        ]
+
+        result = MODULE.canonicalize_consumer_title_matrix(settings, matrix)
+
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0]["metric"]["title"], "Trockner")
+        self.assertEqual(result[0]["samples"], [(100, 500.0), (110, 700.0), (120, 800.0)])
 
     def test_battery_soc_rollups_collapse_to_single_series(self):
         catalog = MODULE.build_catalog(self.settings)
@@ -1111,6 +1181,41 @@ class VmRollupTests(unittest.TestCase):
         self.assertNotIn("C2", totals["1970-01-02"])
         self.assertAlmostEqual(totals["1970-01-01"]["C1"]["pv"], 1000.0 * 0.5 / 60.0, places=6)
         self.assertAlmostEqual(totals["1970-01-02"]["C1"]["grid"], 1400.0 / 60.0, places=6)
+
+    def test_consumer_source_attribution_emits_all_sources_with_title(self):
+        window = MODULE.DayWindow(
+            day="1970-01-01",
+            start_iso="1970-01-01T00:00:00Z",
+            end_iso="1970-01-01T00:01:00Z",
+            sample_timestamp_ms=0,
+            local_year="1970",
+            local_month="01",
+            local_day="01",
+            local_date="1970-01-01",
+        )
+        context = {
+            "pv_samples": [(0, 1000.0)],
+            "battery_samples": [(0, 500.0)],
+            "charge_loadpoint_matrix": [],
+            "ext_title_matrix": [],
+            "aux_title_matrix": [],
+            "consumer_title_matrix": [
+                {"metric": {"title": "Office"}, "samples": [(0, 2000.0)]},
+            ],
+        }
+
+        result = MODULE.summarize_consumer_source_attribution_rollups(self.settings, window, context)
+
+        values = {}
+        for source in ("pv", "battery", "grid"):
+            rows = result[f"consumer_daily_energy_from_{source}"]
+            self.assertEqual(len(rows), 1)
+            labels, value = rows[0]
+            self.assertEqual(labels["title"], "Office")
+            values[source] = value
+        self.assertAlmostEqual(values["pv"], 1000.0 / 60.0, places=6)
+        self.assertAlmostEqual(values["battery"], 500.0 / 60.0, places=6)
+        self.assertAlmostEqual(values["grid"], 500.0 / 60.0, places=6)
 
 if __name__ == "__main__":
     unittest.main()

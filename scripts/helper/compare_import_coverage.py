@@ -21,14 +21,15 @@ from zoneinfo import ZoneInfo
 
 UTC = dt.timezone.utc
 SCRIPT_NAME = "compare_import_coverage.py"
-SCRIPT_VERSION = "2026.04.09.2"
-SCRIPT_LAST_MODIFIED = "2026-04-09"
+SCRIPT_VERSION = "2026.07.26.1"
+SCRIPT_LAST_MODIFIED = "2026-07-26"
 
 REPO_RELEVANT_MEASUREMENTS: Sequence[str] = (
     "auxPower",
     "batteryPower",
     "batterySoc",
     "chargePower",
+    "consumersPower",
     "extPower",
     "gridEnergy",
     "gridPower",

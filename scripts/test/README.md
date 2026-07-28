@@ -156,7 +156,7 @@ Standard-Fixture mit AUX/EXT:
 npm run test:render-e2e
 ```
 
-No-AUX/EXT-Fixture fuer Nutzer ohne Zusatzzaehler. Die Fixture enthaelt Hausverbrauch und Kernmetriken, aber keine `auxPower_value`-, `extPower_value`-, `evcc_aux_*`- oder `evcc_ext_*`-Serien:
+No-Consumer/AUX/EXT-Fixture fuer Nutzer ohne optionale Verbraucher oder Zusatzzaehler. Die Fixture enthaelt Hausverbrauch und Kernmetriken, aber keine `consumersPower_value`-, `auxPower_value`-, `extPower_value`-, `evcc_consumer_*`-, `evcc_aux_*`- oder `evcc_ext_*`-Serien:
 
 ```bash
 npm run test:render-e2e:no-aux-ext

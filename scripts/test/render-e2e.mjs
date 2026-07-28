@@ -1,7 +1,7 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.07.26.1
+ * Version: 2026.07.26.2
  * Last modified: 2026-07-26
  */
 import { spawnSync } from "node:child_process";
@@ -359,6 +359,7 @@ function fixtureSeries(now, profile = "default") {
   ];
   if (includeAuxExt) {
     dailyValues.push(
+      ["evcc_consumer_energy_daily_wh", { title: "Office" }, 1800],
       ["evcc_ext_energy_daily_wh", { title: "Server" }, 2500],
       ["evcc_aux_energy_daily_wh", { title: "Aux" }, 500],
     );
@@ -402,6 +403,7 @@ function fixtureSeries(now, profile = "default") {
   addSeries(series, "tariffFeedIn_value", {}, rawValues(0.08));
   addSeries(series, "tariffCo2_value", {}, rawValues(320));
   if (includeAuxExt) {
+    addSeries(series, "consumersPower_value", { title: "Office" }, rawValues(240));
     addSeries(series, "extPower_value", { title: "Server" }, rawValues(350));
     addSeries(series, "extPower_value", { title: "KWL" }, rawValues(180));
     addSeries(series, "auxPower_value", { title: "Aux" }, rawValues(90));
@@ -607,7 +609,7 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.07.26.1");
+    console.log("Version:       2026.07.26.2");
     console.log("Last modified: 2026-07-26");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");

@@ -154,7 +154,7 @@ Default fixture with AUX/EXT:
 npm run test:render-e2e
 ```
 
-No-AUX/EXT fixture for users without additional meters. The fixture still includes home consumption and core metrics, but no `auxPower_value`, `extPower_value`, `evcc_aux_*`, or `evcc_ext_*` series:
+No-Consumer/AUX/EXT fixture for users without optional consumers or additional meters. The fixture still includes home consumption and core metrics, but no `consumersPower_value`, `auxPower_value`, `extPower_value`, `evcc_consumer_*`, `evcc_aux_*`, or `evcc_ext_*` series:
 
 ```bash
 npm run test:render-e2e:no-aux-ext

@@ -1,6 +1,7 @@
 {
   "variables": {
     "extBlocklist": "^none$",
+    "consumerBlocklist": "^none$",
     "loadpointBlocklist": "^none$",
     "auxBlocklist": "^none$",
     "vehicleBlocklist": "^none$",

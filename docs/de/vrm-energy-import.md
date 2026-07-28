@@ -26,7 +26,9 @@ BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/ma
 
 sudo mkdir -p /opt/evcc-vm-tools
 curl -fsSLo /tmp/import-vrm-energy-flows.py "$BASE/scripts/helper/import-vrm-energy-flows.py"
+curl -fsSLo /tmp/validate-vrm-import.py "$BASE/scripts/helper/validate-vrm-import.py"
 sudo install -m 0755 /tmp/import-vrm-energy-flows.py /opt/evcc-vm-tools/import-vrm-energy-flows.py
+sudo install -m 0755 /tmp/validate-vrm-import.py /opt/evcc-vm-tools/validate-vrm-import.py
 ```
 
 ## Historischen Backfill ausfuehren
@@ -40,6 +42,7 @@ sudo /usr/bin/python3 /opt/evcc-vm-tools/import-vrm-energy-flows.py \
   --vm-base-url "http://127.0.0.1:8428" \
   --start-day 2025-01-01 \
   --end-day "$(date -d 'yesterday' +%F)" \
+  --output-json /tmp/vrm-import-source.json \
   --write --replace-range
 ```
 
@@ -57,3 +60,17 @@ Wenn die Metriken vorhanden sind, zeigt das Monatsdashboard im Tab `Speicher` zu
 
 - `VRM Speicherwirkungsgrad`: Laden, Entladen und Wirkungsgrad aus VRM-Flussdaten.
 - `VRM Speicherfluesse`: PV zu Speicher, Netz zu Speicher, Speicher zu Verbrauchern und Speicher zu Netz.
+
+## Import Validieren
+
+Der Importer kann die normalisierten VRM-Quellzeilen desselben Laufs mit `--output-json` sichern. Vergleiche anschließend alle sechs importierten Metriken taggenau mit VictoriaMetrics:
+
+```bash
+sudo /usr/bin/python3 /opt/evcc-vm-tools/validate-vrm-import.py \
+  --vm-base-url "http://127.0.0.1:8428" \
+  --vrm-json /tmp/vrm-import-source.json \
+  --start-day 2025-01-01 \
+  --end-day "$(date -d 'yesterday' +%F)"
+```
+
+Der Prüfer muss für jede Metrik `missing=0`, `extra=0` und `duplicates=0` melden. Für einen bekannten Referenzmonat kann zusätzlich `--expected-efficiency-pct` mit `--efficiency-tolerance-pp` gesetzt werden. Ein zweiter Import mit denselben Grenzen und `--replace-range` muss dieselbe Samplezahl und dieselben Tageswerte ergeben.

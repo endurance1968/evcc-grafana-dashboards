@@ -4,7 +4,31 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 
 ## Unreleased
 
-No entries yet.
+### New Features
+
+- Dedicated EVCC Consumers are available in `Today - Details`, `Month`, `Year`, and `All-time`, separately from AUX and EXT.
+- Historical EXT consumers can continue under the same Consumer title through `consumer_legacy_ext_regex`; overlap is deterministically deduplicated in favor of Consumer.
+- Renamed Consumer titles can be canonicalized before daily integration through `consumer_title_aliases_json`.
+- The optional VRM energy-flow import includes a day-level source-to-VM validator for all six helper metrics.
+
+### Improvements
+
+- EXT meters have separate additional-meter views and no longer affect `Other` or the home-consumer balance.
+- Today finance values use the same sign convention as long-range rollups: purchase costs negative, feed-in credit positive, and balance as their sum.
+- A static source audit rejects known German end-user text and stale repository links in English dashboard sources.
+- Data validation treats multiple rollup samples for the same label set and local day as a critical error.
+- The rollup scheduler guards write runs with a lock file, accepts completed days only by default, and reports resets, power spikes, and missing energy buckets.
+- The complete livecopy backfill was profiled; title canonicalization runs memory-efficiently in MetricsQL and the normal monthly replacement path remains short.
+
+### Bug Fixes
+
+- Consumer title aliases are now applied before daily integration, preventing old and current spellings from appearing as duplicate long-range series.
+- Strict energy validation treats EVCC and VRM battery values as separate measurement boundaries and validates VRM import parity against the same source snapshot instead.
+
+### User Notes
+
+- After an EXT-to-Consumer role change, recalculate the complete affected range. `--replace-range --write` is safe only with complete raw history because it deletes existing rollups before rebuilding them.
+- `consumer_legacy_ext_regex` must contain only former end consumers, never distribution or sum meters.
 
 ## V2026-06-30
 
@@ -19,6 +43,11 @@ No entries yet.
 - `Year` and `Month` group home, consumer, and finance areas more clearly: supply-mix panels live under `Home`, while cost and price panels live under `Finances`. Relevant commit: `afb8248`.
 - Grid-control panels use consistent signs and colors: import/consumption in red, feed-in in green, and calculated values in blue; feed-in is shown as negative. Relevant commits: `d3c32c0`, `8645fa1`.
 - The deployer writes a more useful dashboard build marker with build/source instead of only the deployment timestamp. Relevant commit: `bec38c9`.
+
+### Bug Fixes
+
+- Consumer title aliases are now applied before daily integration, preventing old and current spellings from appearing as duplicate long-range series.
+- Strict energy validation treats EVCC and VRM battery values as separate measurement boundaries and validates VRM import parity against the same source snapshot instead.
 
 ### User Notes
 

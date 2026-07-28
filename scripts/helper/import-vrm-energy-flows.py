@@ -16,8 +16,8 @@ from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from zoneinfo import ZoneInfo
 
 SCRIPT_NAME = "import-vrm-energy-flows.py"
-SCRIPT_VERSION = "2026.07.03.1"
-SCRIPT_LAST_MODIFIED = "2026-07-03"
+SCRIPT_VERSION = "2026.07.28.1"
+SCRIPT_LAST_MODIFIED = "2026-07-28"
 ROOT = Path(__file__).resolve().parents[2]
 ENV_LOCAL = ROOT / ".env.local"
 DEFAULT_VM_BASE_URL = "http://127.0.0.1:8428"
@@ -359,6 +359,30 @@ def summarize(rows: Sequence[Mapping[str, object]]) -> Dict[str, object]:
     }
 
 
+def write_source_snapshot(
+    path: Path,
+    rows: Sequence[Mapping[str, object]],
+    site_id: str,
+    source_label: str,
+    start_day: dt.date,
+    end_day: dt.date,
+) -> None:
+    payload = {
+        "script": {"name": SCRIPT_NAME, "version": SCRIPT_VERSION, "last_modified": SCRIPT_LAST_MODIFIED},
+        "generated_at": local_timestamp(),
+        "site_id": site_id,
+        "source": source_label,
+        "requested_start_day": start_day.isoformat(),
+        "requested_end_day": end_day.isoformat(),
+        "summary": summarize(rows),
+        "rows": list(rows),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + ".tmp")
+    temporary.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + chr(10), encoding="utf-8")
+    temporary.replace(path)
+
+
 def default_days(lookback_days: int) -> tuple[dt.date, dt.date]:
     end_day = dt.datetime.now().astimezone().date() - dt.timedelta(days=1)
     start_day = end_day - dt.timedelta(days=max(lookback_days, 1) - 1)
@@ -379,6 +403,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--source-label", default=os.environ.get("VRM_SOURCE_LABEL", DEFAULT_SOURCE_LABEL), help="source label written to VictoriaMetrics")
     parser.add_argument("--input-json", help="Import rows from an existing fetch_vrm_kwh_cache.py JSON file")
     parser.add_argument("--input-csv", help="Import rows from an existing fetch_vrm_kwh_cache.py CSV file")
+    parser.add_argument("--output-json", help="Write the normalized source rows from this run as a validation snapshot")
     parser.add_argument("--write", action="store_true", help="Write to VictoriaMetrics. Without this, only a summary is printed.")
     parser.add_argument("--replace-range", action="store_true", help="Delete the helper metrics for the selected site/source/date range before writing")
     args = parser.parse_args(argv)
@@ -416,6 +441,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     summary = summarize(rows)
     print(json.dumps({"site_id": str(args.site_id), "source": args.source_label, "summary": summary}, indent=2, ensure_ascii=True))
+    if args.output_json:
+        output_path = Path(args.output_json)
+        write_source_snapshot(output_path, rows, str(args.site_id), args.source_label, start_day, end_day)
+        print(f"Wrote validation source snapshot: {output_path}")
     if not args.write:
         print("Dry run only. Add --write to import into VictoriaMetrics.")
         return 0

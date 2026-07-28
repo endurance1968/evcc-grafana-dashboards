@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.07.05.2
- * Last modified: 2026-07-05
+ * Version: 2026.07.27.3
+ * Last modified: 2026-07-27
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -300,7 +300,7 @@ const criticalPanels = {
       "id": 31,
       "title": "Home: Energy consumption",
       "type": "barchart",
-      "minTargets": 6,
+      "minTargets": 5,
       "xField": "Time"
     },
     {
@@ -820,10 +820,54 @@ function isPortalDashboardLink(link) {
   return String(link?.url || "") === "$inverterPortalUrl" || String(link?.title || "") === "$inverterPortalTitle";
 }
 
+const englishVisibleKeys = new Set([
+  "title",
+  "label",
+  "legendFormat",
+  "description",
+  "displayName",
+  "text",
+  "content",
+]);
+
+const forbiddenEnglishSourcePhrases = [
+  "Strompreis",
+  "Ströme",
+  "Preis",
+  "Die Formel",
+  "Sonstige",
+  "Verfügbarkeit",
+  "Siehe ",
+  "geändert werden",
+  "Viertel-Stundentakt",
+];
+
+function collectVisibleDashboardStrings(value, out = []) {
+  if (!value || typeof value !== "object") {
+    return out;
+  }
+  for (const [key, child] of Object.entries(value)) {
+    if (englishVisibleKeys.has(key) && typeof child === "string") {
+      out.push(child);
+    }
+    collectVisibleDashboardStrings(child, out);
+  }
+  return out;
+}
+
+function validateEnglishDashboardSource(fileName, dashboard, rawJson, failures) {
+  const visibleText = collectVisibleDashboardStrings(dashboard).join("\n");
+  for (const phrase of forbiddenEnglishSourcePhrases) {
+    assert(!visibleText.includes(phrase), failures, `${fileName}: English source contains non-English visible text '${phrase}'`);
+  }
+  assert(!rawJson.includes("github.com/ha-puzzles/"), failures, `${fileName}: English source contains a stale upstream repository link`);
+}
+
 function validateDashboard(fileName, dashboard) {
   const failures = [];
   const rawJson = JSON.stringify(dashboard);
   const panels = collectDashboardPanels(dashboard);
+  validateEnglishDashboardSource(fileName, dashboard, rawJson, failures);
 
   for (const text of forbiddenTexts) {
     assert(!rawJson.includes(text), failures, `${fileName}: forbidden Grafana error text is present: ${text}`);
@@ -862,6 +906,87 @@ function validateDashboard(fileName, dashboard) {
   validateGrafanaTabSlugs(fileName, dashboard.spec?.layout, failures);
   validateInvestmentConditionalRow(fileName, dashboard, failures);
   validateTodayPaletteFallbacks(fileName, dashboard, failures);
+
+  if (["VM_EVCC_All-time.json", "VM_EVCC_Today-Details.json", "VM_EVCC_Month.json", "VM_EVCC_Year.json"].includes(fileName)) {
+    const variableNames = dashboardVariables(dashboard).map((variable) => variable?.spec?.name);
+    assert(variableNames.includes("consumerBlocklist"), failures, `${fileName}: Consumer dashboards must define consumerBlocklist`);
+  }
+  if (fileName === "VM_EVCC_Today-Details.json") {
+    assert(rawJson.includes("consumersPower_value"), failures, `${fileName}: Today Details must query EVCC consumersPower_value`);
+    assert(!rawJson.includes('"refId": "otherPowersAux"'), failures, `${fileName}: Today Details must use one optional-meter-safe Other power query`);
+    assert(!rawJson.includes('"refId": "otherPowersExt"'), failures, `${fileName}: Today Details must not duplicate Other power series`);
+    assert(rawJson.includes('"refId":"meterOverlapCurrent"'), failures, `${fileName}: Current home distribution must expose meter overlap instead of silently clamping it`);
+    assert(rawJson.includes('"refId":"meterOverlapEnergy"'), failures, `${fileName}: Home energy distribution must expose meter overlap instead of silently clamping it`);
+    assert(rawJson.includes("last_over_time(consumersPower_value") && rawJson.includes("[2m]"), failures, `${fileName}: Current home distribution must ignore stale role series`);
+    const currentPowerPanel = panels.find((panel) => panel.title === "Home: Current power");
+    assert(Boolean(currentPowerPanel), failures, `${fileName}: Current home distribution panel is missing`);
+    for (const target of currentPowerPanel?.targets || []) {
+      const querySpec = target?.raw?.spec?.query?.spec || target;
+      assert(querySpec.range === true && querySpec.instant === false, failures, `${fileName}: Current home distribution target ${target.refId} must use range data so Grafana Today resolves lastNotNull at now`);
+    }
+    assert(rawJson.includes("tracked = consumer or aux"), failures, `${fileName}: Consumer and AUX role changes must collapse by title`);
+    assert(rawJson.includes('"title":"Additional meters"'), failures, `${fileName}: EXT meters must have a separate Additional meters tab`);
+    assert(rawJson.includes("avg(homePower_value) - (sum(tracked) or on() vector(0))"), failures, `${fileName}: Home power timeline must retain signed residual values`);
+  }
+  if (["VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_All-time.json"].includes(fileName)) {
+    const extDistributionTitle = fileName === "VM_EVCC_All-time.json" ? "Additional meter totals" : "Additional meters: Energy distribution";
+    const extDistribution = panels.find((panel) => panel.title === extDistributionTitle);
+    assert(Boolean(extDistribution), failures, `${fileName}: Additional meters energy distribution panel is missing`);
+    const extTarget = extDistribution?.targets?.find((target) => String(target?.raw?.spec?.query?.spec?.expr || target?.expr || "").includes("evcc_ext_energy_daily_wh"));
+    const extQuery = extTarget?.raw?.spec?.query?.spec || extTarget || {};
+    assert(extQuery.format === "time_series" && extQuery.instant === true && extQuery.range === false, failures, `${fileName}: Additional meters distribution must return one instant time-series frame per title`);
+    if (fileName === "VM_EVCC_All-time.json") {
+      assert(extDistribution?.type === "bargauge", failures, `${fileName}: overlapping additional meters must use absolute bars instead of a percentage pie`);
+    }
+  }
+  if (["VM_EVCC_Month.json", "VM_EVCC_Year.json"].includes(fileName)) {
+    assert(rawJson.includes("evcc_consumer_energy_daily_wh"), failures, `${fileName}: Long-range consumer panels must query consumer daily rollups`);
+    assert(rawJson.includes('"refId":"MeterOverlap"'), failures, `${fileName}: Long-range home distribution must expose meter overlap`);
+    assert(rawJson.includes("((-$homeTotalPie + $consumerSum + $auxSum) + abs($homeTotalPie - $consumerSum - $auxSum)) / 2"), failures, `${fileName}: Long-range meter overlap must calculate max(Consumer + AUX - home, 0)`);
+    assert(rawJson.includes('"id":"byFrameRefID","options":"MeterOverlap"') && rawJson.includes('"id":"displayName","value":"Meter overlap"'), failures, `${fileName}: Long-range meter overlap must use a translatable display name`);
+    assert(rawJson.includes("sum by (title)(consumer or aux)"), failures, `${fileName}: Long-range Consumer and AUX role changes must collapse to one series per title`);
+    assert(rawJson.includes('"title":"Additional meters"'), failures, `${fileName}: EXT rollups must have a separate Additional meters tab`);
+  }
+  if (fileName === "VM_EVCC_Month.json") {
+    assert(rawJson.includes("$homeTotalDaily - $consumerTotalDaily - $auxTotalDaily"), failures, `${fileName}: Daily Other energy must retain signed Consumer/AUX residual values`);
+    assert(!rawJson.includes("$homeTotalDaily - $consumerTotalDaily - $extTotalDaily"), failures, `${fileName}: EXT meters must not reduce Daily Other energy`);
+  }
+  if (fileName === "VM_EVCC_Year.json") {
+    assert(rawJson.includes("other = label_set((home -"), failures, `${fileName}: Monthly Other energy must retain signed residual values`);
+    assert(rawJson.includes("tracked = sum by (local_month, series)(consumer or aux)"), failures, `${fileName}: Monthly Consumer and AUX role changes must collapse to one series per title`);
+  }
+  if (["VM_EVCC_Today.json", "VM_EVCC_Today-Mobile.json", "VM_EVCC_Today-Details.json"].includes(fileName)) {
+    assert(rawJson.includes("-range_sum(avg(tariffGrid_value)"), failures, `${fileName}: Today purchase cost must be negative`);
+    assert(rawJson.includes("clamp_min(-avg(gridPower_value), 0)"), failures, `${fileName}: Today feed-in credit must use positive export power`);
+    assert(!rawJson.includes("tariffFeedIn_value) * integrate(clamp_max(avg(gridPower_value), 0)"), failures, `${fileName}: Today feed-in credit still uses the negative legacy sign`);
+  }
+  if (fileName === "VM_EVCC_Today-Details.json") {
+    const intervalCostPanel = panels.find((panel) => panel.title === "Costs" && panel.targets?.some((target) => target.refId === "bought") && panel.targets?.length === 2);
+    assert(Boolean(intervalCostPanel), failures, `${fileName}: Interval cost panel is missing`);
+    for (const target of intervalCostPanel?.targets || []) {
+      const expr = String(target?.raw?.spec?.query?.spec?.expr || target?.expr || "");
+      assert(!expr.includes("offset -$tariffPriceInterval"), failures, `${fileName}: Interval cost target ${target.refId} must align power and tariff at the same timestamp`);
+    }
+  }
+  if (fileName === "VM_EVCC_All-time.json") {
+    assert(rawJson.includes('"title":"Consumers"'), failures, `${fileName}: All-time must expose Consumer rollups`);
+    assert(rawJson.includes("evcc_consumer_energy_daily_wh"), failures, `${fileName}: All-time Consumers tab must query Consumer rollups`);
+    assert(rawJson.includes('"title":"Additional meters"'), failures, `${fileName}: All-time must expose EXT meters separately`);
+    const consumerDistribution = panels.find((panel) => panel.title === "Consumer energy distribution");
+    const consumerDistributionTargets = consumerDistribution?.targets?.filter((target) => !target.hidden) || [];
+    const consumerDistributionQuery = String(consumerDistributionTargets[0]?.raw?.spec?.query?.spec?.expr || consumerDistributionTargets[0]?.expr || "");
+    const consumerDistributionSpec = consumerDistributionTargets[0]?.raw?.spec?.query?.spec || consumerDistributionTargets[0] || {};
+    assert(consumerDistributionTargets.length === 1, failures, `${fileName}: Consumer energy distribution must use one visible query frame`);
+    assert(consumerDistributionQuery.includes("other or overlap or tracked"), failures, `${fileName}: Consumer energy distribution must return Other, overlap and tracked meters from one query`);
+    assert(consumerDistributionSpec.format === "time_series" && consumerDistributionSpec.instant === true && consumerDistributionSpec.range === false, failures, `${fileName}: Consumer energy distribution must return one instant time-series frame per series`);
+    for (const title of ["Consumer energy/year", "Additional meters: Energy/year"]) {
+      const annualPanel = panels.find((panel) => panel.title === title);
+      assert(Boolean(annualPanel), failures, `${fileName}: ${title} panel is missing`);
+      const serialized = JSON.stringify(annualPanel?.raw || annualPanel || {});
+      assert(serialized.includes('"local_year"') && serialized.includes('"year"') && !serialized.includes('"local_month"') && !serialized.includes('"month"'), failures, `${fileName}: ${title} must pivot by year, not month`);
+    }
+  }
+
   for (const panel of panels) {
     validateSemanticColors(fileName, panel, failures);
     for (const override of panel.fieldConfig?.overrides || []) {

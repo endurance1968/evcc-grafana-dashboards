@@ -26,7 +26,9 @@ BASE="https://raw.githubusercontent.com/endurance1968/evcc-grafana-dashboards/ma
 
 sudo mkdir -p /opt/evcc-vm-tools
 curl -fsSLo /tmp/import-vrm-energy-flows.py "$BASE/scripts/helper/import-vrm-energy-flows.py"
+curl -fsSLo /tmp/validate-vrm-import.py "$BASE/scripts/helper/validate-vrm-import.py"
 sudo install -m 0755 /tmp/import-vrm-energy-flows.py /opt/evcc-vm-tools/import-vrm-energy-flows.py
+sudo install -m 0755 /tmp/validate-vrm-import.py /opt/evcc-vm-tools/validate-vrm-import.py
 ```
 
 ## Historical Backfill
@@ -40,6 +42,7 @@ sudo /usr/bin/python3 /opt/evcc-vm-tools/import-vrm-energy-flows.py \
   --vm-base-url "http://127.0.0.1:8428" \
   --start-day 2025-01-01 \
   --end-day "$(date -d 'yesterday' +%F)" \
+  --output-json /tmp/vrm-import-source.json \
   --write --replace-range
 ```
 
@@ -57,3 +60,17 @@ When the metrics exist, the Month dashboard shows two additional panels in the `
 
 - `VRM battery efficiency`: charge, discharge, and efficiency from VRM flow data.
 - `VRM battery flows`: PV to battery, grid to battery, battery to consumers, and battery to grid.
+
+## Validate The Import
+
+The importer can save normalized VRM source rows from the same run through `--output-json`. Then compare all six imported metrics day by day with VictoriaMetrics:
+
+```bash
+sudo /usr/bin/python3 /opt/evcc-vm-tools/validate-vrm-import.py \
+  --vm-base-url "http://127.0.0.1:8428" \
+  --vrm-json /tmp/vrm-import-source.json \
+  --start-day 2025-01-01 \
+  --end-day "$(date -d 'yesterday' +%F)"
+```
+
+The validator must report `missing=0`, `extra=0`, and `duplicates=0` for every metric. For a known reference month, add `--expected-efficiency-pct` and `--efficiency-tolerance-pp`. A second import with identical boundaries and `--replace-range` must produce the same sample count and daily values.

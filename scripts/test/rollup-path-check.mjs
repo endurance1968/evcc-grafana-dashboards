@@ -1,14 +1,14 @@
 /**
  * Script: rollup-path-check.mjs
  * Purpose: Run the complete deterministic rollup validation path as one reproducible check.
- * Version: 2026.07.26.1
- * Last modified: 2026-07-26
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import { spawnSync } from "node:child_process";
 
 const scriptName = "rollup-path-check.mjs";
-const version = "2026.07.26.1";
-const lastModified = "2026-07-26";
+const version = "2026.07.28.1";
+const lastModified = "2026-07-28";
 
 function parseArg(name, fallback = "") {
   const prefix = `--${name}=`;
@@ -53,25 +53,21 @@ function runNodeScript(script, stepName, extraArgs = []) {
   return run(process.execPath, [script, ...extraArgs], stepName);
 }
 
-function energyValidationArgs() {
-  const args = [];
-  const strict = hasFlag("strict-energy") || process.env.ENERGY_VALIDATION_STRICT === "1";
-  const vmBaseUrl = parseArg(
+function validationVmBaseUrl() {
+  return parseArg(
     "vm-base-url",
     process.env.ENERGY_VALIDATION_VM_BASE_URL || process.env.VM_BASE_URL || "",
   );
+}
 
+function energyValidationArgs() {
+  const args = [];
+  const strict = hasFlag("strict-energy") || process.env.ENERGY_VALIDATION_STRICT === "1";
   if (strict) {
     args.push("--require-cache", "tibber-vm");
     args.push("--require-cache", "tibber-influx");
     args.push("--require-cache", "vrm");
     args.push("--require-cache", "vrm-battery");
-  }
-  if (vmBaseUrl) {
-    args.push("--vm-base-url", vmBaseUrl);
-    if (strict) {
-      args.push("--require-cache", "vrm-vm");
-    }
   }
   return args;
 }
@@ -89,6 +85,15 @@ function main() {
 
   results.push(["Static/unit/dashboard checks", runNodeScript("scripts/test/local-checks.mjs", "Static/unit/dashboard checks")]);
   results.push(["External energy validation", runNodeScript("scripts/test/energy-validation.mjs", "External energy validation", energyValidationArgs())]);
+  const vmBaseUrl = validationVmBaseUrl();
+  if (vmBaseUrl) {
+    results.push([
+      "VRM import parity",
+      runNodeScript("scripts/test/energy-validation.mjs", "VRM import parity", ["--vrm-import", "--vm-base-url", vmBaseUrl]),
+    ]);
+  } else {
+    results.push(["VRM import parity", "SKIP (no --vm-base-url)"]);
+  }
   results.push(["Daily rollup DST check", runNodeScript("scripts/test/daily-rollup-dst-check.mjs", "Daily rollup DST check")]);
   results.push(["Dashboard query readback", runNodeScript("scripts/test/dashboard-query-readback.mjs", "Dashboard query readback", ["--docker"])]);
   if (skipRender) {
