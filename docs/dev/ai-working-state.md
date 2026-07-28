@@ -25,7 +25,8 @@ Issues #20, #21, and #22 were technically completed on 2026-07-28. Their Forgejo
 
 ## Final Technical Evidence
 
-- Fresh isolated Grafana 13.1.0: `http://127.0.0.1:13000`, login `admin` / `admin`.
+- Fresh isolated Grafana 13.0.1 baseline: `http://127.0.0.1:13001`, login `admin` / `admin`.
+- Fresh isolated Grafana 13.1.0 compatibility check: `http://127.0.0.1:13000`, login `admin` / `admin`; Grafana 13.1.0 is not required.
 - Fresh isolated VictoriaMetrics 1.139.0: `http://127.0.0.1:18440`.
 - Exactly six current German dashboards are deployed with the production filter overrides.
 - Full livecopy rollup: 573 completed days, 36,625 samples, 1,388 series, 210.606 seconds, 1,264 MB peak Python memory.
@@ -52,7 +53,8 @@ Read-only production references:
 
 Disposable test setup currently retained for review:
 
-- Test Grafana: `http://127.0.0.1:13000`
+- Test Grafana 13.0.1: `http://127.0.0.1:13001`
+- Test Grafana 13.1.0: `http://127.0.0.1:13000`
 - Test VictoriaMetrics: `http://127.0.0.1:18440`
 - Test Grafana credentials: `admin` / `admin`
 

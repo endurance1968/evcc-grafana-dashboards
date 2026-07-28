@@ -101,7 +101,7 @@ Mindestens diese Punkte muessen vor dem ersten Endnutzer-Release erfuellt sein:
 
 Zuletzt aktualisiert: 2026-07-28.
 
-Der aktuelle Release-Kandidat wurde in einer frisch bereinigten Docker-Testumgebung mit Grafana 13.1.0 und VictoriaMetrics 1.139.0 geprüft. Die Produktion blieb read-only; 19 Monatsblöcke von 2025-01-01 bis 2026-07-29 wurden in die isolierte Test-VM kopiert. Vor dem Endnutzer-Sichttest wurden alle alten Testdashboards gelöscht und exakt sechs aktuelle deutsche Dashboards mit den produktiven Filtern ausgerollt.
+Der aktuelle Release-Kandidat wurde in frisch bereinigten Docker-Testinstanzen mit der unterstützten Basis Grafana 13.0.1 und zusätzlich mit Grafana 13.1.0 gegen VictoriaMetrics 1.139.0 geprüft. Die Produktion blieb read-only; 19 Monatsblöcke von 2025-01-01 bis 2026-07-29 wurden in die isolierte Test-VM kopiert. Vor dem Endnutzer-Sichttest wurden alle alten Testdashboards gelöscht und exakt sechs aktuelle deutsche Dashboards mit den produktiven Filtern ausgerollt.
 
 Aktuelle technische Nachweise:
 
@@ -111,7 +111,7 @@ Aktuelle technische Nachweise:
 - Der VRM-Import enthielt 383 Tage und 2.298 Samples. Alle sechs VRM-Metriken stimmten taggenau mit dem normalisierten Quellsnapshot überein; `missing=0`, `extra=0`, `duplicates=0`. Juni 2026 ergab 85,260% Wirkungsgrad gegenüber 85,3% Referenz, also 0,040 Prozentpunkte Abweichung.
 - Der Scheduler-Lock wies einen gleichzeitig gestarteten zweiten Schreiblauf ab. Der Voll-Backfill meldete zwei ignorierte Counter-Resets, keine Leistungsspitzen und 9.910 fehlende Energie-Buckets.
 - Die Consumer-Langzeitreihen enthalten 14 kanonische Titel. Die alte Schreibweise `Trocker` erscheint nach dem Vollersatz nur noch als `Trockner`; gemappte frühere EXT-Verbraucher werden nicht zusätzlich als EXT gezählt.
-- Der Endnutzer-Sichttest bestätigte 2025 und 2026 im Gesamtzeitraum, plausible Juli-2026-Werte, `Today` als echten Grafana-Zeitraum sowie getrennte EVCC- und VRM-Speicherwerte. Für Juni 2026 zeigte Grafana 96,5% EVCC- und 85,3% VRM-Wirkungsgrad.
+- Der Endnutzer-Sichttest unter Grafana 13.0.1 und 13.1.0 bestätigte 2025 und 2026 im Gesamtzeitraum, plausible Juli-2026-Werte, `Today` als echten Grafana-Zeitraum sowie getrennte EVCC- und VRM-Speicherwerte. Für Juni 2026 zeigte Grafana 96,5% EVCC- und 85,3% VRM-Wirkungsgrad.
 - Das Monats-Speicherlayout wurde bei 1280 Pixel Breite korrigiert: Kennzahlen und Tagesachsen überlappen sich nicht mehr.
 
 Frühere Installations-, Migrations- und Lokalisierungsnachweise bleiben gültig. Die Screenshots unter `docs/screenshots` bilden jedoch noch den vorherigen Release-Kandidaten ab und dürfen erst nach Oles manueller Sichtfreigabe aktualisiert und als final markiert werden.

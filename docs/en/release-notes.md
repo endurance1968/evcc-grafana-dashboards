@@ -108,7 +108,7 @@ The release validation checked the live-ingest path, imported a real multi-year 
 
 ## Dashboard Set
 
-The deployed dashboards always use the Grafana 13 tab-navigation layout and require Grafana 13.0.1 or newer. The legacy row-based deploy path and dashboard set selection have been removed from the deploy manifest and scripts.
+The deployed dashboards always use the Grafana 13 tab-navigation layout and require Grafana 13.0.1 or newer. Grafana 13.0.1 remains the supported minimum; Grafana 13.1.0 was tested additionally but is not required. The legacy row-based deploy path and dashboard set selection have been removed from the deploy manifest and scripts.
 
 The release screenshots document the German generated tab-navigation dashboard set directly under [screenshots](../screenshots/README_EN.md), including the active Grafana tab bar where dashboards use tabs.
 

@@ -101,7 +101,7 @@ At minimum, do not publish a first end-user release until all of these are true:
 
 Last updated: 2026-07-28.
 
-The current release candidate was tested in a freshly cleaned Docker environment with Grafana 13.1.0 and VictoriaMetrics 1.139.0. Production remained read-only; 19 monthly blocks from 2025-01-01 through 2026-07-29 were copied into the isolated test VM. Before end-user visual testing, all old test dashboards were deleted and exactly six current German dashboards were deployed with the production filters.
+The current release candidate was tested in freshly cleaned Docker instances with the supported Grafana 13.0.1 baseline and additionally with Grafana 13.1.0 against VictoriaMetrics 1.139.0. Production remained read-only; 19 monthly blocks from 2025-01-01 through 2026-07-29 were copied into the isolated test VM. Before end-user visual testing, all old test dashboards were deleted and exactly six current German dashboards were deployed with the production filters.
 
 Current technical evidence:
 
@@ -111,7 +111,7 @@ Current technical evidence:
 - The VRM import contained 383 days and 2,298 samples. All six VRM metrics matched the normalized source snapshot day by day with `missing=0`, `extra=0`, and `duplicates=0`. June 2026 produced 85.260% efficiency versus the 85.3% reference, a 0.040 percentage-point delta.
 - The scheduler lock rejected a concurrently started second write run. The full backfill reported two ignored counter resets, zero power spikes, and 9,910 missing energy buckets.
 - Consumer long-range series contain 14 canonical titles. The former `Trocker` spelling appears only as `Trockner` after full replacement; mapped former EXT consumers are not also counted as EXT.
-- End-user visual testing confirmed 2025 and 2026 in All-time, plausible July 2026 values, `Today` as the actual Grafana range, and separate EVCC and VRM battery values. For June 2026, Grafana showed 96.5% EVCC and 85.3% VRM efficiency.
+- End-user visual testing under Grafana 13.0.1 and 13.1.0 confirmed 2025 and 2026 in All-time, plausible July 2026 values, `Today` as the actual Grafana range, and separate EVCC and VRM battery values. For June 2026, Grafana showed 96.5% EVCC and 85.3% VRM efficiency.
 - The Month battery layout was corrected at 1280 pixels: metrics and daily axis labels no longer overlap.
 
 Earlier installation, migration, and localization evidence remains valid. The screenshots under `docs/screenshots` still represent the previous release candidate and must only be refreshed and marked final after Ole's manual visual approval.
