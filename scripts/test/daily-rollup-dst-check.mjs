@@ -2,8 +2,8 @@
 /**
  * Script: daily-rollup-dst-check.mjs
  * Purpose: Verify calendar-day rollup timestamps and MetricsQL aggregation across DST and calendar boundaries.
- * Version: 2026.07.26.1
- * Last modified: 2026-07-26
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -13,8 +13,15 @@ const timeZone = "Europe/Berlin";
 const image = process.env.DST_CHECK_VM_IMAGE || "victoriametrics/victoria-metrics:v1.126.0";
 const port = process.env.DST_CHECK_VM_PORT || "18432";
 const containerName = `evcc-dst-check-${process.pid}`;
-const baseUrl = `http://127.0.0.1:${port}`;
 const dashboardFiles = ["VM_EVCC_Month.json", "VM_EVCC_Year.json", "VM_EVCC_All-time.json"];
+
+function runsInsideContainer() {
+  return fs.existsSync("/.dockerenv") || fs.existsSync("/run/.containerenv");
+}
+
+const bindAddress = process.env.DST_CHECK_VM_BIND_ADDRESS || (runsInsideContainer() ? "0.0.0.0" : "127.0.0.1");
+const publishedHost = process.env.DST_CHECK_VM_PUBLISHED_HOST || (runsInsideContainer() ? "host.docker.internal" : "127.0.0.1");
+const baseUrl = `http://${publishedHost}:${port}`;
 
 function run(command, args) {
   const result = spawnSync(command, args, { encoding: "utf8" });
@@ -186,7 +193,7 @@ async function main() {
   assertEqual(rangeSeconds("2025-10-26", "2025-10-27"), 90000, "autumn DST day");
   assertEqual(new Date(localNoonMs("2024-02-29")).toISOString(), "2024-02-29T11:00:00.000Z", "leap-day noon");
 
-  run("docker", ["run", "-d", "--name", containerName, "-p", `127.0.0.1:${port}:8428`, image, "-retentionPeriod=100y"]);
+  run("docker", ["run", "-d", "--name", containerName, "-p", `${bindAddress}:${port}:8428`, image, "-retentionPeriod=100y"]);
   try {
     await waitForVm();
     await importSeries(makeSeries());
@@ -202,8 +209,8 @@ async function main() {
 
     console.log("Daily rollup DST check");
     console.log("======================");
-    console.log("Version:       2026.07.26.1");
-    console.log("Last modified: 2026-07-26");
+    console.log("Version:       2026.07.28.1");
+    console.log("Last modified: 2026-07-28");
     console.log("Result:        OK");
     console.log("Covered:       Europe/Berlin 23h/25h days, leap day, month/year boundaries, EVCC/SMA/VRM mixing");
   } finally {
