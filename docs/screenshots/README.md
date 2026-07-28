@@ -30,6 +30,22 @@ All-Time-Finanzansicht mit Kosten- und Ersparniskennzahlen.
 
 All-Time-Anlagengesundheit mit Langzeitindikatoren.
 
+### All-Time Verbraucher
+
+<a href="./alltime-consumers.png" target="_blank" rel="noopener">
+  <img src="./alltime-consumers.png" alt="All-Time Verbraucher Tab" width="720">
+</a>
+
+All-Time-Verbraucherenergie mit historischen EXT- und aktuellen Consumer-Reihen.
+
+### All-Time Zusätzliche Zähler
+
+<a href="./alltime-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./alltime-additional-meters.png" alt="All-Time Zusätzliche Zähler Tab" width="720">
+</a>
+
+All-Time-Ansicht der fachlich getrennten zusätzlichen Kontroll- und Summenzähler.
+
 ## Year
 
 ### Year PV
@@ -72,6 +88,14 @@ Jahresansicht fuer Finanzen, Stromkosten und PV-Gestehungskosten.
 
 Jahresansicht fuer Fahrzeuge und Ladeenergie.
 
+### Year Zusätzliche Zähler
+
+<a href="./year-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./year-additional-meters.png" alt="Year Zusätzliche Zähler Tab" width="720">
+</a>
+
+Jahresansicht der zusätzlichen Zähler getrennt von den Hausverbrauchern.
+
 ## Month
 
 ### Month PV
@@ -105,6 +129,14 @@ Monatsansicht fuer Batterie, SOC und Speicherfluesse.
 </a>
 
 Monatsansicht fuer Finanzen, Strompreise und Stromkosten.
+
+### Month Zusätzliche Zähler
+
+<a href="./month-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./month-additional-meters.png" alt="Month Zusätzliche Zähler Tab" width="720">
+</a>
+
+Monatsansicht der zusätzlichen Kontroll- und Summenzähler.
 
 ## Today - Details
 
@@ -155,6 +187,14 @@ Tarife-Tab mit Preis- und Kostenansichten.
 </a>
 
 Ladepunkte-Tab mit Ladepunkt- und Fahrzeugdaten.
+
+### Today Details Zusätzliche Zähler
+
+<a href="./today-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./today-additional-meters.png" alt="Today Details Zusätzliche Zähler Tab" width="720">
+</a>
+
+Aktuelle Leistung und Tagesenergie der zusätzlichen Zähler ohne doppelte historische Consumer.
 
 ## Today
 

@@ -30,6 +30,22 @@ All-time finance view with cost and savings metrics.
 
 All-time plant-health view with long-range indicators.
 
+### All-Time Consumers
+
+<a href="./alltime-consumers.png" target="_blank" rel="noopener">
+  <img src="./alltime-consumers.png" alt="All-Time Consumers Tab" width="720">
+</a>
+
+All-time consumer energy with historical EXT and current Consumer series.
+
+### All-Time Additional Meters
+
+<a href="./alltime-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./alltime-additional-meters.png" alt="All-Time Additional Meters Tab" width="720">
+</a>
+
+All-time view of separately classified control and sum meters.
+
 ## Year
 
 ### Year PV
@@ -72,6 +88,14 @@ Yearly finance view with electricity costs and PV generation costs.
 
 Yearly vehicle and charging energy view.
 
+### Year Additional Meters
+
+<a href="./year-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./year-additional-meters.png" alt="Year Additional Meters Tab" width="720">
+</a>
+
+Year view of additional meters separately from home consumers.
+
 ## Month
 
 ### Month PV
@@ -105,6 +129,14 @@ Monthly battery, SOC, and storage flow view.
 </a>
 
 Monthly finance view with electricity prices and costs.
+
+### Month Additional Meters
+
+<a href="./month-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./month-additional-meters.png" alt="Month Additional Meters Tab" width="720">
+</a>
+
+Month view of additional control and sum meters.
 
 ## Today - Details
 
@@ -155,6 +187,14 @@ Tariffs tab with price and cost views.
 </a>
 
 Loadpoints tab with charging point and vehicle data.
+
+### Today Details Additional Meters
+
+<a href="./today-additional-meters.png" target="_blank" rel="noopener">
+  <img src="./today-additional-meters.png" alt="Today Details Additional Meters Tab" width="720">
+</a>
+
+Current power and daily energy of additional meters without duplicated historical Consumers.
 
 ## Today
 

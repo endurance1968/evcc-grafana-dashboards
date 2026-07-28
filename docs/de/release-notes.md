@@ -4,7 +4,9 @@ Englische Version: [release-notes.md](../en/release-notes.md).
 
 Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetrics-Basis zusammen.
 
-## Unreleased
+## V2026-07-28
+
+Relevante Commits: `10609e6`, `4bb01ee`, `fdb8093`, `fc4cdad`, `90c1dbf`, `42b748b`, `3e327e1`, `bf5ea36`.
 
 ### Neue Funktionen
 
@@ -22,6 +24,8 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 - Die Datenprüfung erkennt mehrere Rollup-Samples desselben Labelsatzes am selben lokalen Tag als kritischen Fehler.
 - Der Rollup-Scheduler schützt Schreibläufe mit einer Lock-Datei, verarbeitet standardmäßig nur abgeschlossene Tage und meldet Resets, Leistungsspitzen sowie fehlende Energie-Buckets.
 - Der vollständige Livecopy-Backfill wurde profiliert; die Titelkanonisierung läuft speicherschonend in MetricsQL und der normale Monats-Ersatzpfad bleibt kurz.
+- Grafana 13.0.1 bleibt die unterstützte Basis; derselbe Dashboard-Stand wurde zusätzlich unter Grafana 13.1.0 geprüft, ohne 13.1 vorauszusetzen.
+- Die kuratierte Screenshot-Galerie umfasst jetzt 25 aktuelle Ansichten einschließlich Consumer- und Zusatzzaehler-Tabs.
 
 ### Fehlerbehebungen
 

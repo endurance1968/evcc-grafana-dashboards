@@ -1,8 +1,8 @@
 /**
  * Script: capture-docs-screenshots.mjs
  * Purpose: Capture curated German dashboard screenshots for docs/screenshots.
- * Version: 2026.06.30.3
- * Last modified: 2026-06-30
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,8 +16,8 @@ import {
   requireEnv,
 } from "./_lib.mjs";
 
-const SCRIPT_VERSION = "2026.06.30.3";
-const SCRIPT_LAST_MODIFIED = "2026-06-30";
+const SCRIPT_VERSION = "2026.07.28.1";
+const SCRIPT_LAST_MODIFIED = "2026-07-28";
 
 loadEnvFile(parseArg("env", ".env.local"));
 
@@ -46,6 +46,8 @@ const capturePlan = [
       { file: "alltime-energy.png", tab: "Energie", viewport: desktop },
       { file: "alltime-finances.png", tab: "Finanzen", viewport: desktopTall },
       { file: "alltime-planthealth.png", tab: "Anlagengesundheit", viewport: desktop },
+      { file: "alltime-consumers.png", tab: "Verbraucher", viewport: desktop },
+      { file: "alltime-additional-meters.png", tab: "Zusätzliche Zähler", viewport: desktop },
     ],
   },
   {
@@ -56,6 +58,7 @@ const capturePlan = [
       { file: "year-battery.png", tab: "Speicher", viewport: desktop },
       { file: "year-finances.png", tab: "Finanzen", viewport: desktop },
       { file: "year-vehicles.png", tab: "Fahrzeuge", viewport: desktop },
+      { file: "year-additional-meters.png", tab: "Zusätzliche Zähler", viewport: desktop },
     ],
   },
   {
@@ -65,6 +68,7 @@ const capturePlan = [
       { file: "month-home.png", tab: "Haus", viewport: desktop },
       { file: "month-battery.png", tab: "Speicher", viewport: desktop },
       { file: "month-finances.png", tab: "Finanzen", viewport: desktop },
+      { file: "month-additional-meters.png", tab: "Zusätzliche Zähler", viewport: desktop },
     ],
   },
   {
@@ -76,6 +80,7 @@ const capturePlan = [
       { file: "today-consumption.png", tab: "Haus", viewport: desktop },
       { file: "today-tariffs.png", tab: "Tarife", viewport: desktop },
       { file: "today-loadpoints.png", tab: "Ladepunkte", viewport: desktop },
+      { file: "today-additional-meters.png", tab: "Zusätzliche Zähler", viewport: desktop },
     ],
   },
   {

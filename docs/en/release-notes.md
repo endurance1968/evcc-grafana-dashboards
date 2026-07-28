@@ -2,7 +2,9 @@
 
 These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 
-## Unreleased
+## V2026-07-28
+
+Relevant commits: `10609e6`, `4bb01ee`, `fdb8093`, `fc4cdad`, `90c1dbf`, `42b748b`, `3e327e1`, `bf5ea36`.
 
 ### New Features
 
@@ -20,6 +22,8 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 - Data validation treats multiple rollup samples for the same label set and local day as a critical error.
 - The rollup scheduler guards write runs with a lock file, accepts completed days only by default, and reports resets, power spikes, and missing energy buckets.
 - The complete livecopy backfill was profiled; title canonicalization runs memory-efficiently in MetricsQL and the normal monthly replacement path remains short.
+- Grafana 13.0.1 remains the supported baseline; the same dashboard revision was additionally validated on Grafana 13.1.0 without requiring 13.1.
+- The curated screenshot gallery now contains 25 current views, including Consumer and additional-meter tabs.
 
 ### Bug Fixes
 

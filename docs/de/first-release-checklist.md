@@ -93,7 +93,7 @@ Mindestens diese Punkte muessen vor dem ersten Endnutzer-Release erfuellt sein:
 - [x] taegliche Rollup-Aktualisierung getestet
 - [x] Windows- und Linux-Deployer getestet
 - [x] Lokalisierungs-Audit bei `0`
-- [ ] kuratierte Release-Screenshot-Serie unter [docs/screenshots](../screenshots/README.md) bildet den finalen sichtbaren Dashboard-Zustand ab, inklusive Tab-Navigation
+- [x] kuratierte Release-Screenshot-Serie unter [docs/screenshots](../screenshots/README.md) bildet den finalen sichtbaren Dashboard-Zustand ab, inklusive Tab-Navigation
 - [x] ein kompletter End-to-End-Migrationsdurchlauf wurde anhand der veroeffentlichten Doku abgeschlossen
 - [x] Read-only Live-Quellen-Render mit den echten Deploy-Overrides ist plausibel; neue optionale Funktionen ohne passende Live-Metrik sind nicht als live-validiert markiert
 
@@ -107,7 +107,7 @@ Aktuelle technische Nachweise:
 
 - Der vollständige Rollup verarbeitete 573 abgeschlossene Tage, 36.625 Samples und 1.388 Serien in 210,606 Sekunden bei 1.264 MB Spitzenspeicher.
 - `check_data.py --phase full` meldete insgesamt `OK`, keine doppelten Label-/Tageskombinationen sowie keine `host`- oder `db`-Labels.
-- Der verpflichtende Lauf `npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:18440` bestand in 520,4 Sekunden: 190 Python-Tests, 76 Dashboard-JSON-Dateien, 382 reale MetricsQL-Abfragen, 60 kritische Panels in sechs Dashboards, 17 zusaetzliche historische `Today - Details`-Panelpruefungen und wiederholtes `--replace-range` ohne Duplikate.
+- Der verpflichtende Lauf `npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:18440` bestand auf den finalen Release-Quellen in 521,3 Sekunden: 190 Python-Tests, 76 Dashboard-JSON-Dateien, 382 reale MetricsQL-Abfragen, 60 kritische Panels in sechs Dashboards, 17 zusaetzliche historische `Today - Details`-Panelpruefungen und wiederholtes `--replace-range` ohne Duplikate.
 - Der VRM-Import enthielt 383 Tage und 2.298 Samples. Alle sechs VRM-Metriken stimmten taggenau mit dem normalisierten Quellsnapshot überein; `missing=0`, `extra=0`, `duplicates=0`. Juni 2026 ergab 85,260% Wirkungsgrad gegenüber 85,3% Referenz, also 0,040 Prozentpunkte Abweichung.
 - Der Scheduler-Lock wies einen gleichzeitig gestarteten zweiten Schreiblauf ab. Der Voll-Backfill meldete zwei ignorierte Counter-Resets, keine Leistungsspitzen und 9.910 fehlende Energie-Buckets.
 - Die Consumer-Langzeitreihen enthalten 14 kanonische Titel. Die alte Schreibweise `Trocker` erscheint nach dem Vollersatz nur noch als `Trockner`; gemappte frühere EXT-Verbraucher werden nicht zusätzlich als EXT gezählt.
@@ -115,9 +115,9 @@ Aktuelle technische Nachweise:
 - Der EXT-zu-Consumer-Migrationstest pruefte unter beiden Grafana-Versionen den 25.07.2026 vor dem Rollenwechsel, den 27.07.2026 als Uebergangstag und die aktuelle Today-Ansicht gegen die Live-Kopie. Die vier Haus-Panels blieben in allen Fenstern gefuellt; 14 historische und 14 aktuelle Verbrauchertitel wurden ohne identische Doppeltitel sowie ohne Carport- oder Hauptverteiler-Summenzaehler geliefert.
 - Das Monats-Speicherlayout wurde bei 1280 Pixel Breite korrigiert: Kennzahlen und Tagesachsen überlappen sich nicht mehr.
 
-Frühere Installations-, Migrations- und Lokalisierungsnachweise bleiben gültig. Die Screenshots unter `docs/screenshots` bilden jedoch noch den vorherigen Release-Kandidaten ab und dürfen erst nach Oles manueller Sichtfreigabe aktualisiert und als final markiert werden.
+Frühere Installations-, Migrations- und Lokalisierungsnachweise bleiben gültig. Ole hat den finalen Dashboard-Stand am 2026-07-28 manuell freigegeben. Die kuratierte Galerie wurde danach vollständig neu erzeugt und umfasst 25 Ansichten einschließlich Consumer- und Zusatzzaehler-Tabs.
 
-Noch offen für das Release-Gate: Oles manuelle Sichtfreigabe, Aktualisierung der kuratierten Screenshots und Abschluss von Issue #30. Issue #35 bleibt ausdrücklich außerhalb dieses Release-Umfangs.
+Das Release-Gate ist vollständig erfüllt: Oles manuelle Sichtfreigabe liegt vor, 25 kuratierte Screenshots bilden den finalen Stand ab und der verpflichtende Rollup-Pfad bestand auf den finalen Quellen in 521,3 Sekunden. Issue #30 wird mit diesem Release geschlossen. Issue #35 bleibt ausdrücklich außerhalb dieses Release-Umfangs.
 Debian-13-Installationsnachweise vom 2026-05-29:
 
 - validiert in frischen `debian:trixie` Docker-Containern mit Debian `13.5` und `x86_64`

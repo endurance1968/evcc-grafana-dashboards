@@ -93,7 +93,7 @@ At minimum, do not publish a first end-user release until all of these are true:
 - [x] daily rollup refresh tested
 - [x] Windows and Linux deployers tested
 - [x] localization audit at `0`
-- [ ] curated release screenshot set under [docs/screenshots](../screenshots/README_EN.md) reflects the final visible dashboard state, including tab navigation state
+- [x] curated release screenshot set under [docs/screenshots](../screenshots/README_EN.md) reflects the final visible dashboard state, including tab navigation state
 - [x] one complete end-to-end migration walkthrough completed from the published docs
 - [x] Read-only live-source rendering with actual deploy overrides is plausible; new optional features without matching live metrics are not marked as live-validated
 
@@ -107,7 +107,7 @@ Current technical evidence:
 
 - The complete rollup processed 573 completed days, 36,625 samples, and 1,388 series in 210.606 seconds with 1,264 MB peak memory.
 - `check_data.py --phase full` reported overall `OK`, no duplicate label/day combinations, and no `host` or `db` labels.
-- The mandatory `npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:18440` run passed in 520.4 seconds: 190 Python tests, 76 dashboard JSON files, 382 real MetricsQL queries, 60 critical panels across six dashboards, 17 additional historical `Today - Details` panel checks, and repeated `--replace-range` without duplicates.
+- The mandatory `npm run test:rollup-path -- --strict-energy --vm-base-url http://127.0.0.1:18440` run passed on the final release sources in 521.3 seconds: 190 Python tests, 76 dashboard JSON files, 382 real MetricsQL queries, 60 critical panels across six dashboards, 17 additional historical `Today - Details` panel checks, and repeated `--replace-range` without duplicates.
 - The VRM import contained 383 days and 2,298 samples. All six VRM metrics matched the normalized source snapshot day by day with `missing=0`, `extra=0`, and `duplicates=0`. June 2026 produced 85.260% efficiency versus the 85.3% reference, a 0.040 percentage-point delta.
 - The scheduler lock rejected a concurrently started second write run. The full backfill reported two ignored counter resets, zero power spikes, and 9,910 missing energy buckets.
 - Consumer long-range series contain 14 canonical titles. The former `Trocker` spelling appears only as `Trockner` after full replacement; mapped former EXT consumers are not also counted as EXT.
@@ -115,9 +115,9 @@ Current technical evidence:
 - The EXT-to-Consumer migration test covered 2026-07-25 before the role change, 2026-07-27 as the cutover day, and the current Today view against the live-data copy under both Grafana versions. All four Home panels stayed populated; 14 historical and 14 current consumer titles were returned without identical duplicate titles and without Carport or Main Distribution sum meters.
 - The Month battery layout was corrected at 1280 pixels: metrics and daily axis labels no longer overlap.
 
-Earlier installation, migration, and localization evidence remains valid. The screenshots under `docs/screenshots` still represent the previous release candidate and must only be refreshed and marked final after Ole's manual visual approval.
+Earlier installation, migration, and localization evidence remains valid. Ole manually approved the final dashboard revision on 2026-07-28. The curated gallery was then regenerated completely and contains 25 views, including Consumer and additional-meter tabs.
 
-Still open for the release gate: Ole's manual visual approval, refreshed curated screenshots, and completion of issue #30. Issue #35 remains explicitly outside this release scope.
+The release gate is fully satisfied: Ole manually approved the final view, 25 curated screenshots represent the final revision, and the mandatory rollup path passed on the final sources in 521.3 seconds. Issue #30 is closed with this release. Issue #35 remains explicitly outside this release scope.
 Debian 13 install evidence from 2026-05-29:
 
 - validated in fresh `debian:trixie` Docker containers reporting Debian `13.5` and `x86_64`
