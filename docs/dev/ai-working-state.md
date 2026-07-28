@@ -19,7 +19,7 @@ This file is an internal handoff note for Codex continuation work. It is not end
 
 Repository: `D:\AI-Workspaces\evcc-grafana-dashboards`
 
-The July release candidate includes Consumer dashboards and rollups, Consumer/EXT migration mapping, Consumer title aliases, Today finance fixes, VRM energy-flow validation, scheduler/data-quality guards, deployer updates, and generated localizations.
+The July release candidate includes Consumer dashboards and rollups, Consumer/EXT migration mapping for both rollups and Today raw panels, Consumer title aliases, Today finance fixes, VRM energy-flow validation, scheduler/data-quality guards, deployer updates, and generated localizations.
 
 Issues #20, #21, and #22 were technically completed on 2026-07-28. Their Forgejo closure comments must reference the final commit and the evidence below.
 
@@ -33,7 +33,8 @@ Issues #20, #21, and #22 were technically completed on 2026-07-28. Their Forgejo
 - Data quality: overall `OK`, zero duplicate label/day combinations, zero `host` labels, zero `db` labels, two ignored counter resets, zero power spikes, 9,910 missing energy buckets.
 - Consumer titles: 14 canonical long-range titles; `Trocker` is merged into `Trockner` before daily integration.
 - VRM parity: 383 days, 2,298 samples, six metrics, zero missing/extra/duplicate days. June 2026 efficiency 85.260%, reference delta 0.040 percentage points.
-- Mandatory release path: 190 Python tests, 76 dashboard JSON files, 382 live MetricsQL queries, 58 critical rendered panels, repeated replace-range idempotence; result `OK` in 417.0 seconds on the final dashboard sources.
+- Mandatory release path: 190 Python tests, 76 dashboard JSON files, 382 live MetricsQL queries, 60 critical rendered panels plus 17 historical Today Details panels, repeated replace-range idempotence; result `OK` in 520.4 seconds on the final dashboard sources.
+- EXT-to-Consumer raw migration: both Grafana 13.0.1 and 13.1.0 passed current, pre-cutover (2026-07-25), and cutover-day (2026-07-27) livecopy renders. The four Home panels stayed populated; the explicit mapping returned 14 historical and 14 current titles without identical duplicates or filtered parent/sum meters.
 - The Month battery layout was visually checked at 1280 pixels after deployment; values and daily axis labels no longer overlap.
 
 ## Remaining Release Gate

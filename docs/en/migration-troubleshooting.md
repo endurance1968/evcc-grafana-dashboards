@@ -219,12 +219,13 @@ Important points:
 - Missing Consumer, AUX, or EXT series are not an error when EVCC does not write such meters.
 - Fix EVCC first when a name is wrong. New samples will then arrive correctly; historical values can be adjusted with `vm-rewrite-label-value.py` if needed.
 
-Starting with version 0.309.2, EVCC writes dedicated consumers as `consumersPower`. Historical devices that previously ran as additional meters under `extPower` are not renamed automatically. For a role change with an unchanged `title`, set `consumer_legacy_ext_regex` in the rollup configuration and recalculate the complete affected period with `--replace-range --write`. Consumer wins per sampling interval during overlap, and the mapped legacy title is not also written as an EXT rollup.
+Starting with version 0.309.2, EVCC writes dedicated consumers as `consumersPower`. Historical devices that previously ran as additional meters under `extPower` are not renamed automatically. For a role change with an unchanged `title`, set `consumer_legacy_ext_regex` in the rollup configuration and recalculate the complete affected period with `--replace-range --write`. Also set `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` to the same regex when deploying dashboards. Consumer wins per sampling interval during overlap, and the mapped legacy title is not also written as an EXT rollup.
 
 Dashboard blocklists only filter the dashboard view and do not delete data. Put them into `vm-dashboard-install.env`; the deployer applies them during dashboard import:
 
 ```env
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Dishwasher|Washing Machine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
@@ -232,7 +233,7 @@ DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|heat pump).*"
 ```
 
-`^none$` is the safe value for "filter nothing" because normal EVCC names should not match it. Quote regexes that contain `|`, spaces, or special characters. After changing a blocklist, redeploy the dashboards; no data migration is required for that.
+`^none$` is the safe value for "filter nothing" because normal EVCC names should not match it. For `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX`, the disabled default is `^$`. Quote regexes that contain `|`, spaces, or special characters. After changing a blocklist, redeploy the dashboards; no data migration is required for that. After adding a role-migration mapping, both redeployment and a complete rollup of the affected range are required.
 
 ### Excluding Sum And Parent Meters From Home Attribution
 
@@ -250,7 +251,7 @@ Choose exactly one non-overlapping level per hierarchy. If, for example, the sum
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Main.*|^Ground Floor Distribution$|^UPS$|^Laundry$"
 ```
 
-Always adapt the regex to the actual EVCC `title` values and the Consumer, EXT, or AUX roles. A filtered Consumer or AUX meter disappears from both the legend and home attribution. A filtered EXT meter disappears only from the separate additional-meter view. Historical merging of an identical EXT/Consumer `title` is handled by the rollup through `consumer_legacy_ext_regex`.
+Always adapt the regex to the actual EVCC `title` values and the Consumer, EXT, or AUX roles. A filtered Consumer or AUX meter disappears from both the legend and home attribution. A filtered EXT meter disappears only from the separate additional-meter view. Historical merging of an identical EXT/Consumer `title` is handled by the rollup through `consumer_legacy_ext_regex` and by the raw-data panels in `Today - Details` through the identical `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` dashboard variable.
 
 `Other` intentionally remains the difference between `homePower` and all included detail meters. It can therefore contain real conversion and distribution losses as well as loads without a dedicated meter, such as microinverter losses or a load connected to the wallbox feeder rather than to a wallbox itself. If the detail meters remaining after the blocklists exceed home consumption, the dashboard shows the red `Meter overlap` diagnostic; check the hierarchy, sign, and meter assignment in that case.
 

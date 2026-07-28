@@ -1,8 +1,8 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.07.27.3
- * Last modified: 2026-07-27
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -913,18 +913,22 @@ function validateDashboard(fileName, dashboard) {
   }
   if (fileName === "VM_EVCC_Today-Details.json") {
     assert(rawJson.includes("consumersPower_value"), failures, `${fileName}: Today Details must query EVCC consumersPower_value`);
+    const legacyExtVariable = dashboardVariables(dashboard).find((variable) => variable?.spec?.name === "consumerLegacyExtRegex");
+    assert(Boolean(legacyExtVariable), failures, `${fileName}: Today Details must define consumerLegacyExtRegex`);
+    assert(legacyExtVariable?.spec?.query === "^$", failures, `${fileName}: legacy EXT fallback must be disabled by default`);
     assert(!rawJson.includes('"refId": "otherPowersAux"'), failures, `${fileName}: Today Details must use one optional-meter-safe Other power query`);
     assert(!rawJson.includes('"refId": "otherPowersExt"'), failures, `${fileName}: Today Details must not duplicate Other power series`);
     assert(rawJson.includes('"refId":"meterOverlapCurrent"'), failures, `${fileName}: Current home distribution must expose meter overlap instead of silently clamping it`);
     assert(rawJson.includes('"refId":"meterOverlapEnergy"'), failures, `${fileName}: Home energy distribution must expose meter overlap instead of silently clamping it`);
-    assert(rawJson.includes("last_over_time(consumersPower_value") && rawJson.includes("[2m]"), failures, `${fileName}: Current home distribution must ignore stale role series`);
+    assert(rawJson.includes("last_over_time(consumersPower_value") && rawJson.includes("last_over_time(extPower_value") && rawJson.includes("[2m]"), failures, `${fileName}: Current home distribution must ignore stale role series`);
     const currentPowerPanel = panels.find((panel) => panel.title === "Home: Current power");
     assert(Boolean(currentPowerPanel), failures, `${fileName}: Current home distribution panel is missing`);
     for (const target of currentPowerPanel?.targets || []) {
       const querySpec = target?.raw?.spec?.query?.spec || target;
       assert(querySpec.range === true && querySpec.instant === false, failures, `${fileName}: Current home distribution target ${target.refId} must use range data so Grafana Today resolves lastNotNull at now`);
     }
-    assert(rawJson.includes("tracked = consumer or aux"), failures, `${fileName}: Consumer and AUX role changes must collapse by title`);
+    assert(rawJson.includes('title =~ \\"$consumerLegacyExtRegex\\"'), failures, `${fileName}: Today Details must restrict historical EXT fallback to configured Consumer titles`);
+    assert(rawJson.includes("tracked = consumer or legacy_ext or aux"), failures, `${fileName}: Consumer must take precedence over mapped legacy EXT and AUX by title`);
     assert(rawJson.includes('"title":"Additional meters"'), failures, `${fileName}: EXT meters must have a separate Additional meters tab`);
     assert(rawJson.includes("avg(homePower_value) - (sum(tracked) or on() vector(0))"), failures, `${fileName}: Home power timeline must retain signed residual values`);
   }

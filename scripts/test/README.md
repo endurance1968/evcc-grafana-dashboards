@@ -150,6 +150,8 @@ Checks:
 
 Zweck: disposable Grafana und VictoriaMetrics starten, Fixture-Daten importieren und die kritischen Dashboard-Panels browserbasiert rendern.
 
+Die Standard-Fixture bildet einen EXT-zu-Consumer-Rollenwechsel ab: Am Vortag existiert der Testverbraucher nur als `extPower_value`, am Tageswechsel ueberlappen Alt- und Neureihe, und am aktuellen Tag existiert er nur als `consumersPower_value`. Der normale Lauf rendert 60 kritische Panels und prueft danach die 17 kritischen `Today - Details`-Panels nochmals im reinen historischen EXT-Zeitfenster. Die Dashboard-Overrides werden standardmaessig aus `scripts/test/deploy-overrides.vm.default.json` geladen und koennen mit `--overrides=<datei>` ersetzt werden.
+
 Standard-Fixture mit AUX/EXT:
 
 ```bash

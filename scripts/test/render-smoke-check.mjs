@@ -1,8 +1,8 @@
 /**
  * Script: render-smoke-check.mjs
  * Purpose: Open imported Grafana dashboards in a browser and fail on rendered panel errors.
- * Version: 2026.06.03.2
- * Last modified: 2026-06-03
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import path from "node:path";
 import { chromium } from "playwright";
@@ -24,6 +24,7 @@ const orgId = optionalEnv("GRAFANA_ORG_ID", "1");
 const waitMs = Number(parseArg("wait-ms", optionalEnv("GRAFANA_RENDER_SMOKE_WAIT_MS", optionalEnv("GRAFANA_SCREENSHOT_WAIT_MS", "3500"))));
 const overrideFrom = parseArg("from", "");
 const overrideTo = parseArg("to", "");
+const dashboardFile = parseArg("dashboard-file", "").trim();
 const failNoData = parseArg("fail-no-data", "true") !== "false";
 const failQueryErrors = parseArg("fail-query-errors", "true") !== "false";
 const failPageErrors = parseArg("fail-page-errors", "false") === "true";
@@ -220,6 +221,14 @@ const criticalPanelsByFile = {
     {
       "id": 36,
       "title": "Home: Power"
+    },
+    {
+      "id": 37,
+      "title": "Home: Energy distribution"
+    },
+    {
+      "id": 38,
+      "title": "Home: Energy"
     },
     {
       "id": 20,
@@ -583,6 +592,8 @@ async function checkSoloPanel(page, dashboard, panel) {
 
 async function main() {
   const manifest = readJson(manifestPath);
+  const dashboards = (manifest.dashboards || []).filter((dashboard) => !dashboardFile || sourceFileName(dashboard) === dashboardFile);
+  if (dashboardFile && dashboards.length === 0) throw new Error(`Dashboard file not found in manifest: ${dashboardFile}`);
   let failures = 0;
   let checkedPanels = 0;
 
@@ -593,7 +604,7 @@ async function main() {
   try {
     await login(page);
 
-    for (const dashboard of manifest.dashboards || []) {
+    for (const dashboard of dashboards) {
       const fileName = sourceFileName(dashboard);
       const criticalPanels = criticalPanelsByFile[fileName] || [];
       try {
@@ -620,7 +631,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`Render smoke check passed: dashboards=${(manifest.dashboards || []).length}, criticalPanels=${checkedPanels}`);
+  console.log(`Render smoke check passed: dashboards=${dashboards.length}, criticalPanels=${checkedPanels}`);
 }
 
 main().catch((error) => {

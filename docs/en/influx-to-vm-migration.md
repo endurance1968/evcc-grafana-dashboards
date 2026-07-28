@@ -237,6 +237,8 @@ When an end consumer previously ran as `ext` and is now configured as `consumer`
 consumer_legacy_ext_regex = ^(Dishwasher|Washing Machine)$
 ```
 
+Use the same regex as `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` during dashboard deployment. The rollup supplies Month, Year, and All-time data; the dashboard variable continues historical `extPower` raw data in `Today - Details`. Consumer wins during overlap in both paths. Keep both values at `^$` when no role migration exists.
+
 The rollup then continues legacy EXT power and current Consumer power under `evcc_consumer_energy_daily_wh`. Consumer wins per sampling interval during overlap, and the mapped title is excluded from `evcc_ext_energy_daily_wh` at the same time. Never include distribution or sum meters in this regex.
 
 When a Consumer title was corrected or renamed, `consumer_title_aliases_json` can merge old and current spellings before daily integration. Example: `{"Dryr":"Dryer"}`. The current target title wins during temporal overlap. Recalculate the complete affected range after a title rename as well.

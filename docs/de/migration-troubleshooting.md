@@ -221,12 +221,13 @@ Wichtig:
 - Fehlende Consumer-, AUX- oder EXT-Serien sind kein Fehler, wenn EVCC keine solchen Meter schreibt.
 - Aendere zuerst EVCC, wenn ein Name falsch ist. Danach kommen neue Messwerte korrekt an; historische Werte koennen bei Bedarf mit `vm-rewrite-label-value.py` nachgezogen werden.
 
-EVCC schreibt ab Version 0.309.2 echte Verbraucher als `consumersPower`. Historische Geraete, die vorher als zusaetzliche Zaehler unter `extPower` liefen, werden dadurch nicht automatisch umbenannt. Setze fuer einen Rollenwechsel mit unveraendertem `title` im Rollup `consumer_legacy_ext_regex` und berechne den kompletten betroffenen Zeitraum mit `--replace-range --write` neu. Consumer gewinnt bei Ueberlappung pro Messintervall; der zugeordnete Alt-Titel wird nicht zusaetzlich als EXT-Rollup geschrieben.
+EVCC schreibt ab Version 0.309.2 echte Verbraucher als `consumersPower`. Historische Geraete, die vorher als zusaetzliche Zaehler unter `extPower` liefen, werden dadurch nicht automatisch umbenannt. Setze fuer einen Rollenwechsel mit unveraendertem `title` im Rollup `consumer_legacy_ext_regex` und berechne den kompletten betroffenen Zeitraum mit `--replace-range --write` neu. Setze beim Dashboard-Deployment zusaetzlich `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` auf dieselbe Regex. Consumer gewinnt bei Ueberlappung pro Messintervall; der zugeordnete Alt-Titel wird nicht zusaetzlich als EXT-Rollup geschrieben.
 
 Dashboard-Blocklists filtern nur die Anzeige und loeschen keine Daten. Sie gehoeren in `vm-dashboard-install.env` und werden beim Dashboard-Deployment uebernommen:
 
 ```env
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Spuelmaschine|Waschmaschine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
@@ -234,7 +235,7 @@ DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|heat pump).*"
 ```
 
-`^none$` ist der sichere Wert fuer "nichts filtern", weil normale EVCC-Namen dadurch nicht matchen. Wenn du Regexes mit `|`, Leerzeichen oder Sonderzeichen nutzt, setze sie in Anfuehrungszeichen. Nach einer Blocklist-Aenderung reicht ein erneutes Dashboard-Deployment; Daten muessen dafuer nicht migriert werden.
+`^none$` ist der sichere Wert fuer "nichts filtern", weil normale EVCC-Namen dadurch nicht matchen. Fuer `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` ist dagegen `^$` der deaktivierte Standard. Wenn du Regexes mit `|`, Leerzeichen oder Sonderzeichen nutzt, setze sie in Anfuehrungszeichen. Nach einer Blocklist-Aenderung reicht ein erneutes Dashboard-Deployment; Daten muessen dafuer nicht migriert werden. Nach einer Rollenwechsel-Zuordnung sind sowohl das erneute Deployment als auch der vollstaendige Rollup des betroffenen Zeitraums erforderlich.
 
 ### Summen- und Elternzaehler aus der Hausaufteilung entfernen
 
@@ -252,7 +253,7 @@ Waehle pro Hierarchie genau eine nicht ueberlappende Ebene. Wenn beispielsweise 
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*|^EG-Verteiler$|^USV$|^Waschraum$"
 ```
 
-Passe die Regex immer an die tatsaechlichen EVCC-`title`-Werte und die Rollen Consumer, EXT oder AUX an. Ein gefilterter Consumer- oder AUX-Zaehler verschwindet aus Legende und Hausaufteilung. Ein gefilterter EXT-Zaehler verschwindet nur aus der getrennten Zusatzzaehleransicht. Die historische Zusammenfuehrung eines identischen EXT-/Consumer-`title` erfolgt im Rollup ueber `consumer_legacy_ext_regex`.
+Passe die Regex immer an die tatsaechlichen EVCC-`title`-Werte und die Rollen Consumer, EXT oder AUX an. Ein gefilterter Consumer- oder AUX-Zaehler verschwindet aus Legende und Hausaufteilung. Ein gefilterter EXT-Zaehler verschwindet nur aus der getrennten Zusatzzaehleransicht. Die historische Zusammenfuehrung eines identischen EXT-/Consumer-`title` erfolgt im Rollup ueber `consumer_legacy_ext_regex` und in den Rohdaten-Panels von `Today - Details` ueber die identische Dashboard-Variable `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX`.
 
 `Sonstiges` bleibt bewusst die Differenz zwischen `homePower` und allen einbezogenen Detailzaehlern. Darin koennen deshalb reale Umwandlungs- und Verteilverluste sowie nicht separat gemessene Verbraucher enthalten sein, zum Beispiel MPII-Verluste oder ein Verbraucher am Wallbox-Zuleitungszweig. Uebersteigen die nach den Blocklists verbleibenden Detailzaehler den Hausverbrauch, zeigt das Dashboard die rote Diagnose `Zaehlerueberlappung`; dann sind Hierarchie, Vorzeichen oder Messpunktzuordnung zu pruefen.
 

@@ -239,6 +239,8 @@ Wenn ein Endverbraucher frueher als `ext` lief und nun unter demselben EVCC-`tit
 consumer_legacy_ext_regex = ^(Spuelmaschine|Waschmaschine)$
 ```
 
+Uebernimm dieselbe Regex beim Dashboard-Deployment in `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX`. Der Rollup stellt damit Monats-, Jahres- und Gesamtzeitraumdaten bereit; die Dashboard-Variable fuehrt die historischen `extPower`-Rohdaten in `Today - Details` fort. In beiden Pfaden gewinnt Consumer bei Ueberlappung. Ohne Rollenwechsel bleiben beide Werte auf `^$`.
+
 Der Rollup fuehrt dann die alte EXT-Leistung und die neue Consumer-Leistung unter `evcc_consumer_energy_daily_wh` fort. Bei zeitlicher Ueberlappung gewinnt der Consumer-Wert pro Messintervall; der zugeordnete Titel wird gleichzeitig aus `evcc_ext_energy_daily_wh` entfernt. Verteiler- und Summenzaehler duerfen nicht in diesen Regex aufgenommen werden.
 
 Wurde ein Consumer-Titel korrigiert oder umbenannt, kann `consumer_title_aliases_json` alte und neue Schreibweisen vor der Tagesintegration zusammenführen. Beispiel: `{"Trocker":"Trockner"}`. Der aktuelle Zieltitel hat bei zeitlicher Überlappung Vorrang. Berechne auch nach einer Titelumbenennung den vollständigen betroffenen Zeitraum neu.

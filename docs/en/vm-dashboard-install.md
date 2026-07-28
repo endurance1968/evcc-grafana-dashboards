@@ -156,6 +156,7 @@ DASHBOARD_STORAGE_CAPACITY_WH=9500
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Dishwasher|Washing Machine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
@@ -168,6 +169,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 Quote regex values containing `|`, `(`, `)`, spaces, or non-ASCII characters so the Bash deployer can source the env file safely.
 
 The blocklist and heat-pump values are regexes against existing EVCC labels. They do not rename series and do not delete data; they only control what the dashboards show or filter out of totals. `^none$` is the recommended value when nothing should be filtered. If detail panels look empty or wrongly grouped, first check the EVCC labels in [migration-troubleshooting.md#business-labels-titles-and-blocklists](./migration-troubleshooting.md#business-labels-titles-and-blocklists).
+
+`DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` is not a blocklist. It maps former `extPower` titles to today's Consumers for historical raw views and must match `consumer_legacy_ext_regex` in the rollup configuration. Consumer wins during overlap. Use `^$` when no role migration exists, and never include distribution or sum meters.
 
 Backward-compatible aliases are still accepted:
 

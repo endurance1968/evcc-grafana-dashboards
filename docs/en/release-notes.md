@@ -7,7 +7,7 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 ### New Features
 
 - Dedicated EVCC Consumers are available in `Today - Details`, `Month`, `Year`, and `All-time`, separately from AUX and EXT.
-- Historical EXT consumers can continue under the same Consumer title through `consumer_legacy_ext_regex`; overlap is deterministically deduplicated in favor of Consumer.
+- Historical EXT consumers can continue under the same Consumer title through `consumer_legacy_ext_regex` and the matching `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` dashboard variable; this covers rollups and the raw-data panels in `Today - Details`, with overlap deterministically deduplicated in favor of Consumer.
 - Renamed Consumer titles can be canonicalized before daily integration through `consumer_title_aliases_json`.
 - The optional VRM energy-flow import includes a day-level source-to-VM validator for all six helper metrics.
 
@@ -29,6 +29,7 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 
 - After an EXT-to-Consumer role change, recalculate the complete affected range. `--replace-range --write` is safe only with complete raw history because it deletes existing rollups before rebuilding them.
 - `consumer_legacy_ext_regex` must contain only former end consumers, never distribution or sum meters.
+- `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` must be set to the same regex during dashboard deployment; keep both settings at `^$` when no role migration exists.
 
 ## V2026-06-30
 

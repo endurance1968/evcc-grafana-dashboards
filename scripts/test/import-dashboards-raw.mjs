@@ -1,8 +1,8 @@
 /**
  * Script: import-dashboards-raw.mjs
  * Purpose: Import raw dashboard JSON files into Grafana and emit an import manifest.
- * Version: 2026.06.23.1
- * Last modified: 2026-06-23
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -52,6 +52,8 @@ const folderTitle = optionalEnv("GRAFANA_TEST_FOLDER_TITLE", "EVCC Test");
 const manifestOut = parseArg("manifest", `tests/artifacts/import-manifest-${tag}.json`);
 const titlePrefix = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX", "");
 const titlePrefixMode = optionalEnv("GRAFANA_DASHBOARD_TITLE_PREFIX_MODE", "tag").trim().toLowerCase();
+const overridesArg = parseArg("overrides", "").trim();
+const variableOverrides = overridesArg ? (readJson(path.resolve(overridesArg)).variables || {}) : {};
 
 const dsMap = {
   "DS_VM-EVCC": optionalEnv("GRAFANA_DS_VM_EVCC_UID", "vm-evcc"),
@@ -202,8 +204,26 @@ function prepareV2Dashboard(raw, filePath) {
   return deepReplaceDataSourcePlaceholders(dashboard, dsMap);
 }
 
+function applyVariableOverrides(dashboard) {
+  const variables = isV2Dashboard(dashboard)
+    ? dashboard?.spec?.variables || []
+    : dashboard?.templating?.list || [];
+  for (const variable of variables) {
+    const spec = isV2Dashboard(dashboard) ? variable?.spec : variable;
+    const name = spec?.name;
+    if (!name || !Object.hasOwn(variableOverrides, name)) continue;
+    const value = String(variableOverrides[name] ?? "");
+    if (!value) continue;
+    spec.query = value;
+    spec.current = { text: value, value, selected: true };
+    spec.options = [{ text: value, value, selected: true }];
+  }
+  return dashboard;
+}
+
 function prepareDashboard(raw, filePath) {
-  return isV2Dashboard(raw) ? prepareV2Dashboard(raw, filePath) : prepareClassicDashboard(raw, filePath);
+  const prepared = isV2Dashboard(raw) ? prepareV2Dashboard(raw, filePath) : prepareClassicDashboard(raw, filePath);
+  return applyVariableOverrides(prepared);
 }
 
 function collectLibraryElements(rawDashboards) {

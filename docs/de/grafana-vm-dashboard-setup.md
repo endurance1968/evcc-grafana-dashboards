@@ -163,6 +163,7 @@ DASHBOARD_INSTALLED_WATT_PEAK=22
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Spuelmaschine|Waschmaschine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -173,6 +174,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 ```
 
 Wenn Summen- oder Elternzaehler und ihre Unterzaehler gleichzeitig unter Consumer, EXT oder AUX vorhanden sind, muessen sie mit der jeweiligen Blocklist auf eine nicht ueberlappende Ebene reduziert werden. Die Filter wirken auf die sichtbaren Reihen und auf `Sonstiges`; ein konkretes Verteiler-, USV- und Waschraum-Beispiel steht unter [Summen- und Elternzaehler aus der Hausaufteilung entfernen](./migration-troubleshooting.md#summen--und-elternzaehler-aus-der-hausaufteilung-entfernen).
+
+Bei einem EXT-zu-Consumer-Rollenwechsel muss `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` dieselben frueheren Endverbraucher wie `consumer_legacy_ext_regex` im Rollup enthalten. Damit bleiben historische Haus-Panels in `Today - Details` gefuellt. Consumer hat bei Ueberlappung Vorrang; Verteiler- und Summenzaehler duerfen nicht gemappt werden.
 
 Wenn die Dashboard-Dateien von einem selbst gehosteten Raw-Endpunkt statt von GitHub kommen sollen, wechsle den Source Mode auf `rawurl`:
 

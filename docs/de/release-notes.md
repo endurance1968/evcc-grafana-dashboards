@@ -9,7 +9,7 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 ### Neue Funktionen
 
 - Reguläre EVCC-Consumer werden in `Today - Details`, `Month`, `Year` und `All-time` getrennt von AUX und EXT ausgewertet.
-- Historische EXT-Verbraucher können über `consumer_legacy_ext_regex` lückenlos unter demselben Consumer-Titel fortgeführt werden; Überlappungen werden zugunsten der Consumer-Reihe dedupliziert.
+- Historische EXT-Verbraucher können über `consumer_legacy_ext_regex` und die gleich gesetzte Dashboard-Variable `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` lückenlos unter demselben Consumer-Titel fortgeführt werden; das gilt für Rollups und die Rohdaten-Panels in `Today - Details`, Überlappungen werden zugunsten der Consumer-Reihe dedupliziert.
 - Umbenannte Consumer-Titel können über `consumer_title_aliases_json` vor der Tagesintegration kanonisiert werden.
 - Der optionale VRM-Energieflussimport besitzt einen taggenauen Quell-/VM-Validator für alle sechs Hilfsmetriken.
 
@@ -31,6 +31,7 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 
 - Nach einem EXT-zu-Consumer-Rollenwechsel muss der komplette betroffene Zeitraum neu berechnet werden. `--replace-range --write` ist nur bei vollstaendiger Rohdatenhistorie sicher, weil vorhandene Rollups vor der Neuberechnung geloescht werden.
 - `consumer_legacy_ext_regex` darf nur echte frühere Endverbraucher enthalten, keine Verteiler- oder Summenzähler.
+- `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` muss beim Dashboard-Deployment auf dieselbe Regex gesetzt werden; ohne Rollenwechsel bleiben beide Einstellungen auf `^$`.
 
 ## V2026-06-30
 

@@ -77,6 +77,7 @@ DASHBOARD_STORAGE_CAPACITY_WH=9500
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Spuelmaschine|Waschmaschine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -87,6 +88,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 ```
 
 Summen- oder Elternzaehler lassen sich mit der Blocklist ihrer Consumer-, EXT- oder AUX-Rolle aus Anzeige und `Sonstiges` entfernen. Verwende je Messhierarchie nur eine Ebene; ein konkretes Beispiel steht unter [Summen- und Elternzaehler aus der Hausaufteilung entfernen](./migration-troubleshooting.md#summen--und-elternzaehler-aus-der-hausaufteilung-entfernen).
+
+Nach einem Rollenwechsel von EXT zu Consumer muss `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` exakt dieselben frueheren Endverbraucher enthalten wie `consumer_legacy_ext_regex` in der Rollup-Konfiguration. Dadurch zeigt `Today - Details` auch historische Rohdaten vor dem Wechsel; aktuelle Consumer-Samples haben bei Ueberlappung Vorrang. Der Standard `^$` deaktiviert den Fallback. Verteiler- und Summenzaehler duerfen nie enthalten sein.
 
 Die vollstaendige Liste steht in [vm-dashboard-install.md](./vm-dashboard-install.md) und in `vm-dashboard-install.env.example`. Jeder Env-Key darf nur einmal aktiv gesetzt sein; doppelte Keys werden abgelehnt.
 

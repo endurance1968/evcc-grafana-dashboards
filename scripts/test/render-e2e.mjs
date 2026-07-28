@@ -1,8 +1,8 @@
 /**
  * Script: render-e2e.mjs
  * Purpose: Run Grafana render smoke against disposable Grafana and VictoriaMetrics with fixture data.
- * Version: 2026.07.26.2
- * Last modified: 2026-07-26
+ * Version: 2026.07.28.1
+ * Last modified: 2026-07-28
  */
 import { spawnSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -374,7 +374,8 @@ function fixtureSeries(now, profile = "default") {
   const monthStartDays = [...new Map(days.map((day) => [`${day.getUTCFullYear()}-${day.getUTCMonth()}`, new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), 1))])).values()];
   addDailyRollupSeries(series, "evcc_pv_top5_mean_monthly_wh", {}, monthStartDays, (day, index) => dailyShape(30000, day, index));
 
-  const rawStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const rawStart = new Date(todayStart.getTime() - 24 * 60 * 60 * 1000);
   const rawStepMs = 5 * 60 * 1000;
   const rawTimestamps = Array.from(
     { length: Math.max(1, Math.floor((now.getTime() - rawStart.getTime()) / rawStepMs) + 1) },
@@ -384,6 +385,7 @@ function fixtureSeries(now, profile = "default") {
     rawTimestamps.push(now.getTime());
   }
   const rawValues = (value) => rawTimestamps.map((timestamp, index) => ({ timestamp, value: value + index }));
+  const rawValuesFor = (timestamps, value) => timestamps.map((timestamp, index) => ({ timestamp, value: value + index }));
   const boundedRatioValues = (value) => rawTimestamps.map((timestamp, index) => ({ timestamp, value: Math.min(1, value + (index % 8) * 0.005) }));
   addSeries(series, "pvPower_value", { id: "", title: "Gesamt" }, rawValues(5000));
   addSeries(series, "pvPower_value", { id: "pv1", title: "PV 1" }, rawValues(2200));
@@ -403,7 +405,10 @@ function fixtureSeries(now, profile = "default") {
   addSeries(series, "tariffFeedIn_value", {}, rawValues(0.08));
   addSeries(series, "tariffCo2_value", {}, rawValues(320));
   if (includeAuxExt) {
-    addSeries(series, "consumersPower_value", { title: "Office" }, rawValues(240));
+    const legacyConsumerTimestamps = rawTimestamps.filter((timestamp) => timestamp <= todayStart.getTime());
+    const currentConsumerTimestamps = rawTimestamps.filter((timestamp) => timestamp >= todayStart.getTime());
+    addSeries(series, "extPower_value", { title: "Office" }, rawValuesFor(legacyConsumerTimestamps, 240));
+    addSeries(series, "consumersPower_value", { title: "Office" }, rawValuesFor(currentConsumerTimestamps, 240));
     addSeries(series, "extPower_value", { title: "Server" }, rawValues(350));
     addSeries(series, "extPower_value", { title: "KWL" }, rawValues(180));
     addSeries(series, "auxPower_value", { title: "Aux" }, rawValues(90));
@@ -569,6 +574,7 @@ async function main() {
     manifest: parseArg("manifest", "tests/artifacts/import-manifest-vm-render-e2e.json"),
     waitMs: parseArg("wait-ms", "5000"),
     fixtureProfile: parseArg("fixture-profile", "default"),
+    overrides: parseArg("overrides", "scripts/test/deploy-overrides.vm.default.json"),
     keepDocker: hasFlag("keep-docker"),
   };
   const now = new Date(parseArg("fixture-now", new Date().toISOString()));
@@ -594,6 +600,7 @@ async function main() {
       `--source=${args.source}`,
       `--tag=${args.tag}`,
       `--manifest=${args.manifest}`,
+      `--overrides=${args.overrides}`,
     ], { env });
     try {
       run("node", [
@@ -601,6 +608,17 @@ async function main() {
         `--manifest=${args.manifest}`,
         `--wait-ms=${args.waitMs}`,
       ], { env });
+      if (args.fixtureProfile !== "no-aux-ext") {
+        const todayStart = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+        run("node", [
+          "scripts/test/render-smoke-check.mjs",
+          `--manifest=${args.manifest}`,
+          "--dashboard-file=VM_EVCC_Today-Details.json",
+          `--from=${new Date(todayStart - 24 * 60 * 60 * 1000).toISOString()}`,
+          `--to=${new Date(todayStart - 1).toISOString()}`,
+          `--wait-ms=${args.waitMs}`,
+        ], { env });
+      }
     } catch (error) {
       printDockerDiagnostics(dockerEnv);
       throw error;
@@ -609,8 +627,8 @@ async function main() {
     console.log("Render E2E");
     console.log("==========");
     console.log("Script:        render-e2e.mjs");
-    console.log("Version:       2026.07.26.2");
-    console.log("Last modified: 2026-07-26");
+    console.log("Version:       2026.07.28.1");
+    console.log("Last modified: 2026-07-28");
     console.log(`Fixture:       ${args.fixtureProfile}`);
     console.log("");
     console.log("Result");

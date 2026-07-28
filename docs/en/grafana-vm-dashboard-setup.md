@@ -161,6 +161,7 @@ DASHBOARD_INSTALLED_WATT_PEAK=22
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Dishwasher|Washing Machine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -171,6 +172,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 ```
 
 If sum or parent meters and their child meters exist under Consumer, EXT, or AUX at the same time, use the corresponding blocklist to select one non-overlapping level. The filters affect both the visible series and `Other`; see [Excluding Sum And Parent Meters From Home Attribution](./migration-troubleshooting.md#excluding-sum-and-parent-meters-from-home-attribution) for a concrete distribution, UPS, and laundry example.
+
+For an EXT-to-Consumer role change, `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` must contain the same former end consumers as `consumer_legacy_ext_regex` in the rollup. This keeps historical Home panels in `Today - Details` populated. Consumer takes precedence during overlap; never map distribution or sum meters.
 
 If the dashboard files should come from a self-hosted raw endpoint instead of GitHub, switch the source mode to `rawurl`:
 

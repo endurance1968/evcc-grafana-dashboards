@@ -75,6 +75,7 @@ DASHBOARD_STORAGE_CAPACITY_WH=9500
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Dishwasher|Washing Machine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
@@ -85,6 +86,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 ```
 
 Sum or parent meters can be removed from both the display and `Other` with the blocklist for their Consumer, EXT, or AUX role. Use only one level of each meter hierarchy; see [Excluding Sum And Parent Meters From Home Attribution](./migration-troubleshooting.md#excluding-sum-and-parent-meters-from-home-attribution) for a concrete example.
+
+After an EXT-to-Consumer role change, `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` must contain exactly the same former end consumers as `consumer_legacy_ext_regex` in the rollup configuration. This keeps historical raw data visible in `Today - Details`; current Consumer samples take precedence during overlap. The `^$` default disables the fallback. Never include distribution or sum meters.
 
 The full option list is in [vm-dashboard-install.md](./vm-dashboard-install.md) and the commented template is `vm-dashboard-install.env.example`. Define each env key only once; duplicate keys are rejected.
 

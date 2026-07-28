@@ -158,6 +158,7 @@ DASHBOARD_STORAGE_CAPACITY_WH=9500
 DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|wärmepumpe|heat pump).*"
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Spuelmaschine|Waschmaschine)$"
 DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
@@ -170,6 +171,8 @@ DASHBOARD_EVCC_URL=http://home:7070/#/
 Quote Regex-Werte mit `|`, `(`, `)`, Leerzeichen oder Nicht-ASCII-Zeichen, damit der Bash-Deployer die Env-Datei sicher sourcen kann.
 
 Die Blocklist- und Heat-Pump-Werte sind Regexes gegen vorhandene EVCC-Labels. Sie benennen keine Serien um und loeschen keine Daten; sie steuern nur, was die Dashboards anzeigen oder aus Summen herausfiltern. `^none$` ist der empfohlene Wert, wenn nichts gefiltert werden soll. Wenn Detailpanels leer oder falsch gruppiert wirken, pruefe zuerst die EVCC-Labels in [migration-troubleshooting.md#fachlabels-titles-und-blocklists](./migration-troubleshooting.md#fachlabels-titles-und-blocklists).
+
+`DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` ist keine Blocklist. Sie ordnet fruehere `extPower`-Titel den heutigen Consumern fuer historische Rohansichten zu und muss mit `consumer_legacy_ext_regex` im Rollup uebereinstimmen. Consumer gewinnt bei Ueberlappung. Nutze `^$`, wenn kein Rollenwechsel vorliegt, und nimm niemals Verteiler- oder Summenzaehler auf.
 
 Rueckwaertskompatible Aliase werden weiterhin akzeptiert:
 

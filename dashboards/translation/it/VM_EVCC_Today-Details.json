@@ -1113,7 +1113,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(delta, 0)",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  legacy_ext = avg by (title)(last_over_time(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or legacy_ext or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(delta, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "Altro",
@@ -1137,7 +1137,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(-delta, 0)",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  legacy_ext = avg by (title)(last_over_time(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or legacy_ext or aux,\n  home = avg(last_over_time(homePower_value[2m])),\n  delta = home - (sum(tracked) or on() vector(0))\n)\nclamp_min(-delta, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "Sovrapposizione contatori",
@@ -1161,7 +1161,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or aux\n)\nsort_by_label(tracked, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(last_over_time(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}[2m])),\n  legacy_ext = avg by (title)(last_over_time(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}[2m])),\n  aux = avg by (title)(last_over_time(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}[2m])),\n  tracked = consumer or legacy_ext or aux\n)\nsort_by_label(tracked, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -1287,7 +1287,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\navg(homePower_value) - (sum(tracked) or on() vector(0))",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or legacy_ext or aux\n)\navg(homePower_value) - (sum(tracked) or on() vector(0))",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "Altro",
@@ -1311,7 +1311,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\nsort_by_label(tracked, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or legacy_ext or aux\n)\nsort_by_label(tracked, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -1448,7 +1448,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(delta_energy, 0)",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or legacy_ext or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(delta_energy, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "Altro",
@@ -1472,7 +1472,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(-delta_energy, 0)",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or legacy_ext or aux,\n  delta = avg(homePower_value) - (sum(tracked) or on() vector(0)),\n  delta_energy = range_sum(integrate(delta)) / 3600\n)\nclamp_min(-delta_energy, 0)",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "Sovrapposizione contatori",
@@ -1496,7 +1496,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or aux\n)\nsort_by_label(range_sum(integrate(tracked)) / 3600, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"}),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"}),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"}),\n  tracked = consumer or legacy_ext or aux\n)\nsort_by_label(range_sum(integrate(tracked)) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -1622,7 +1622,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or aux\n)\nsum(integrate(avg(homePower_value) offset -1h)) / 3600 - (sum(integrate(tracked)) / 3600 or on() vector(0))",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or legacy_ext or aux\n)\nsum(integrate(avg(homePower_value) offset -1h)) / 3600 - (sum(integrate(tracked)) / 3600 or on() vector(0))",
                         "format": "time_series",
                         "interval": "1h",
                         "legendFormat": "Altro",
@@ -1646,7 +1646,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or aux\n)\nsort_by_label(integrate(tracked) / 3600, \"title\")",
+                        "expr": "WITH (\n  consumer = avg by (title)(consumersPower_value{title!=\"\", title !~ \"$consumerBlocklist\"} offset -1h),\n  legacy_ext = avg by (title)(extPower_value{title!=\"\", title =~ \"$consumerLegacyExtRegex\", title !~ \"$consumerBlocklist\"} offset -1h),\n  aux = avg by (title)(auxPower_value{title!=\"\", title !~ \"$auxBlocklist\"} offset -1h),\n  tracked = consumer or legacy_ext or aux\n)\nsort_by_label(integrate(tracked) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "1h",
                         "legendFormat": "{{title}}",
@@ -7076,6 +7076,29 @@
             {
               "value": "^none$",
               "text": "^none$",
+              "selected": false
+            }
+          ]
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "name": "consumerLegacyExtRegex",
+          "query": "^$",
+          "current": {
+            "selected": true,
+            "text": "^$",
+            "value": "^$"
+          },
+          "label": "Consumer legacy EXT match",
+          "hide": "hideVariable",
+          "skipUrlSync": true,
+          "description": "Former EXT titles that continue as Consumers under the same title. Consumer samples take precedence during overlap. Keep ^$ when no role migration exists and never include distribution or sum meters.",
+          "options": [
+            {
+              "value": "^$",
+              "text": "^$",
               "selected": false
             }
           ]
