@@ -219,14 +219,14 @@ Important points:
 - Missing Consumer, AUX, or EXT series are not an error when EVCC does not write such meters.
 - Fix EVCC first when a name is wrong. New samples will then arrive correctly; historical values can be adjusted with `vm-rewrite-label-value.py` if needed.
 
-Starting with version 0.309.2, EVCC writes dedicated consumers as `consumersPower`. Historical devices that previously ran as additional meters under `extPower` are not renamed automatically. For a role change with an unchanged `title`, set `consumer_legacy_ext_regex` in the rollup configuration and recalculate the complete affected period with `--replace-range --write`. Also set `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` to the same regex when deploying dashboards. Consumer wins per sampling interval during overlap, and the mapped legacy title is not also written as an EXT rollup.
+Starting with version 0.309.2, EVCC writes dedicated consumers as `consumersPower`. Historical devices that previously ran as additional meters under `extPower` are not renamed automatically. For a role change with an unchanged `title`, set `consumer_legacy_ext_regex` in the rollup configuration and recalculate the complete affected period with `--replace-range --write`. Also set `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` to the same regex when deploying dashboards. Consumer wins per sampling interval during overlap, and the mapped legacy title is shown neither as an EXT rollup nor in the raw EXT panels of `Today - Details`. Every unmatched `extPower` title remains a genuine additional meter.
 
 Dashboard blocklists only filter the dashboard view and do not delete data. Put them into `vm-dashboard-install.env`; the deployer applies them during dashboard import:
 
 ```env
-DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=".*Car.*|.*Main.*"
 DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Dishwasher|Washing Machine)$"
-DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
+DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
@@ -237,7 +237,7 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 ### Excluding Sum And Parent Meters From Home Attribution
 
-The Consumer and AUX blocklists apply to visible consumer series and to `Other`. EXT is intentionally separate: `extBlocklist` filters only the `Additional meters` tab, and EXT values are neither subtracted from home consumption nor summed as end consumers. No blocklist deletes VictoriaMetrics data.
+The Consumer and AUX blocklists apply to visible consumer series and to `Other`. EXT is intentionally separate: `extBlocklist` filters only the `Additional meters` tab, and EXT values are neither subtracted from home consumption nor summed as end consumers. To keep a genuine EXT sum or control meter visible there, remove it from `extBlocklist`. No blocklist deletes VictoriaMetrics data.
 
 Concrete use case: A sum meter and its child meters must not contribute to home attribution at the same time. Typical overlapping hierarchies include:
 

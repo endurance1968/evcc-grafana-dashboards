@@ -16,6 +16,7 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 ### Verbesserungen
 
 - EXT-Zähler besitzen eigene Ansichten als zusätzliche Zähler und beeinflussen `Sonstiges` oder die Hausverbraucherbilanz nicht mehr.
+- Als historische Consumer zugeordnete EXT-Titel werden auch in den Rohdaten-Panels nicht mehr zusätzlich als EXT angezeigt; nicht zugeordnete Kontroll- und Summenzähler bleiben als zusätzliche Zähler sichtbar.
 - Today-Finanzwerte verwenden dieselbe Vorzeichenkonvention wie die Langzeit-Rollups: Bezugskosten negativ, Einspeisegutschrift positiv und Bilanz als Summe beider Werte.
 - Englische Quelldashboards werden statisch auf bekannte deutsche Endusertexte und veraltete Repository-Links geprüft.
 - Die Datenprüfung erkennt mehrere Rollup-Samples desselben Labelsatzes am selben lokalen Tag als kritischen Fehler.
@@ -32,6 +33,7 @@ Diese Hinweise fassen die oeffentlichen EVCC-Dashboard-Releases auf VictoriaMetr
 - Nach einem EXT-zu-Consumer-Rollenwechsel muss der komplette betroffene Zeitraum neu berechnet werden. `--replace-range --write` ist nur bei vollstaendiger Rohdatenhistorie sicher, weil vorhandene Rollups vor der Neuberechnung geloescht werden.
 - `consumer_legacy_ext_regex` darf nur echte frühere Endverbraucher enthalten, keine Verteiler- oder Summenzähler.
 - `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` muss beim Dashboard-Deployment auf dieselbe Regex gesetzt werden; ohne Rollenwechsel bleiben beide Einstellungen auf `^$`.
+- `DASHBOARD_FILTER_EXT_BLOCKLIST` filtert nur die separate Zusatzzaehleransicht. Verwende `^none$`, wenn echte EXT-Kontroll- und Summenzaehler dort sichtbar bleiben sollen.
 
 ## V2026-06-30
 

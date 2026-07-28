@@ -6344,7 +6344,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(last_over_time(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}[2m])), \"title\")",
+                        "expr": "sort_by_label(avg by (title)(last_over_time(extPower_value{title!=\"\", title !~ \"$consumerLegacyExtRegex\", title !~ \"$extBlocklist\"}[2m])), \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -6470,7 +6470,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}), \"title\")",
+                        "expr": "sort_by_label(avg by (title)(extPower_value{title!=\"\", title !~ \"$consumerLegacyExtRegex\", title !~ \"$extBlocklist\"}), \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -6607,7 +6607,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_by_label(range_sum(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"}))) / 3600, \"title\")",
+                        "expr": "sort_by_label(range_sum(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$consumerLegacyExtRegex\", title !~ \"$extBlocklist\"}))) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "$energySampleInterval",
                         "legendFormat": "{{title}}",
@@ -6733,7 +6733,7 @@
                       "version": "v0",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "sort_by_label(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$extBlocklist\"} offset -1h)) / 3600, \"title\")",
+                        "expr": "sort_by_label(integrate(avg by (title)(extPower_value{title!=\"\", title !~ \"$consumerLegacyExtRegex\", title !~ \"$extBlocklist\"} offset -1h)) / 3600, \"title\")",
                         "format": "time_series",
                         "interval": "1h",
                         "legendFormat": "{{title}}",

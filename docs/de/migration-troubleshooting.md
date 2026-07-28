@@ -221,14 +221,14 @@ Wichtig:
 - Fehlende Consumer-, AUX- oder EXT-Serien sind kein Fehler, wenn EVCC keine solchen Meter schreibt.
 - Aendere zuerst EVCC, wenn ein Name falsch ist. Danach kommen neue Messwerte korrekt an; historische Werte koennen bei Bedarf mit `vm-rewrite-label-value.py` nachgezogen werden.
 
-EVCC schreibt ab Version 0.309.2 echte Verbraucher als `consumersPower`. Historische Geraete, die vorher als zusaetzliche Zaehler unter `extPower` liefen, werden dadurch nicht automatisch umbenannt. Setze fuer einen Rollenwechsel mit unveraendertem `title` im Rollup `consumer_legacy_ext_regex` und berechne den kompletten betroffenen Zeitraum mit `--replace-range --write` neu. Setze beim Dashboard-Deployment zusaetzlich `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` auf dieselbe Regex. Consumer gewinnt bei Ueberlappung pro Messintervall; der zugeordnete Alt-Titel wird nicht zusaetzlich als EXT-Rollup geschrieben.
+EVCC schreibt ab Version 0.309.2 echte Verbraucher als `consumersPower`. Historische Geraete, die vorher als zusaetzliche Zaehler unter `extPower` liefen, werden dadurch nicht automatisch umbenannt. Setze fuer einen Rollenwechsel mit unveraendertem `title` im Rollup `consumer_legacy_ext_regex` und berechne den kompletten betroffenen Zeitraum mit `--replace-range --write` neu. Setze beim Dashboard-Deployment zusaetzlich `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` auf dieselbe Regex. Consumer gewinnt bei Ueberlappung pro Messintervall; der zugeordnete Alt-Titel wird weder als EXT-Rollup noch in den EXT-Rohdaten-Panels von `Today - Details` angezeigt. Alle nicht zugeordneten `extPower`-Titel bleiben echte zusaetzliche Zaehler.
 
 Dashboard-Blocklists filtern nur die Anzeige und loeschen keine Daten. Sie gehoeren in `vm-dashboard-install.env` und werden beim Dashboard-Deployment uebernommen:
 
 ```env
-DASHBOARD_FILTER_CONSUMER_BLOCKLIST=^none$
+DASHBOARD_FILTER_CONSUMER_BLOCKLIST=".*Car.*|.*Haupt.*"
 DASHBOARD_CONSUMER_LEGACY_EXT_REGEX="^(Spuelmaschine|Waschmaschine)$"
-DASHBOARD_FILTER_EXT_BLOCKLIST=".*Car.*|.*Haupt.*"
+DASHBOARD_FILTER_EXT_BLOCKLIST=^none$
 DASHBOARD_FILTER_AUX_BLOCKLIST=^none$
 DASHBOARD_FILTER_LOADPOINT_BLOCKLIST=^none$
 DASHBOARD_FILTER_VEHICLE_BLOCKLIST=^none$
@@ -239,7 +239,7 @@ DASHBOARD_HEAT_PUMP_LOADPOINT_REGEX="(?i).*(daikin-wp|wp|warmepumpe|waermepumpe|
 
 ### Summen- und Elternzaehler aus der Hausaufteilung entfernen
 
-Die Consumer- und AUX-Blocklists gelten fuer die sichtbaren Verbrauchsreihen und fuer `Sonstiges`. EXT ist fachlich getrennt: `extBlocklist` filtert nur den Tab `Zusaetzliche Zaehler`, und EXT-Werte werden weder vom Hausverbrauch abgezogen noch als Endverbraucher summiert. Keine Blocklist loescht Daten aus VictoriaMetrics.
+Die Consumer- und AUX-Blocklists gelten fuer die sichtbaren Verbrauchsreihen und fuer `Sonstiges`. EXT ist fachlich getrennt: `extBlocklist` filtert nur den Tab `Zusaetzliche Zaehler`, und EXT-Werte werden weder vom Hausverbrauch abgezogen noch als Endverbraucher summiert. Soll ein echter EXT-Summen- oder Kontrollzaehler dort sichtbar bleiben, muss er deshalb aus `extBlocklist` entfernt werden. Keine Blocklist loescht Daten aus VictoriaMetrics.
 
 Konkreter Anwendungsfall: Ein Summenzaehler und seine Unterzaehler duerfen nicht gleichzeitig in die Hausaufteilung eingehen. Typische ueberlappende Hierarchien sind:
 

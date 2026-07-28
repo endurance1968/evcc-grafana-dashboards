@@ -14,6 +14,7 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 ### Improvements
 
 - EXT meters have separate additional-meter views and no longer affect `Other` or the home-consumer balance.
+- EXT titles mapped as historical Consumers are no longer repeated in the raw EXT panels; unmatched control and sum meters remain visible as additional meters.
 - Today finance values use the same sign convention as long-range rollups: purchase costs negative, feed-in credit positive, and balance as their sum.
 - A static source audit rejects known German end-user text and stale repository links in English dashboard sources.
 - Data validation treats multiple rollup samples for the same label set and local day as a critical error.
@@ -30,6 +31,7 @@ These notes summarize the public VictoriaMetrics-based EVCC dashboard releases.
 - After an EXT-to-Consumer role change, recalculate the complete affected range. `--replace-range --write` is safe only with complete raw history because it deletes existing rollups before rebuilding them.
 - `consumer_legacy_ext_regex` must contain only former end consumers, never distribution or sum meters.
 - `DASHBOARD_CONSUMER_LEGACY_EXT_REGEX` must be set to the same regex during dashboard deployment; keep both settings at `^$` when no role migration exists.
+- `DASHBOARD_FILTER_EXT_BLOCKLIST` filters only the separate additional-meter view. Use `^none$` when genuine EXT control and sum meters should remain visible there.
 
 ## V2026-06-30
 

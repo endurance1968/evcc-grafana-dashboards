@@ -1,7 +1,7 @@
 /**
  * Script: dashboard-semantic-check.mjs
  * Purpose: Validate static dashboard semantics that basic JSON parsing cannot catch.
- * Version: 2026.07.28.1
+ * Version: 2026.07.28.2
  * Last modified: 2026-07-28
  */
 import fs from "node:fs";
@@ -928,6 +928,7 @@ function validateDashboard(fileName, dashboard) {
       assert(querySpec.range === true && querySpec.instant === false, failures, `${fileName}: Current home distribution target ${target.refId} must use range data so Grafana Today resolves lastNotNull at now`);
     }
     assert(rawJson.includes('title =~ \\"$consumerLegacyExtRegex\\"'), failures, `${fileName}: Today Details must restrict historical EXT fallback to configured Consumer titles`);
+    assert(rawJson.includes('extPower_value{title!=\\"\\", title !~ \\"$consumerLegacyExtRegex\\", title !~ \\"$extBlocklist\\"}'), failures, `${fileName}: Additional meters must exclude EXT titles mapped to historical Consumers before applying the EXT display blocklist`);
     assert(rawJson.includes("tracked = consumer or legacy_ext or aux"), failures, `${fileName}: Consumer must take precedence over mapped legacy EXT and AUX by title`);
     assert(rawJson.includes('"title":"Additional meters"'), failures, `${fileName}: EXT meters must have a separate Additional meters tab`);
     assert(rawJson.includes("avg(homePower_value) - (sum(tracked) or on() vector(0))"), failures, `${fileName}: Home power timeline must retain signed residual values`);
